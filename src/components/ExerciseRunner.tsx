@@ -12,6 +12,7 @@ import ScenarioDialogue from './dialogue/ScenarioDialogue';
 import { playAudio } from '../lib/audio';
 import ConjugationTable from './grammar/ConjugationTable';
 import { getLocalizedText } from '../lib/i18n/utils';
+import { renderArabiziWithBadges } from './ui/PhoneticBadge';
 
 interface ExerciseRunnerProps {
   lesson: Lesson;
@@ -36,7 +37,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
   const [xpGained, setXpGained] = useState(0);
   const [isLessonFinished, setIsLessonFinished] = useState(false);
 
-  const { preferredNotation, addXp, soundEnabled } = useAppStore();
+  const { preferredNotation, addXp, soundEnabled, audioSpeed, setAudioSpeed } = useAppStore();
   const step = lesson.steps[currentStepIndex];
   const progress = ((currentStepIndex) / lesson.steps.length) * 100;
 
@@ -55,9 +56,8 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
     } else if (type === 'fill-blank') {
       correct = selectedBlankId === answer;
     } else if (type === 'matching' || type === 'match') {
-      // Pour chaque paire, vérifier si match.
       const correctMapping = step.exercise.pairs?.reduce((acc, p) => {
-        acc[p.id] = p.id; // L'ID gauche correspond à l'ID droit
+        acc[p.id] = p.id;
         return acc;
       }, {} as Record<string, string>) || {};
       
@@ -70,10 +70,10 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
     
     if (correct) {
       setXpGained(prev => prev + 10);
-      playAudio('correct', undefined, soundEnabled); // Need proper SFX urls, fallback to nothing
+      playAudio('correct', undefined, soundEnabled, audioSpeed);
     } else {
       setLives(prev => Math.max(0, prev - 1));
-      playAudio('error', undefined, soundEnabled);
+      playAudio('error', undefined, soundEnabled, audioSpeed);
     }
   };
 
@@ -86,7 +86,6 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
     setIsCorrect(false);
 
     if (lives === 0) {
-      // Échec de la leçon
       return;
     }
 
@@ -99,7 +98,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
   };
 
   const handlePlayAudio = (text: string, audioUrl?: string) => {
-    playAudio(text, audioUrl, soundEnabled);
+    playAudio(text, audioUrl, soundEnabled, audioSpeed);
   };
 
   if (lives === 0 && !isLessonFinished) {
@@ -162,8 +161,10 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
             >
               <Volume2 className="w-6 h-6" />
             </button>
-            <div className="text-5xl font-extrabold text-orange-600 mb-4 font-arabic">
-              {preferredNotation === 'arabic' ? step.content.arabic : step.content.arabizi}
+            <div className="text-5xl font-extrabold text-orange-600 mb-4 font-arabic flex items-center justify-center flex-wrap">
+              {preferredNotation === 'arabic' 
+                ? step.content.arabic 
+                : renderArabiziWithBadges(step.content.arabizi)}
             </div>
             <div className="text-xl text-slate-600 font-medium">{getLocalizedText(step.content.translation, lang)}</div>
           </div>
@@ -275,10 +276,19 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
             style={{ width: `${progress}%` }}
           />
         </div>
-        <div className="flex gap-1 items-center">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Heart key={i} className={`w-6 h-6 transition-all ${i < lives ? 'fill-red-500 text-red-500' : 'text-red-200'}`} />
-          ))}
+        <div className="flex gap-4 items-center">
+          <button 
+            onClick={() => setAudioSpeed(audioSpeed === 1.0 ? 0.75 : 1.0)}
+            className="text-slate-400 hover:text-slate-700 font-bold bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded-full text-sm transition-colors"
+            title="Vitesse de lecture"
+          >
+            {audioSpeed}x
+          </button>
+          <div className="flex gap-1 items-center">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Heart key={i} className={`w-6 h-6 transition-all ${i < lives ? 'fill-red-500 text-red-500' : 'text-red-200'}`} />
+            ))}
+          </div>
         </div>
       </header>
 

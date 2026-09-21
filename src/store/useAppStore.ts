@@ -9,6 +9,9 @@ interface AppState {
   // User Progress
   xp: number;
   streakDays: number;
+  streakFreezes: number;
+  activityDates: string[]; // ISO date strings
+  unlockedBadges: string[];
   currentLevel: number;
   completedLessons: string[];
   
@@ -18,13 +21,18 @@ interface AppState {
   // Settings
   preferredNotation: Notation;
   soundEnabled: boolean;
+  audioSpeed: number;
   uiLanguage: UILanguage;
   
   // Actions
   addXp: (amount: number) => void;
   completeLesson: (lessonId: string) => void;
+  unlockBadge: (badgeId: string) => void;
+  useStreakFreeze: () => void;
+  recordActivity: () => void;
   setNotation: (notation: Notation) => void;
   toggleSound: () => void;
+  setAudioSpeed: (speed: number) => void;
   setLanguage: (lang: UILanguage) => void;
   
   // SRS Actions
@@ -38,24 +46,69 @@ export const useAppStore = create<AppState>()(
     (set, get) => ({
       xp: 0,
       streakDays: 1,
+      streakFreezes: 1,
+      activityDates: [],
+      unlockedBadges: [],
       currentLevel: 1,
       completedLessons: [],
       srsDeck: {},
       preferredNotation: 'arabizi',
       soundEnabled: true,
+      audioSpeed: 1.0,
       uiLanguage: 'fr',
       
-      addXp: (amount) => set((state) => ({ xp: state.xp + amount })),
+      addXp: (amount) => set((state) => {
+        const newXp = state.xp + amount;
+        const newBadges = [...state.unlockedBadges];
+        if (newXp >= 500 && !newBadges.includes('polyglot')) {
+          newBadges.push('polyglot');
+        }
+        return { xp: newXp, unlockedBadges: newBadges };
+      }),
       
-      completeLesson: (lessonId) => set((state) => ({ 
-        completedLessons: state.completedLessons.includes(lessonId) 
-          ? state.completedLessons 
-          : [...state.completedLessons, lessonId] 
+      completeLesson: (lessonId) => set((state) => {
+        const completed = state.completedLessons.includes(lessonId)
+          ? state.completedLessons
+          : [...state.completedLessons, lessonId];
+          
+        const newBadges = [...state.unlockedBadges];
+        if (lessonId.includes('cafe') && !newBadges.includes('cafe_master')) {
+          newBadges.push('cafe_master');
+        }
+        if (lessonId.includes('taxi') && !newBadges.includes('taxi_ace')) {
+          newBadges.push('taxi_ace');
+        }
+        
+        return { completedLessons: completed, unlockedBadges: newBadges };
+      }),
+
+      unlockBadge: (badgeId) => set((state) => ({
+        unlockedBadges: state.unlockedBadges.includes(badgeId)
+          ? state.unlockedBadges
+          : [...state.unlockedBadges, badgeId]
       })),
+
+      useStreakFreeze: () => set((state) => ({
+        streakFreezes: Math.max(0, state.streakFreezes - 1)
+      })),
+
+      recordActivity: () => set((state) => {
+        const today = new Date().toISOString().split('T')[0];
+        if (state.activityDates.includes(today)) return state;
+        
+        // Simple streak logic: if yesterday is not in activityDates, check if streak freeze was used
+        // For simplicity in this demo, just add the date. Real app would calculate gap.
+        return { 
+          activityDates: [...state.activityDates, today],
+          streakDays: state.activityDates.length === 0 ? 1 : state.streakDays + 1
+        };
+      }),
       
       setNotation: (notation) => set({ preferredNotation: notation }),
       
       toggleSound: () => set((state) => ({ soundEnabled: !state.soundEnabled })),
+
+      setAudioSpeed: (speed) => set({ audioSpeed: speed }),
       
       setLanguage: (lang) => set({ uiLanguage: lang }),
       

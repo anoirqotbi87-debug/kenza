@@ -10,6 +10,10 @@ import { supabase } from '../lib/supabase';
 import { Session } from '@supabase/supabase-js';
 import { fullCurriculum, allLessonsList } from '../data/curriculum';
 import { getLocalizedText } from '../lib/i18n/utils';
+import Leaderboard from './gamification/Leaderboard';
+import BadgesList from './gamification/BadgesList';
+import StreakHeatmap from './gamification/StreakHeatmap';
+import SmartReviewSession from './srs/SmartReviewSession';
 
 interface DashboardProps {
   onStartLesson: (lessonId: string) => void;
@@ -19,6 +23,7 @@ export default function Dashboard({ onStartLesson }: DashboardProps) {
   const { xp, streakDays, completedLessons, preferredNotation, setNotation, toggleSound, soundEnabled } = useAppStore();
   const { t, lang } = useTranslation();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isReviewSessionOpen, setIsReviewSessionOpen] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
@@ -51,6 +56,10 @@ export default function Dashboard({ onStartLesson }: DashboardProps) {
         onClose={() => setIsAuthModalOpen(false)} 
         onSuccess={() => setIsAuthModalOpen(false)} 
       />
+
+      {isReviewSessionOpen && (
+        <SmartReviewSession onClose={() => setIsReviewSessionOpen(false)} />
+      )}
 
       {/* Top Navigation / Stats */}
       <header className="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-orange-100 gap-4">
@@ -110,6 +119,29 @@ export default function Dashboard({ onStartLesson }: DashboardProps) {
           </div>
         </div>
       </header>
+
+      {/* Gamification Dashboard */}
+      <section className="flex flex-col gap-6 animate-in slide-in-from-bottom-4">
+        <div className="flex justify-between items-center bg-blue-50 border border-blue-100 p-6 rounded-3xl shadow-sm">
+          <div>
+            <h2 className="text-xl font-bold text-blue-900 mb-1">Entraînement Quotidien</h2>
+            <p className="text-blue-700">Révisez vos mots difficiles pour renforcer votre mémoire.</p>
+          </div>
+          <button 
+            onClick={() => setIsReviewSessionOpen(true)}
+            className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-2xl font-bold shadow-md transition-transform hover:scale-105 active:scale-95"
+          >
+            Pratique du Jour
+          </button>
+        </div>
+        
+        <StreakHeatmap />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Leaderboard />
+          <BadgesList />
+        </div>
+      </section>
 
       {/* Learning Path */}
       <section className="space-y-12">
