@@ -22,11 +22,10 @@ export default function StreakHeatmap() {
         </div>
         <div>
           <div className="text-sm font-bold text-slate-400 uppercase tracking-wide">
-            {/* Translations could be added for these specific strings if needed */}
-            Série Actuelle
+            {t.dashboard.currentStreak}
           </div>
           <div className="text-2xl font-black text-slate-800">
-            {streakDays} Jours
+            {streakDays} {t.dashboard.streakDays}
           </div>
         </div>
       </div>
@@ -53,7 +52,7 @@ export default function StreakHeatmap() {
 
       <div className="flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-sm font-bold">
         <Snowflake className="w-5 h-5" />
-        <span>{streakFreezes} Gel{streakFreezes > 1 ? 's' : ''}</span>
+        <span>{streakFreezes} {streakFreezes > 1 ? t.dashboard.streakFreezes : t.dashboard.streakFreeze}</span>
       </div>
     </div>
   );

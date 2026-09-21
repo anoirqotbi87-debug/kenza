@@ -17,7 +17,7 @@ interface ScenarioDialogueProps {
 export default function ScenarioDialogue({ exercise, preferredNotation, onComplete, isAnswerChecked }: ScenarioDialogueProps) {
   const [selectedChoiceId, setSelectedChoiceId] = useState<string | null>(null);
   const { soundEnabled } = useAppStore();
-  const { lang } = useTranslation();
+  const { lang, t } = useTranslation();
 
   const handleSelect = (choice: DialogueChoice) => {
     if (isAnswerChecked) return;
@@ -40,7 +40,7 @@ export default function ScenarioDialogue({ exercise, preferredNotation, onComple
       {/* Context Bar */}
       <div className="bg-orange-100 text-orange-800 px-4 py-2 rounded-xl text-sm font-bold uppercase tracking-wide flex justify-center items-center gap-2 mb-8">
         <CarFront className="w-5 h-5" />
-        {exercise.dialogueContext ? getLocalizedText(exercise.dialogueContext, lang) : "Scénario"}
+        {exercise.dialogueContext ? getLocalizedText(exercise.dialogueContext, lang) : "Scenario"}
       </div>
 
       {/* NPC Bubble */}
@@ -67,7 +67,7 @@ export default function ScenarioDialogue({ exercise, preferredNotation, onComple
       {/* User Response Area */}
       {!isAnswerChecked ? (
         <div className="flex flex-col gap-3 mt-auto">
-          <div className="text-sm font-bold text-slate-400 mb-2 uppercase tracking-wide px-2">Choisissez votre réponse :</div>
+          <div className="text-sm font-bold text-slate-400 mb-2 uppercase tracking-wide px-2">{t.lessons.chooseAnswer}</div>
           {exercise.dialogueChoices?.map(choice => (
             <button
               key={choice.id}

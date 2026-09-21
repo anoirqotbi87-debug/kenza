@@ -311,7 +311,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
                   {isCorrect ? <Check className="w-8 h-8" /> : <X className="w-8 h-8" />}
                 </div>
                 <div>
-                  <h3 className="font-bold text-2xl">{isCorrect ? 'Excellent !' : 'Oups !'}</h3>
+                  <h3 className="font-bold text-2xl">{isCorrect ? t.lessons.excellent : t.lessons.oops}</h3>
                   {step.type === 'exercise' && step.exercise?.explanation && (
                     <p className="text-base font-medium opacity-90 mt-1">{getLocalizedText(step.exercise.explanation, lang)}</p>
                   )}

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useAppStore } from '../../store/useAppStore';
+import { useAppStore, useTranslation } from '../../store/useAppStore';
 import { Volume2 } from 'lucide-react';
 import { playAudio } from '../../lib/audio';
 
@@ -16,35 +16,51 @@ interface RuleExample {
   translation?: string;
 }
 
+import { MultiLangText } from '../../types/curriculum';
+import { getLocalizedText } from '../../lib/i18n/utils';
+
 interface RuleData {
-  title: string;
-  description: string;
+  title: MultiLangText;
+  description: MultiLangText;
   examples: RuleExample[];
 }
 
 export default function ConjugationTable() {
   const [activeRule, setActiveRule] = useState<GrammarRule>('present');
   const { preferredNotation, soundEnabled } = useAppStore();
+  const { t } = useTranslation();
 
   const handlePlay = (text: string) => {
     playAudio(text, undefined, soundEnabled);
   };
 
+  const { lang } = useTranslation();
+
   const rules: Record<GrammarRule, RuleData> = {
     present: {
-      title: "Le présent (Habitude/Continu)",
-      description: "On ajoute le préfixe 'ka-' suivi du marqueur de personne.",
+      title: { fr: "Le présent", en: "Present", es: "Presente", ar: "المضارع" },
+      description: {
+        fr: "On ajoute le préfixe 'ka-' suivi du marqueur de personne.",
+        en: "Add the prefix 'ka-' followed by the person marker.",
+        es: "Añadimos el prefijo 'ka-' seguido del marcador de persona.",
+        ar: "نضيف البادئة 'ka-' متبوعة بعلامة الشخص."
+      },
       examples: [
-        { person: "Ana (Je)", prefix: "ka-n", verb: "kteb", suffix: "", arabic: "كانكتب" },
-        { person: "Nta (Tu m.)", prefix: "ka-t", verb: "kteb", suffix: "", arabic: "كاتكتب" },
-        { person: "Nti (Tu f.)", prefix: "ka-t", verb: "ketb", suffix: "i", arabic: "كاتكتبي" },
-        { person: "Houwa (Il)", prefix: "ka-y", verb: "kteb", suffix: "", arabic: "كايكتب" },
-        { person: "Hiya (Elle)", prefix: "ka-t", verb: "kteb", suffix: "", arabic: "كاتكتب" },
+        { person: "Ana", prefix: "ka-n", verb: "kteb", suffix: "", arabic: "كانكتب" },
+        { person: "Nta", prefix: "ka-t", verb: "kteb", suffix: "", arabic: "كاتكتب" },
+        { person: "Nti", prefix: "ka-t", verb: "ketb", suffix: "i", arabic: "كاتكتبي" },
+        { person: "Houwa", prefix: "ka-y", verb: "kteb", suffix: "", arabic: "كايكتب" },
+        { person: "Hiya", prefix: "ka-t", verb: "kteb", suffix: "", arabic: "كاتكتب" },
       ]
     },
     negation: {
-      title: "La négation",
-      description: "On encadre le verbe avec 'ma-' avant et '-ch' après.",
+      title: { fr: "La négation", en: "Negation", es: "Negación", ar: "النفي" },
+      description: {
+        fr: "On encadre le verbe avec 'ma-' avant et '-ch' après.",
+        en: "Frame the verb with 'ma-' before and '-ch' after.",
+        es: "Enmarcamos el verbo con 'ma-' antes y '-ch' después.",
+        ar: "نضع الفعل بين 'ma-' قبله و '-ch' بعده."
+      },
       examples: [
         { person: "Positif", prefix: "fhem", verb: "t", suffix: "", arabic: "فهمت", translation: "J'ai compris" },
         { person: "Négatif", prefix: "ma-fhem-t", verb: "-ch", suffix: "", arabic: "مافهمتش", translation: "Je n'ai pas compris" },
@@ -53,20 +69,30 @@ export default function ConjugationTable() {
       ]
     },
     future: {
-      title: "Le futur",
-      description: "On utilise la particule invariable 'ghadi' + le verbe sans 'ka-'.",
+      title: { fr: "Le futur", en: "Future", es: "Futuro", ar: "المستقبل" },
+      description: {
+        fr: "On utilise la particule invariable 'ghadi' + le verbe sans 'ka-'.",
+        en: "Use the invariable particle 'ghadi' + the verb without 'ka-'.",
+        es: "Usamos la partícula invariable 'ghadi' + el verbo sin 'ka-'.",
+        ar: "نستخدم الأداة الثابتة 'ghadi' + الفعل بدون 'ka-'."
+      },
       examples: [
-        { person: "Ana (Je)", prefix: "ghadi ", verb: "nmchi", suffix: "", arabic: "غادي نمشي", translation: "Je vais partir" },
-        { person: "Nta (Tu m.)", prefix: "ghadi ", verb: "tmchi", suffix: "", arabic: "غادي تمشي", translation: "Tu vas partir" },
+        { person: "Ana", prefix: "ghadi ", verb: "nmchi", suffix: "", arabic: "غادي نمشي", translation: "Je vais partir" },
+        { person: "Nta", prefix: "ghadi ", verb: "tmchi", suffix: "", arabic: "غادي تمشي", translation: "Tu vas partir" },
       ]
     },
     possession: {
-      title: "La possession (dyal)",
-      description: "Le mot 'dyal' (de) est souvent utilisé pour exprimer l'appartenance.",
+      title: { fr: "La possession", en: "Possession", es: "Posesión", ar: "الملكية" },
+      description: {
+        fr: "Le mot 'dyal' (de) est souvent utilisé pour exprimer l'appartenance.",
+        en: "The word 'dyal' (of) is often used to express belonging.",
+        es: "La palabra 'dyal' (de) se usa a menudo para expresar pertenencia.",
+        ar: "تُستخدم كلمة 'dyal' (لـ) غالباً للتعبير عن الانتماء."
+      },
       examples: [
-        { person: "À moi", prefix: "dyal", verb: "i", suffix: "", arabic: "ديالي", translation: "L-ktab dyali (Mon livre)" },
-        { person: "À toi", prefix: "dyal", verb: "ek", suffix: "", arabic: "ديالك", translation: "T-tonobil dyalek (Ta voiture)" },
-        { person: "À lui", prefix: "dyal", verb: "o", suffix: "", arabic: "ديالو", translation: "D-dar dyalo (Sa maison)" },
+        { person: "À moi", prefix: "dyal", verb: "i", suffix: "", arabic: "ديالي", translation: "L-ktab dyali" },
+        { person: "À toi", prefix: "dyal", verb: "ek", suffix: "", arabic: "ديالك", translation: "T-tonobil dyalek" },
+        { person: "À lui", prefix: "dyal", verb: "o", suffix: "", arabic: "ديالو", translation: "D-dar dyalo" },
       ]
     }
   };
@@ -77,8 +103,8 @@ export default function ConjugationTable() {
     <div className="w-full max-w-4xl mx-auto flex flex-col h-full animate-in fade-in duration-300">
       
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-black text-slate-800 mb-2">Grammaire Active</h2>
-        <p className="text-slate-600">Explorez les mécanismes de la langue.</p>
+        <h2 className="text-3xl font-black text-slate-800 mb-2">{t.lessons.grammarTitle}</h2>
+        <p className="text-slate-600">{t.lessons.grammarDesc}</p>
       </div>
 
       <div className="flex gap-2 overflow-x-auto pb-4 mb-6 justify-center">
@@ -88,14 +114,14 @@ export default function ConjugationTable() {
             onClick={() => setActiveRule(rule)}
             className={`px-6 py-3 rounded-full font-bold whitespace-nowrap transition-all ${activeRule === rule ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
           >
-            {rules[rule].title.split(' ')[1]}
+            {getLocalizedText(rules[rule].title, lang)}
           </button>
         ))}
       </div>
 
       <div className="bg-white p-6 md:p-8 rounded-3xl border-2 border-orange-100 shadow-sm">
-        <h3 className="text-2xl font-bold text-orange-600 mb-2">{currentRule.title}</h3>
-        <p className="text-slate-600 mb-8 font-medium">{currentRule.description}</p>
+        <h3 className="text-2xl font-bold text-orange-600 mb-2">{getLocalizedText(currentRule.title, lang)}</h3>
+        <p className="text-slate-600 mb-8 font-medium">{getLocalizedText(currentRule.description, lang)}</p>
 
         <div className="space-y-4">
           {currentRule.examples.map((ex, idx) => (

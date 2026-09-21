@@ -3,158 +3,138 @@ export type UILanguage = 'fr' | 'es' | 'en' | 'ar';
 export const translations = {
   fr: {
     header: {
-      guestMode: "Mode Invité",
-      logout: "Déconnexion",
-      arabizi: "Arabizi (3afak)",
-      arabic: "Arabe (عفاك)",
-      duo: "Bilingue"
+      guestMode: "Mode Invité", logout: "Déconnexion", arabizi: "Arabizi (3afak)", arabic: "Arabe (عفاك)", duo: "Bilingue"
     },
     dashboard: {
-      xp: "XP",
-      module: "Module",
-      current: "ACTUEL",
-      start: "Commencer"
+      xp: "XP", module: "Module", current: "ACTUEL", start: "Commencer",
+      dailyTraining: "Entraînement Quotidien",
+      reviewPrompt: "Révisez vos mots difficiles pour renforcer votre mémoire.",
+      dailyPractice: "Pratique du Jour",
+      currentStreak: "SÉRIE ACTUELLE", streakDays: "Jours", streakFreeze: "Gel", streakFreezes: "Gels",
+      weeklyLeagues: "Ligues Hebdomadaires", yourTrophies: "Vos Trophées", youGuest: "Vous (Invité)",
+      badgeCafeMaster: "Maître du Café", badgeTaxiAce: "As du Taxi", badgeSoukNego: "Négociateur du Souk", badgePolyglot: "Polyglotte de l'Atlas"
     },
     lessons: {
-      check: "Vérifier",
-      continue: "Continuer",
-      retry: "Réessayer",
-      gameOver: "Plus de vies !",
-      congrats: "Leçon terminée !",
-      lives: "Vies"
+      check: "Vérifier", continue: "Continuer", retry: "Réessayer", gameOver: "Plus de vies !",
+      congrats: "Leçon terminée !", lives: "Vies",
+      excellent: "Excellent !", oops: "Oups !", chooseAnswer: "Choisissez votre réponse :",
+      grammarTitle: "Grammaire Active", grammarDesc: "Explorez les mécanismes de la langue."
     },
     srs: {
-      flip: "Retourner la carte",
-      again: "À revoir",
-      hard: "Difficile",
-      good: "Bon",
-      easy: "Facile",
-      dueToday: "Cartes dues aujourd'hui"
+      flip: "Retourner la carte", again: "À revoir", hard: "Difficile", good: "Bon", easy: "Facile",
+      dueToday: "Cartes dues aujourd'hui", tapToFlip: "Appuyez pour retourner ->",
+      answer: "RÉPONSE", translateToArabizi: "TRADUIS EN",
+      allCaughtUp: "Tout est à jour !",
+      allCaughtUpDesc: "Vous n'avez aucune carte à réviser aujourd'hui. Revenez demain pour consolider votre mémoire.",
+      backToMenu: "Retour au Menu",
+      sessionComplete: "Session Terminée",
+      sessionCompleteDesc: "Vous avez révisé {count} mots avec succès. +{xp} XP gagnés !"
     },
     auth: {
-      login: "Connexion",
-      signup: "Inscription",
-      email: "Email",
-      password: "Mot de passe",
-      continueGuest: "Continuer en mode invité",
-      google: "Continuer avec Google"
+      login: "Connexion", signup: "Inscription", email: "Email", password: "Mot de passe",
+      continueGuest: "Continuer en mode invité", google: "Continuer avec Google"
     }
   },
   en: {
     header: {
-      guestMode: "Guest Mode",
-      logout: "Logout",
-      arabizi: "Arabizi (3afak)",
-      arabic: "Arabic (عفاك)",
-      duo: "Bilingual"
+      guestMode: "Guest Mode", logout: "Logout", arabizi: "Arabizi (3afak)", arabic: "Arabic (عفاك)", duo: "Bilingual"
     },
     dashboard: {
-      xp: "XP",
-      module: "Module",
-      current: "CURRENT",
-      start: "Start"
+      xp: "XP", module: "Module", current: "CURRENT", start: "Start",
+      dailyTraining: "Daily Training",
+      reviewPrompt: "Review difficult words to strengthen your memory.",
+      dailyPractice: "Daily Practice",
+      currentStreak: "CURRENT STREAK", streakDays: "Days", streakFreeze: "Freeze", streakFreezes: "Freezes",
+      weeklyLeagues: "Weekly Leagues", yourTrophies: "Your Trophies", youGuest: "You (Guest)",
+      badgeCafeMaster: "Cafe Master", badgeTaxiAce: "Taxi Ace", badgeSoukNego: "Souk Negotiator", badgePolyglot: "Atlas Polyglot"
     },
     lessons: {
-      check: "Check",
-      continue: "Continue",
-      retry: "Retry",
-      gameOver: "Out of lives!",
-      congrats: "Lesson complete!",
-      lives: "Lives"
+      check: "Check", continue: "Continue", retry: "Retry", gameOver: "Out of lives!",
+      congrats: "Lesson complete!", lives: "Lives",
+      excellent: "Excellent!", oops: "Oops!", chooseAnswer: "Choose your answer:",
+      grammarTitle: "Active Grammar", grammarDesc: "Explore the mechanics of the language."
     },
     srs: {
-      flip: "Flip card",
-      again: "Again",
-      hard: "Hard",
-      good: "Good",
-      easy: "Easy",
-      dueToday: "Due cards today"
+      flip: "Flip card", again: "Again", hard: "Hard", good: "Good", easy: "Easy",
+      dueToday: "Due cards today", tapToFlip: "Tap to flip ->",
+      answer: "ANSWER", translateToArabizi: "TRANSLATE TO",
+      allCaughtUp: "All caught up!",
+      allCaughtUpDesc: "You have no cards to review today. Come back tomorrow to consolidate your memory.",
+      backToMenu: "Back to Menu",
+      sessionComplete: "Session Complete",
+      sessionCompleteDesc: "You successfully reviewed {count} words. +{xp} XP earned!"
     },
     auth: {
-      login: "Login",
-      signup: "Sign up",
-      email: "Email",
-      password: "Password",
-      continueGuest: "Continue as guest",
-      google: "Continue with Google"
+      login: "Login", signup: "Sign up", email: "Email", password: "Password",
+      continueGuest: "Continue as guest", google: "Continue with Google"
     }
   },
   es: {
     header: {
-      guestMode: "Modo Invitado",
-      logout: "Cerrar sesión",
-      arabizi: "Arabizi (3afak)",
-      arabic: "Árabe (عفاك)",
-      duo: "Bilingüe"
+      guestMode: "Modo Invitado", logout: "Cerrar sesión", arabizi: "Arabizi (3afak)", arabic: "Árabe (عفاك)", duo: "Bilingüe"
     },
     dashboard: {
-      xp: "XP",
-      module: "Módulo",
-      current: "ACTUAL",
-      start: "Empezar"
+      xp: "XP", module: "Módulo", current: "ACTUAL", start: "Empezar",
+      dailyTraining: "Entrenamiento Diario",
+      reviewPrompt: "Repasa tus palabras difíciles para reforzar tu memoria.",
+      dailyPractice: "Práctica del Día",
+      currentStreak: "RACHA ACTUAL", streakDays: "Días", streakFreeze: "Congelador", streakFreezes: "Congeladores",
+      weeklyLeagues: "Ligas Semanales", yourTrophies: "Tus Trofeos", youGuest: "Tú (Invitado)",
+      badgeCafeMaster: "Maestro del Café", badgeTaxiAce: "As del Taxi", badgeSoukNego: "Negociador del Zoco", badgePolyglot: "Políglota del Atlas"
     },
     lessons: {
-      check: "Comprobar",
-      continue: "Continuar",
-      retry: "Reintentar",
-      gameOver: "¡Sin vidas!",
-      congrats: "¡Lección completada!",
-      lives: "Vidas"
+      check: "Comprobar", continue: "Continuar", retry: "Reintentar", gameOver: "¡Sin vidas!",
+      congrats: "¡Lección completada!", lives: "Vidas",
+      excellent: "¡Excelente!", oops: "¡Uy!", chooseAnswer: "Elige tu respuesta:",
+      grammarTitle: "Gramática Activa", grammarDesc: "Explora los mecanismos del idioma."
     },
     srs: {
-      flip: "Girar tarjeta",
-      again: "De nuevo",
-      hard: "Difícil",
-      good: "Bien",
-      easy: "Fácil",
-      dueToday: "Tarjetas para hoy"
+      flip: "Girar tarjeta", again: "Repetir", hard: "Difícil", good: "Bueno", easy: "Fácil",
+      dueToday: "Tarjetas para hoy", tapToFlip: "Toca para voltear ->",
+      answer: "RESPUESTA", translateToArabizi: "TRADUCE AL",
+      allCaughtUp: "¡Todo al día!",
+      allCaughtUpDesc: "No tienes tarjetas para repasar hoy. Vuelve mañana para consolidar tu memoria.",
+      backToMenu: "Volver al Menú",
+      sessionComplete: "Sesión Completada",
+      sessionCompleteDesc: "Has repasado {count} palabras con éxito. ¡+{xp} XP ganados!"
     },
     auth: {
-      login: "Iniciar sesión",
-      signup: "Registrarse",
-      email: "Correo",
-      password: "Contraseña",
-      continueGuest: "Continuar como invitado",
-      google: "Continuar con Google"
+      login: "Iniciar sesión", signup: "Registrarse", email: "Correo", password: "Contraseña",
+      continueGuest: "Continuar como invitado", google: "Continuar con Google"
     }
   },
   ar: {
     header: {
-      guestMode: "وضع الضيف",
-      logout: "تسجيل الخروج",
-      arabizi: "عربيزي (3afak)",
-      arabic: "عربي (عفاك)",
-      duo: "مزدوج"
+      guestMode: "وضع الضيف", logout: "تسجيل الخروج", arabizi: "عربيزي (3afak)", arabic: "عربي (عفاك)", duo: "مزدوج"
     },
     dashboard: {
-      xp: "نقاط",
-      module: "وحدة",
-      current: "الحالي",
-      start: "ابدأ"
+      xp: "نقاط", module: "وحدة", current: "الحالي", start: "ابدأ",
+      dailyTraining: "التدريب اليومي",
+      reviewPrompt: "راجع كلماتك الصعبة لتعزيز ذاكرتك.",
+      dailyPractice: "تمرين اليوم",
+      currentStreak: "السلسلة الحالية", streakDays: "أيام", streakFreeze: "تجميد", streakFreezes: "تجميد",
+      weeklyLeagues: "الدوريات الأسبوعية", yourTrophies: "جوائزك", youGuest: "أنت (ضيف)",
+      badgeCafeMaster: "خبير المقهى", badgeTaxiAce: "بطل التاكسي", badgeSoukNego: "مفاوض السوق", badgePolyglot: "متحدث لغات الأطلس"
     },
     lessons: {
-      check: "تحقق",
-      continue: "استمر",
-      retry: "حاول مجدداً",
-      gameOver: "لقد نفذت محاولاتك!",
-      congrats: "اكتمل الدرس!",
-      lives: "محاولات"
+      check: "تحقق", continue: "استمر", retry: "حاول مجدداً", gameOver: "لقد نفذت محاولاتك!",
+      congrats: "اكتمل الدرس!", lives: "محاولات",
+      excellent: "ممتاز!", oops: "عفواً!", chooseAnswer: "اختر إجابتك:",
+      grammarTitle: "القواعد النشطة", grammarDesc: "اكتشف آليات اللغة."
     },
     srs: {
-      flip: "اقلب البطاقة",
-      again: "مجدداً",
-      hard: "صعب",
-      good: "جيد",
-      easy: "سهل",
-      dueToday: "بطاقات اليوم"
+      flip: "اقلب البطاقة", again: "مجدداً", hard: "صعب", good: "جيد", easy: "سهل",
+      dueToday: "بطاقات اليوم", tapToFlip: "انقر للقلب ->",
+      answer: "الإجابة", translateToArabizi: "ترجم إلى",
+      allCaughtUp: "أنت مواكب لكل شيء!",
+      allCaughtUpDesc: "ليس لديك بطاقات لمراجعتها اليوم. عد غداً لتعزيز ذاكرتك.",
+      backToMenu: "العودة للقائمة",
+      sessionComplete: "انتهت الجلسة",
+      sessionCompleteDesc: "لقد راجعت {count} كلمات بنجاح. +{xp} نقطة مكتسبة!"
     },
     auth: {
-      login: "تسجيل الدخول",
-      signup: "إنشاء حساب",
-      email: "البريد الإلكتروني",
-      password: "كلمة المرور",
-      continueGuest: "الاستمرار كضيف",
-      google: "الاستمرار مع جوجل"
+      login: "تسجيل الدخول", signup: "إنشاء حساب", email: "البريد الإلكتروني", password: "كلمة المرور",
+      continueGuest: "الاستمرار كضيف", google: "الاستمرار مع جوجل"
     }
   }
 };

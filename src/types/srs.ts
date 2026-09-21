@@ -14,8 +14,8 @@ export interface VocabularySRSData {
   id: string; // the wordId
   arabizi: string;
   arabic: string;
-  translation: string;
-  category: string;
+  translation: any;
+  category?: string;
   audioUrl?: string;
   example?: {
     arabizi: string;

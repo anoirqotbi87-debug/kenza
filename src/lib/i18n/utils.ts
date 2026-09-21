@@ -8,5 +8,10 @@ export function getLocalizedText(
 ): string {
   if (!text) return '';
   if (typeof text === 'string') return text;
+  
+  if (lang === 'es' && !text.es) {
+    console.warn(`[i18n Warning] Traduction espagnole manquante pour :`, text);
+  }
+  
   return text[lang] || text[fallback] || Object.values(text)[0] || '';
 }

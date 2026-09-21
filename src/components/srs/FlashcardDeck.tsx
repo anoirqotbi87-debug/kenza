@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Volume2, Info } from 'lucide-react';
 import { VocabularySRSData, ReviewGrade, SRSCard } from '../../types/srs';
 import { playAudio } from '../../lib/audio';
-import { useAppStore } from '../../store/useAppStore';
+import { useAppStore, useTranslation } from '../../store/useAppStore';
+import { getLocalizedText } from '../../lib/i18n/utils';
 
 interface FlashcardDeckProps {
   cards: SRSCard[];
@@ -17,6 +18,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const { preferredNotation, soundEnabled, reviewCard } = useAppStore();
+  const { lang, t } = useTranslation();
 
   const currentSRSCard = cards[currentIndex];
   const wordData = currentSRSCard ? vocabulary.find(v => v.id === currentSRSCard.wordId) : null;
@@ -102,17 +104,19 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
         >
           {/* Front */}
           <div className="absolute w-full h-full backface-hidden bg-white rounded-3xl shadow-xl border border-slate-100 p-8 flex flex-col items-center justify-center">
-            <div className="absolute top-4 left-4 bg-orange-100 text-orange-700 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider">
-              {wordData.category}
-            </div>
+            {wordData.category && (
+              <div className="absolute top-4 left-4 bg-orange-100 text-orange-700 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider">
+                {wordData.category}
+              </div>
+            )}
             
             <h2 className="text-4xl font-bold text-slate-800 text-center mb-6">
-              {wordData.translation}
+              {getLocalizedText(wordData.translation, lang)}
             </h2>
             
             {!isFlipped && (
               <div className="absolute bottom-6 text-slate-400 text-sm animate-pulse flex flex-col items-center gap-2">
-                <span>Cliquez ou appuyez sur Espace pour révéler</span>
+                <span>{t.srs.tapToFlip}</span>
               </div>
             )}
           </div>
@@ -168,19 +172,19 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
       {/* Controls */}
       <div className={`w-full mt-8 grid grid-cols-4 gap-4 transition-all duration-300 ${isFlipped ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
         <button onClick={() => handleGrade('again')} className="py-4 bg-red-100 hover:bg-red-200 text-red-700 rounded-2xl font-bold flex flex-col items-center">
-          <span>À revoir</span>
+          <span>{t.srs.again}</span>
           <span className="text-xs font-normal opacity-70 mt-1">[1]</span>
         </button>
         <button onClick={() => handleGrade('hard')} className="py-4 bg-orange-100 hover:bg-orange-200 text-orange-700 rounded-2xl font-bold flex flex-col items-center">
-          <span>Difficile</span>
+          <span>{t.srs.hard}</span>
           <span className="text-xs font-normal opacity-70 mt-1">[2]</span>
         </button>
         <button onClick={() => handleGrade('good')} className="py-4 bg-green-100 hover:bg-green-200 text-green-700 rounded-2xl font-bold flex flex-col items-center">
-          <span>Bon</span>
+          <span>{t.srs.good}</span>
           <span className="text-xs font-normal opacity-70 mt-1">[3]</span>
         </button>
         <button onClick={() => handleGrade('easy')} className="py-4 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-2xl font-bold flex flex-col items-center">
-          <span>Facile</span>
+          <span>{t.srs.easy}</span>
           <span className="text-xs font-normal opacity-70 mt-1">[4]</span>
         </button>
       </div>

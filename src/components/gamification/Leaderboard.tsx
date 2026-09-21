@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Medal, Trophy, Star } from 'lucide-react';
-import { useAppStore } from '../../store/useAppStore';
+import { useAppStore, useTranslation } from '../../store/useAppStore';
 
 interface Profile {
   username: string;
@@ -11,6 +11,7 @@ interface Profile {
 export default function Leaderboard() {
   const [leaders, setLeaders] = useState<Profile[]>([]);
   const { xp: localXp } = useAppStore(); // To show user their own XP locally if not logged in
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function fetchLeaders() {
@@ -40,7 +41,7 @@ export default function Leaderboard() {
 
   // Mock some data if no DB connection or empty
   const displayLeaders = leaders.length > 0 ? leaders : [
-    { username: 'Vous (Invité)', xp: localXp },
+    { username: t.dashboard.youGuest, xp: localXp },
     { username: 'Laila99', xp: 450 },
     { username: 'Karim_Casa', xp: 230 },
     { username: 'Sarah.M', xp: 120 }
@@ -50,7 +51,7 @@ export default function Leaderboard() {
     <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
       <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
         <Trophy className="w-5 h-5 text-yellow-500" />
-        Ligues Hebdomadaires
+        {t.dashboard.weeklyLeagues}
       </h3>
       
       <div className="flex flex-col gap-3">
