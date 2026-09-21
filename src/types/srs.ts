@@ -1,0 +1,26 @@
+export interface SRSCard {
+  id: string;
+  wordId: string;
+  interval: number; // Days before next review
+  repetition: number; // Consecutive correct reviews
+  easeFactor: number; // Ease factor for SM-2 (default 2.5)
+  dueDate: string; // ISO String timestamp
+  state: 'new' | 'learning' | 'review';
+}
+
+export type ReviewGrade = 'again' | 'hard' | 'good' | 'easy';
+
+export interface VocabularySRSData {
+  id: string; // the wordId
+  arabizi: string;
+  arabic: string;
+  translation: string;
+  category: string;
+  audioUrl?: string;
+  example?: {
+    arabizi: string;
+    arabic: string;
+    translation: string;
+  };
+  culturalNote?: string;
+}
