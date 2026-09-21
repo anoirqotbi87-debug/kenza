@@ -156,10 +156,10 @@ export const translations = {
       backToMenu: "العودة للقائمة",
       sessionComplete: "انتهت الجلسة",
       sessionCompleteDesc: "لقد راجعت {count} كلمات بنجاح. +{xp} نقطة مكتسبة!",
-      smartReviewsTitle: "المراجعة الذكية",
-      smartReviewsDesc: "احفظ مفردات الدارجة إلى الأبد بفضل نظام التكرار المتباعد.",
-      cardsToReview: "بطاقات للمراجعة",
-      startSession: "ابدأ الجلسة"
+      smartReviewsTitle: "\u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0630\u0643\u064a\u0629",
+      smartReviewsDesc: "\u0627\u062d\u0641\u0638 \u0645\u0641\u0631\u062f\u0627\u062a \u0627\u0644\u062f\u0627\u0631\u062c\u0629 \u0625\u0644\u0649 \u0627\u0644\u0623\u0628\u062f \u0628\u0641\u0636\u0644 \u0646\u0638\u0627\u0645 \u0627\u0644\u062a\u0643\u0631\u0627\u0631 \u0627\u0644\u0645\u062a\u0628\u0627\u0639\u062f.",
+      cardsToReview: "\u0628\u0637\u0627\u0642\u0627\u062a \u0644\u0644\u0645\u0631\u0627\u062c\u0639\u0629",
+      startSession: "\u0627\u0628\u062f\u0623 \u0627\u0644\u062c\u0644\u0633\u0629"
     },
     leagues: {
       bronze: "برونزية", silver: "فضية", gold: "ذهبية", diamond: "ماسية"
