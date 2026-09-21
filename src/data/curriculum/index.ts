@@ -9,9 +9,9 @@ export const module2Lessons: Lesson[] = [
   lessonTaxi,
   {
     id: 'l_module2_souk_1',
-    title: 'Au Souk',
+    title: { fr: 'Au Souk', en: 'At the Souk', es: 'En el Zoco', ar: 'في السوق' },
     level: 2,
-    description: 'Négociez les prix au marché.',
+    description: { fr: 'Négociez les prix au marché.', en: 'Negotiate prices at the market.', es: 'Negocia los precios en el mercado.', ar: 'تفاوض على الأسعار في السوق.' },
     steps: [] // Squelette pour la UI
   }
 ];

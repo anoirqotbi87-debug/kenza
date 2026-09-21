@@ -33,10 +33,10 @@ export default function Leaderboard() {
   }, []);
 
   const getLeague = (xp: number) => {
-    if (xp >= 1500) return { name: 'Diamant', color: 'text-cyan-400', bg: 'bg-cyan-50' };
-    if (xp >= 500) return { name: 'Or', color: 'text-yellow-500', bg: 'bg-yellow-50' };
-    if (xp >= 150) return { name: 'Argent', color: 'text-slate-400', bg: 'bg-slate-50' };
-    return { name: 'Bronze', color: 'text-orange-400', bg: 'bg-orange-50' };
+    if (xp >= 1500) return { name: (t as any).leagues?.diamond || 'Diamant', color: 'text-cyan-400', bg: 'bg-cyan-50' };
+    if (xp >= 500) return { name: (t as any).leagues?.gold || 'Or', color: 'text-yellow-500', bg: 'bg-yellow-50' };
+    if (xp >= 150) return { name: (t as any).leagues?.silver || 'Argent', color: 'text-slate-400', bg: 'bg-slate-50' };
+    return { name: (t as any).leagues?.bronze || 'Bronze', color: 'text-orange-400', bg: 'bg-orange-50' };
   };
 
   // Mock some data if no DB connection or empty
@@ -63,7 +63,7 @@ export default function Leaderboard() {
                 <div className="w-8 h-8 flex items-center justify-center font-bold text-slate-400">
                   {idx === 0 ? <Medal className="w-6 h-6 text-yellow-500" /> : idx + 1}
                 </div>
-                <div className="font-bold text-slate-700">{leader.username || 'Anonyme'}</div>
+                <div className="font-bold text-slate-700">{leader.username || (t.dashboard as any).anonymous || 'Anonyme'}</div>
               </div>
               
               <div className="flex items-center gap-4">

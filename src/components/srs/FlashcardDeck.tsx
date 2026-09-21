@@ -58,7 +58,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
   }, [isFlipped, wordData, handleGrade]);
 
   if (!wordData) {
-    return <div className="text-center p-8">Chargement...</div>;
+    return <div className="text-center p-8">{t.dashboard?.loading || "Chargement..."}</div>;
   }
 
   // Highlight specific phonetic numbers in Arabizi
@@ -81,7 +81,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
       
       {/* Progress */}
       <div className="w-full mb-8 flex justify-between items-center text-slate-500 font-medium">
-        <span>Cartes restantes : {cards.length - currentIndex}</span>
+        <span>{t.dashboard?.remainingCards || "Cartes restantes :"} {cards.length - currentIndex}</span>
         <div className="flex gap-2">
           {cards.map((_, i) => (
             <div 

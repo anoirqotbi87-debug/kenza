@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useAppStore } from '../../store/useAppStore';
+import { useAppStore, useTranslation } from '../../store/useAppStore';
 import { srsVocabulary } from '../../data/srs-deck';
 import FlashcardDeck from './FlashcardDeck';
 import { BrainCircuit, Play } from 'lucide-react';
@@ -9,6 +9,7 @@ import { SRSCard } from '../../types/srs';
 
 export default function SRSDashboard() {
   const { getDueCards, addCardsToSRS, srsDeck } = useAppStore();
+  const { t } = useTranslation();
   const [isReviewing, setIsReviewing] = useState(false);
   const [dueCards, setDueCards] = useState<SRSCard[]>([]);
 
@@ -50,16 +51,16 @@ export default function SRSDashboard() {
         <BrainCircuit className="w-10 h-10" />
       </div>
       
-      <h2 className="text-2xl font-bold text-slate-800 mb-2">Révisions Intelligentes</h2>
+      <h2 className="text-2xl font-bold text-slate-800 mb-2">{t.srs.smartReviewsTitle}</h2>
       
       <p className="text-slate-600 mb-8 max-w-md">
-        Mémorisez le vocabulaire de la Darija pour toujours grâce à notre système de répétition espacée.
+        {t.srs.smartReviewsDesc}
       </p>
 
       <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 w-full max-w-sm mb-8 flex justify-between items-center">
         <div className="text-left">
           <div className="text-3xl font-black text-slate-800">{dueCards.length}</div>
-          <div className="text-sm text-slate-500 font-medium uppercase tracking-wider">Cartes à réviser</div>
+          <div className="text-sm text-slate-500 font-medium uppercase tracking-wider">{t.srs.cardsToReview}</div>
         </div>
         
         {dueCards.length > 0 ? (
@@ -75,7 +76,7 @@ export default function SRSDashboard() {
         className="w-full max-w-sm py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 text-white rounded-2xl font-bold text-lg shadow-md transition-all flex justify-center items-center gap-2"
       >
         <Play className="w-5 h-5 fill-current" />
-        {dueCards.length > 0 ? 'Commencer la session' : 'Tout est à jour !'}
+        {dueCards.length > 0 ? t.srs.startSession : t.srs.allCaughtUp}
       </button>
     </div>
   );

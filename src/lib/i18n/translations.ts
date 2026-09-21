@@ -12,7 +12,8 @@ export const translations = {
       dailyPractice: "Pratique du Jour",
       currentStreak: "SÉRIE ACTUELLE", streakDays: "Jours", streakFreeze: "Gel", streakFreezes: "Gels",
       weeklyLeagues: "Ligues Hebdomadaires", yourTrophies: "Vos Trophées", youGuest: "Vous (Invité)",
-      badgeCafeMaster: "Maître du Café", badgeTaxiAce: "As du Taxi", badgeSoukNego: "Négociateur du Souk", badgePolyglot: "Polyglotte de l'Atlas"
+      badgeCafeMaster: "Maître du Café", badgeTaxiAce: "As du Taxi", badgeSoukNego: "Négociateur du Souk", badgePolyglot: "Polyglotte de l'Atlas",
+      loading: "Chargement...", anonymous: "Anonyme", remainingCards: "Cartes restantes :"
     },
     lessons: {
       check: "Vérifier", continue: "Continuer", retry: "Réessayer", gameOver: "Plus de vies !",
@@ -28,7 +29,14 @@ export const translations = {
       allCaughtUpDesc: "Vous n'avez aucune carte à réviser aujourd'hui. Revenez demain pour consolider votre mémoire.",
       backToMenu: "Retour au Menu",
       sessionComplete: "Session Terminée",
-      sessionCompleteDesc: "Vous avez révisé {count} mots avec succès. +{xp} XP gagnés !"
+      sessionCompleteDesc: "Vous avez révisé {count} mots avec succès. +{xp} XP gagnés !",
+      smartReviewsTitle: "Révisions Intelligentes",
+      smartReviewsDesc: "Mémorisez le vocabulaire de la Darija pour toujours grâce à notre système de répétition espacée.",
+      cardsToReview: "Cartes à réviser",
+      startSession: "Commencer la session"
+    },
+    leagues: {
+      bronze: "Bronze", silver: "Argent", gold: "Or", diamond: "Diamant"
     },
     auth: {
       login: "Connexion", signup: "Inscription", email: "Email", password: "Mot de passe",
@@ -46,7 +54,8 @@ export const translations = {
       dailyPractice: "Daily Practice",
       currentStreak: "CURRENT STREAK", streakDays: "Days", streakFreeze: "Freeze", streakFreezes: "Freezes",
       weeklyLeagues: "Weekly Leagues", yourTrophies: "Your Trophies", youGuest: "You (Guest)",
-      badgeCafeMaster: "Cafe Master", badgeTaxiAce: "Taxi Ace", badgeSoukNego: "Souk Negotiator", badgePolyglot: "Atlas Polyglot"
+      badgeCafeMaster: "Cafe Master", badgeTaxiAce: "Taxi Ace", badgeSoukNego: "Souk Negotiator", badgePolyglot: "Atlas Polyglot",
+      loading: "Loading...", anonymous: "Anonymous", remainingCards: "Remaining cards:"
     },
     lessons: {
       check: "Check", continue: "Continue", retry: "Retry", gameOver: "Out of lives!",
@@ -62,7 +71,14 @@ export const translations = {
       allCaughtUpDesc: "You have no cards to review today. Come back tomorrow to consolidate your memory.",
       backToMenu: "Back to Menu",
       sessionComplete: "Session Complete",
-      sessionCompleteDesc: "You successfully reviewed {count} words. +{xp} XP earned!"
+      sessionCompleteDesc: "You successfully reviewed {count} words. +{xp} XP earned!",
+      smartReviewsTitle: "Smart Reviews",
+      smartReviewsDesc: "Memorize Darija vocabulary forever with our spaced repetition system.",
+      cardsToReview: "Cards to review",
+      startSession: "Start session"
+    },
+    leagues: {
+      bronze: "Bronze", silver: "Silver", gold: "Gold", diamond: "Diamond"
     },
     auth: {
       login: "Login", signup: "Sign up", email: "Email", password: "Password",
@@ -80,7 +96,8 @@ export const translations = {
       dailyPractice: "Práctica del Día",
       currentStreak: "RACHA ACTUAL", streakDays: "Días", streakFreeze: "Congelador", streakFreezes: "Congeladores",
       weeklyLeagues: "Ligas Semanales", yourTrophies: "Tus Trofeos", youGuest: "Tú (Invitado)",
-      badgeCafeMaster: "Maestro del Café", badgeTaxiAce: "As del Taxi", badgeSoukNego: "Negociador del Zoco", badgePolyglot: "Políglota del Atlas"
+      badgeCafeMaster: "Maestro del Café", badgeTaxiAce: "As del Taxi", badgeSoukNego: "Negociador del Zoco", badgePolyglot: "Políglota del Atlas",
+      loading: "Cargando...", anonymous: "Anónimo", remainingCards: "Tarjetas restantes:"
     },
     lessons: {
       check: "Comprobar", continue: "Continuar", retry: "Reintentar", gameOver: "¡Sin vidas!",
@@ -96,7 +113,14 @@ export const translations = {
       allCaughtUpDesc: "No tienes tarjetas para repasar hoy. Vuelve mañana para consolidar tu memoria.",
       backToMenu: "Volver al Menú",
       sessionComplete: "Sesión Completada",
-      sessionCompleteDesc: "Has repasado {count} palabras con éxito. ¡+{xp} XP ganados!"
+      sessionCompleteDesc: "Has repasado {count} palabras con éxito. ¡+{xp} XP ganados!",
+      smartReviewsTitle: "Repasos Inteligentes",
+      smartReviewsDesc: "Memoriza el vocabulario de Darija para siempre con nuestro sistema de repetición espaciada.",
+      cardsToReview: "Tarjetas por repasar",
+      startSession: "Comenzar sesión"
+    },
+    leagues: {
+      bronze: "Bronce", silver: "Plata", gold: "Oro", diamond: "Diamante"
     },
     auth: {
       login: "Iniciar sesión", signup: "Registrarse", email: "Correo", password: "Contraseña",
@@ -114,7 +138,8 @@ export const translations = {
       dailyPractice: "تمرين اليوم",
       currentStreak: "السلسلة الحالية", streakDays: "أيام", streakFreeze: "تجميد", streakFreezes: "تجميد",
       weeklyLeagues: "الدوريات الأسبوعية", yourTrophies: "جوائزك", youGuest: "أنت (ضيف)",
-      badgeCafeMaster: "خبير المقهى", badgeTaxiAce: "بطل التاكسي", badgeSoukNego: "مفاوض السوق", badgePolyglot: "متحدث لغات الأطلس"
+      badgeCafeMaster: "خبير المقهى", badgeTaxiAce: "بطل التاكسي", badgeSoukNego: "مفاوض السوق", badgePolyglot: "متحدث لغات الأطلس",
+      loading: "جاري التحميل...", anonymous: "مجهول", remainingCards: "البطاقات المتبقية:"
     },
     lessons: {
       check: "تحقق", continue: "استمر", retry: "حاول مجدداً", gameOver: "لقد نفذت محاولاتك!",
@@ -130,7 +155,14 @@ export const translations = {
       allCaughtUpDesc: "ليس لديك بطاقات لمراجعتها اليوم. عد غداً لتعزيز ذاكرتك.",
       backToMenu: "العودة للقائمة",
       sessionComplete: "انتهت الجلسة",
-      sessionCompleteDesc: "لقد راجعت {count} كلمات بنجاح. +{xp} نقطة مكتسبة!"
+      sessionCompleteDesc: "لقد راجعت {count} كلمات بنجاح. +{xp} نقطة مكتسبة!",
+      smartReviewsTitle: "المراجعة الذكية",
+      smartReviewsDesc: "احفظ مفردات الدارجة إلى الأبد بفضل نظام التكرار المتباعد.",
+      cardsToReview: "بطاقات للمراجعة",
+      startSession: "ابدأ الجلسة"
+    },
+    leagues: {
+      bronze: "برونزية", silver: "فضية", gold: "ذهبية", diamond: "ماسية"
     },
     auth: {
       login: "تسجيل الدخول", signup: "إنشاء حساب", email: "البريد الإلكتروني", password: "كلمة المرور",
