@@ -5,6 +5,7 @@ import Dashboard from '@/components/Dashboard';
 import ExerciseRunner from '@/components/ExerciseRunner';
 import SRSDashboard from '@/components/srs/SRSDashboard';
 import { module1Lessons } from '@/data/module1';
+import { lessonCafe } from '@/data/lessons/lesson-cafe';
 import { useAppStore } from '@/store/useAppStore';
 
 export default function Home() {
@@ -26,8 +27,10 @@ export default function Home() {
     setActiveLessonId(null);
   };
 
+  const allLessons = [...module1Lessons, lessonCafe];
+  
   const activeLesson = activeLessonId 
-    ? module1Lessons.find(l => l.id === activeLessonId) 
+    ? allLessons.find(l => l.id === activeLessonId) 
     : null;
 
   return (

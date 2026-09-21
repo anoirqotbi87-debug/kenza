@@ -1,10 +1,16 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Lesson, LessonStep, Notation } from '../types/curriculum';
+import { Lesson, Notation } from '../types/curriculum';
 import { useAppStore } from '../store/useAppStore';
-import { X, Check, Volume2, Info, ArrowRight } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { X, Check, Volume2, Info, ArrowRight, Heart, HeartCrack, Trophy } from 'lucide-react';
+import McqExercise from './lessons/exercises/McqExercise';
+import ReorderExercise from './lessons/exercises/ReorderExercise';
+import MatchingExercise from './lessons/exercises/MatchingExercise';
+import FillBlankExercise from './lessons/exercises/FillBlankExercise';
+import ScenarioDialogue from './dialogue/ScenarioDialogue';
+import { playAudio } from '../lib/audio';
+import ConjugationTable from './grammar/ConjugationTable';
 
 interface ExerciseRunnerProps {
   lesson: Lesson;
@@ -14,88 +20,143 @@ interface ExerciseRunnerProps {
 
 export default function ExerciseRunner({ lesson, onComplete, onClose }: ExerciseRunnerProps) {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
-  const [orderedWords, setOrderedWords] = useState<{id: string, text: string}[]>([]);
-  const [availableWords, setAvailableWords] = useState<{id: string, text: string}[]>([]);
   const [isAnswerChecked, setIsAnswerChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  
+  // Exercise states
+  const [selectedMcqId, setSelectedMcqId] = useState<string | null>(null);
+  const [orderedWords, setOrderedWords] = useState<string[]>([]);
+  const [matches, setMatches] = useState<Record<string, string>>({});
+  const [selectedBlankId, setSelectedBlankId] = useState<string | null>(null);
+
+  // Lesson states
+  const [lives, setLives] = useState(3);
+  const [xpGained, setXpGained] = useState(0);
+  const [isLessonFinished, setIsLessonFinished] = useState(false);
 
   const { preferredNotation, addXp, soundEnabled } = useAppStore();
   const step = lesson.steps[currentStepIndex];
   const progress = ((currentStepIndex) / lesson.steps.length) * 100;
 
-  // Init reorder exercise words
-  useEffect(() => {
-    if (step.type === 'exercise' && step.exercise?.type === 'reorder' && step.exercise.options) {
-      const words = step.exercise.options.map(opt => ({
-        id: opt.id,
-        text: getTextForNotation(opt, preferredNotation)
-      }));
-      // Shuffle available words
-      setAvailableWords(words.sort(() => Math.random() - 0.5));
-      setOrderedWords([]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentStepIndex, step, preferredNotation]);
-
-  const getTextForNotation = (item: any, notation: Notation) => {
-    if (notation === 'arabizi') return item.arabizi;
-    if (notation === 'arabic') return item.arabic;
-    return item.translation;
-  };
-
-  const playAudio = (text: string) => {
-    if (!soundEnabled) return;
-    // Fallback simple Text-to-Speech (Note: TTS arabe marocain est limité, à remplacer par Howler.js en prod avec vrais audios)
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'ar-MA'; 
-    window.speechSynthesis.speak(utterance);
-  };
-
   const handleCheckAnswer = () => {
     if (step.type !== 'exercise' || !step.exercise) return;
 
     let correct = false;
-    if (step.exercise.type === 'mcq') {
-      correct = selectedOptionId === step.exercise.answer;
-    } else if (step.exercise.type === 'reorder') {
-      const answerArr = step.exercise.answer as string[];
+    const { type, answer } = step.exercise;
+
+    if (type === 'mcq') {
+      correct = selectedMcqId === answer;
+    } else if (type === 'reorder') {
+      const answerArr = answer as string[];
       correct = orderedWords.length === answerArr.length && 
-                orderedWords.every((word, idx) => word.id === answerArr[idx]);
+                orderedWords.every((id, idx) => id === answerArr[idx]);
+    } else if (type === 'fill-blank') {
+      correct = selectedBlankId === answer;
+    } else if (type === 'matching' || type === 'match') {
+      // Pour chaque paire, vérifier si match.
+      const correctMapping = step.exercise.pairs?.reduce((acc, p) => {
+        acc[p.id] = p.id; // L'ID gauche correspond à l'ID droit
+        return acc;
+      }, {} as Record<string, string>) || {};
+      
+      const isAllMatched = Object.keys(correctMapping).length === Object.keys(matches).length;
+      correct = isAllMatched && Object.keys(correctMapping).every(k => matches[k] === correctMapping[k]);
     }
 
     setIsCorrect(correct);
     setIsAnswerChecked(true);
     
     if (correct) {
-      // Play success sound
-      addXp(10);
+      setXpGained(prev => prev + 10);
+      playAudio('correct', undefined, soundEnabled); // Need proper SFX urls, fallback to nothing
     } else {
-      // Play error sound
+      setLives(prev => Math.max(0, prev - 1));
+      playAudio('error', undefined, soundEnabled);
     }
   };
 
   const handleNext = () => {
     setIsAnswerChecked(false);
-    setSelectedOptionId(null);
+    setSelectedMcqId(null);
+    setOrderedWords([]);
+    setMatches({});
+    setSelectedBlankId(null);
     setIsCorrect(false);
+
+    if (lives === 0) {
+      // Échec de la leçon
+      return;
+    }
 
     if (currentStepIndex < lesson.steps.length - 1) {
       setCurrentStepIndex(curr => curr + 1);
     } else {
-      onComplete();
+      setIsLessonFinished(true);
+      addXp(xpGained);
     }
   };
 
+  const handlePlayAudio = (text: string, audioUrl?: string) => {
+    playAudio(text, audioUrl, soundEnabled);
+  };
+
+  if (lives === 0 && !isLessonFinished) {
+    return (
+      <div className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-4 text-center">
+        <HeartCrack className="w-24 h-24 text-red-500 mb-6" />
+        <h2 className="text-3xl font-bold text-slate-800 mb-4">Plus de vies !</h2>
+        <p className="text-slate-600 mb-8 max-w-md">Ne vous découragez pas, l'apprentissage prend du temps. Révisez et réessayez.</p>
+        <button onClick={onClose} className="px-8 py-4 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-2xl font-bold text-lg">
+          Quitter la leçon
+        </button>
+      </div>
+    );
+  }
+
+  if (isLessonFinished) {
+    return (
+      <div className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-4 text-center animate-in fade-in zoom-in duration-300">
+        <div className="w-32 h-32 bg-amber-100 rounded-full flex items-center justify-center mb-8 shadow-inner border-4 border-amber-50">
+          <Trophy className="w-16 h-16 text-amber-500" />
+        </div>
+        <h2 className="text-4xl font-black text-amber-500 mb-2">Leçon Terminée !</h2>
+        <p className="text-xl text-slate-600 font-medium mb-12">Vous avez assuré.</p>
+
+        <div className="flex gap-8 mb-12">
+          <div className="bg-blue-50 border border-blue-100 p-6 rounded-3xl min-w-[140px]">
+            <div className="text-blue-500 text-sm font-bold uppercase mb-1">XP Gagné</div>
+            <div className="text-3xl font-black text-blue-600">+{xpGained}</div>
+          </div>
+          <div className="bg-red-50 border border-red-100 p-6 rounded-3xl min-w-[140px]">
+            <div className="text-red-500 text-sm font-bold uppercase mb-1">Vies Restantes</div>
+            <div className="text-3xl font-black text-red-600 flex justify-center gap-1 mt-2">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Heart key={i} className={`w-6 h-6 ${i < lives ? 'fill-red-500 text-red-500' : 'text-red-200'}`} />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <button onClick={onComplete} className="px-12 py-4 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-bold text-xl shadow-lg transition-transform hover:scale-105 active:scale-95 w-full max-w-sm">
+          Continuer
+        </button>
+      </div>
+    );
+  }
+
   const renderContent = () => {
+    // 1. Learning screens
     if (step.type === 'learning' && step.content) {
+      if (step.content.title === "Grammaire Active") {
+         return <ConjugationTable />;
+      }
       return (
         <div className="flex flex-col items-center justify-center h-full space-y-8 text-center animate-in fade-in zoom-in duration-300">
           <h2 className="text-3xl font-bold text-slate-800">{step.content.title}</h2>
           
           <div className="bg-orange-50 p-8 rounded-3xl w-full max-w-md shadow-sm border border-orange-100 relative">
             <button 
-              onClick={() => playAudio(step.content!.arabic)}
+              onClick={() => handlePlayAudio(step.content!.arabic, step.content!.audioUrl)}
               className="absolute -top-4 -right-4 bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-full shadow-lg transition-transform hover:scale-110"
             >
               <Volume2 className="w-6 h-6" />
@@ -103,12 +164,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
             <div className="text-5xl font-extrabold text-orange-600 mb-4 font-arabic">
               {preferredNotation === 'arabic' ? step.content.arabic : step.content.arabizi}
             </div>
-            {preferredNotation !== 'translation' && (
-              <div className="text-xl text-slate-600 font-medium">{step.content.translation}</div>
-            )}
-            {preferredNotation === 'translation' && (
-              <div className="text-xl text-slate-600 font-medium">{step.content.arabizi}</div>
-            )}
+            <div className="text-xl text-slate-600 font-medium">{step.content.translation}</div>
           </div>
           
           <p className="text-lg text-slate-600 max-w-lg">{step.content.description}</p>
@@ -123,78 +179,93 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
       );
     }
 
+    // 2. Exercises
     if (step.type === 'exercise' && step.exercise) {
       return (
-        <div className="flex flex-col h-full w-full max-w-2xl mx-auto space-y-8 animate-in slide-in-from-right duration-300">
-          <h2 className="text-2xl font-bold text-slate-800">{step.exercise.prompt}</h2>
+        <div className="flex flex-col h-full w-full max-w-3xl mx-auto space-y-8 animate-in slide-in-from-right duration-300">
+          <div className="flex justify-between items-start">
+            <h2 className="text-2xl font-bold text-slate-800">{step.exercise.prompt}</h2>
+            {step.exercise.audioUrl && (
+              <button onClick={() => handlePlayAudio('', step.exercise?.audioUrl)} className="p-3 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-full transition-colors">
+                <Volume2 className="w-6 h-6" />
+              </button>
+            )}
+          </div>
           
-          {step.exercise.type === 'mcq' && step.exercise.options && (
-            <div className="grid grid-cols-1 gap-4">
-              {step.exercise.options.map((opt) => (
-                <button
-                  key={opt.id}
-                  onClick={() => !isAnswerChecked && setSelectedOptionId(opt.id)}
-                  disabled={isAnswerChecked}
-                  className={`
-                    p-6 rounded-2xl border-2 text-left text-lg font-medium transition-all
-                    ${selectedOptionId === opt.id && !isAnswerChecked ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white hover:border-slate-300'}
-                    ${isAnswerChecked && opt.id === step.exercise!.answer ? 'border-green-500 bg-green-50 text-green-700' : ''}
-                    ${isAnswerChecked && selectedOptionId === opt.id && opt.id !== step.exercise!.answer ? 'border-red-500 bg-red-50 text-red-700' : ''}
-                  `}
-                >
-                  {getTextForNotation(opt, preferredNotation)}
-                </button>
-              ))}
-            </div>
+          {step.exercise.type === 'mcq' && (
+            <McqExercise 
+              exercise={step.exercise} 
+              preferredNotation={preferredNotation}
+              selectedOptionId={selectedMcqId}
+              onSelect={setSelectedMcqId}
+              isAnswerChecked={isAnswerChecked}
+            />
           )}
 
           {step.exercise.type === 'reorder' && (
-            <div className="space-y-8">
-              {/* Drop zone */}
-              <div className="min-h-[80px] p-4 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 flex flex-wrap gap-2 items-center">
-                {orderedWords.map((word, idx) => (
-                  <button
-                    key={word.id}
-                    onClick={() => {
-                      if(isAnswerChecked) return;
-                      setOrderedWords(prev => prev.filter((_, i) => i !== idx));
-                      setAvailableWords(prev => [...prev, word]);
-                    }}
-                    className="px-4 py-3 bg-white border-2 border-slate-200 rounded-xl font-medium shadow-sm hover:border-slate-300"
-                  >
-                    {word.text}
-                  </button>
-                ))}
-              </div>
-              
-              {/* Source words */}
-              <div className="flex flex-wrap gap-2 justify-center min-h-[80px]">
-                {availableWords.map((word) => (
-                  <button
-                    key={word.id}
-                    onClick={() => {
-                      if(isAnswerChecked) return;
-                      setAvailableWords(prev => prev.filter(w => w.id !== word.id));
-                      setOrderedWords(prev => [...prev, word]);
-                    }}
-                    className="px-4 py-3 bg-white border-2 border-slate-200 rounded-xl font-medium shadow-sm hover:border-slate-300 text-slate-800"
-                  >
-                    {word.text}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <ReorderExercise 
+              exercise={step.exercise} 
+              preferredNotation={preferredNotation}
+              onUpdate={setOrderedWords}
+              isAnswerChecked={isAnswerChecked}
+            />
+          )}
+
+          {step.exercise.type === 'fill-blank' && (
+            <FillBlankExercise 
+              exercise={step.exercise} 
+              preferredNotation={preferredNotation}
+              onUpdate={setSelectedBlankId}
+              isAnswerChecked={isAnswerChecked}
+            />
+          )}
+
+          {(step.exercise.type === 'matching' || step.exercise.type === 'match') && (
+            <MatchingExercise 
+              exercise={step.exercise} 
+              preferredNotation={preferredNotation}
+              onUpdate={setMatches}
+              isAnswerChecked={isAnswerChecked}
+            />
+          )}
+
+          {step.exercise.type === 'dialogue' && (
+            <ScenarioDialogue
+              exercise={step.exercise}
+              preferredNotation={preferredNotation}
+              onComplete={(isOptimal) => {
+                // Pour le dialogue, on déclenche directement la vérification
+                setIsCorrect(isOptimal);
+                setIsAnswerChecked(true);
+                if (isOptimal) {
+                  setXpGained(prev => prev + 15);
+                  playAudio('correct', undefined, soundEnabled);
+                } else {
+                  playAudio('error', undefined, soundEnabled);
+                }
+              }}
+              isAnswerChecked={isAnswerChecked}
+            />
           )}
         </div>
       );
     }
   };
 
+  const isCheckDisabled = () => {
+    if (!step.exercise) return false;
+    if (step.exercise.type === 'mcq') return !selectedMcqId;
+    if (step.exercise.type === 'reorder') return orderedWords.length === 0;
+    if (step.exercise.type === 'fill-blank') return !selectedBlankId;
+    if (step.exercise.type === 'matching' || step.exercise.type === 'match') return Object.keys(matches).length !== (step.exercise.pairs?.length || 0);
+    return false;
+  };
+
   return (
     <div className="fixed inset-0 bg-white z-50 flex flex-col">
-      {/* Header with progress */}
-      <header className="p-4 flex items-center gap-4 max-w-4xl mx-auto w-full">
-        <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100">
+      {/* Header */}
+      <header className="p-4 flex items-center gap-6 max-w-5xl mx-auto w-full">
+        <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors">
           <X className="w-6 h-6" />
         </button>
         <div className="flex-1 h-4 bg-slate-100 rounded-full overflow-hidden">
@@ -202,6 +273,11 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
             className="h-full bg-green-500 transition-all duration-500 ease-out rounded-full"
             style={{ width: `${progress}%` }}
           />
+        </div>
+        <div className="flex gap-1 items-center">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Heart key={i} className={`w-6 h-6 transition-all ${i < lives ? 'fill-red-500 text-red-500' : 'text-red-200'}`} />
+          ))}
         </div>
       </header>
 
@@ -215,18 +291,18 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
         border-t-2 p-4 md:p-6 transition-colors duration-300
         ${isAnswerChecked ? (isCorrect ? 'bg-green-100 border-green-200' : 'bg-red-100 border-red-200') : 'bg-white border-slate-100'}
       `}>
-        <div className="max-w-4xl mx-auto w-full flex justify-between items-center h-16">
+        <div className="max-w-5xl mx-auto w-full flex justify-between items-center min-h-[64px]">
           
           <div className="flex-1">
             {isAnswerChecked && (
               <div className={`flex items-center gap-4 ${isCorrect ? 'text-green-700' : 'text-red-700'}`}>
-                <div className={`p-2 rounded-full ${isCorrect ? 'bg-green-200' : 'bg-red-200'}`}>
+                <div className={`p-3 rounded-full ${isCorrect ? 'bg-green-200' : 'bg-red-200'}`}>
                   {isCorrect ? <Check className="w-8 h-8" /> : <X className="w-8 h-8" />}
                 </div>
                 <div>
-                  <h3 className="font-bold text-xl">{isCorrect ? 'Excellent !' : 'Oups...'}</h3>
+                  <h3 className="font-bold text-2xl">{isCorrect ? 'Excellent !' : 'La bonne réponse était :'}</h3>
                   {step.type === 'exercise' && step.exercise?.explanation && (
-                    <p className="text-sm opacity-90">{step.exercise.explanation}</p>
+                    <p className="text-base font-medium opacity-90 mt-1">{step.exercise.explanation}</p>
                   )}
                 </div>
               </div>
@@ -237,18 +313,15 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
             {!isAnswerChecked && step.type === 'exercise' ? (
               <button 
                 onClick={handleCheckAnswer}
-                disabled={
-                  (step.exercise?.type === 'mcq' && !selectedOptionId) ||
-                  (step.exercise?.type === 'reorder' && orderedWords.length === 0)
-                }
-                className="px-8 py-4 bg-green-500 hover:bg-green-600 disabled:bg-slate-200 disabled:text-slate-400 text-white rounded-2xl font-bold text-lg shadow-sm transition-all"
+                disabled={isCheckDisabled()}
+                className="px-10 py-4 bg-green-500 hover:bg-green-600 disabled:bg-slate-200 disabled:text-slate-400 text-white rounded-2xl font-bold text-lg shadow-sm transition-all active:scale-95"
               >
                 Vérifier
               </button>
             ) : (
               <button 
                 onClick={handleNext}
-                className={`px-8 py-4 rounded-2xl font-bold text-lg shadow-sm transition-all flex items-center gap-2
+                className={`px-10 py-4 rounded-2xl font-bold text-lg shadow-sm transition-all flex items-center gap-2 active:scale-95
                   ${isAnswerChecked && isCorrect ? 'bg-green-500 text-white hover:bg-green-600' : ''}
                   ${isAnswerChecked && !isCorrect ? 'bg-red-500 text-white hover:bg-red-600' : ''}
                   ${!isAnswerChecked && step.type === 'learning' ? 'bg-green-500 text-white hover:bg-green-600' : ''}

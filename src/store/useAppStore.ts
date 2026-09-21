@@ -65,7 +65,7 @@ export const useAppStore = create<AppState>()(
               repetition: 0,
               easeFactor: 2.5,
               dueDate: now,
-              state: 'new'
+              state: 'new' as const
             };
           }
         });
@@ -111,7 +111,7 @@ export const useAppStore = create<AppState>()(
             repetition,
             easeFactor,
             dueDate: nextDate.toISOString(),
-            state: 'review'
+            state: 'review' as const
           }
         };
 
