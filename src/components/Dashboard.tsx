@@ -1,13 +1,15 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useAppStore } from '../store/useAppStore';
+import { useAppStore, useTranslation } from '../store/useAppStore';
 import { Flame, Star, Settings, Play, CheckCircle2, User, LogOut } from 'lucide-react';
 import { Notation } from '../types/curriculum';
 import AuthModal from './auth/AuthModal';
+import LanguageSelector from './ui/LanguageSelector';
 import { supabase } from '../lib/supabase';
 import { Session } from '@supabase/supabase-js';
 import { fullCurriculum, allLessonsList } from '../data/curriculum';
+import { getLocalizedText } from '../lib/i18n/utils';
 
 interface DashboardProps {
   onStartLesson: (lessonId: string) => void;
@@ -15,6 +17,7 @@ interface DashboardProps {
 
 export default function Dashboard({ onStartLesson }: DashboardProps) {
   const { xp, streakDays, completedLessons, preferredNotation, setNotation, toggleSound, soundEnabled } = useAppStore();
+  const { t, lang } = useTranslation();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
 
@@ -61,7 +64,7 @@ export default function Dashboard({ onStartLesson }: DashboardProps) {
             <div className="flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full font-bold text-sm">
               <User className="w-4 h-4" />
               <span className="truncate max-w-[100px]">{session.user.user_metadata?.full_name || session.user.email?.split('@')[0]}</span>
-              <button onClick={handleLogout} className="ml-2 hover:text-red-500 transition-colors" title="Déconnexion">
+              <button onClick={handleLogout} className="ml-2 hover:text-red-500 transition-colors" title={t.header.logout}>
                 <LogOut className="w-4 h-4" />
               </button>
             </div>
@@ -71,7 +74,7 @@ export default function Dashboard({ onStartLesson }: DashboardProps) {
               className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-full font-bold text-sm transition-colors"
             >
               <User className="w-4 h-4" />
-              Mode Invité
+              {t.header.guestMode}
             </button>
           )}
 
@@ -81,7 +84,7 @@ export default function Dashboard({ onStartLesson }: DashboardProps) {
           </div>
           <div className="flex items-center gap-2 text-blue-500 font-bold">
             <Star className="w-5 h-5 fill-blue-500" />
-            <span>{xp} XP</span>
+            <span>{xp} {t.dashboard.xp}</span>
           </div>
           
           <div className="flex items-center gap-2 border-l pl-4 border-slate-200">
@@ -90,15 +93,17 @@ export default function Dashboard({ onStartLesson }: DashboardProps) {
               onChange={handleNotationChange}
               className="bg-slate-100 text-slate-700 text-sm rounded-lg p-1 outline-none cursor-pointer border border-transparent hover:border-slate-300 transition-colors"
             >
-              <option value="arabizi">Arabizi (3afak)</option>
-              <option value="arabic">Arabe (عفاك)</option>
-              <option value="duo">Bilingue</option>
+              <option value="arabizi">{t.header.arabizi}</option>
+              <option value="arabic">{t.header.arabic}</option>
+              <option value="duo">{t.header.duo}</option>
             </select>
+            
+            <LanguageSelector />
             
             <button 
               onClick={toggleSound}
               className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors"
-              title={soundEnabled ? "Désactiver le son" : "Activer le son"}
+              title={soundEnabled ? "Mute" : "Sound"}
             >
               <Settings className="w-5 h-5" />
             </button>
@@ -110,8 +115,8 @@ export default function Dashboard({ onStartLesson }: DashboardProps) {
       <section className="space-y-12">
         {Object.entries(fullCurriculum).map(([moduleId, moduleData]) => (
           <div key={moduleId} className="space-y-6">
-            <div className="bg-gradient-to-r from-orange-500 to-amber-500 p-6 rounded-3xl text-white shadow-lg">
-              <h2 className="text-2xl font-bold mb-2">Module {moduleId} : {moduleData.title}</h2>
+            <div className="bg-gradient-to-r from-orange-500 to-amber-500 p-6 rounded-3xl text-white shadow-lg flex items-center justify-between">
+              <h2 className="text-2xl font-bold mb-2">{t.dashboard.module} {moduleId} : {getLocalizedText(moduleData.title, lang)}</h2>
             </div>
 
             <div className="relative pt-8 pb-12 flex flex-col items-center gap-12">
@@ -135,13 +140,13 @@ export default function Dashboard({ onStartLesson }: DashboardProps) {
                     >
                       <div className="flex justify-between items-start mb-2">
                         <h3 className={`font-bold text-lg ${isLocked ? 'text-slate-400' : 'text-slate-800'}`}>
-                          {lesson.title}
+                          {getLocalizedText(lesson.title, lang)}
                         </h3>
                         {isCompleted && <CheckCircle2 className="text-green-500 w-6 h-6" />}
-                        {isNext && <div className="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full animate-pulse">ACTUEL</div>}
+                        {isNext && <div className="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full animate-pulse">{t.dashboard.current}</div>}
                       </div>
                       <p className={`text-sm mb-4 ${isLocked ? 'text-slate-400' : 'text-slate-600'}`}>
-                        {lesson.description}
+                        {getLocalizedText(lesson.description, lang)}
                       </p>
                       
                       {isNext && (
@@ -153,7 +158,7 @@ export default function Dashboard({ onStartLesson }: DashboardProps) {
                           className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold flex justify-center items-center gap-2 transition-colors shadow-md"
                         >
                           <Play className="w-5 h-5 fill-white" />
-                          Commencer
+                          {t.dashboard.start}
                         </button>
                       )}
                     </div>

@@ -23,14 +23,16 @@ export const metadata: Metadata = {
     type: "website",
   }
 };
+import I18nProvider from '../components/I18nProvider';
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="fr" dir="ltr">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-50 text-slate-900 min-h-screen`}>
+        <I18nProvider>
+          {children}
+        </I18nProvider>
+      </body>
     </html>
   );
 }

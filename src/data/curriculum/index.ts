@@ -34,11 +34,26 @@ export const module5Lessons: Lesson[] = [
 ];
 
 export const fullCurriculum = {
-  1: { title: "Les Fondations", lessons: module1Lessons },
-  2: { title: "Survie Quotidienne", lessons: module2Lessons },
-  3: { title: "Grammaire Active", lessons: module3Lessons },
-  4: { title: "Temps & Modaux", lessons: module4Lessons },
-  5: { title: "Immersion Culturelle", lessons: module5Lessons },
+  1: { 
+    title: { fr: "Les Fondations", en: "Foundations", es: "Los Cimientos", ar: "الأساسيات" }, 
+    lessons: module1Lessons 
+  },
+  2: { 
+    title: { fr: "Survie Quotidienne", en: "Daily Survival", es: "Supervivencia Diaria", ar: "البقاء اليومي" }, 
+    lessons: module2Lessons 
+  },
+  3: { 
+    title: { fr: "Grammaire Active", en: "Active Grammar", es: "Gramática Activa", ar: "قواعد نشطة" }, 
+    lessons: module3Lessons 
+  },
+  4: { 
+    title: { fr: "Temps & Modaux", en: "Tenses & Modals", es: "Tiempos y Modales", ar: "الأزمنة والأفعال الناقصة" }, 
+    lessons: module4Lessons 
+  },
+  5: { 
+    title: { fr: "Immersion Culturelle", en: "Cultural Immersion", es: "Inmersión Cultural", ar: "الانغماس الثقافي" }, 
+    lessons: module5Lessons 
+  },
 };
 
 export const allLessonsList = [

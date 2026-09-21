@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { Exercise, Notation } from '../../../types/curriculum';
+import { useTranslation } from '../../../store/useAppStore';
+import { getLocalizedText } from '../../../lib/i18n/utils';
 
 interface MatchingExerciseProps {
   exercise: Exercise;
@@ -13,6 +15,7 @@ interface MatchingExerciseProps {
 export default function MatchingExercise({ exercise, preferredNotation, onUpdate, isAnswerChecked }: MatchingExerciseProps) {
   const [leftItems, setLeftItems] = useState<{id: string, text: string}[]>([]);
   const [rightItems, setRightItems] = useState<{id: string, text: string}[]>([]);
+  const { lang } = useTranslation();
   
   const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
   const [selectedRight, setSelectedRight] = useState<string | null>(null);
@@ -21,7 +24,7 @@ export default function MatchingExercise({ exercise, preferredNotation, onUpdate
   useEffect(() => {
     if (exercise.pairs) {
       const lefts = exercise.pairs.map(p => ({ id: p.id, text: p.left.text })).sort(() => Math.random() - 0.5);
-      const rights = exercise.pairs.map(p => ({ id: p.id, text: p.right.text })).sort(() => Math.random() - 0.5);
+      const rights = exercise.pairs.map(p => ({ id: p.id, text: getLocalizedText(p.right.text, lang) })).sort(() => Math.random() - 0.5);
       setLeftItems(lefts);
       setRightItems(rights);
       setMatches({});
@@ -29,7 +32,7 @@ export default function MatchingExercise({ exercise, preferredNotation, onUpdate
       setSelectedRight(null);
       onUpdate({});
     }
-  }, [exercise, onUpdate]);
+  }, [exercise, onUpdate, lang]);
 
   const handleLeftClick = (id: string) => {
     if (isAnswerChecked) return;

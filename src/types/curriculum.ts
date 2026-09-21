@@ -11,67 +11,72 @@ export interface UserProfile {
   preferredNotation: Notation;
 }
 
-export type ExerciseType = 'mcq' | 'reorder' | 'match' | 'dialogue' | 'flashcard' | 'fill-blank' | 'matching';
+export type ExerciseType = 'mcq' | 'reorder' | 'match' | 'matching' | 'fill-blank' | 'dialogue';
+
+export interface MultiLangText {
+  fr: string;
+  es: string;
+  en: string;
+  ar: string;
+}
+
+export interface Lesson {
+  id: string;
+  title: MultiLangText | string;
+  level: number;
+  description: MultiLangText | string;
+  steps: LessonStep[];
+}
+
+export interface LessonStep {
+  id: string;
+  type: 'learning' | 'exercise' | 'grammar';
+  content?: {
+    title: MultiLangText | string;
+    description: MultiLangText | string;
+    arabizi: string;
+    arabic: string;
+    translation: MultiLangText | string;
+    audioUrl?: string;
+    culturalNote?: MultiLangText | string;
+  };
+  exercise?: Exercise;
+}
 
 export interface ExerciseOption {
   id: string;
-  arabizi: string;
-  arabic: string;
-  translation: string;
-  audioUrl?: string;
+  text: string; // Keeps Darija in text
+  isCorrect: boolean;
 }
 
 export interface MatchingPair {
   id: string;
-  left: { text: string; audioUrl?: string }; // Darija
-  right: { text: string }; // Français
+  left: { text: string }; // Darija
+  right: { text: MultiLangText | string }; // Translation
 }
 
 export interface DialogueChoice {
   id: string;
-  text: { arabizi: string; arabic: string; translation: string };
+  text: { arabizi: string; arabic: string; translation: MultiLangText | string };
   isOptimal: boolean;
-  feedback: string;
-  nextNpcLine?: string; // Optionnel : réaction immédiate
+  feedback: MultiLangText | string;
+  nextNpcLine?: string;
 }
 
 export interface Exercise {
   id: string;
   type: ExerciseType;
-  prompt: string; // The instruction for the user
+  prompt: MultiLangText | string;
   audioUrl?: string;
-  options?: ExerciseOption[]; // For MCQ, Match, Reorder, Fill-blank
-  pairs?: MatchingPair[]; // For Matching
-  dialogueContext?: string; // For dialogue
-  npcStartLine?: { arabizi: string; arabic: string; translation: string; audioUrl?: string }; // For dialogue
-  dialogueChoices?: DialogueChoice[]; // For dialogue
-  sentenceTemplate?: string; // For fill-blank (use {blank} for missing word)
-  answer: string | string[] | Record<string, string>; // Correct option ID(s), ordered array of IDs, or map for matching
-  explanation: string;
-  culturalNote?: string;
-}
-
-export interface LessonStep {
-  id: string;
-  type: 'learning' | 'exercise';
-  content?: {
-    title: string;
-    description: string;
-    arabizi: string;
-    arabic: string;
-    translation: string;
-    audioUrl?: string;
-    culturalNote?: string;
-  };
-  exercise?: Exercise;
-}
-
-export interface Lesson {
-  id: string;
-  title: string;
-  level: number;
-  description: string;
-  steps: LessonStep[];
+  options?: ExerciseOption[];
+  pairs?: MatchingPair[];
+  dialogueContext?: MultiLangText | string;
+  npcStartLine?: { arabizi: string; arabic: string; translation: MultiLangText | string; audioUrl?: string };
+  dialogueChoices?: DialogueChoice[];
+  sentenceTemplate?: string;
+  answer: string | string[] | Record<string, string>;
+  explanation: MultiLangText | string;
+  culturalNote?: MultiLangText | string;
 }
 
 export interface VocabularyItem {
@@ -80,6 +85,6 @@ export interface VocabularyItem {
   arabic: string;
   audioUrl?: string;
   category: string;
-  examples: { arabizi: string; arabic: string; translation: string }[];
-  culturalNotes?: string;
+  examples: { arabizi: string; arabic: string; translation: MultiLangText }[];
+  culturalNotes?: MultiLangText;
 }

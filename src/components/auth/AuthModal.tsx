@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { X, Mail, Lock, User, LogIn } from 'lucide-react';
 import { syncService } from '../../lib/syncService';
+import { useTranslation } from '../../store/useAppStore';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   if (!isOpen) return null;
 
@@ -45,7 +47,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         }
       }
     } catch (err: any) {
-      setError(err.message || "Une erreur est survenue.");
+      setError(err.message || "Erreur / Error");
     } finally {
       setLoading(false);
     }
@@ -71,9 +73,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             <h2 className="text-2xl font-black text-slate-800 flex justify-center items-center gap-2">
               <span className="text-3xl">🐪</span> KENZA <span className="text-lg font-medium text-slate-400 font-arabic ml-1">كنزة</span>
             </h2>
-            <p className="text-slate-500 mt-2 font-medium">
-              Sauvegardez votre progression à vie.
-            </p>
           </div>
 
           <div className="flex bg-slate-100 p-1 rounded-xl mb-6">
@@ -81,13 +80,13 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               onClick={() => setIsLogin(true)}
               className={`flex-1 py-2 font-bold text-sm rounded-lg transition-all ${isLogin ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
             >
-              Connexion
+              {t.auth.login}
             </button>
             <button 
               onClick={() => setIsLogin(false)}
               className={`flex-1 py-2 font-bold text-sm rounded-lg transition-all ${!isLogin ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
             >
-              Inscription
+              {t.auth.signup}
             </button>
           </div>
 
@@ -103,7 +102,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input 
                   type="email" 
-                  placeholder="Email" 
+                  placeholder={t.auth.email} 
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -116,7 +115,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input 
                   type="password" 
-                  placeholder="Mot de passe" 
+                  placeholder={t.auth.password} 
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -130,32 +129,21 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70"
             >
-              {loading ? 'Chargement...' : (isLogin ? 'Se connecter' : 'Créer mon compte')}
+              {loading ? '...' : (isLogin ? t.auth.login : t.auth.signup)}
               {!loading && <LogIn className="w-5 h-5" />}
             </button>
           </form>
 
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-200"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-slate-500 font-medium">Ou continuer avec</span>
-              </div>
-            </div>
-
-            <div className="mt-6 flex gap-3">
-              <button onClick={() => handleOAuth('google')} className="flex-1 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2">
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
-                Google
-              </button>
-            </div>
+          <div className="mt-6 flex gap-3">
+            <button onClick={() => handleOAuth('google')} className="flex-1 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2">
+              <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
+              {t.auth.google}
+            </button>
           </div>
           
           <div className="mt-8 text-center">
             <button onClick={onClose} className="text-slate-500 hover:text-slate-800 text-sm font-bold underline-offset-4 hover:underline">
-              Continuer en mode invité (Local)
+              {t.auth.continueGuest}
             </button>
           </div>
         </div>

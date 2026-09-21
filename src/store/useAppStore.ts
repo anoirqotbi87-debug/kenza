@@ -3,6 +3,8 @@ import { persist } from 'zustand/middleware';
 import { Notation } from '../types/curriculum';
 import { SRSCard, ReviewGrade } from '../types/srs';
 
+import { UILanguage, translations } from '../lib/i18n/translations';
+
 interface AppState {
   // User Progress
   xp: number;
@@ -16,12 +18,14 @@ interface AppState {
   // Settings
   preferredNotation: Notation;
   soundEnabled: boolean;
+  uiLanguage: UILanguage;
   
   // Actions
   addXp: (amount: number) => void;
   completeLesson: (lessonId: string) => void;
   setNotation: (notation: Notation) => void;
   toggleSound: () => void;
+  setLanguage: (lang: UILanguage) => void;
   
   // SRS Actions
   addCardsToSRS: (wordIds: string[]) => void;
@@ -39,6 +43,7 @@ export const useAppStore = create<AppState>()(
       srsDeck: {},
       preferredNotation: 'arabizi',
       soundEnabled: true,
+      uiLanguage: 'fr',
       
       addXp: (amount) => set((state) => ({ xp: state.xp + amount })),
       
@@ -51,6 +56,8 @@ export const useAppStore = create<AppState>()(
       setNotation: (notation) => set({ preferredNotation: notation }),
       
       toggleSound: () => set((state) => ({ soundEnabled: !state.soundEnabled })),
+      
+      setLanguage: (lang) => set({ uiLanguage: lang }),
       
       addCardsToSRS: (wordIds) => set((state) => {
         const newDeck = { ...state.srsDeck };
@@ -132,3 +139,8 @@ export const useAppStore = create<AppState>()(
     }
   )
 );
+
+export function useTranslation() {
+  const uiLanguage = useAppStore((state) => state.uiLanguage);
+  return { t: translations[uiLanguage], lang: uiLanguage };
+}

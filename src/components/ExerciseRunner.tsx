@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Lesson, Notation } from '../types/curriculum';
-import { useAppStore } from '../store/useAppStore';
+import { useAppStore, useTranslation } from '../store/useAppStore';
 import { X, Check, Volume2, Info, ArrowRight, Heart, HeartCrack, Trophy } from 'lucide-react';
 import McqExercise from './lessons/exercises/McqExercise';
 import ReorderExercise from './lessons/exercises/ReorderExercise';
@@ -11,6 +11,7 @@ import FillBlankExercise from './lessons/exercises/FillBlankExercise';
 import ScenarioDialogue from './dialogue/ScenarioDialogue';
 import { playAudio } from '../lib/audio';
 import ConjugationTable from './grammar/ConjugationTable';
+import { getLocalizedText } from '../lib/i18n/utils';
 
 interface ExerciseRunnerProps {
   lesson: Lesson;
@@ -22,6 +23,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isAnswerChecked, setIsAnswerChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const { t, lang } = useTranslation();
   
   // Exercise states
   const [selectedMcqId, setSelectedMcqId] = useState<string | null>(null);
@@ -104,10 +106,9 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
     return (
       <div className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-4 text-center">
         <HeartCrack className="w-24 h-24 text-red-500 mb-6" />
-        <h2 className="text-3xl font-bold text-slate-800 mb-4">Plus de vies !</h2>
-        <p className="text-slate-600 mb-8 max-w-md">Ne vous découragez pas, l'apprentissage prend du temps. Révisez et réessayez.</p>
+        <h2 className="text-3xl font-bold text-slate-800 mb-4">{t.lessons.gameOver}</h2>
         <button onClick={onClose} className="px-8 py-4 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-2xl font-bold text-lg">
-          Quitter la leçon
+          {t.lessons.retry}
         </button>
       </div>
     );
@@ -119,16 +120,15 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
         <div className="w-32 h-32 bg-amber-100 rounded-full flex items-center justify-center mb-8 shadow-inner border-4 border-amber-50">
           <Trophy className="w-16 h-16 text-amber-500" />
         </div>
-        <h2 className="text-4xl font-black text-amber-500 mb-2">Leçon Terminée !</h2>
-        <p className="text-xl text-slate-600 font-medium mb-12">Vous avez assuré.</p>
+        <h2 className="text-4xl font-black text-amber-500 mb-2">{t.lessons.congrats}</h2>
 
         <div className="flex gap-8 mb-12">
           <div className="bg-blue-50 border border-blue-100 p-6 rounded-3xl min-w-[140px]">
-            <div className="text-blue-500 text-sm font-bold uppercase mb-1">XP Gagné</div>
+            <div className="text-blue-500 text-sm font-bold uppercase mb-1">XP</div>
             <div className="text-3xl font-black text-blue-600">+{xpGained}</div>
           </div>
           <div className="bg-red-50 border border-red-100 p-6 rounded-3xl min-w-[140px]">
-            <div className="text-red-500 text-sm font-bold uppercase mb-1">Vies Restantes</div>
+            <div className="text-red-500 text-sm font-bold uppercase mb-1">{t.lessons.lives}</div>
             <div className="text-3xl font-black text-red-600 flex justify-center gap-1 mt-2">
               {Array.from({ length: 3 }).map((_, i) => (
                 <Heart key={i} className={`w-6 h-6 ${i < lives ? 'fill-red-500 text-red-500' : 'text-red-200'}`} />
@@ -138,7 +138,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
         </div>
 
         <button onClick={onComplete} className="px-12 py-4 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-bold text-xl shadow-lg transition-transform hover:scale-105 active:scale-95 w-full max-w-sm">
-          Continuer
+          {t.lessons.continue}
         </button>
       </div>
     );
@@ -147,12 +147,13 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
   const renderContent = () => {
     // 1. Learning screens
     if (step.type === 'learning' && step.content) {
-      if (step.content.title === "Grammaire Active") {
+      const titleText = getLocalizedText(step.content.title, lang, 'fr');
+      if (titleText === "Grammaire Active") {
          return <ConjugationTable />;
       }
       return (
         <div className="flex flex-col items-center justify-center h-full space-y-8 text-center animate-in fade-in zoom-in duration-300">
-          <h2 className="text-3xl font-bold text-slate-800">{step.content.title}</h2>
+          <h2 className="text-3xl font-bold text-slate-800">{getLocalizedText(step.content.title, lang)}</h2>
           
           <div className="bg-orange-50 p-8 rounded-3xl w-full max-w-md shadow-sm border border-orange-100 relative">
             <button 
@@ -164,15 +165,15 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
             <div className="text-5xl font-extrabold text-orange-600 mb-4 font-arabic">
               {preferredNotation === 'arabic' ? step.content.arabic : step.content.arabizi}
             </div>
-            <div className="text-xl text-slate-600 font-medium">{step.content.translation}</div>
+            <div className="text-xl text-slate-600 font-medium">{getLocalizedText(step.content.translation, lang)}</div>
           </div>
           
-          <p className="text-lg text-slate-600 max-w-lg">{step.content.description}</p>
+          <p className="text-lg text-slate-600 max-w-lg">{getLocalizedText(step.content.description, lang)}</p>
 
           {step.content.culturalNote && (
             <div className="bg-amber-50 p-4 rounded-xl flex gap-3 text-left w-full max-w-lg">
               <Info className="w-6 h-6 text-amber-500 shrink-0" />
-              <p className="text-amber-800 text-sm">{step.content.culturalNote}</p>
+              <p className="text-amber-800 text-sm">{getLocalizedText(step.content.culturalNote, lang)}</p>
             </div>
           )}
         </div>
@@ -184,7 +185,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
       return (
         <div className="flex flex-col h-full w-full max-w-3xl mx-auto space-y-8 animate-in slide-in-from-right duration-300">
           <div className="flex justify-between items-start">
-            <h2 className="text-2xl font-bold text-slate-800">{step.exercise.prompt}</h2>
+            <h2 className="text-2xl font-bold text-slate-800">{getLocalizedText(step.exercise.prompt, lang)}</h2>
             {step.exercise.audioUrl && (
               <button onClick={() => handlePlayAudio('', step.exercise?.audioUrl)} className="p-3 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-full transition-colors">
                 <Volume2 className="w-6 h-6" />
@@ -300,9 +301,9 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
                   {isCorrect ? <Check className="w-8 h-8" /> : <X className="w-8 h-8" />}
                 </div>
                 <div>
-                  <h3 className="font-bold text-2xl">{isCorrect ? 'Excellent !' : 'La bonne réponse était :'}</h3>
+                  <h3 className="font-bold text-2xl">{isCorrect ? 'Excellent !' : 'Oups !'}</h3>
                   {step.type === 'exercise' && step.exercise?.explanation && (
-                    <p className="text-base font-medium opacity-90 mt-1">{step.exercise.explanation}</p>
+                    <p className="text-base font-medium opacity-90 mt-1">{getLocalizedText(step.exercise.explanation, lang)}</p>
                   )}
                 </div>
               </div>
@@ -316,7 +317,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
                 disabled={isCheckDisabled()}
                 className="px-10 py-4 bg-green-500 hover:bg-green-600 disabled:bg-slate-200 disabled:text-slate-400 text-white rounded-2xl font-bold text-lg shadow-sm transition-all active:scale-95"
               >
-                Vérifier
+                {t.lessons.check}
               </button>
             ) : (
               <button 
@@ -327,7 +328,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
                   ${!isAnswerChecked && step.type === 'learning' ? 'bg-green-500 text-white hover:bg-green-600' : ''}
                 `}
               >
-                Continuer <ArrowRight className="w-5 h-5" />
+                {t.lessons.continue} <ArrowRight className="w-5 h-5" />
               </button>
             )}
           </div>

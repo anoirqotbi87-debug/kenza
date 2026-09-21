@@ -2,32 +2,31 @@ import { Lesson } from '../../types/curriculum';
 
 export const lessonCafe: Lesson = {
   id: 'l_module2_cafe_1',
-  title: 'Au Café',
+  title: {
+    fr: 'Au Café',
+    en: 'At the Cafe',
+    es: 'En el Café',
+    ar: 'في المقهى'
+  },
   level: 2,
-  description: 'Apprenez à commander un thé et discuter avec le serveur.',
+  description: {
+    fr: 'Apprenez à commander un thé et discuter avec le serveur.',
+    en: 'Learn how to order tea and talk with the waiter.',
+    es: 'Aprende a pedir un té y hablar con el camarero.',
+    ar: 'تعلم كيف تطلب شاياً وتتحدث مع النادل.'
+  },
   steps: [
     {
       id: 's1_intro',
       type: 'learning',
       content: {
-        title: 'Vocabulaire du Café',
-        description: 'La culture du café est centrale au Maroc. Commençons par les mots clés.',
+        title: { fr: 'Vocabulaire du Café', en: 'Cafe Vocabulary', es: 'Vocabulario del Café', ar: 'مفردات المقهى' },
+        description: { fr: 'La culture du café est centrale au Maroc.', en: 'Cafe culture is central in Morocco.', es: 'La cultura del café es central en Marruecos.', ar: 'ثقافة المقاهي أساسية في المغرب.' },
         arabizi: '9hwa / Atay',
         arabic: 'قهوة / أتاي',
-        translation: 'Café / Thé',
-        culturalNote: 'Le thé à la menthe (Atay b ne3na3) est la boisson nationale.'
+        translation: { fr: 'Café / Thé', en: 'Coffee / Tea', es: 'Café / Té', ar: 'قهوة / شاي' },
+        culturalNote: { fr: 'Le thé à la menthe (Atay b ne3na3) est la boisson nationale.', en: 'Mint tea is the national drink.', es: 'El té a la menta es la bebida nacional.', ar: 'الشاي بالنعناع هو المشروب الوطني.' }
       }
-    },
-    {
-      id: 's2_grammar',
-      type: 'learning',
-      content: {
-        title: 'Grammaire Active',
-        description: 'Apprenons à utiliser le verbe vouloir (Bgha) et la négation (Ma...ch).',
-        arabizi: 'Bghit',
-        arabic: 'بغيت',
-        translation: 'Je veux'
-      } // The 'Grammaire Active' title acts as a trigger to render ConjugationTable in ExerciseRunner
     },
     {
       id: 's3_matching',
@@ -35,15 +34,15 @@ export const lessonCafe: Lesson = {
       exercise: {
         id: 'ex_match_cafe',
         type: 'matching',
-        prompt: 'Reliez chaque boisson à sa traduction :',
+        prompt: { fr: 'Reliez chaque boisson à sa traduction :', en: 'Match each drink to its translation:', es: 'Relaciona cada bebida con su traducción:', ar: 'اربط كل مشروب بترجمته:' },
         pairs: [
-          { id: 'p1', left: { text: 'Atay' }, right: { text: 'Thé' } },
-          { id: 'p2', left: { text: '9hwa' }, right: { text: 'Café' } },
-          { id: 'p3', left: { text: 'Lma' }, right: { text: 'Eau' } },
-          { id: 'p4', left: { text: '3asir' }, right: { text: 'Jus' } }
+          { id: 'p1', left: { text: 'Atay' }, right: { text: { fr: 'Thé', en: 'Tea', es: 'Té', ar: 'شاي' } } },
+          { id: 'p2', left: { text: '9hwa' }, right: { text: { fr: 'Café', en: 'Coffee', es: 'Café', ar: 'قهوة' } } },
+          { id: 'p3', left: { text: 'Lma' }, right: { text: { fr: 'Eau', en: 'Water', es: 'Agua', ar: 'ماء' } } },
+          { id: 'p4', left: { text: '3asir' }, right: { text: { fr: 'Jus', en: 'Juice', es: 'Zumo', ar: 'عصير' } } }
         ],
-        answer: {}, // Handled by engine
-        explanation: '3asir = jus, Lma = eau, 9hwa = café, Atay = thé.'
+        answer: {}, 
+        explanation: { fr: '3asir = jus, Lma = eau, 9hwa = café, Atay = thé.', en: '3asir = juice, Lma = water, 9hwa = coffee, Atay = tea.', es: '3asir = zumo, Lma = agua, 9hwa = café, Atay = té.', ar: 'عصير = jus, ماء = Lma, قهوة = 9hwa, شاي = Atay.' }
       }
     },
     {
@@ -52,16 +51,16 @@ export const lessonCafe: Lesson = {
       exercise: {
         id: 'ex_reorder_cafe',
         type: 'reorder',
-        prompt: 'Reconstituez : "Je veux un thé à la menthe sans sucre"',
+        prompt: { fr: 'Reconstituez : "Je veux un thé à la menthe sans sucre"', en: 'Reorder: "I want a mint tea without sugar"', es: 'Reconstruye: "Quiero un té de menta sin azúcar"', ar: 'أعد ترتيب: "أريد شاي بالنعناع بدون سكر"' },
         options: [
-          { id: 'w1', arabizi: 'Bghit', arabic: 'بغيت', translation: 'Je veux' },
-          { id: 'w2', arabizi: 'atay', arabic: 'أتاي', translation: 'thé' },
-          { id: 'w3', arabizi: 'b ne3na3', arabic: 'ب نعناع', translation: 'à la menthe' },
-          { id: 'w4', arabizi: 'bla', arabic: 'بلا', translation: 'sans' },
-          { id: 'w5', arabizi: 'sekkar', arabic: 'سكر', translation: 'sucre' }
+          { id: 'w1', text: 'Bghit', isCorrect: true },
+          { id: 'w2', text: 'atay', isCorrect: true },
+          { id: 'w3', text: 'b ne3na3', isCorrect: true },
+          { id: 'w4', text: 'bla', isCorrect: true },
+          { id: 'w5', text: 'sekkar', isCorrect: true }
         ],
         answer: ['w1', 'w2', 'w3', 'w4', 'w5'],
-        explanation: 'Structure : Sujet+Verbe (Bghit) -> Objet (atay) -> Détails (b ne3na3, bla sekkar).'
+        explanation: { fr: 'Structure : Sujet+Verbe (Bghit) -> Objet (atay) -> Détails.', en: 'Structure: Subject+Verb -> Object -> Details.', es: 'Estructura: Sujeto+Verbo -> Objeto -> Detalles.', ar: 'التركيب: فاعل+فعل -> مفعول به -> تفاصيل.' }
       }
     },
     {
@@ -70,33 +69,15 @@ export const lessonCafe: Lesson = {
       exercise: {
         id: 'ex_mcq_cafe',
         type: 'mcq',
-        prompt: 'Le serveur vous apporte votre commande et dit "Bessaha" (À votre santé). Que répondez-vous ?',
+        prompt: { fr: 'Que répondez-vous à "Bessaha" ?', en: 'What do you reply to "Bessaha"?', es: '¿Qué respondes a "Bessaha"?', ar: 'بماذا ترد على "بالصحة"؟' },
         options: [
-          { id: 'opt1', arabizi: 'Lahetek saha', arabic: 'الله يعطيك الصحة', translation: 'Que Dieu te donne la santé' },
-          { id: 'opt2', arabizi: 'Shokran', arabic: 'شكرا', translation: 'Merci' },
-          { id: 'opt3', arabizi: 'Bslama', arabic: 'بسلامة', translation: 'Au revoir' },
-          { id: 'opt4', arabizi: 'Wakhan', arabic: 'واخا', translation: 'D\'accord' }
+          { id: 'opt1', text: 'Lahetek saha', isCorrect: true },
+          { id: 'opt2', text: 'Shokran', isCorrect: false },
+          { id: 'opt3', text: 'Bslama', isCorrect: false },
+          { id: 'opt4', text: 'Wakhan', isCorrect: false }
         ],
         answer: 'opt1',
-        explanation: 'On répond toujours "Lahetek saha" quand on nous dit "Bessaha".',
-        culturalNote: 'Bessaha s\'utilise quand on achète du neuf, on sort du bain, ou quand on mange !'
-      }
-    },
-    {
-      id: 's6_fill_blank',
-      type: 'exercise',
-      exercise: {
-        id: 'ex_fill_cafe',
-        type: 'fill-blank',
-        prompt: 'Complétez la négation : "Je ne veux pas de sucre"',
-        sentenceTemplate: '{blank} sekkar',
-        options: [
-          { id: 'opt1', arabizi: 'Ma-bghit-ch', arabic: 'مابغيتش', translation: 'Je ne veux pas' },
-          { id: 'opt2', arabizi: 'Ma-bghit', arabic: 'مابغيت', translation: 'Je ne veux' },
-          { id: 'opt3', arabizi: 'Bghit-ch', arabic: 'بغيتش', translation: 'veux-pas' }
-        ],
-        answer: 'opt1',
-        explanation: 'La négation encadre le verbe : Ma + verbe + ch.'
+        explanation: { fr: 'On répond "Lahetek saha".', en: 'We reply "Lahetek saha".', es: 'Respondemos "Lahetek saha".', ar: 'نرد بـ "الله يعطيك الصحة".' }
       }
     }
   ]

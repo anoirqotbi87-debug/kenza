@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { Exercise, Notation, DialogueChoice } from '../../types/curriculum';
 import { Volume2, User, CarFront } from 'lucide-react';
 import { playAudio } from '../../lib/audio';
-import { useAppStore } from '../../store/useAppStore';
+import { useAppStore, useTranslation } from '../../store/useAppStore';
+import { getLocalizedText } from '../../lib/i18n/utils';
 
 interface ScenarioDialogueProps {
   exercise: Exercise;
@@ -16,6 +17,7 @@ interface ScenarioDialogueProps {
 export default function ScenarioDialogue({ exercise, preferredNotation, onComplete, isAnswerChecked }: ScenarioDialogueProps) {
   const [selectedChoiceId, setSelectedChoiceId] = useState<string | null>(null);
   const { soundEnabled } = useAppStore();
+  const { lang } = useTranslation();
 
   const handleSelect = (choice: DialogueChoice) => {
     if (isAnswerChecked) return;
@@ -27,7 +29,7 @@ export default function ScenarioDialogue({ exercise, preferredNotation, onComple
     if (preferredNotation === 'arabizi') return item.arabizi;
     if (preferredNotation === 'arabic') return item.arabic;
     if (preferredNotation === 'duo') return `${item.arabizi} / ${item.arabic}`;
-    return item.translation; // fallback
+    return getLocalizedText(item.translation, lang); // fallback
   };
 
   const selectedChoice = exercise.dialogueChoices?.find(c => c.id === selectedChoiceId);
@@ -38,7 +40,7 @@ export default function ScenarioDialogue({ exercise, preferredNotation, onComple
       {/* Context Bar */}
       <div className="bg-orange-100 text-orange-800 px-4 py-2 rounded-xl text-sm font-bold uppercase tracking-wide flex justify-center items-center gap-2 mb-8">
         <CarFront className="w-5 h-5" />
-        {exercise.dialogueContext || "Scénario"}
+        {exercise.dialogueContext ? getLocalizedText(exercise.dialogueContext, lang) : "Scénario"}
       </div>
 
       {/* NPC Bubble */}
@@ -51,7 +53,7 @@ export default function ScenarioDialogue({ exercise, preferredNotation, onComple
             {exercise.npcStartLine ? getTextForNotation(exercise.npcStartLine) : ""}
           </p>
           <p className="text-slate-500 text-sm">
-            {exercise.npcStartLine?.translation}
+            {exercise.npcStartLine ? getLocalizedText(exercise.npcStartLine.translation, lang) : ""}
           </p>
           <button 
             onClick={() => playAudio(exercise.npcStartLine?.arabic || '', exercise.npcStartLine?.audioUrl, soundEnabled)}
@@ -75,7 +77,7 @@ export default function ScenarioDialogue({ exercise, preferredNotation, onComple
               <div className="font-bold text-blue-900 text-lg group-hover:text-blue-700 transition-colors">
                 {getTextForNotation(choice.text)}
               </div>
-              <div className="text-blue-600/70 text-sm mt-1">{choice.text.translation}</div>
+              <div className="text-blue-600/70 text-sm mt-1">{getLocalizedText(choice.text.translation, lang)}</div>
             </button>
           ))}
         </div>
@@ -90,7 +92,7 @@ export default function ScenarioDialogue({ exercise, preferredNotation, onComple
                 {getTextForNotation(selectedChoice?.text)}
               </p>
               <p className={`text-sm ${selectedChoice?.isOptimal ? 'text-green-600' : 'text-orange-600'}`}>
-                {selectedChoice?.text.translation}
+                {selectedChoice ? getLocalizedText(selectedChoice.text.translation, lang) : ''}
               </p>
             </div>
             <div className="w-12 h-12 bg-slate-200 text-slate-500 rounded-full flex items-center justify-center shrink-0 border-2 border-white shadow-sm">
@@ -111,7 +113,7 @@ export default function ScenarioDialogue({ exercise, preferredNotation, onComple
               )}
               <div className="flex gap-3 items-start">
                 <span className="text-2xl">{selectedChoice?.isOptimal ? '✅' : '⚠️'}</span>
-                <p className="text-slate-200 font-medium leading-relaxed">{selectedChoice?.feedback}</p>
+                <p className="text-slate-200 font-medium leading-relaxed">{selectedChoice ? getLocalizedText(selectedChoice.feedback, lang) : ''}</p>
               </div>
             </div>
           </div>
