@@ -21,6 +21,13 @@ export default function SmartReviewSession({ onClose }: SmartReviewSessionProps)
   const [isFlipped, setIsFlipped] = useState(false);
   const [sessionComplete, setSessionComplete] = useState(false);
 
+  React.useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
   if (sessionCards.length === 0) {
     return (
       <div className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-4">
@@ -66,7 +73,7 @@ export default function SmartReviewSession({ onClose }: SmartReviewSessionProps)
   }
 
   return (
-    <div className="fixed inset-0 bg-slate-900 z-50 flex flex-col items-center justify-center p-4">
+    <div className="z-50 fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="flex justify-between items-center mb-8 text-white">
           <button onClick={onClose} className="p-2 hover:bg-slate-800 rounded-full">
@@ -87,7 +94,9 @@ export default function SmartReviewSession({ onClose }: SmartReviewSessionProps)
               <div className="flex justify-center mb-3">
                 <CardIllustration illustration={getWordFromDictionary(currentCard.wordId)?.illustration} />
               </div>
-              <div className="text-sm font-bold text-slate-400 mb-4">{t.srs.translateToArabizi} {preferredNotation}</div>
+              <div className="text-sm font-bold text-slate-400 mb-4">
+                {preferredNotation === 'arabizi' ? t.srs.translateArabizi : preferredNotation === 'arabic' ? t.srs.translateArabic : t.srs.translateDuo}
+              </div>
               <div className="text-3xl font-bold text-slate-800">
                 {getLocalizedText(getWordFromDictionary(currentCard.wordId)?.translation, lang) || `Word_${currentCard.wordId}`}
               </div>

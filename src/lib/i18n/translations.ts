@@ -24,7 +24,7 @@ export const translations = {
     srs: {
       flip: "Retourner la carte", again: "À revoir", hard: "Difficile", good: "Bon", easy: "Facile",
       dueToday: "Cartes dues aujourd'hui", tapToFlip: "Appuyez pour retourner ->",
-      answer: "RÉPONSE", translateToArabizi: "TRADUIS EN",
+      answer: "RÉPONSE", translateArabizi: "Traduisez en Arabizi", translateArabic: "Traduisez en Arabe", translateDuo: "Traduisez en Darija (Bilingue)",
       allCaughtUp: "Tout est à jour !",
       allCaughtUpDesc: "Vous n'avez aucune carte à réviser aujourd'hui. Revenez demain pour consolider votre mémoire.",
       backToMenu: "Retour au Menu",
@@ -66,7 +66,7 @@ export const translations = {
     srs: {
       flip: "Flip card", again: "Again", hard: "Hard", good: "Good", easy: "Easy",
       dueToday: "Due cards today", tapToFlip: "Tap to flip ->",
-      answer: "ANSWER", translateToArabizi: "TRANSLATE TO",
+      answer: "ANSWER", translateArabizi: "Translate to Arabizi", translateArabic: "Translate to Arabic", translateDuo: "Translate to Darija (Duo)",
       allCaughtUp: "All caught up!",
       allCaughtUpDesc: "You have no cards to review today. Come back tomorrow to consolidate your memory.",
       backToMenu: "Back to Menu",
@@ -108,7 +108,7 @@ export const translations = {
     srs: {
       flip: "Girar tarjeta", again: "Repetir", hard: "Difícil", good: "Bueno", easy: "Fácil",
       dueToday: "Tarjetas para hoy", tapToFlip: "Toca para voltear ->",
-      answer: "RESPUESTA", translateToArabizi: "TRADUCE AL",
+      answer: "RESPUESTA", translateArabizi: "Traduce al Arabizi", translateArabic: "Traduce al Arabe", translateDuo: "Traduce al Darija (Bilingüe)",
       allCaughtUp: "¡Todo al día!",
       allCaughtUpDesc: "No tienes tarjetas para repasar hoy. Vuelve mañana para consolidar tu memoria.",
       backToMenu: "Volver al Menú",
@@ -150,7 +150,7 @@ export const translations = {
     srs: {
       flip: "اقلب البطاقة", again: "مجدداً", hard: "صعب", good: "جيد", easy: "سهل",
       dueToday: "بطاقات اليوم", tapToFlip: "انقر للقلب ->",
-      answer: "الإجابة", translateToArabizi: "ترجم إلى",
+      answer: "الإجابة", translateArabizi: "ترجم إلى العَرَبيزي", translateArabic: "ترجم إلى العربية", translateDuo: "ترجم إلى الدارجة (ثنائي)",
       allCaughtUp: "أنت مواكب لكل شيء!",
       allCaughtUpDesc: "ليس لديك بطاقات لمراجعتها اليوم. عد غداً لتعزيز ذاكرتك.",
       backToMenu: "العودة للقائمة",

@@ -159,7 +159,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
                   <div className="font-medium text-slate-800">
                     {preferredNotation === 'arabic' ? wordData.example.arabic : wordData.example.arabizi}
                   </div>
-                  <div className="text-slate-500 italic text-sm">{wordData.example.translation}</div>
+                  <div className="text-slate-500 italic text-sm">{typeof wordData.example.translation === 'object' ? getLocalizedText(wordData.example.translation, lang) : wordData.example.translation}</div>
                 </div>
               )}
 

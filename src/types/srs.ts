@@ -1,3 +1,5 @@
+import { MultiLangText } from './curriculum';
+
 export interface SRSCard {
   id: string;
   wordId: string;
@@ -26,7 +28,7 @@ export interface VocabularySRSData {
   example?: {
     arabizi: string;
     arabic: string;
-    translation: string;
+    translation: MultiLangText;
   };
   culturalNote?: string;
 }
