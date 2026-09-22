@@ -121,9 +121,9 @@ export const module7Lessons: Lesson[] = [
           type: 'matching',
           prompt: { fr: 'Associez chaque proverbe à son sens profond :', en: 'Match each proverb with its deep meaning:', es: 'Empareja cada proverbio con su significado profundo:', ar: 'اربط كل مثل بمعناه العميق:' },
           pairs: [
-            { id: 'p1', left: 'Lli fat mat', right: 'Tourner la page' },
-            { id: 'p2', left: 'Drba b drba', right: 'Patience et régularité' },
-            { id: 'p3', left: 'Zrbat matat', right: 'Rien ne sert de courir' }
+            { id: 'p1', left: { text: 'Lli fat mat' }, right: { text: 'Tourner la page' } },
+            { id: 'p2', left: { text: 'Drba b drba' }, right: { text: 'Patience et régularité' } },
+            { id: 'p3', left: { text: 'Zrbat matat' }, right: { text: 'Rien ne sert de courir' } }
           ]
         }
       },
