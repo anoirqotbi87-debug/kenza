@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -30,5 +31,5 @@ body {
 
 /* Support typographique pour l'Arabe */
 [dir="rtl"], [lang="ar"] {
-  font-family: system-ui, -apple-system, 'Segoe UI', 'Noto Sans Arabic', 'Cairo', Tahoma, Arial, sans-serif !important;
+  font-family: 'Cairo', 'Noto Sans Arabic', system-ui, -apple-system, sans-serif !important;
 }
