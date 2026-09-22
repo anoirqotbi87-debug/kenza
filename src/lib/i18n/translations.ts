@@ -13,7 +13,8 @@ export const translations = {
       currentStreak: "SÉRIE ACTUELLE", streakDays: "Jours", streakFreeze: "Gel", streakFreezes: "Gels",
       weeklyLeagues: "Ligues Hebdomadaires", yourTrophies: "Vos Trophées", youGuest: "Vous (Invité)",
       badgeCafeMaster: "Maître du Café", badgeTaxiAce: "As du Taxi", badgeSoukNego: "Négociateur du Souk", badgePolyglot: "Polyglotte de l'Atlas",
-      loading: "Chargement...", anonymous: "Anonyme", remainingCards: "Cartes restantes :"
+      loading: "Chargement...", anonymous: "Anonyme", remainingCards: "Cartes restantes :",
+      trackA: "Grammaire & Fondations", trackB: "Situations & Conversations Réelles"
     },
     lessons: {
       check: "Vérifier", continue: "Continuer", retry: "Réessayer", gameOver: "Plus de vies !",
@@ -55,7 +56,8 @@ export const translations = {
       currentStreak: "CURRENT STREAK", streakDays: "Days", streakFreeze: "Freeze", streakFreezes: "Freezes",
       weeklyLeagues: "Weekly Leagues", yourTrophies: "Your Trophies", youGuest: "You (Guest)",
       badgeCafeMaster: "Cafe Master", badgeTaxiAce: "Taxi Ace", badgeSoukNego: "Souk Negotiator", badgePolyglot: "Atlas Polyglot",
-      loading: "Loading...", anonymous: "Anonymous", remainingCards: "Remaining cards:"
+      loading: "Loading...", anonymous: "Anonymous", remainingCards: "Remaining cards:",
+      trackA: "Grammar & Foundations", trackB: "Situations & Conversations"
     },
     lessons: {
       check: "Check", continue: "Continue", retry: "Retry", gameOver: "Out of lives!",
@@ -97,7 +99,8 @@ export const translations = {
       currentStreak: "RACHA ACTUAL", streakDays: "Días", streakFreeze: "Congelador", streakFreezes: "Congeladores",
       weeklyLeagues: "Ligas Semanales", yourTrophies: "Tus Trofeos", youGuest: "Tú (Invitado)",
       badgeCafeMaster: "Maestro del Café", badgeTaxiAce: "As del Taxi", badgeSoukNego: "Negociador del Zoco", badgePolyglot: "Políglota del Atlas",
-      loading: "Cargando...", anonymous: "Anónimo", remainingCards: "Tarjetas restantes:"
+      loading: "Cargando...", anonymous: "Anónimo", remainingCards: "Cartas restantes:",
+      trackA: "Gramática y Fundamentos", trackB: "Situaciones y Conversaciones"
     },
     lessons: {
       check: "Comprobar", continue: "Continuar", retry: "Reintentar", gameOver: "¡Sin vidas!",
@@ -139,7 +142,8 @@ export const translations = {
       currentStreak: "السلسلة الحالية", streakDays: "أيام", streakFreeze: "تجميد", streakFreezes: "تجميد",
       weeklyLeagues: "الدوريات الأسبوعية", yourTrophies: "جوائزك", youGuest: "أنت (ضيف)",
       badgeCafeMaster: "خبير المقهى", badgeTaxiAce: "بطل التاكسي", badgeSoukNego: "مفاوض السوق", badgePolyglot: "متحدث لغات الأطلس",
-      loading: "جاري التحميل...", anonymous: "مجهول", remainingCards: "البطاقات المتبقية:"
+      loading: "جاري التحميل...", anonymous: "مجهول", remainingCards: "البطاقات المتبقية:",
+      trackA: "القواعد والأساسيات", trackB: "المواقف والمحادثات اليومية"
     },
     lessons: {
       check: "تحقق", continue: "استمر", retry: "حاول مجدداً", gameOver: "لقد نفذت محاولاتك!",

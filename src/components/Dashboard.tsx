@@ -24,6 +24,7 @@ export default function Dashboard({ onStartLesson }: DashboardProps) {
   const { t, lang } = useTranslation();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isReviewSessionOpen, setIsReviewSessionOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'trackA' | 'trackB'>('trackA');
   const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
@@ -143,68 +144,113 @@ export default function Dashboard({ onStartLesson }: DashboardProps) {
         </div>
       </section>
 
-      {/* Learning Path */}
-      <section className="space-y-12">
-        {Object.entries(fullCurriculum).map(([moduleId, moduleData]) => (
-          <div key={moduleId} className="space-y-6">
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-500 p-6 rounded-3xl text-white shadow-lg flex items-center justify-between">
-              <h2 className="text-2xl font-bold mb-2">{t.dashboard.module} {moduleId} : {getLocalizedText(moduleData.title, lang)}</h2>
-            </div>
+  const renderModule = (moduleId: string, moduleData: any, track: 'A' | 'B' = 'A') => {
+    const headerBg = track === 'A' 
+      ? "bg-gradient-to-r from-blue-600 to-indigo-500" 
+      : "bg-gradient-to-r from-amber-500 to-orange-500";
+    
+    const lineColor = track === 'A' ? "bg-blue-100" : "bg-amber-100";
+    
+    return (
+    <div key={moduleId} className="space-y-6">
+      <div className={`${headerBg} p-6 rounded-3xl text-white shadow-lg flex items-center justify-between`}>
+        <h2 className="text-2xl font-bold mb-2">{t.dashboard.module} {moduleId} : {getLocalizedText(moduleData.title, lang)}</h2>
+      </div>
 
-            <div className="relative pt-8 pb-12 flex flex-col items-center gap-12">
-              <div className="absolute top-0 bottom-0 left-1/2 w-4 bg-blue-100 -translate-x-1/2 z-0 rounded-full"></div>
-              
-              {moduleData.lessons.map((lesson) => {
-                const globalIndex = allLessonsList.findIndex(l => l.id === lesson.id);
-                const isCompleted = completedLessons.includes(lesson.id);
-                let isNext = !isCompleted && (globalIndex === 0 || completedLessons.includes(allLessonsList[globalIndex - 1].id));
-                let isLocked = !isCompleted && !isNext;
+      <div className="relative pt-8 pb-12 flex flex-col items-center gap-12">
+        <div className={`absolute top-0 bottom-0 left-1/2 w-4 ${lineColor} -translate-x-1/2 z-0 rounded-full`}></div>
+        
+        {moduleData.lessons.map((lesson: any) => {
+          const globalIndex = allLessonsList.findIndex(l => l.id === lesson.id);
+          const isCompleted = completedLessons.includes(lesson.id);
+          let isNext = !isCompleted && (globalIndex === 0 || completedLessons.includes(allLessonsList[globalIndex - 1].id));
+          let isLocked = !isCompleted && !isNext;
 
-                if (devUnlockAll) {
-                  isLocked = false;
-                  isNext = !isCompleted;
-                }
+          if (devUnlockAll) {
+            isLocked = false;
+            isNext = !isCompleted;
+          }
+          
+          return (
+            <div key={lesson.id} className="relative z-10 w-full max-w-md">
+              <div className={`
+                relative p-6 rounded-3xl border-4 transition-all duration-300
+                ${isCompleted ? 'bg-white border-green-400 shadow-md' : ''}
+                ${isNext ? 'bg-blue-50 border-blue-600 shadow-xl scale-105 transform cursor-pointer hover:bg-blue-100' : ''}
+                ${isLocked ? 'bg-slate-50 border-slate-200 opacity-70' : ''}
+              `}
+              onClick={() => isNext && onStartLesson(lesson.id)}
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className={`font-bold text-lg ${isLocked ? 'text-slate-400' : 'text-slate-800'}`}>
+                    {getLocalizedText(lesson.title, lang)}
+                  </h3>
+                  {isCompleted && <CheckCircle2 className="text-green-500 w-6 h-6" />}
+                  {isNext && <div className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full animate-pulse">{t.dashboard.current}</div>}
+                </div>
+                <p className={`text-sm mb-4 ${isLocked ? 'text-slate-400' : 'text-slate-600'}`}>
+                  {getLocalizedText(lesson.description, lang)}
+                </p>
                 
-                return (
-                  <div key={lesson.id} className="relative z-10 w-full max-w-md">
-                    <div className={`
-                      relative p-6 rounded-3xl border-4 transition-all duration-300
-                      ${isCompleted ? 'bg-white border-green-400 shadow-md' : ''}
-                      ${isNext ? 'bg-blue-50 border-blue-600 shadow-xl scale-105 transform cursor-pointer hover:bg-blue-100' : ''}
-                      ${isLocked ? 'bg-slate-50 border-slate-200 opacity-70' : ''}
-                    `}
-                    onClick={() => isNext && onStartLesson(lesson.id)}
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className={`font-bold text-lg ${isLocked ? 'text-slate-400' : 'text-slate-800'}`}>
-                          {getLocalizedText(lesson.title, lang)}
-                        </h3>
-                        {isCompleted && <CheckCircle2 className="text-green-500 w-6 h-6" />}
-                        {isNext && <div className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full animate-pulse">{t.dashboard.current}</div>}
-                      </div>
-                      <p className={`text-sm mb-4 ${isLocked ? 'text-slate-400' : 'text-slate-600'}`}>
-                        {getLocalizedText(lesson.description, lang)}
-                      </p>
-                      
-                      {isNext && (
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onStartLesson(lesson.id);
-                          }}
-                          className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold flex justify-center items-center gap-2 transition-colors shadow-md"
-                        >
-                          <Play className="w-5 h-5 fill-white" />
-                          {t.dashboard.start}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+                {isNext && (
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onStartLesson(lesson.id);
+                    }}
+                    className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold flex justify-center items-center gap-2 transition-colors shadow-md"
+                  >
+                    <Play className="w-5 h-5 fill-white" />
+                    {t.dashboard.start}
+                  </button>
+                )}
+              </div>
             </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+    };
+
+  return (
+    <div className="max-w-6xl mx-auto p-4 space-y-8">
+      {/* Mobile Tabs */}
+      <div className="lg:hidden flex bg-slate-200 p-1 rounded-xl mb-6">
+        <button 
+          onClick={() => setActiveTab('trackA')}
+          className={`flex-1 py-3 text-sm font-bold rounded-lg transition-colors ${activeTab === 'trackA' ? 'bg-white text-blue-600 shadow' : 'text-slate-500'}`}
+        >
+          📚 {t.dashboard.trackA || "Grammaire"}
+        </button>
+        <button 
+          onClick={() => setActiveTab('trackB')}
+          className={`flex-1 py-3 text-sm font-bold rounded-lg transition-colors ${activeTab === 'trackB' ? 'bg-white text-amber-600 shadow' : 'text-slate-500'}`}
+        >
+          💬 {t.dashboard.trackB || "Situations"}
+        </button>
+      </div>
+
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        {/* Colonne Piste A (Grammaire) */}
+        <div className={`space-y-12 ${activeTab === 'trackA' ? 'block' : 'hidden'} lg:block`}>
+          <div className="bg-blue-100 text-blue-800 p-4 rounded-2xl shadow-sm text-center font-bold text-xl mb-6 border border-blue-200">
+            📚 {t.dashboard.trackA || "Grammaire & Fondations"}
           </div>
-        ))}
+          {Object.entries(fullCurriculum)
+            .filter(([mId]) => ['1', '3', '4', '6'].includes(mId))
+            .map(([moduleId, moduleData]) => renderModule(moduleId, moduleData))}
+        </div>
+
+        {/* Colonne Piste B (Situations) */}
+        <div className={`space-y-12 ${activeTab === 'trackB' ? 'block' : 'hidden'} lg:block`}>
+          <div className="bg-amber-100 text-amber-800 p-4 rounded-2xl shadow-sm text-center font-bold text-xl mb-6 border border-amber-200">
+            💬 {t.dashboard.trackB || "Situations & Conversations"}
+          </div>
+          {Object.entries(fullCurriculum)
+            .filter(([mId]) => ['2', '5', '7'].includes(mId))
+            .map(([moduleId, moduleData]) => renderModule(moduleId, moduleData, 'B'))}
+        </div>
       </section>
 
       {/* Footer / Dev Utilities */}
