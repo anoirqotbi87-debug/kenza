@@ -20,7 +20,7 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ onStartLesson }: DashboardProps) {
-  const { xp, streakDays, completedLessons, preferredNotation, setNotation, toggleSound, soundEnabled } = useAppStore();
+  const { xp, streakDays, completedLessons, preferredNotation, setNotation, toggleSound, soundEnabled, devUnlockAll } = useAppStore();
   const { t, lang } = useTranslation();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isReviewSessionOpen, setIsReviewSessionOpen] = useState(false);
@@ -157,8 +157,13 @@ export default function Dashboard({ onStartLesson }: DashboardProps) {
               {moduleData.lessons.map((lesson) => {
                 const globalIndex = allLessonsList.findIndex(l => l.id === lesson.id);
                 const isCompleted = completedLessons.includes(lesson.id);
-                const isNext = !isCompleted && (globalIndex === 0 || completedLessons.includes(allLessonsList[globalIndex - 1].id));
-                const isLocked = !isCompleted && !isNext;
+                let isNext = !isCompleted && (globalIndex === 0 || completedLessons.includes(allLessonsList[globalIndex - 1].id));
+                let isLocked = !isCompleted && !isNext;
+
+                if (devUnlockAll) {
+                  isLocked = false;
+                  isNext = !isCompleted;
+                }
                 
                 return (
                   <div key={lesson.id} className="relative z-10 w-full max-w-md">

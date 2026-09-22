@@ -39,6 +39,9 @@ interface AppState {
   addCardsToSRS: (wordIds: string[]) => void;
   reviewCard: (wordId: string, grade: ReviewGrade) => void;
   getDueCards: () => SRSCard[];
+  
+  devUnlockAll: boolean;
+  toggleDevUnlockAll: () => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -56,6 +59,9 @@ export const useAppStore = create<AppState>()(
       soundEnabled: true,
       audioSpeed: 1.0,
       uiLanguage: 'fr',
+      devUnlockAll: true, // Activated by default for dev/testing
+      
+      toggleDevUnlockAll: () => set((state) => ({ devUnlockAll: !state.devUnlockAll })),
       
       addXp: (amount) => set((state) => {
         const newXp = state.xp + amount;
