@@ -392,6 +392,109 @@ export const module6Lessons: Lesson[] = [
     title: { fr: 'Négociation de bail', en: 'Lease Negotiation', es: 'Negociación de Arrendamiento', ar: 'التفاوض على الإيجار' },
     level: 4,
     description: { fr: 'Kra, caution, état des lieux', en: 'Rent, deposit, inventory', es: 'Alquiler, fianza, inventario', ar: 'الكراء، الضمان، حالة المكان' },
-    steps: []
+    steps: [
+      {
+        id: 's1_learn_kra',
+        type: 'learning',
+        content: {
+          title: { fr: 'Louer un Appartement', en: 'Renting an Apartment', es: 'Alquilar un Apartamento', ar: 'كراء شقة' },
+          description: { 
+            fr: 'Mots-clés : L-Kra (Loyer), Dman (Caution), L-Frakh (Meublé), L-ma w d-dow (L\'eau et l\'électricité), Moul d-dar (Propriétaire).', 
+            en: 'Keywords: L-Kra (Rent), Dman (Deposit), L-Frakh (Furnished), L-ma w d-dow (Water and electricity), Moul d-dar (Landlord).', 
+            es: 'Palabras clave: L-Kra (Alquiler), Dman (Fianza), L-Frakh (Amueblado), L-ma w d-dow (Agua y electricidad), Moul d-dar (Propietario).', 
+            ar: 'الكلمات الرئيسية: الكرا، الضمان، الفراش، الما والضو، مول الدار.' 
+          },
+          arabizi: 'Sh7al l-kra f ch-her?',
+          arabic: 'شحال الكرا فالشهر؟',
+          translation: { fr: 'Combien coûte le loyer par mois ?', en: 'How much is the rent per month?', es: '¿Cuánto es el alquiler al mes?', ar: 'كم الإيجار في الشهر؟' },
+          culturalNote: { fr: 'Le propriétaire est souvent appelé "Moul d-dar" (le maître de la maison).', en: 'The landlord is often called "Moul d-dar" (master of the house).', es: 'El propietario a menudo se llama "Moul d-dar" (el amo de la casa).', ar: 'غالباً ما يُطلق على صاحب المنزل اسم "مول الدار".' }
+        }
+      },
+      {
+        id: 's2_exercise_mcq',
+        type: 'exercise',
+        exercise: {
+          id: 'ex_mcq_kra',
+          type: 'mcq',
+          prompt: { fr: 'Comment dit-on "Combien coûte le loyer par mois ?"', en: 'How do you say "How much is the rent per month?"', es: '¿Cómo se dice "¿Cuánto es el alquiler al mes?"', ar: 'كيف تقول "كم الإيجار في الشهر؟"' },
+          options: [
+            { id: 'opt1', text: 'Sh7al l-kra f ch-her?', isCorrect: true },
+            { id: 'opt2', text: 'Fin d-dar?', isCorrect: false },
+            { id: 'opt3', text: 'Sh7al l-ma?', isCorrect: false },
+            { id: 'opt4', text: 'Bghit n-kri', isCorrect: false }
+          ],
+          answer: 'opt1',
+          explanation: { 
+            fr: 'Sh7al (Combien) + l-kra (le loyer) + f (dans/par) + ch-her (le mois).', 
+            en: 'Sh7al (How much) + l-kra (the rent) + f (in/per) + ch-her (the month).', 
+            es: 'Sh7al (Cuánto) + l-kra (el alquiler) + f (en/por) + ch-her (el mes).', 
+            ar: 'شحال (كم) + الكرا (الإيجار) + ف (في) + الشهر.' 
+          }
+        }
+      },
+      {
+        id: 's3_exercise_reorder',
+        type: 'exercise',
+        exercise: {
+          id: 'ex_reorder_charges',
+          type: 'reorder',
+          prompt: { fr: 'Reconstituez : "Est-ce que cet appartement comprend l\'eau et l\'électricité ?"', en: 'Reorder: "Does this apartment include water and electricity?"', es: 'Reconstruye: "¿Este apartamento incluye agua y electricidad?"', ar: 'أعد ترتيب: "هل هذه الشقة تشمل الماء والكهرباء؟"' },
+          options: [
+            { id: 'w1', text: 'Wash', isCorrect: true },
+            { id: 'w2', text: 'had', isCorrect: true },
+            { id: 'w3', text: 'd-dar', isCorrect: true },
+            { id: 'w4', text: 'fiha', isCorrect: true },
+            { id: 'w5', text: 'l-ma', isCorrect: true },
+            { id: 'w6', text: 'w', isCorrect: true },
+            { id: 'w7', text: 'd-dow?', isCorrect: true }
+          ],
+          answer: ['w1', 'w2', 'w3', 'w4', 'w5', 'w6', 'w7'],
+          explanation: { 
+            fr: 'Wash (Est-ce que) had (cette) d-dar (maison) fiha (elle contient) l-ma w d-dow (l\'eau et l\'électricité).', 
+            en: 'Wash (Does) had (this) d-dar (house) fiha (have in it) l-ma w d-dow (water and electricity).', 
+            es: 'Wash (¿Acaso) had (esta) d-dar (casa) fiha (tiene dentro) l-ma w d-dow (agua y electricidad).', 
+            ar: 'واش هاد الدار فيها الما والضو؟' 
+          }
+        }
+      },
+      {
+        id: 's4_exercise_fill',
+        type: 'exercise',
+        exercise: {
+          id: 'ex_fill_dman',
+          type: 'fill-blank',
+          prompt: { fr: 'Complétez : "Khass-ni n-khelles ch-her dyal ___" (Je dois payer un mois de caution).', en: 'Complete: "Khass-ni n-khelles ch-her dyal ___" (I must pay a month\'s deposit).', es: 'Completa: "Khass-ni n-khelles ch-her dyal ___" (Debo pagar un mes de fianza).', ar: 'أكمل: "خاصني نخلص شهر ديال ___" (الضمان)' },
+          sentenceTemplate: 'Khass-ni n-khelles ch-her dyal ___',
+          options: [
+            { id: 'opt1', text: 'dman', isCorrect: true },
+            { id: 'opt2', text: 'kra', isCorrect: false },
+            { id: 'opt3', text: 'l-ma', isCorrect: false }
+          ],
+          answer: 'opt1',
+          explanation: { 
+            fr: 'Dman veut dire "caution" ou "garantie".', 
+            en: 'Dman means "deposit" or "guarantee".', 
+            es: 'Dman significa "fianza" o "garantía".', 
+            ar: 'الضمان يعني الوديعة أو التأمين.' 
+          }
+        }
+      },
+      {
+        id: 's5_learn_dialogue',
+        type: 'learning',
+        content: {
+          title: { fr: 'Négociation (Mouchatara)', en: 'Negotiation', es: 'Negociación', ar: 'المفاوضة' },
+          description: { 
+            fr: 'Vous : "3jbatni d-dar, walakin l-kra ghali chwiya. Wash momkin t-nqess 500 DH ?" (J\'aime la maison, mais le loyer est un peu cher. Peux-tu baisser de 500 DH ?)\n\nMoul d-dar : "Wakha a sidi, n-khalliha lik b 4000 DH m3a dman dyal ch-her." (D\'accord monsieur, je vous la laisse à 4000 DH avec un mois de caution.)', 
+            en: 'You: "3jbatni d-dar, walakin l-kra ghali chwiya. Wash momkin t-nqess 500 DH?"\nLandlord: "Wakha a sidi, n-khalliha lik b 4000 DH m3a dman dyal ch-her."', 
+            es: 'Tú: "3jbatni d-dar, walakin l-kra ghali chwiya. Wash momkin t-nqess 500 DH?"\nPropietario: "Wakha a sidi, n-khalliha lik b 4000 DH m3a dman dyal ch-her."', 
+            ar: 'أنت: "عجباتني الدار، ولكن الكرا غالي شوية. واش ممكن تنقص 500 درهم؟"\nمول الدار: "واخا أسيدي، نخليها ليك بـ 4000 درهم مع ضمان ديال شهر."' 
+          },
+          arabizi: 'T-nqess 500 DH? (Baisser 500 DH ?)',
+          arabic: 'تنقص 500 درهم؟',
+          translation: { fr: 'La négociation au Maroc est courante pour le loyer.', en: 'Negotiation in Morocco is common for rent.', es: 'La negociación en Marruecos es común para el alquiler.', ar: 'المفاوضة شائعة في المغرب للإيجار.' }
+        }
+      }
+    ]
   }
 ];

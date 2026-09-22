@@ -145,7 +145,22 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
 
   const renderContent = () => {
     // 1. Learning screens
-    if (step.type === 'learning' && step.content) {
+    if (step.type === 'learning' || (step.type as string) === 'concept') {
+      if (!step.content) {
+        return (
+          <div className="flex flex-col items-center justify-center h-full space-y-8 text-center animate-in fade-in zoom-in duration-300">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 text-center">
+              <h3 className="text-xl font-bold text-slate-800 mb-4">
+                {getLocalizedText((step as any).title || step.exercise?.prompt, lang)}
+              </h3>
+              <div className="text-slate-600 mb-6 leading-relaxed">
+                {getLocalizedText((step as any).content || step.exercise?.explanation, lang)}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
       const titleText = getLocalizedText(step.content.title, lang, 'fr');
       if (titleText === "Grammaire Active") {
          return <ConjugationTable />;
@@ -155,17 +170,19 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
           <h2 className="text-3xl font-bold text-slate-800">{getLocalizedText(step.content.title, lang)}</h2>
           
           <div className="bg-blue-50 p-8 rounded-3xl w-full max-w-md shadow-sm border border-blue-100 relative">
-            <button 
-              onClick={() => handlePlayAudio(step.content!.arabic, step.content!.audioUrl)}
-              className="absolute -top-4 -right-4 bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-full shadow-lg transition-transform hover:scale-110"
-            >
-              <Volume2 className="w-6 h-6" />
-            </button>
+            {(step.content.arabic || step.content.audioUrl) && (
+              <button 
+                onClick={() => handlePlayAudio(step.content?.arabic || '', step.content?.audioUrl)}
+                className="absolute -top-4 -right-4 bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-full shadow-lg transition-transform hover:scale-110"
+              >
+                <Volume2 className="w-6 h-6" />
+              </button>
+            )}
             
             <div className="text-5xl font-extrabold text-blue-600 mb-4 font-arabic flex items-center justify-center flex-wrap">
               {preferredNotation === 'arabic' 
                 ? step.content.arabic 
-                : renderArabiziWithBadges(step.content.arabizi)}
+                : renderArabiziWithBadges(step.content.arabizi || '')}
             </div>
             <div className="text-xl text-slate-600 font-medium">{getLocalizedText(step.content.translation, lang)}</div>
           </div>
