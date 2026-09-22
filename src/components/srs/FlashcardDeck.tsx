@@ -105,7 +105,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
           {/* Front */}
           <div className="absolute w-full h-full backface-hidden bg-white rounded-3xl shadow-xl border border-slate-100 p-8 flex flex-col items-center justify-center">
             {wordData.category && (
-              <div className="absolute top-4 left-4 bg-orange-100 text-orange-700 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider">
+              <div className="absolute top-4 left-4 bg-orange-100 text-orange-700 text-xs px-3 py-1 rounded-full font-bold">
                 {wordData.category}
               </div>
             )}
@@ -150,7 +150,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
               {/* Example Context */}
               {wordData.example && (
                 <div className="mt-8 p-4 bg-slate-50 rounded-xl border border-slate-100 text-left">
-                  <div className="text-slate-500 text-xs uppercase font-bold mb-1">En contexte</div>
+                  <div className="text-slate-500 text-xs font-bold mb-1">En contexte</div>
                   <div className="font-medium text-slate-800">
                     {preferredNotation === 'arabic' ? wordData.example.arabic : wordData.example.arabizi}
                   </div>

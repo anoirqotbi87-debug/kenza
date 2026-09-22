@@ -60,7 +60,7 @@ export default function SRSDashboard() {
       <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 w-full max-w-sm mb-8 flex justify-between items-center">
         <div className="text-left">
           <div className="text-3xl font-black text-slate-800">{dueCards.length}</div>
-          <div className="text-sm text-slate-500 font-medium uppercase tracking-wider">{t.srs.cardsToReview}</div>
+          <div className="text-sm text-slate-500 font-medium">{t.srs.cardsToReview}</div>
         </div>
         
         {dueCards.length > 0 ? (
