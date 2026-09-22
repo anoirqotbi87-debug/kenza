@@ -206,6 +206,22 @@ export default function Dashboard({ onStartLesson }: DashboardProps) {
           </div>
         ))}
       </section>
+
+      {/* Footer / Dev Utilities */}
+      <footer className="pt-12 pb-6 flex justify-center">
+        <button 
+          onClick={() => {
+            if (confirm("Voulez-vous vraiment vider le cache local ? Vous perdrez votre progression (XP, leçons).")) {
+              localStorage.clear();
+              sessionStorage.clear();
+              window.location.reload();
+            }
+          }}
+          className="text-xs text-slate-400 hover:text-red-500 transition-colors bg-transparent border border-slate-200 hover:border-red-200 px-4 py-2 rounded-lg"
+        >
+          Vider le cache local / Réinitialiser
+        </button>
+      </footer>
     </div>
   );
 }

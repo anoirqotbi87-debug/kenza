@@ -42,15 +42,17 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
       if (!wordData) return;
       
       if (e.code === 'Space') {
+        e.preventDefault();
         setIsFlipped(true);
       } else if (isFlipped) {
-        if (e.key === '1') handleGrade('again');
-        if (e.key === '2') handleGrade('hard');
-        if (e.key === '3') handleGrade('good');
-        if (e.key === '4') handleGrade('easy');
+        if (e.key === '1') { e.preventDefault(); handleGrade('again'); }
+        if (e.key === '2') { e.preventDefault(); handleGrade('hard'); }
+        if (e.key === '3') { e.preventDefault(); handleGrade('good'); }
+        if (e.key === '4') { e.preventDefault(); handleGrade('easy'); }
       }
     };
     
