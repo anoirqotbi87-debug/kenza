@@ -21,6 +21,24 @@ interface ExerciseRunnerProps {
 }
 
 export default function ExerciseRunner({ lesson, onComplete, onClose }: ExerciseRunnerProps) {
+  if (!lesson || !lesson.steps || lesson.steps.length === 0) {
+    console.error("[ExerciseRunner Crash Guard] Leçon manquante ou sans steps :", lesson);
+    return (
+      <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl p-6 max-w-md w-full text-center shadow-xl">
+          <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">⚠️</div>
+          <h3 className="text-lg font-bold text-slate-800 mb-2">Leçon indisponible</h3>
+          <p className="text-sm text-slate-500 mb-4">
+            La leçon demandée ({lesson?.id || 'ID inconnu'}) n'a pas pu être chargée ou ne contient aucune étape.
+          </p>
+          <button onClick={onClose} className="w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl hover:bg-blue-700">
+            Retour au Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isAnswerChecked, setIsAnswerChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);

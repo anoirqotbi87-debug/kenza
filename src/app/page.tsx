@@ -4,9 +4,9 @@ import { useState } from 'react';
 import Dashboard from '@/components/Dashboard';
 import ExerciseRunner from '@/components/ExerciseRunner';
 import SRSDashboard from '@/components/srs/SRSDashboard';
-import { module1Lessons } from '@/data/module1';
-import { lessonCafe } from '@/data/lessons/lesson-cafe';
+import { allLessonsList } from '@/data/curriculum';
 import { useAppStore } from '@/store/useAppStore';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export default function Home() {
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
@@ -27,10 +27,8 @@ export default function Home() {
     setActiveLessonId(null);
   };
 
-  const allLessons = [...module1Lessons, lessonCafe];
-  
   const activeLesson = activeLessonId 
-    ? allLessons.find(l => l.id === activeLessonId) 
+    ? allLessonsList.find(l => l.id === activeLessonId) 
     : null;
 
   return (
@@ -46,11 +44,13 @@ export default function Home() {
         </div>
       ) : (
         activeLesson && (
-          <ExerciseRunner 
-            lesson={activeLesson}
-            onComplete={handleCompleteLesson}
-            onClose={handleCloseLesson}
-          />
+          <ErrorBoundary onClose={handleCloseLesson}>
+            <ExerciseRunner 
+              lesson={activeLesson}
+              onComplete={handleCompleteLesson}
+              onClose={handleCloseLesson}
+            />
+          </ErrorBoundary>
         )
       )}
     </main>
