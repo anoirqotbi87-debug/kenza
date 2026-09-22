@@ -195,6 +195,21 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'darija-quest-storage',
+      version: 2,
+      migrate: (persistedState: any, version: number) => {
+        if (version < 2) {
+          if (persistedState.srsDeck) {
+            const hasLegacyCards = Object.keys(persistedState.srsDeck).some(
+              id => id.toLowerCase().startsWith('word_v')
+            );
+            if (hasLegacyCards) {
+              // Purge legacy deck entirely so new one can take over
+              persistedState.srsDeck = {};
+            }
+          }
+        }
+        return persistedState;
+      }
     }
   )
 );

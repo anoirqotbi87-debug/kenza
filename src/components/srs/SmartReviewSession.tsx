@@ -14,12 +14,20 @@ export default function SmartReviewSession({ onClose }: SmartReviewSessionProps)
   const { getDueCards, reviewCard, preferredNotation } = useAppStore();
   const { lang, t } = useTranslation();
   
-  const dueCards = getDueCards();
-  const sessionCards = dueCards.slice(0, 10); // Review up to 10 cards
-
+  const [sessionCards, setSessionCards] = useState<SRSCard[] | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [sessionComplete, setSessionComplete] = useState(false);
+
+  React.useEffect(() => {
+    // Diffère le calcul lourd pour ne pas bloquer le thread principal (INP fix)
+    const timer = setTimeout(() => {
+      const dueCards = getDueCards();
+      setSessionCards(dueCards.slice(0, 10)); // Review up to 10 cards
+    }, 0);
+    
+    return () => clearTimeout(timer);
+  }, [getDueCards]);
 
   React.useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -27,6 +35,14 @@ export default function SmartReviewSession({ onClose }: SmartReviewSessionProps)
       document.body.style.overflow = 'unset';
     };
   }, []);
+
+  if (!sessionCards) {
+    return (
+      <div className="z-50 fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="text-white text-xl font-bold animate-pulse">{t.dashboard.loading || 'Chargement...'}</div>
+      </div>
+    );
+  }
 
   if (sessionCards.length === 0) {
     return (
