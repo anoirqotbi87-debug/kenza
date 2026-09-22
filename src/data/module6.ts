@@ -263,7 +263,129 @@ export const module6Lessons: Lesson[] = [
     title: { fr: 'L\'hypothèse', en: 'Hypothesis', es: 'La Hipótesis', ar: 'الافتراض' },
     level: 3,
     description: { fr: 'Ila réalisable vs Koun irréel', en: 'Ila (possible) vs Koun (unreal)', es: 'Ila (posible) vs Koun (irreal)', ar: 'إيلا (ممكن) مقابل كون (مستحيل)' },
-    steps: []
+    steps: [
+      {
+        id: 's1_learn_ila_koun',
+        type: 'learning',
+        content: {
+          title: { fr: 'L\'Hypothèse : Ila vs Koun', en: 'Hypothesis: Ila vs Koun', es: 'Hipótesis: Ila vs Koun', ar: 'الافتراض: إيلا مقابل كون' },
+          description: { 
+            fr: 'Ila (Réalisable) : Condition future possible (Ila + verbe -> Ghadi...). Koun (Irréel) : Condition imaginaire ou regret passé (Koun + passé -> Koun + passé).', 
+            en: 'Ila (Possible): Possible future condition (Ila + verb -> Ghadi...). Koun (Unreal): Imaginary condition or past regret (Koun + past -> Koun + past).', 
+            es: 'Ila (Posible): Condición futura posible (Ila + verbo -> Ghadi...). Koun (Irreal): Condición imaginaria o arrepentimiento pasado (Koun + pasado -> Koun + pasado).', 
+            ar: 'إيلا (ممكن): شرط مستقبلي ممكن (إيلا + فعل -> غادي...). كون (غير واقعي): شرط خيالي أو ندم على الماضي (كون + ماضي -> كون + ماضي).' 
+          },
+          arabizi: 'Ila jiti, ghadi n-chufek / Koun jiti, koun chef-t-ek',
+          arabic: 'إيلا جيتي، غادي نشوفك / كون جيتي، كون شفتك',
+          translation: { fr: 'Si tu viens, je te verrai / Si tu étais venu, je t\'aurais vu', en: 'If you come, I will see you / If you had come, I would have seen you', es: 'Si vienes, te veré / Si hubieras venido, te habría visto', ar: 'إذا جئت، سأراك / لو جئت، لرأيتك' },
+          culturalNote: { fr: 'Règle d\'or : "Koun exprime toujours le regret de ce qui ne s\'est pas produit !"', en: 'Golden rule: "Koun always expresses the regret of what did not happen!"', es: 'Regla de oro: "¡Koun siempre expresa el arrepentimiento de lo que no sucedió!"', ar: 'القاعدة الذهبية: "كون تعبر دائماً عن الندم على ما لم يحدث!"' }
+        }
+      },
+      {
+        id: 's2_exercise_mcq',
+        type: 'exercise',
+        exercise: {
+          id: 'ex_mcq_ila',
+          type: 'mcq',
+          prompt: { fr: 'Complétez : "___ jiti ghdda, ghadi n-chufek" (Si tu viens demain, je te verrai)', en: 'Complete: "___ jiti ghdda, ghadi n-chufek" (If you come tomorrow, I will see you)', es: 'Completa: "___ jiti ghdda, ghadi n-chufek" (Si vienes mañana, te veré)', ar: 'أكمل: "___ جيتي غدا، غادي نشوفك"' },
+          options: [
+            { id: 'opt1', text: 'Ila', isCorrect: true },
+            { id: 'opt2', text: 'Koun', isCorrect: false },
+            { id: 'opt3', text: 'Wakha', isCorrect: false },
+            { id: 'opt4', text: 'Bghit', isCorrect: false }
+          ],
+          answer: 'opt1',
+          explanation: { 
+            fr: 'On parle d\'un événement futur réalisable (ghdda = demain), donc on utilise Ila.', 
+            en: 'We are talking about a possible future event (ghdda = tomorrow), so we use Ila.', 
+            es: 'Hablamos de un evento futuro posible (ghdda = mañana), por lo que usamos Ila.', 
+            ar: 'نحن نتحدث عن حدث مستقبلي ممكن (غدا)، لذلك نستخدم إيلا.' 
+          }
+        }
+      },
+      {
+        id: 's3_exercise_reorder',
+        type: 'exercise',
+        exercise: {
+          id: 'ex_reorder_koun',
+          type: 'reorder',
+          prompt: { fr: 'Reconstituez : "Si j\'avais su, je serais venu."', en: 'Reorder: "If I had known, I would have come."', es: 'Reconstruye: "Si lo hubiera sabido, habría venido."', ar: 'أعد ترتيب: "لو كنت أعرف، لكنت جئت."' },
+          options: [
+            { id: 'w1', text: 'Koun', isCorrect: true },
+            { id: 'w2', text: '3ref-t,', isCorrect: true },
+            { id: 'w3', text: 'koun', isCorrect: true },
+            { id: 'w4', text: 'ji-t', isCorrect: true }
+          ],
+          answer: ['w1', 'w2', 'w3', 'w4'],
+          explanation: { 
+            fr: 'La double répétition de "Koun" est typique en Darija pour l\'irréel du passé.', 
+            en: 'The double repetition of "Koun" is typical in Darija for past unreality.', 
+            es: 'La doble repetición de "Koun" es típica en Darija para la irrealidad pasada.', 
+            ar: 'التكرار المزدوج لـ "كون" هو نموذجي في الدارجة للماضي غير الواقعي.' 
+          }
+        }
+      },
+      {
+        id: 's4_exercise_fill',
+        type: 'exercise',
+        exercise: {
+          id: 'ex_fill_koun',
+          type: 'fill-blank',
+          prompt: { fr: 'Complétez : "___ kan 3endi l-flus, koun chri-t had d-dar." (Si j\'avais de l\'argent, j\'aurais acheté cette maison.)', en: 'Complete: "___ kan 3endi l-flus, koun chri-t had d-dar." (If I had money, I would have bought this house.)', es: 'Completa: "___ kan 3endi l-flus, koun chri-t had d-dar." (Si tuviera dinero, habría comprado esta casa.)', ar: 'أكمل: "___ كان عندي الفلوس، كون شريت هاد الدار."' },
+          sentenceTemplate: '___ kan 3endi l-flus, koun chri-t had d-dar.',
+          options: [
+            { id: 'opt1', text: 'Koun', isCorrect: true },
+            { id: 'opt2', text: 'Ila', isCorrect: false },
+            { id: 'opt3', text: 'Wakha', isCorrect: false }
+          ],
+          answer: 'opt1',
+          explanation: { 
+            fr: 'C\'est un regret (irréel). L\'indice est la suite de la phrase qui contient déjà "koun".', 
+            en: 'It\'s a regret (unreal). The clue is the rest of the sentence which already contains "koun".', 
+            es: 'Es un arrepentimiento (irreal). La pista es el resto de la oración que ya contiene "koun".', 
+            ar: 'إنه ندم (غير واقعي). الدليل هو بقية الجملة التي تحتوي بالفعل على "كون".' 
+          }
+        }
+      },
+      {
+        id: 's5_exercise_fill_2',
+        type: 'exercise',
+        exercise: {
+          id: 'ex_fill_ila',
+          type: 'fill-blank',
+          prompt: { fr: 'Complétez : "___ bghiti, n-mchiw daba." (Si tu veux, on y va maintenant.)', en: 'Complete: "___ bghiti, n-mchiw daba." (If you want, we can go now.)', es: 'Completa: "___ bghiti, n-mchiw daba." (Si quieres, vamos ahora.)', ar: 'أكمل: "___ بغيتي، نمشيو دابا."' },
+          sentenceTemplate: '___ bghiti, n-mchiw daba.',
+          options: [
+            { id: 'opt1', text: 'Ila', isCorrect: true },
+            { id: 'opt2', text: 'Koun', isCorrect: false },
+            { id: 'opt3', text: 'Wakha', isCorrect: false }
+          ],
+          answer: 'opt1',
+          explanation: { 
+            fr: 'C\'est une condition réalisable dans le présent/futur immédiat.', 
+            en: 'It\'s a possible condition in the present/immediate future.', 
+            es: 'Es una condición posible en el presente/futuro inmediato.', 
+            ar: 'إنه شرط ممكن في الحاضر/المستقبل القريب.' 
+          }
+        }
+      },
+      {
+        id: 's6_learn_dialogue',
+        type: 'learning',
+        content: {
+          title: { fr: 'Dialogue en contexte', en: 'Dialogue in context', es: 'Diálogo en contexto', ar: 'حوار في السياق' },
+          description: { 
+            fr: 'Rachid : "Ila saliti l-khedma békri, aji n-tlaqaw f l-qhwa." (Si tu finis tôt, viens au café.)\nOmar : "Wakha, walakin koun 3lem-tini l-bare7, koun khwit rasi l-youm !" (D\'accord, mais si tu m\'avais prévenu hier, j\'aurais libéré ma journée !)', 
+            en: 'Rachid: "Ila saliti l-khedma békri, aji n-tlaqaw f l-qhwa."\nOmar: "Wakha, walakin koun 3lem-tini l-bare7, koun khwit rasi l-youm!"', 
+            es: 'Rachid: "Ila saliti l-khedma békri, aji n-tlaqaw f l-qhwa."\nOmar: "Wakha, walakin koun 3lem-tini l-bare7, koun khwit rasi l-youm!"', 
+            ar: 'رشيد: "إيلا ساليتي الخدمة بكري، أجي نتلاقاو فالقهوة."\nعمر: "واخا، ولكن كون علمتيني البارح، كون خويت راسي اليوم!"' 
+          },
+          arabizi: 'Ila (Promesse) vs Koun (Regret)',
+          arabic: 'إيلا مقابل كون',
+          translation: { fr: 'Décryptage de la condition', en: 'Condition decoding', es: 'Decodificación de la condición', ar: 'فك تشفير الشرط' }
+        }
+      }
+    ]
   },
   {
     id: 'l_mod6_4',
