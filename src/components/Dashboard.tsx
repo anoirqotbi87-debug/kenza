@@ -62,8 +62,8 @@ export default function Dashboard({ onStartLesson }: DashboardProps) {
       )}
 
       {/* Top Navigation / Stats */}
-      <header className="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-orange-100 gap-4">
-        <h1 className="text-2xl font-bold text-orange-600 flex items-center gap-2 w-full sm:w-auto">
+      <header className="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-blue-100 gap-4">
+        <h1 className="text-2xl font-bold text-blue-600 flex items-center gap-2 w-full sm:w-auto">
           <span className="text-3xl">🐪</span> KENZA <span className="text-sm font-medium text-slate-400 font-arabic ml-1">كنزة</span>
         </h1>
         
@@ -147,12 +147,12 @@ export default function Dashboard({ onStartLesson }: DashboardProps) {
       <section className="space-y-12">
         {Object.entries(fullCurriculum).map(([moduleId, moduleData]) => (
           <div key={moduleId} className="space-y-6">
-            <div className="bg-gradient-to-r from-orange-500 to-amber-500 p-6 rounded-3xl text-white shadow-lg flex items-center justify-between">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-500 p-6 rounded-3xl text-white shadow-lg flex items-center justify-between">
               <h2 className="text-2xl font-bold mb-2">{t.dashboard.module} {moduleId} : {getLocalizedText(moduleData.title, lang)}</h2>
             </div>
 
             <div className="relative pt-8 pb-12 flex flex-col items-center gap-12">
-              <div className="absolute top-0 bottom-0 left-1/2 w-4 bg-orange-100 -translate-x-1/2 z-0 rounded-full"></div>
+              <div className="absolute top-0 bottom-0 left-1/2 w-4 bg-blue-100 -translate-x-1/2 z-0 rounded-full"></div>
               
               {moduleData.lessons.map((lesson) => {
                 const globalIndex = allLessonsList.findIndex(l => l.id === lesson.id);
@@ -165,7 +165,7 @@ export default function Dashboard({ onStartLesson }: DashboardProps) {
                     <div className={`
                       relative p-6 rounded-3xl border-4 transition-all duration-300
                       ${isCompleted ? 'bg-white border-green-400 shadow-md' : ''}
-                      ${isNext ? 'bg-orange-50 border-orange-500 shadow-xl scale-105 transform cursor-pointer hover:bg-orange-100' : ''}
+                      ${isNext ? 'bg-blue-50 border-blue-600 shadow-xl scale-105 transform cursor-pointer hover:bg-blue-100' : ''}
                       ${isLocked ? 'bg-slate-50 border-slate-200 opacity-70' : ''}
                     `}
                     onClick={() => isNext && onStartLesson(lesson.id)}
@@ -175,7 +175,7 @@ export default function Dashboard({ onStartLesson }: DashboardProps) {
                           {getLocalizedText(lesson.title, lang)}
                         </h3>
                         {isCompleted && <CheckCircle2 className="text-green-500 w-6 h-6" />}
-                        {isNext && <div className="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full animate-pulse">{t.dashboard.current}</div>}
+                        {isNext && <div className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full animate-pulse">{t.dashboard.current}</div>}
                       </div>
                       <p className={`text-sm mb-4 ${isLocked ? 'text-slate-400' : 'text-slate-600'}`}>
                         {getLocalizedText(lesson.description, lang)}
@@ -187,7 +187,7 @@ export default function Dashboard({ onStartLesson }: DashboardProps) {
                             e.stopPropagation();
                             onStartLesson(lesson.id);
                           }}
-                          className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold flex justify-center items-center gap-2 transition-colors shadow-md"
+                          className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold flex justify-center items-center gap-2 transition-colors shadow-md"
                         >
                           <Play className="w-5 h-5 fill-white" />
                           {t.dashboard.start}

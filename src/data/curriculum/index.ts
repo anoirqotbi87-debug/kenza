@@ -2,7 +2,7 @@ import { module1Lessons } from '../module1';
 import { lessonCafe } from '../lessons/lesson-cafe';
 import { lessonTaxi } from '../lessons/lesson-taxi';
 // On simule l'existence d'autres leçons pour l'UI, bien qu'elles soient à remplir plus tard
-import { Lesson } from '../../types/curriculum';
+import { Lesson, MultiLangText } from '../../types/curriculum';
 
 export const module2Lessons: Lesson[] = [
   lessonCafe,
@@ -19,8 +19,10 @@ export const module2Lessons: Lesson[] = [
 import { module3Lessons } from '../module3';
 import { module4Lessons } from '../module4';
 import { module5Lessons } from '../module5';
+import { module6Lessons } from '../module6';
+import { module7Lessons } from '../module7';
 
-export const fullCurriculum = {
+export const fullCurriculum: Record<string, { title: MultiLangText, lessons: Lesson[] }> = {
   1: { 
     title: { fr: "Les Fondations", en: "Foundations", es: "Los Cimientos", ar: "الأساسيات" }, 
     lessons: module1Lessons 
@@ -41,6 +43,14 @@ export const fullCurriculum = {
     title: { fr: "Immersion Culturelle", en: "Cultural Immersion", es: "Inmersión Cultural", ar: "الانغماس الثقافي" }, 
     lessons: module5Lessons 
   },
+  6: {
+    title: { fr: "Niveau B1 - Autonomie", en: "Level B1 - Autonomy", es: "Nivel B1 - Autonomía", ar: "المستوى B1 - الاستقلالية" },
+    lessons: module6Lessons
+  },
+  7: {
+    title: { fr: "Niveau B2 - Aisance", en: "Level B2 - Fluency", es: "Nivel B2 - Fluidez", ar: "المستوى B2 - الطلاقة" },
+    lessons: module7Lessons
+  }
 };
 
 export const allLessonsList = [
@@ -48,5 +58,7 @@ export const allLessonsList = [
   ...module2Lessons,
   ...module3Lessons,
   ...module4Lessons,
-  ...module5Lessons
+  ...module5Lessons,
+  ...module6Lessons,
+  ...module7Lessons
 ];

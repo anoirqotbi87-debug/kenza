@@ -10,6 +10,11 @@ export interface SRSCard {
 
 export type ReviewGrade = 'again' | 'hard' | 'good' | 'easy';
 
+export interface CardIllustration {
+  iconName: string; // Nom de l'icône Lucide (ex: 'Coffee', 'Car', 'Home')
+  category?: string;
+}
+
 export interface VocabularySRSData {
   id: string; // the wordId
   arabizi: string;
@@ -17,6 +22,7 @@ export interface VocabularySRSData {
   translation: any;
   category?: string;
   audioUrl?: string;
+  illustration?: CardIllustration;
   example?: {
     arabizi: string;
     arabic: string;

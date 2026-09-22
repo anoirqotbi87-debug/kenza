@@ -7,6 +7,7 @@ import { VocabularySRSData, ReviewGrade, SRSCard } from '../../types/srs';
 import { playAudio } from '../../lib/audio';
 import { useAppStore, useTranslation } from '../../store/useAppStore';
 import { getLocalizedText } from '../../lib/i18n/utils';
+import CardIllustration from './CardIllustration';
 
 interface FlashcardDeckProps {
   cards: SRSCard[];
@@ -105,10 +106,12 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
           {/* Front */}
           <div className="absolute w-full h-full backface-hidden bg-white rounded-3xl shadow-xl border border-slate-100 p-8 flex flex-col items-center justify-center">
             {wordData.category && (
-              <div className="absolute top-4 left-4 bg-orange-100 text-orange-700 text-xs px-3 py-1 rounded-full font-bold">
+              <div className="absolute top-4 left-4 bg-amber-100 text-amber-700 text-xs px-3 py-1 rounded-full font-bold">
                 {wordData.category}
               </div>
             )}
+            
+            <CardIllustration illustration={wordData.illustration} />
             
             <h2 className="text-4xl font-bold text-slate-800 text-center mb-6">
               {getLocalizedText(wordData.translation, lang)}
@@ -134,9 +137,11 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
             </button>
 
             <div className="text-center space-y-4 w-full">
+              <CardIllustration illustration={wordData.illustration} />
+              
               {/* Display Logic Based on Notation Preference */}
               {(preferredNotation === 'arabizi' || preferredNotation === 'duo') && (
-                <div className="text-5xl font-extrabold text-orange-600">
+                <div className="text-5xl font-extrabold text-blue-600">
                   {formatArabizi(wordData.arabizi)}
                 </div>
               )}

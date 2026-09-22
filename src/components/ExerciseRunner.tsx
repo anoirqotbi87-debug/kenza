@@ -154,14 +154,15 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
         <div className="flex flex-col items-center justify-center h-full space-y-8 text-center animate-in fade-in zoom-in duration-300">
           <h2 className="text-3xl font-bold text-slate-800">{getLocalizedText(step.content.title, lang)}</h2>
           
-          <div className="bg-orange-50 p-8 rounded-3xl w-full max-w-md shadow-sm border border-orange-100 relative">
+          <div className="bg-blue-50 p-8 rounded-3xl w-full max-w-md shadow-sm border border-blue-100 relative">
             <button 
               onClick={() => handlePlayAudio(step.content!.arabic, step.content!.audioUrl)}
               className="absolute -top-4 -right-4 bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-full shadow-lg transition-transform hover:scale-110"
             >
               <Volume2 className="w-6 h-6" />
             </button>
-            <div className="text-5xl font-extrabold text-orange-600 mb-4 font-arabic flex items-center justify-center flex-wrap">
+            
+            <div className="text-5xl font-extrabold text-blue-600 mb-4 font-arabic flex items-center justify-center flex-wrap">
               {preferredNotation === 'arabic' 
                 ? step.content.arabic 
                 : renderArabiziWithBadges(step.content.arabizi)}

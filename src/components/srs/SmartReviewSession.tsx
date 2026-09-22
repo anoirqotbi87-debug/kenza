@@ -4,6 +4,7 @@ import { Brain, ArrowRight, Check, X } from 'lucide-react';
 import { SRSCard } from '../../types/srs';
 import { getLocalizedText } from '../../lib/i18n/utils';
 import { getWordFromDictionary } from '../../data/srs-deck';
+import CardIllustration from './CardIllustration';
 
 interface SmartReviewSessionProps {
   onClose: () => void;
@@ -83,6 +84,9 @@ export default function SmartReviewSession({ onClose }: SmartReviewSessionProps)
         >
           {!isFlipped ? (
             <div className="flex flex-col items-center justify-center w-full h-full" style={{ backfaceVisibility: 'hidden' }}>
+              <div className="flex justify-center mb-3">
+                <CardIllustration illustration={getWordFromDictionary(currentCard.wordId)?.illustration} />
+              </div>
               <div className="text-sm font-bold text-slate-400 mb-4">{t.srs.translateToArabizi} {preferredNotation}</div>
               <div className="text-3xl font-bold text-slate-800">
                 {getLocalizedText(getWordFromDictionary(currentCard.wordId)?.translation, lang) || `Word_${currentCard.wordId}`}
@@ -93,6 +97,9 @@ export default function SmartReviewSession({ onClose }: SmartReviewSessionProps)
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center w-full h-full" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
+               <div className="flex justify-center mb-3">
+                 <CardIllustration illustration={getWordFromDictionary(currentCard.wordId)?.illustration} />
+               </div>
                <div className="text-sm font-bold text-green-500 mb-4">{t.srs.answer}</div>
                <div className="text-4xl font-extrabold text-slate-800 mb-2">
                  {preferredNotation === 'arabic' 
