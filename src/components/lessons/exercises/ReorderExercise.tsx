@@ -74,16 +74,16 @@ export default function ReorderExercise({ exercise, preferredNotation, onUpdate,
         ))}
       </div>
       
-      {/* Source words */}
-      <div className="flex flex-wrap gap-3 justify-center min-h-[100px]">
+      {/* Zone des blocs de mots disponibles */}
+      <div className="flex flex-wrap gap-2.5 justify-center items-center my-6 max-w-md mx-auto min-h-[100px]">
         {availableWords.map((word) => (
           <button
             key={`avail-${word.id}`}
             onClick={() => handleAdd(word)}
             disabled={isAnswerChecked}
             className={`
-              px-4 py-2 bg-white border-2 border-slate-200 rounded-xl shadow-sm transition-all flex items-center justify-center
-              ${isAnswerChecked ? 'opacity-50 cursor-not-allowed' : 'hover:border-slate-300 hover:shadow-md active:scale-95 text-slate-800'}
+              w-auto px-4 py-2.5 bg-blue-50 text-blue-900 border border-blue-200 rounded-xl font-bold text-base shadow-sm transition-all flex items-center justify-center
+              ${isAnswerChecked ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-100 hover:shadow-md active:scale-95'}
             `}
           >
             {word.text}

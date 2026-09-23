@@ -30,17 +30,18 @@ export const preloadAudio = async (url: string): Promise<void> => {
  */
 export const playAudio = async (text: string, audioUrl?: string, soundEnabled: boolean = true, speed: number = 1.0) => {
   if (!soundEnabled) return;
+  if (!text && !audioUrl) return;
 
+  const ctx = getAudioContext();
+  if (ctx.state === 'suspended') {
+    await ctx.resume();
+  }
+
+  // Si on a une URL de fichier statique, on la joue
   if (audioUrl) {
     try {
-      const ctx = getAudioContext();
-      if (ctx.state === 'suspended') {
-        await ctx.resume();
-      }
-      
       let audioBuffer = audioCache.get(audioUrl);
       if (!audioBuffer) {
-        // If not preloaded, fetch it now
         const response = await fetch(audioUrl);
         const arrayBuffer = await response.arrayBuffer();
         audioBuffer = await ctx.decodeAudioData(arrayBuffer);
@@ -52,18 +53,46 @@ export const playAudio = async (text: string, audioUrl?: string, soundEnabled: b
       source.playbackRate.value = speed;
       source.connect(ctx.destination);
       source.start();
+      return;
     } catch (e) {
       console.error("Error playing audio url with Web Audio API:", e);
-      // Fallback to HTML5 Audio if Web Audio API fails (CORS, etc.)
-      const audio = new Audio(audioUrl);
-      audio.playbackRate = speed;
-      audio.play().catch(err => console.error("Fallback audio failed:", err));
     }
-    return;
   }
 
-  // Fallback to SpeechSynthesis
-  if ('speechSynthesis' in window) {
+  // Sinon, on tente notre vraie voix IA via Edge TTS (sauf pour les sons d'UI simples)
+  if (text && text !== 'correct' && text !== 'error') {
+    try {
+      // Clé de cache pour le TTS
+      const cacheKey = `tts_${text}`;
+      let audioBuffer = audioCache.get(cacheKey);
+
+      if (!audioBuffer) {
+        const response = await fetch('/api/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ arabicText: text, text: text })
+        });
+
+        if (!response.ok) throw new Error('TTS API failed');
+
+        const arrayBuffer = await response.arrayBuffer();
+        audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+        audioCache.set(cacheKey, audioBuffer);
+      }
+
+      const source = ctx.createBufferSource();
+      source.buffer = audioBuffer;
+      source.playbackRate.value = speed;
+      source.connect(ctx.destination);
+      source.start();
+      return; // Succès TTS
+    } catch (e) {
+      console.error("Error with Edge TTS, falling back to Web Speech API:", e);
+    }
+  }
+
+  // Fallback ultime : Web Speech API du navigateur
+  if ('speechSynthesis' in window && text && text !== 'correct' && text !== 'error') {
     const voices = window.speechSynthesis.getVoices();
     const voice = voices.find(v => v.lang.includes('ar-MA')) || voices.find(v => v.lang.includes('ar-'));
     
