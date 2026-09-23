@@ -1,15 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAppStore, useTranslation } from '../store/useAppStore';
-import { Flame, Star, Settings, Play, CheckCircle2, User, LogOut } from 'lucide-react';
-import { Notation } from '../types/curriculum';
-import AuthModal from './auth/AuthModal';
-import LanguageSelector from './ui/LanguageSelector';
-import { supabase } from '../lib/supabase';
-import { Session } from '@supabase/supabase-js';
-import { fullCurriculum, allLessonsList } from '../data/curriculum';
-import { getLocalizedText } from '../lib/i18n/utils';
 import Leaderboard from './gamification/Leaderboard';
 import BadgesList from './gamification/BadgesList';
 import StreakHeatmap from './gamification/StreakHeatmap';
@@ -22,104 +14,15 @@ interface DashboardProps {
 export default function Dashboard({ onStartLesson }: DashboardProps) {
   const { xp, streakDays, completedLessons, preferredNotation, setNotation, toggleSound, soundEnabled, devUnlockAll } = useAppStore();
   const { t, lang } = useTranslation();
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isReviewSessionOpen, setIsReviewSessionOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'trackA' | 'trackB'>('trackA');
-  const [session, setSession] = useState<Session | null>(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const handleNotationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setNotation(e.target.value as Notation);
-  };
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-  };
 
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-8">
-      {/* Auth Modal */}
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
-        onSuccess={() => setIsAuthModalOpen(false)} 
-      />
-
       {isReviewSessionOpen && (
         <SmartReviewSession onClose={() => setIsReviewSessionOpen(false)} />
       )}
 
-      {/* Top Navigation / Stats */}
-      <header className="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-blue-100 gap-4">
-        <h1 className="text-2xl font-bold text-blue-600 flex items-center gap-2 w-full sm:w-auto">
-          <span className="text-3xl">🐪</span> KENZA <span className="text-sm font-medium text-slate-400 font-arabic ml-1">كنزة</span>
-        </h1>
-        
-        <div className="flex flex-wrap gap-4 items-center justify-between w-full sm:w-auto">
-          {/* User Badge */}
-          {session ? (
-            <div className="flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full font-bold text-sm">
-              <User className="w-4 h-4" />
-              <span className="truncate max-w-[100px]">{session.user.user_metadata?.full_name || session.user.email?.split('@')[0]}</span>
-              <button onClick={handleLogout} className="ml-2 hover:text-red-500 transition-colors" title={t.header.logout}>
-                <LogOut className="w-4 h-4" />
-              </button>
-            </div>
-          ) : (
-            <button 
-              onClick={() => setIsAuthModalOpen(true)}
-              className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-full font-bold text-sm transition-colors"
-            >
-              <User className="w-4 h-4" />
-              {t.header.guestMode}
-            </button>
-          )}
 
-          <div className="flex items-center gap-2 text-amber-500 font-bold">
-            <Flame className="w-5 h-5 fill-amber-500" />
-            <span>{streakDays}</span>
-          </div>
-          <div className="flex items-center gap-2 text-blue-500 font-bold">
-            <Star className="w-5 h-5 fill-blue-500" />
-            <span>{xp} {t.dashboard.xp}</span>
-          </div>
-          
-          <div className="flex items-center gap-2 border-l pl-4 border-slate-200">
-            <select 
-              value={preferredNotation} 
-              onChange={handleNotationChange}
-              className="bg-slate-100 text-slate-700 text-sm rounded-lg p-1 outline-none cursor-pointer border border-transparent hover:border-slate-300 transition-colors"
-            >
-              <option value="arabizi">{t.header.arabizi}</option>
-              <option value="arabic">{t.header.arabic}</option>
-              <option value="duo">{t.header.duo}</option>
-            </select>
-            
-            <LanguageSelector />
-            
-            <button 
-              onClick={toggleSound}
-              className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors"
-              title={soundEnabled ? "Mute" : "Sound"}
-            >
-              <Settings className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-      </header>
 
       {/* Gamification Dashboard */}
       <section className="flex flex-col gap-6 animate-in slide-in-from-bottom-4">
