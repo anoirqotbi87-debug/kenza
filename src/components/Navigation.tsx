@@ -1,79 +1,65 @@
 import React from 'react';
 import { Home, BookOpen, Mic, User } from 'lucide-react';
-import { useTranslation } from '../lib/i18n/TranslationsProvider';
-
-export type AppTab = 'learn' | 'phrasebook' | 'speech' | 'profile';
+import { useTranslation } from '@/store/useAppStore';
 
 interface NavigationProps {
-  activeTab: AppTab;
-  onChange: (tab: AppTab) => void;
+  currentTab: 'learn' | 'phrasebook' | 'speech' | 'profile';
+  onTabChange: (tab: 'learn' | 'phrasebook' | 'speech' | 'profile') => void;
 }
 
-export default function Navigation({ activeTab, onChange }: NavigationProps) {
+export const Navigation: React.FC<NavigationProps> = ({ currentTab, onTabChange }) => {
   const { t } = useTranslation();
 
-  const navItems: { id: AppTab; label: string; icon: React.FC<any> }[] = [
-    { id: 'learn', label: t.dashboard?.trackA || 'Apprendre', icon: Home },
-    { id: 'phrasebook', label: 'Lexique', icon: BookOpen },
-    { id: 'speech', label: 'Pratique', icon: Mic },
-    { id: 'profile', label: 'Profil', icon: User },
-  ];
+  const tabs = [
+    { id: 'learn', label: t.nav?.learn || 'Apprendre', icon: Home },
+    { id: 'phrasebook', label: t.nav?.phrasebook || 'Lexique', icon: BookOpen },
+    { id: 'speech', label: t.nav?.speech || 'Pratique Orale', icon: Mic },
+    { id: 'profile', label: t.nav?.profile || 'Profil', icon: User },
+  ] as const;
 
   return (
     <>
-      {/* Desktop Header Navigation */}
-      <div className="hidden lg:flex w-full bg-white shadow-sm border-b border-slate-200 sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto w-full px-4 flex justify-between items-center h-16">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">🐪</span>
-            <span className="font-bold text-xl text-blue-600">KENZA</span>
-          </div>
-          <nav className="flex items-center gap-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => onChange(item.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-colors font-semibold text-sm ${
-                    isActive 
-                      ? 'bg-blue-50 text-blue-600' 
-                      : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
-                  {item.label}
-                </button>
-              );
-            })}
-          </nav>
-        </div>
-      </div>
+      {/* Navigation Desktop (Header) */}
+      <nav className="hidden md:flex items-center gap-1 bg-slate-100/80 p-1.5 rounded-2xl border border-slate-200/60">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = currentTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => onTabChange(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+                isActive
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
+      </nav>
 
-      {/* Mobile Bottom Navigation */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 pb-safe z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-        <nav className="flex justify-around items-center h-16 px-2">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => onChange(item.id)}
-                className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
-                  isActive ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'
-                }`}
-              >
-                <Icon className={`w-6 h-6 ${isActive ? 'animate-bounce-short' : ''}`} />
-                <span className={`text-[10px] font-bold ${isActive ? 'opacity-100' : 'opacity-70'}`}>
-                  {item.label}
-                </span>
-              </button>
-            );
-          })}
-        </nav>
-      </div>
+      {/* Navigation Mobile (Bottom Bar fixe en bas) */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 px-2 py-2 flex justify-around items-center shadow-lg">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = currentTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => onTabChange(tab.id)}
+              className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all ${
+                isActive ? 'text-blue-600 font-bold' : 'text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              <Icon className="w-5 h-5" />
+              <span className="text-[11px]">{tab.label}</span>
+            </button>
+          );
+        })}
+      </nav>
     </>
   );
-}
+};

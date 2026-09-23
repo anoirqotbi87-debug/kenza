@@ -9,12 +9,12 @@ import { useAppStore, useTranslation } from '@/store/useAppStore';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { CheckCircle2, Play } from 'lucide-react';
 import { getLocalizedText } from '@/lib/i18n/utils';
-import Navigation, { AppTab } from '@/components/Navigation';
+import { Navigation } from '@/components/Navigation';
 import PhrasebookView from '@/components/tools/PhrasebookView';
 import SpeechTrainer from '@/components/audio/SpeechTrainer';
 
 export default function Home() {
-  const [activeAppTab, setActiveAppTab] = useState<AppTab>('learn');
+  const [currentTab, setCurrentTab] = useState<'learn' | 'phrasebook' | 'speech' | 'profile'>('learn');
   const [activeTab, setActiveTab] = useState<'grammar' | 'conversation'>('grammar');
   const { t, lang } = useTranslation();
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
@@ -110,11 +110,11 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-20">
-      {!activeLessonId && <Navigation activeTab={activeAppTab} onChange={setActiveAppTab} />}
+      {!activeLessonId && <Navigation currentTab={currentTab} onTabChange={setCurrentTab} />}
 
       {!activeLessonId ? (
         <div className="pt-6">
-          {activeAppTab === 'learn' && (
+          {currentTab === 'learn' && (
             <div className="space-y-12">
               <Dashboard onStartLesson={handleStartLesson} />
               
@@ -169,11 +169,11 @@ export default function Home() {
             </div>
           )}
 
-          {activeAppTab === 'phrasebook' && <PhrasebookView />}
+          {currentTab === 'phrasebook' && <PhrasebookView />}
           
-          {activeAppTab === 'speech' && <SpeechTrainer />}
+          {currentTab === 'speech' && <SpeechTrainer />}
 
-          {activeAppTab === 'profile' && (
+          {currentTab === 'profile' && (
             <div className="max-w-4xl mx-auto p-4 space-y-8">
               <h2 className="text-2xl font-bold text-center text-slate-800 mb-8">Votre Profil & Révisions</h2>
               <SRSDashboard />
