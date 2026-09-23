@@ -9,8 +9,12 @@ import { useAppStore, useTranslation } from '@/store/useAppStore';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { CheckCircle2, Play } from 'lucide-react';
 import { getLocalizedText } from '@/lib/i18n/utils';
+import Navigation, { AppTab } from '@/components/Navigation';
+import PhrasebookView from '@/components/tools/PhrasebookView';
+import SpeechTrainer from '@/components/audio/SpeechTrainer';
 
 export default function Home() {
+  const [activeAppTab, setActiveAppTab] = useState<AppTab>('learn');
   const [activeTab, setActiveTab] = useState<'grammar' | 'conversation'>('grammar');
   const { t, lang } = useTranslation();
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
@@ -106,63 +110,90 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-20">
+      {!activeLessonId && <Navigation activeTab={activeAppTab} onChange={setActiveAppTab} />}
+
       {!activeLessonId ? (
-        <div className="space-y-12">
-          <Dashboard onStartLesson={handleStartLesson} />
-          
-          {/* Section SRS */}
-          <div className="max-w-4xl mx-auto p-4">
-            <SRSDashboard />
-          </div>
-
-          <div className="max-w-6xl mx-auto p-4 space-y-8">
-            {/* Sélecteur d'onglets pour Mobile */}
-            <div className="flex lg:hidden justify-center gap-2 mb-6">
-              <button 
-                onClick={() => setActiveTab('grammar')}
-                className={`px-4 py-2 rounded-xl font-bold text-sm transition ${activeTab === 'grammar' ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-100 text-slate-600'}`}
-              >
-                📚 {t.dashboard.trackA || "Grammaire & Fondations"}
-              </button>
-              <button 
-                onClick={() => setActiveTab('conversation')}
-                className={`px-4 py-2 rounded-xl font-bold text-sm transition ${activeTab === 'conversation' ? 'bg-amber-500 text-white shadow-md' : 'bg-slate-100 text-slate-600'}`}
-              >
-                💬 {t.dashboard.trackB || "Situations & Immersion"}
-              </button>
-            </div>
-
-            {/* Grille Desktop 2 Colonnes & Affichage Mobile */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-              {/* Colonne 1 : Grammaire */}
-              <div className={`${activeTab === 'grammar' ? 'block' : 'hidden'} lg:block`}>
-                <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-6 text-center">
-                  <span className="text-blue-700 font-extrabold text-lg flex items-center justify-center gap-2">
+        <div className="pt-6">
+          {activeAppTab === 'learn' && (
+            <div className="space-y-12">
+              <Dashboard onStartLesson={handleStartLesson} />
+              
+              <div className="max-w-6xl mx-auto p-4 space-y-8">
+                {/* Sélecteur d'onglets pour Mobile */}
+                <div className="flex lg:hidden justify-center gap-2 mb-6">
+                  <button 
+                    onClick={() => setActiveTab('grammar')}
+                    className={`px-4 py-2 rounded-xl font-bold text-sm transition ${activeTab === 'grammar' ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-100 text-slate-600'}`}
+                  >
                     📚 {t.dashboard.trackA || "Grammaire & Fondations"}
-                  </span>
-                </div>
-                <div className="space-y-6">
-                  {Object.entries(fullCurriculum)
-                    .filter(([mId]) => ['1', '3', '4', '6'].includes(mId))
-                    .map(([moduleId, moduleData]) => renderModule(moduleId, moduleData, 'grammar'))}
-                </div>
-              </div>
-
-              {/* Colonne 2 : Conversation */}
-              <div className={`${activeTab === 'conversation' ? 'block' : 'hidden'} lg:block`}>
-                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6 text-center">
-                  <span className="text-amber-700 font-extrabold text-lg flex items-center justify-center gap-2">
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab('conversation')}
+                    className={`px-4 py-2 rounded-xl font-bold text-sm transition ${activeTab === 'conversation' ? 'bg-amber-500 text-white shadow-md' : 'bg-slate-100 text-slate-600'}`}
+                  >
                     💬 {t.dashboard.trackB || "Situations & Immersion"}
-                  </span>
+                  </button>
                 </div>
-                <div className="space-y-6">
-                  {Object.entries(fullCurriculum)
-                    .filter(([mId]) => ['2', '5', '7'].includes(mId))
-                    .map(([moduleId, moduleData]) => renderModule(moduleId, moduleData, 'conversation'))}
+
+                {/* Grille Desktop 2 Colonnes & Affichage Mobile */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                  {/* Colonne 1 : Grammaire */}
+                  <div className={`${activeTab === 'grammar' ? 'block' : 'hidden'} lg:block`}>
+                    <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-6 text-center">
+                      <span className="text-blue-700 font-extrabold text-lg flex items-center justify-center gap-2">
+                        📚 {t.dashboard.trackA || "Grammaire & Fondations"}
+                      </span>
+                    </div>
+                    <div className="space-y-6">
+                      {Object.entries(fullCurriculum)
+                        .filter(([mId]) => ['1', '3', '4', '6'].includes(mId))
+                        .map(([moduleId, moduleData]) => renderModule(moduleId, moduleData, 'grammar'))}
+                    </div>
+                  </div>
+
+                  {/* Colonne 2 : Conversation */}
+                  <div className={`${activeTab === 'conversation' ? 'block' : 'hidden'} lg:block`}>
+                    <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6 text-center">
+                      <span className="text-amber-700 font-extrabold text-lg flex items-center justify-center gap-2">
+                        💬 {t.dashboard.trackB || "Situations & Immersion"}
+                      </span>
+                    </div>
+                    <div className="space-y-6">
+                      {Object.entries(fullCurriculum)
+                        .filter(([mId]) => ['2', '5', '7'].includes(mId))
+                        .map(([moduleId, moduleData]) => renderModule(moduleId, moduleData, 'conversation'))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
+
+          {activeAppTab === 'phrasebook' && <PhrasebookView />}
+          
+          {activeAppTab === 'speech' && <SpeechTrainer />}
+
+          {activeAppTab === 'profile' && (
+            <div className="max-w-4xl mx-auto p-4 space-y-8">
+              <h2 className="text-2xl font-bold text-center text-slate-800 mb-8">Votre Profil & Révisions</h2>
+              <SRSDashboard />
+              {/* Le bouton Vider le Cache a été déplacé ou reste dans le footer, on peut le mettre ici */}
+              <div className="pt-12 pb-6 flex justify-center">
+                <button 
+                  onClick={() => {
+                    if (confirm("Voulez-vous vraiment vider le cache local ? Vous perdrez votre progression (XP, leçons).")) {
+                      localStorage.clear();
+                      sessionStorage.clear();
+                      window.location.reload();
+                    }
+                  }}
+                  className="text-xs text-slate-400 hover:text-red-500 transition-colors bg-transparent border border-slate-200 hover:border-red-200 px-4 py-2 rounded-lg"
+                >
+                  Vider le cache local / Réinitialiser
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         activeLesson && (

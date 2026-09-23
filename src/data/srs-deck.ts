@@ -7,6 +7,7 @@ export interface SRSDictionaryItem {
   arabic: string;
   translation: MultiLangText;
   illustration?: CardIllustration;
+  category?: 'cafe_resto' | 'taxi_transport' | 'souk_shopping' | 'polite_social' | 'housing_riad' | 'urgencies_health';
   example?: {
     arabizi: string;
     arabic: string;
@@ -21,7 +22,8 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     arabic: 'عفاك',
     translation: { fr: 'S\'il te plaît', en: 'Please', es: 'Por favor', ar: 'من فضلك' },
     illustration: { iconName: 'HandHeart' },
-    example: { arabizi: '3tini lma 3afak', arabic: 'عطيني الما عفاك', translation: { fr: 'Donne-moi de l\'eau s\'il te plaît', en: 'Give me water please', es: 'Dame agua por favor', ar: 'أعطني الماء من فضلك' } }
+    example: { arabizi: '3tini lma 3afak', arabic: 'عطيني الما عفاك', translation: { fr: 'Donne-moi de l\'eau s\'il te plaît', en: 'Give me water please', es: 'Dame agua por favor', ar: 'أعطني الماء من فضلك' } },
+    category: 'polite_social',
   },
   {
     id: 'srs_salam',
@@ -29,7 +31,8 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     arabic: 'سلام',
     translation: { fr: 'Bonjour', en: 'Hello', es: 'Hola', ar: 'مرحباً' },
     illustration: { iconName: 'Hand' },
-    example: { arabizi: 'Salam, labas?', arabic: 'سلام، لاباس؟', translation: { fr: 'Bonjour, ça va ?', en: 'Hello, how are you?', es: 'Hola, ¿qué tal?', ar: 'مرحباً، كيف حالك؟' } }
+    example: { arabizi: 'Salam, labas?', arabic: 'سلام، لاباس؟', translation: { fr: 'Bonjour, ça va ?', en: 'Hello, how are you?', es: 'Hola, ¿qué tal?', ar: 'مرحباً، كيف حالك؟' } },
+    category: 'polite_social',
   },
   {
     id: 'srs_9hwa',
@@ -37,7 +40,8 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     arabic: 'قهوة',
     translation: { fr: 'Café', en: 'Coffee', es: 'Café', ar: 'قهوة' },
     illustration: { iconName: 'Coffee' },
-    example: { arabizi: 'Bghit 9hwa', arabic: 'بغيت قهوة', translation: { fr: 'Je veux un café', en: 'I want a coffee', es: 'Quiero un café', ar: 'أريد قهوة' } }
+    example: { arabizi: 'Bghit 9hwa', arabic: 'بغيت قهوة', translation: { fr: 'Je veux un café', en: 'I want a coffee', es: 'Quiero un café', ar: 'أريد قهوة' } },
+    category: 'cafe_resto',
   },
   {
     id: 'srs_atay',
@@ -45,7 +49,8 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     arabic: 'أتاي',
     translation: { fr: 'Thé', en: 'Tea', es: 'Té', ar: 'شاي' },
     illustration: { iconName: 'CupSoda' },
-    example: { arabizi: 'Kass atay b n3na3', arabic: 'كاس أتاي بالنعناع', translation: { fr: 'Un verre de thé à la menthe', en: 'A glass of mint tea', es: 'Un vaso de té con menta', ar: 'كأس شاي بالنعناع' } }
+    example: { arabizi: 'Kass atay b n3na3', arabic: 'كاس أتاي بالنعناع', translation: { fr: 'Un verre de thé à la menthe', en: 'A glass of mint tea', es: 'Un vaso de té con menta', ar: 'كأس شاي بالنعناع' } },
+    category: 'cafe_resto',
   },
   {
     id: 'srs_lma',
@@ -109,7 +114,8 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     arabic: 'بغيت',
     translation: { fr: 'Je veux', en: 'I want', es: 'Quiero', ar: 'أريد' },
     illustration: { iconName: 'ShoppingBag' },
-    example: { arabizi: 'Bghit nshri hada', arabic: 'بغيت نشري هادا', translation: { fr: 'Je veux acheter ça', en: 'I want to buy this', es: 'Quiero comprar esto', ar: 'أريد شراء هذا' } }
+    example: { arabizi: 'Bghit nshri hada', arabic: 'بغيت نشري هادا', translation: { fr: 'Je veux acheter ça', en: 'I want to buy this', es: 'Quiero comprar esto', ar: 'أريد شراء هذا' } },
+    category: 'cafe_resto',
   },
   {
     id: 'srs_flus',
@@ -149,7 +155,8 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     arabic: 'زوين',
     translation: { fr: 'Beau / Bon', en: 'Beautiful / Good', es: 'Hermoso / Bueno', ar: 'جميل / جيد' },
     illustration: { iconName: 'Star' },
-    example: { arabizi: 'Hadshi zwin', arabic: 'هادشي زوين', translation: { fr: 'C\'est beau', en: 'This is beautiful', es: 'Esto es hermoso', ar: 'هذا جميل' } }
+    example: { arabizi: 'Hadshi zwin', arabic: 'هادشي زوين', translation: { fr: 'C\'est beau', en: 'This is beautiful', es: 'Esto es hermoso', ar: 'هذا جميل' } },
+    category: 'polite_social',
   },
   {
     id: 'srs_khobz',
