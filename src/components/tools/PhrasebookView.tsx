@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Search, Volume2, BookOpen, Coffee, Car, ShoppingBag, Heart, Home, Stethoscope } from 'lucide-react';
 import { srsVocabulary, SRSDictionaryItem } from '../../data/srs-deck';
-import { useTranslation } from '../../lib/i18n/TranslationsProvider';
+import { useTranslation } from '../../store/useAppStore';
 
 type CategoryType = SRSDictionaryItem['category'] | 'all';
 
@@ -30,7 +30,7 @@ export default function PhrasebookView() {
         word.arabic.includes(term) ||
         (typeof word.translation === 'string' 
           ? word.translation.toLowerCase().includes(term)
-          : Object.values(word.translation).some(t => t.toLowerCase().includes(term)));
+          : Object.values(word.translation).some(t => (t as string).toLowerCase().includes(term)));
       
       return matchesCategory && matchesSearch;
     });
@@ -90,7 +90,7 @@ export default function PhrasebookView() {
                   <span className="text-sm font-arabic text-slate-400 font-normal">{word.arabic}</span>
                 </h3>
                 <p className="text-slate-600 text-sm mt-1">
-                  {typeof word.translation === 'string' ? word.translation : word.translation[lang] || word.translation.fr}
+                  {typeof word.translation === 'string' ? word.translation : (word.translation as any)[lang] || word.translation.fr}
                 </p>
                 {word.example && (
                   <p className="text-slate-400 text-xs mt-2 italic">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, Volume2, Trophy, AlertCircle, RefreshCw } from 'lucide-react';
-import { useTranslation } from '../../lib/i18n/TranslationsProvider';
+import { useTranslation } from '../../store/useAppStore';
 
 // Dictionnaire de phrases d'entraînement
 const speechExercises = [
@@ -129,7 +129,7 @@ export default function SpeechTrainer() {
           <h3 className="text-4xl font-bold text-slate-800">{currentExercise.arabizi}</h3>
           <p className="text-2xl font-arabic text-slate-500">{currentExercise.arabic}</p>
           <p className="text-slate-500 font-medium italic mt-2">
-            « {typeof currentExercise.translation === 'string' ? currentExercise.translation : currentExercise.translation[lang] || currentExercise.translation.fr} »
+            « {typeof currentExercise.translation === 'string' ? currentExercise.translation : (currentExercise.translation as any)[lang] || currentExercise.translation.fr} »
           </p>
         </div>
 

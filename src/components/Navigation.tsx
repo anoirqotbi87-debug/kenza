@@ -11,10 +11,10 @@ export const Navigation: React.FC<NavigationProps> = ({ currentTab, onTabChange 
   const { t } = useTranslation();
 
   const tabs = [
-    { id: 'learn', label: t.nav?.learn || 'Apprendre', icon: Home },
-    { id: 'phrasebook', label: t.nav?.phrasebook || 'Lexique', icon: BookOpen },
-    { id: 'speech', label: t.nav?.speech || 'Pratique Orale', icon: Mic },
-    { id: 'profile', label: t.nav?.profile || 'Profil', icon: User },
+    { id: 'learn', label: (t as any).nav?.learn || 'Apprendre', icon: Home },
+    { id: 'phrasebook', label: (t as any).nav?.phrasebook || 'Lexique', icon: BookOpen },
+    { id: 'speech', label: (t as any).nav?.speech || 'Pratique Orale', icon: Mic },
+    { id: 'profile', label: (t as any).nav?.profile || 'Profil', icon: User },
   ] as const;
 
   return (
