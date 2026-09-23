@@ -124,7 +124,14 @@ export const module7Lessons: Lesson[] = [
             { id: 'p1', left: { text: 'Lli fat mat' }, right: { text: 'Tourner la page' } },
             { id: 'p2', left: { text: 'Drba b drba' }, right: { text: 'Patience et régularité' } },
             { id: 'p3', left: { text: 'Zrbat matat' }, right: { text: 'Rien ne sert de courir' } }
-          ]
+          ],
+          answer: 'matching_completed',
+          explanation: {
+            fr: 'Ces proverbes illustrent la sagesse populaire sur la patience et l\'acceptation.',
+            en: 'These proverbs illustrate popular wisdom about patience and acceptance.',
+            es: 'Estos proverbios ilustran la sabiduría popular sobre la paciencia y la aceptación.',
+            ar: 'توضح هذه الأمثال الحكمة الشعبية حول الصبر والقبول.'
+          }
         }
       },
       {
