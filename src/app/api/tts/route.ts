@@ -23,8 +23,8 @@ export async function POST(req: NextRequest) {
     const chunks: Buffer[] = [];
 
     return new Promise<NextResponse>((resolve, reject) => {
-      readable.on('data', (chunk: any) => chunks.push(Buffer.from(chunk)));
-      readable.on('end', () => {
+      readable.audioStream.on('data', (chunk: any) => chunks.push(Buffer.from(chunk)));
+      readable.audioStream.on('end', () => {
         const audioBuffer = Buffer.concat(chunks);
         resolve(new NextResponse(audioBuffer, {
           headers: {
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
           },
         }));
       });
-      readable.on('error', (err: any) => {
+      readable.audioStream.on('error', (err: any) => {
         console.error('TTS Stream Error:', err);
         reject(NextResponse.json({ error: 'TTS Error' }, { status: 500 }));
       });
