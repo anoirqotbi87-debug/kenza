@@ -29,7 +29,7 @@ export default function PhrasebookView() {
         word.arabizi.toLowerCase().includes(term) ||
         word.arabic.includes(term) ||
         (typeof word.translation === 'string' 
-          ? word.translation.toLowerCase().includes(term)
+          ? (word.translation as string).toLowerCase().includes(term)
           : Object.values(word.translation).some(t => (t as string).toLowerCase().includes(term)));
       
       return matchesCategory && matchesSearch;
