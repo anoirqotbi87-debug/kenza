@@ -125,12 +125,12 @@ export const module7Lessons: Lesson[] = [
             { id: 'p2', left: { text: 'Drba b drba' }, right: { text: 'Patience et régularité' } },
             { id: 'p3', left: { text: 'Zrbat matat' }, right: { text: 'Rien ne sert de courir' } }
           ],
-          answer: 'matching_completed',
+          answer: "all",
           explanation: {
-            fr: 'Ces proverbes illustrent la sagesse populaire sur la patience et l\'acceptation.',
-            en: 'These proverbs illustrate popular wisdom about patience and acceptance.',
-            es: 'Estos proverbios ilustran la sabiduría popular sobre la paciencia y la aceptación.',
-            ar: 'توضح هذه الأمثال الحكمة الشعبية حول الصبر والقبول.'
+            fr: "Associez chaque proverbe marocain à son sens équivalent.",
+            en: "Match each Moroccan proverb to its equivalent meaning.",
+            es: "Relaciona cada proverbio marroquí con su significado equivalente.",
+            ar: "طابق كل مثل مغربي مع معناه المناسب."
           }
         }
       },

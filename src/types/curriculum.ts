@@ -74,8 +74,8 @@ export interface Exercise {
   npcStartLine?: { arabizi: string; arabic: string; translation: MultiLangText | string; audioUrl?: string };
   dialogueChoices?: DialogueChoice[];
   sentenceTemplate?: string;
-  answer: string | string[] | Record<string, string>;
-  explanation: MultiLangText | string;
+  answer?: string | string[] | Record<string, string>;
+  explanation?: MultiLangText | string;
   culturalNote?: MultiLangText | string;
 }
 
