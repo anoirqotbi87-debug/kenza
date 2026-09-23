@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { MsEdgeTTS, OUTPUT_FORMAT } from 'edge-tts';
+import { MsEdgeTTS, OUTPUT_FORMAT } from 'msedge-tts';
 
 // Fonction de conversion Arabizi -> Arabe pour que l'IA prononce la Darija
 function arabiziToArabic(text: string): string {
