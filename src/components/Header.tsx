@@ -16,24 +16,9 @@ interface HeaderProps {
 }
 
 export default function Header({ currentTab, onTabChange }: HeaderProps) {
-  const { xp, streakDays, preferredNotation, setNotation, toggleSound, soundEnabled, regionalVariant, setRegionalVariant } = useAppStore();
+  const { xp, streakDays, preferredNotation, setNotation, toggleSound, soundEnabled, regionalVariant, setRegionalVariant, user } = useAppStore();
   const { t } = useTranslation();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [session, setSession] = useState<Session | null>(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   const handleNotationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setNotation(e.target.value as Notation);
@@ -60,10 +45,10 @@ export default function Header({ currentTab, onTabChange }: HeaderProps) {
         </div>
 
         <div className="flex flex-wrap gap-1.5 sm:gap-2 items-center justify-between w-full xl:w-auto shrink-0">
-          {session ? (
+          {user ? (
             <div className="flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full font-bold text-sm">
               <User className="w-4 h-4" />
-              <span className="truncate max-w-[100px]">{session.user.user_metadata?.full_name || session.user.email?.split('@')[0]}</span>
+              <span className="truncate max-w-[100px]">{user.user_metadata?.full_name || user.email?.split('@')[0]}</span>
               <button onClick={handleLogout} className="ml-2 hover:text-red-500 transition-colors" title={t.header?.logout || "Déconnexion"}>
                 <LogOut className="w-4 h-4" />
               </button>

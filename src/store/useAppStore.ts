@@ -7,6 +7,8 @@ import { UILanguage, translations } from '../lib/i18n/translations';
 
 interface AppState {
   // User Progress
+  user: any;
+  setUser: (user: any) => void;
   xp: number;
   streakDays: number;
   streakFreezes: number;
@@ -49,6 +51,8 @@ interface AppState {
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
+      user: null,
+      setUser: (user) => set({ user }),
       xp: 0,
       streakDays: 1,
       streakFreezes: 1,

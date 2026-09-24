@@ -15,12 +15,42 @@ import PhrasebookView from '@/components/tools/PhrasebookView';
 import SpeechTrainer from '@/components/audio/SpeechTrainer';
 import ProfileView from '@/components/profile/ProfileView';
 
+import { supabase } from '@/lib/supabase';
+import { syncService } from '@/lib/syncService';
+import { useEffect } from 'react';
+
 export default function Home() {
   const [currentTab, setCurrentTab] = useState<'learn' | 'phrasebook' | 'speech' | 'profile'>('learn');
   const [activeTab, setActiveTab] = useState<'grammar' | 'conversation'>('grammar');
   const { t, lang } = useTranslation();
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
-  const { completeLesson, completedLessons, devUnlockAll } = useAppStore();
+  const { completeLesson, completedLessons, devUnlockAll, setUser } = useAppStore();
+
+  useEffect(() => {
+    // 1. Récupérer immédiatement la session active au chargement de la page
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        console.log("[Auth] Session active détectée :", session.user.email);
+        setUser(session.user);
+        syncService.migrateGuestDataToCloud(session.user.id);
+      }
+    });
+
+    // 2. Écouter les changements d'état (CRUCIAL pour le retour de Google OAuth !)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("[Auth Event]:", event, session?.user?.email);
+      if (session?.user) {
+        setUser(session.user);
+        await syncService.migrateGuestDataToCloud(session.user.id);
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [setUser]);
 
   const handleStartLesson = (lessonId: string) => {
     setActiveLessonId(lessonId);
