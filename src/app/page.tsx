@@ -10,6 +10,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { CheckCircle2, Play } from 'lucide-react';
 import { getLocalizedText } from '@/lib/i18n/utils';
 import { Navigation } from '@/components/Navigation';
+import Header from '@/components/Header';
 import PhrasebookView from '@/components/tools/PhrasebookView';
 import SpeechTrainer from '@/components/audio/SpeechTrainer';
 
@@ -111,14 +112,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-20">
       {!activeLessonId && (
-        <header className="flex flex-col md:flex-row justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-blue-100 gap-4 max-w-6xl mx-4 md:mx-auto mt-6">
-          <h1 className="text-2xl font-bold text-blue-600 flex items-center gap-2 w-full md:w-auto">
-            <span className="text-3xl">🐪</span> KENZA <span className="text-sm font-medium text-slate-400 font-arabic ml-1">كنزة</span>
-          </h1>
-          <div className="w-full md:w-auto">
-            <Navigation currentTab={currentTab} onTabChange={setCurrentTab} />
-          </div>
-        </header>
+        <Header currentTab={currentTab} onTabChange={setCurrentTab} />
       )}
 
       {!activeLessonId ? (

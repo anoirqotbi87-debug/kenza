@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Exercise, Notation } from '../../../types/curriculum';
 import { useTranslation } from '../../../store/useAppStore';
-import { getLocalizedText } from '../../../lib/i18n/utils';
+import { getExerciseText } from '../../../lib/i18n/utils';
 
 interface MatchingExerciseProps {
   exercise: Exercise;
@@ -23,8 +23,8 @@ export default function MatchingExercise({ exercise, preferredNotation, onUpdate
 
   useEffect(() => {
     if (exercise.pairs) {
-      const lefts = exercise.pairs.map(p => ({ id: p.id, text: p.left.text })).sort(() => Math.random() - 0.5);
-      const rights = exercise.pairs.map(p => ({ id: p.id, text: getLocalizedText(p.right.text, lang) })).sort(() => Math.random() - 0.5);
+      const lefts = exercise.pairs.map(p => ({ id: p.id, text: getExerciseText(p.left, lang) })).sort(() => Math.random() - 0.5);
+      const rights = exercise.pairs.map(p => ({ id: p.id, text: getExerciseText(p.right, lang) })).sort(() => Math.random() - 0.5);
       setLeftItems(lefts);
       setRightItems(rights);
       setMatches({});

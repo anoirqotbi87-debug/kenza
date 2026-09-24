@@ -5,7 +5,7 @@ import { Exercise, Notation, DialogueChoice } from '../../types/curriculum';
 import { Volume2, User, CarFront } from 'lucide-react';
 import { playAudio } from '../../lib/audio';
 import { useAppStore, useTranslation } from '../../store/useAppStore';
-import { getLocalizedText } from '../../lib/i18n/utils';
+import { getLocalizedText, getExerciseText } from '../../lib/i18n/utils';
 
 interface ScenarioDialogueProps {
   exercise: Exercise;
@@ -26,10 +26,11 @@ export default function ScenarioDialogue({ exercise, preferredNotation, onComple
   };
 
   const getTextForNotation = (item: any) => {
-    if (preferredNotation === 'arabizi') return item.arabizi;
-    if (preferredNotation === 'arabic') return item.arabic;
-    if (preferredNotation === 'duo') return `${item.arabizi} / ${item.arabic}`;
-    return getLocalizedText(item.translation, lang); // fallback
+    if (typeof item === 'string') return item;
+    if (preferredNotation === 'arabizi' && item.arabizi) return item.arabizi;
+    if (preferredNotation === 'arabic' && item.arabic) return item.arabic;
+    if (preferredNotation === 'duo' && item.arabizi && item.arabic) return `${item.arabizi} / ${item.arabic}`;
+    return getExerciseText(item, lang); // fallback
   };
 
   const selectedChoice = exercise.dialogueChoices?.find(c => c.id === selectedChoiceId);

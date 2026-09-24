@@ -3,6 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { Exercise, Notation } from '../../../types/curriculum';
 
+import { getExerciseText } from '../../../lib/i18n/utils';
+import { useTranslation } from '../../../store/useAppStore';
+
 interface FillBlankExerciseProps {
   exercise: Exercise;
   preferredNotation: Notation;
@@ -12,6 +15,7 @@ interface FillBlankExerciseProps {
 
 export default function FillBlankExercise({ exercise, preferredNotation, onUpdate, isAnswerChecked }: FillBlankExerciseProps) {
   const [selectedWordId, setSelectedWordId] = useState<string | null>(null);
+  const { lang } = useTranslation();
 
   useEffect(() => {
     setSelectedWordId(null);
@@ -24,10 +28,12 @@ export default function FillBlankExercise({ exercise, preferredNotation, onUpdat
   };
 
   const getTextForNotation = (item: any, notation: Notation) => {
-    if (notation === 'arabizi') return item.arabizi;
-    if (notation === 'arabic') return item.arabic;
-    if (notation === 'duo') return `${item.arabizi} / ${item.arabic}`;
-    return item.translation;
+    if (typeof item === 'string') return item;
+    if (notation === 'arabizi' && item.arabizi) return item.arabizi;
+    if (notation === 'arabic' && item.arabic) return item.arabic;
+    if (notation === 'duo' && item.arabizi && item.arabic) return `${item.arabizi} / ${item.arabic}`;
+    if (item.translation) return item.translation;
+    return getExerciseText(item, lang);
   };
 
   const selectedWordOption = exercise.options?.find(o => o.id === selectedWordId);

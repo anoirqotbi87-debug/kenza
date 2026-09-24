@@ -3,6 +3,9 @@
 import React from 'react';
 import { Exercise, Notation } from '../../../types/curriculum';
 
+import { getExerciseText } from '../../../lib/i18n/utils';
+import { useTranslation } from '../../../store/useAppStore';
+
 interface McqExerciseProps {
   exercise: Exercise;
   preferredNotation: Notation;
@@ -12,16 +15,20 @@ interface McqExerciseProps {
 }
 
 export default function McqExercise({ exercise, preferredNotation, selectedOptionId, onSelect, isAnswerChecked }: McqExerciseProps) {
+  const { lang } = useTranslation();
+
   const getTextForNotation = (item: any, notation: Notation) => {
-    if (notation === 'arabizi') return item.arabizi;
-    if (notation === 'arabic') return item.arabic;
-    if (notation === 'duo') return (
+    if (typeof item === 'string') return item;
+    if (notation === 'arabizi' && item.arabizi) return item.arabizi;
+    if (notation === 'arabic' && item.arabic) return item.arabic;
+    if (notation === 'duo' && item.arabizi && item.arabic) return (
       <div className="flex flex-col items-center">
         <span className="text-orange-600 font-bold">{item.arabizi}</span>
         <span className="text-slate-800 font-arabic text-xl">{item.arabic}</span>
       </div>
     );
-    return item.translation; // fallback
+    if (item.translation) return item.translation; // fallback
+    return getExerciseText(item, lang);
   };
 
   return (
