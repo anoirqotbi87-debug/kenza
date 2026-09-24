@@ -3,12 +3,13 @@ import { Search, Volume2, BookOpen, Coffee, Car, ShoppingBag, Heart, Home, Steth
 import { srsVocabulary, SRSDictionaryItem } from '../../data/srs-deck';
 import { useTranslation, useAppStore } from '../../store/useAppStore';
 import { playAudio } from '../../lib/audio';
+import { getVariantForWord } from '../../data/regionalVariants';
 
 type CategoryType = SRSDictionaryItem['category'] | 'all';
 
 export default function PhrasebookView() {
   const { lang } = useTranslation();
-  const { soundEnabled } = useAppStore();
+  const { soundEnabled, regionalVariant } = useAppStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState<CategoryType>('all');
   const [activeTab, setActiveTab] = useState<'dictionary' | 'grammar'>('dictionary');
@@ -79,30 +80,47 @@ export default function PhrasebookView() {
       {/* Results */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filteredWords.length > 0 ? (
-          filteredWords.map(word => (
-            <div key={word.id} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex justify-between items-center group hover:border-blue-200 transition-colors">
-              <div>
-                <h3 className="font-bold text-lg text-slate-800 flex items-baseline gap-2">
-                  {word.arabizi}
-                  <span className="text-sm font-arabic text-slate-400 font-normal">{word.arabic}</span>
-                </h3>
-                <p className="text-slate-600 text-sm mt-1">
-                  {typeof word.translation === 'string' ? word.translation : (word.translation as any)[lang] || word.translation.fr}
-                </p>
-                {word.example && (
-                  <p className="text-slate-400 text-xs mt-2 italic">
-                    Ex: "{word.example.arabizi}"
+          filteredWords.map(word => {
+            const variant = getVariantForWord(word.arabizi, regionalVariant);
+            const displayArabizi = variant ? variant.variant : word.arabizi;
+            const displayArabic = variant ? variant.variantArabic : word.arabic;
+            
+            // Check both 'translations' and 'translation' properties for backward compatibility.
+            const tMap: any = (word as any).translations || (word as any).translation || { fr: '' };
+            const translated = typeof tMap === 'string' ? tMap : tMap[lang] || tMap.fr;
+
+            return (
+              <div key={word.id} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex justify-between items-center group hover:border-blue-200 transition-colors">
+                <div>
+                  <h3 className="font-bold text-lg text-slate-800 flex items-baseline gap-2">
+                    {displayArabizi}
+                    <span className="text-sm font-arabic text-slate-400 font-normal">{displayArabic}</span>
+                  </h3>
+                  <p className="text-slate-600 text-sm mt-1">
+                    {translated}
                   </p>
-                )}
+                  
+                  {variant && (
+                    <div className="mt-2 inline-flex items-center gap-1 bg-amber-50 text-amber-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
+                      {regionalVariant === 'chamal' ? '🌊 Chamali' : '🏺 Fassi'} (Std: {word.arabizi})
+                    </div>
+                  )}
+
+                  {((word as any).exampleSentence || word.example) && (
+                    <p className="text-slate-400 text-xs mt-2 italic">
+                      Ex: "{((word as any).exampleSentence || word.example).arabizi}"
+                    </p>
+                  )}
+                </div>
+                <button 
+                  onClick={() => playAudio(displayArabizi, displayArabic, soundEnabled)}
+                  className="w-10 h-10 rounded-full bg-slate-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition-colors flex-shrink-0"
+                >
+                  <Volume2 className="w-5 h-5" />
+                </button>
               </div>
-              <button 
-                onClick={() => playAudio(word.arabizi, word.arabic, soundEnabled)}
-                className="w-10 h-10 rounded-full bg-slate-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition-colors flex-shrink-0"
-              >
-                <Volume2 className="w-5 h-5" />
-              </button>
-            </div>
-          ))
+            );
+          })
         ) : (
           <div className="col-span-full text-center py-12 text-slate-400">
             <BookOpen className="w-12 h-12 mx-auto mb-4 opacity-20" />

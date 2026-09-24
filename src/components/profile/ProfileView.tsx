@@ -13,8 +13,15 @@ export default function ProfileView() {
   const { xp, streakDays } = useAppStore();
   const { t } = useTranslation();
   const [session, setSession] = useState<Session | null>(null);
+  
+  const [downloadProgress, setDownloadProgress] = useState(0);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
+    import('../../lib/offlineStorage').then((m) => {
+      m.checkOfflineStatus().then(percent => setDownloadProgress(percent));
+    });
+    
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
@@ -27,6 +34,15 @@ export default function ProfileView() {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const handleDownloadOfflinePack = async () => {
+    setIsDownloading(true);
+    const { downloadFullOfflinePack } = await import('../../lib/offlineStorage');
+    await downloadFullOfflinePack((percent) => {
+      setDownloadProgress(percent);
+    });
+    setIsDownloading(false);
+  };
 
   const getLevelName = (xp: number) => {
     if (xp < 100) return "Débutant Atlas — Niveau A1";
@@ -77,6 +93,45 @@ export default function ProfileView() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Leaderboard />
         <BadgesList />
+      </div>
+
+      {/* Mode Hors-Ligne */}
+      <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 mt-8">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-3 bg-emerald-100 text-emerald-600 rounded-xl">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-slate-800">Mode Hors-Ligne (Pack Voyage & Médina)</h3>
+            <p className="text-slate-500 text-sm">Réviser la Darija sans internet dans l'avion ou le désert.</p>
+          </div>
+        </div>
+        
+        {downloadProgress === 100 ? (
+          <div className="bg-emerald-50 text-emerald-700 p-4 rounded-xl flex items-center gap-3 font-bold border border-emerald-100">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Pack Hors-Ligne Actif — Prêt pour le mode avion
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <button 
+              onClick={handleDownloadOfflinePack}
+              disabled={isDownloading}
+              className={`w-full py-3 rounded-xl font-bold text-white transition-all ${isDownloading ? 'bg-slate-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 active:scale-95'}`}
+            >
+              {isDownloading ? 'Téléchargement en cours...' : 'Télécharger le pack complet (100 sons ~ 4 Mo)'}
+            </button>
+            
+            {isDownloading && (
+              <div className="w-full bg-slate-100 rounded-full h-4 overflow-hidden">
+                <div 
+                  className="bg-blue-500 h-full transition-all duration-300"
+                  style={{ width: `${downloadProgress}%` }}
+                />
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <footer className="pt-12 pb-6 flex justify-center">

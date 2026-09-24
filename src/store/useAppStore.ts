@@ -23,6 +23,7 @@ interface AppState {
   soundEnabled: boolean;
   audioSpeed: number;
   uiLanguage: UILanguage;
+  regionalVariant: 'chamal' | 'casablanca' | 'fes';
   
   // Actions
   addXp: (amount: number) => void;
@@ -34,6 +35,7 @@ interface AppState {
   toggleSound: () => void;
   setAudioSpeed: (speed: number) => void;
   setLanguage: (lang: UILanguage) => void;
+  setRegionalVariant: (variant: 'chamal' | 'casablanca' | 'fes') => void;
   
   // SRS Actions
   addCardsToSRS: (wordIds: string[]) => void;
@@ -59,9 +61,11 @@ export const useAppStore = create<AppState>()(
       soundEnabled: true,
       audioSpeed: 1.0,
       uiLanguage: 'fr',
+      regionalVariant: 'casablanca',
       devUnlockAll: true, // Activated by default for dev/testing
       
       toggleDevUnlockAll: () => set((state) => ({ devUnlockAll: !state.devUnlockAll })),
+      setRegionalVariant: (variant) => set({ regionalVariant: variant }),
       
       addXp: (amount) => set((state) => {
         const newXp = state.xp + amount;

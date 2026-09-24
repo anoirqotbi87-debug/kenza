@@ -1,3 +1,5 @@
+import { getOfflineAudio } from './offlineStorage';
+
 // Web Audio API context
 let audioCtx: AudioContext | null = null;
 const audioCache = new Map<string, AudioBuffer>();
@@ -99,15 +101,23 @@ export const playAudio = async (text: string, audioUrl?: string, soundEnabled: b
       let audioBuffer = audioCache.get(cacheKey);
 
       if (!audioBuffer) {
-        const response = await fetch('/api/tts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ arabicText: textToSpeak, text: text })
-        });
+        // 1. Check Offline IndexedDB First
+        const offlineBlob = await getOfflineAudio(text);
+        let arrayBuffer: ArrayBuffer;
 
-        if (!response.ok) throw new Error('TTS API failed');
+        if (offlineBlob) {
+          arrayBuffer = await offlineBlob.arrayBuffer();
+        } else {
+          // 2. Fetch from network
+          const response = await fetch('/api/tts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ arabicText: textToSpeak, text: text })
+          });
+          if (!response.ok) throw new Error('TTS API failed');
+          arrayBuffer = await response.arrayBuffer();
+        }
 
-        const arrayBuffer = await response.arrayBuffer();
         audioBuffer = await ctx.decodeAudioData(arrayBuffer);
         audioCache.set(cacheKey, audioBuffer);
       }

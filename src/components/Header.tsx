@@ -16,7 +16,7 @@ interface HeaderProps {
 }
 
 export default function Header({ currentTab, onTabChange }: HeaderProps) {
-  const { xp, streakDays, preferredNotation, setNotation, toggleSound, soundEnabled } = useAppStore();
+  const { xp, streakDays, preferredNotation, setNotation, toggleSound, soundEnabled, regionalVariant, setRegionalVariant } = useAppStore();
   const { t } = useTranslation();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
@@ -97,9 +97,18 @@ export default function Header({ currentTab, onTabChange }: HeaderProps) {
               <option value="arabic">{t.header?.arabic || "Arabic"}</option>
               <option value="duo">{t.header?.duo || "Duo"}</option>
             </select>
+            <select 
+              value={regionalVariant} 
+              onChange={(e) => setRegionalVariant(e.target.value as any)}
+              className="bg-slate-100 text-slate-700 text-sm rounded-lg p-1 outline-none cursor-pointer border border-transparent hover:border-slate-300 transition-colors"
+              title="Variante Régionale"
+            >
+              <option value="casablanca">🏙️ Casa/Std</option>
+              <option value="chamal">🌊 Chamal</option>
+              <option value="fes">🏺 Fès</option>
+            </select>
             
             <LanguageSelector />
-            
             <button 
               onClick={toggleSound}
               className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors"
