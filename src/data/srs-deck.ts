@@ -1,11 +1,12 @@
-import { SRSDictionaryItem } from '../types/srs';
+import { VocabularySRSData } from '../types/srs';
 
-export const srsVocabulary: SRSDictionaryItem[] = [
+export type SRSDictionaryItem = VocabularySRSData;
+export const srsVocabulary: VocabularySRSData[] = [
   {
     id: 'srs_salam',
     arabizi: 'Salam',
     arabic: 'السَّلَامُ عَلَيْكُمْ',
-    translations: {
+    translation: {
       fr: 'Bonjour / Paix',
       en: 'Hello / Peace',
       es: 'Hola / Paz',
@@ -13,10 +14,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'polite_social',
     illustration: { iconName: 'Handshake' },
-    exampleSentence: {
+    example: {
       arabizi: 'Salam, labas?',
       arabic: 'السلام، لاباس؟',
-      translations: {
+      translation: {
         fr: 'Bonjour, ça va ?',
         en: 'Hello, how are you?',
         es: 'Hola, ¿qué tal?',
@@ -28,7 +29,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_sba7_lkhir',
     arabizi: 'Sba7 l-khir',
     arabic: 'صْبَاحْ الخِيرْ',
-    translations: {
+    translation: {
       fr: 'Bonjour (matin)',
       en: 'Good morning',
       es: 'Buenos días',
@@ -36,10 +37,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'polite_social',
     illustration: { iconName: 'Sun' },
-    exampleSentence: {
+    example: {
       arabizi: 'Sba7 l-khir a khoya',
       arabic: 'صباح الخير ا خويا',
-      translations: {
+      translation: {
         fr: 'Bonjour mon frère',
         en: 'Good morning brother',
         es: 'Buenos días hermano',
@@ -51,7 +52,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_msa_lkhir',
     arabizi: 'Msa l-khir',
     arabic: 'مسَا الخِيرْ',
-    translations: {
+    translation: {
       fr: 'Bonsoir',
       en: 'Good evening',
       es: 'Buenas tardes',
@@ -59,10 +60,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'polite_social',
     illustration: { iconName: 'Moon' },
-    exampleSentence: {
+    example: {
       arabizi: 'Msa l-khir a lalla',
       arabic: 'مسا الخير ا لالة',
-      translations: {
+      translation: {
         fr: 'Bonsoir madame',
         en: 'Good evening madam',
         es: 'Buenas noches señora',
@@ -74,7 +75,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_labas',
     arabizi: 'Labas',
     arabic: 'لَابَاسْ',
-    translations: {
+    translation: {
       fr: 'Ça va ?',
       en: 'How are you?',
       es: '¿Qué tal?',
@@ -82,10 +83,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'polite_social',
     illustration: { iconName: 'Smile' },
-    exampleSentence: {
+    example: {
       arabizi: 'Labas 3lik?',
       arabic: 'لاباس عليك؟',
-      translations: {
+      translation: {
         fr: 'Est-ce que ça va ?',
         en: 'Are you okay?',
         es: '¿Estás bien?',
@@ -97,7 +98,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_kif_dayer',
     arabizi: 'Kif dayer',
     arabic: 'كِيفْ دَايِرْ',
-    translations: {
+    translation: {
       fr: 'Comment vas-tu ? (masc)',
       en: 'How are you? (masc)',
       es: '¿Cómo estás? (masc)',
@@ -105,10 +106,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'polite_social',
     illustration: { iconName: 'User' },
-    exampleSentence: {
+    example: {
       arabizi: 'Kif dayer m3a s-saha?',
       arabic: 'كيف داير مع الصحة؟',
-      translations: {
+      translation: {
         fr: 'Comment va la santé ?',
         en: 'How is your health?',
         es: '¿Cómo va la salud?',
@@ -120,7 +121,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_kif_dayra',
     arabizi: 'Kif dayra',
     arabic: 'كِيفْ دَايْرَة',
-    translations: {
+    translation: {
       fr: 'Comment vas-tu ? (fém)',
       en: 'How are you? (fem)',
       es: '¿Cómo estás? (fem)',
@@ -128,10 +129,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'polite_social',
     illustration: { iconName: 'User' },
-    exampleSentence: {
+    example: {
       arabizi: 'Kif dayra a lalla?',
       arabic: 'كيف دايرة ا لالة؟',
-      translations: {
+      translation: {
         fr: 'Comment vas-tu madame ?',
         en: 'How are you madam?',
         es: '¿Cómo estás señora?',
@@ -143,7 +144,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_hamdullah',
     arabizi: 'Hamdullah',
     arabic: 'الحَمْدُ للَّه',
-    translations: {
+    translation: {
       fr: 'Dieu merci / Tout va bien',
       en: 'Thank God / All good',
       es: 'Gracias a Dios / Todo bien',
@@ -151,10 +152,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'polite_social',
     illustration: { iconName: 'Heart' },
-    exampleSentence: {
+    example: {
       arabizi: 'Labas, hamdullah',
       arabic: 'لاباس، الحمد لله',
-      translations: {
+      translation: {
         fr: 'Ça va, Dieu merci',
         en: 'Fine, thank God',
         es: 'Bien, gracias a Dios',
@@ -166,7 +167,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_shukran',
     arabizi: 'Shukran',
     arabic: 'شُكْرًا',
-    translations: {
+    translation: {
       fr: 'Merci',
       en: 'Thank you',
       es: 'Gracias',
@@ -174,10 +175,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'polite_social',
     illustration: { iconName: 'ThumbsUp' },
-    exampleSentence: {
+    example: {
       arabizi: 'Shukran bzzaf',
       arabic: 'شكرا بزاف',
-      translations: {
+      translation: {
         fr: 'Merci beaucoup',
         en: 'Thank you very much',
         es: 'Muchas gracias',
@@ -189,7 +190,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_afak',
     arabizi: '3afak',
     arabic: 'عَافَاكْ',
-    translations: {
+    translation: {
       fr: 'S\'il te plaît',
       en: 'Please',
       es: 'Por favor',
@@ -197,10 +198,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'polite_social',
     illustration: { iconName: 'Star' },
-    exampleSentence: {
+    example: {
       arabizi: '3tini lma 3afak',
       arabic: 'عطيني لما عفاك',
-      translations: {
+      translation: {
         fr: 'Donne-moi de l\'eau s\'il te plaît',
         en: 'Give me water please',
         es: 'Dame agua por favor',
@@ -212,7 +213,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_smahli',
     arabizi: 'Smahli',
     arabic: 'سْمَحْ لِي',
-    translations: {
+    translation: {
       fr: 'Excusez-moi / Pardon',
       en: 'Excuse me',
       es: 'Disculpe',
@@ -220,10 +221,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'polite_social',
     illustration: { iconName: 'Info' },
-    exampleSentence: {
+    example: {
       arabizi: 'Smahli a khoya',
       arabic: 'سمح لي ا خويا',
-      translations: {
+      translation: {
         fr: 'Excuse-moi mon frère',
         en: 'Excuse me brother',
         es: 'Disculpa hermano',
@@ -235,7 +236,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_bessaha',
     arabizi: 'Bessaha',
     arabic: 'بَالصَّحَّة',
-    translations: {
+    translation: {
       fr: 'À votre santé / Bon appétit',
       en: 'To your health / Bon appetit',
       es: 'A su salud / Buen provecho',
@@ -243,10 +244,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'polite_social',
     illustration: { iconName: 'Coffee' },
-    exampleSentence: {
+    example: {
       arabizi: 'Bessaha w raha',
       arabic: 'بالصحة و الراحة',
-      translations: {
+      translation: {
         fr: 'À votre santé et repos',
         en: 'To your health and rest',
         es: 'A su salud y descanso',
@@ -258,7 +259,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_lahetek_saha',
     arabizi: 'Lahetek saha',
     arabic: 'اللَّهْ يَعْطِيكْ الصَّحَّة',
-    translations: {
+    translation: {
       fr: 'Réponse à Bessaha',
       en: 'Response to Bessaha',
       es: 'Respuesta a Bessaha',
@@ -266,10 +267,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'polite_social',
     illustration: { iconName: 'Heart' },
-    exampleSentence: {
+    example: {
       arabizi: 'Lahetek saha',
       arabic: 'الله يعطيك الصحة',
-      translations: {
+      translation: {
         fr: 'Que Dieu te donne la santé',
         en: 'May God give you health',
         es: 'Que Dios te dé salud',
@@ -281,7 +282,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_tbarkellah',
     arabizi: 'Tbarkellah',
     arabic: 'تْبَارْكَ اللَّهْ',
-    translations: {
+    translation: {
       fr: 'Formule d\'admiration',
       en: 'Expression of admiration',
       es: 'Expresión de admiración',
@@ -289,10 +290,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'polite_social',
     illustration: { iconName: 'Sparkles' },
-    exampleSentence: {
+    example: {
       arabizi: 'Tbarkellah 3lik',
       arabic: 'تبارك الله عليك',
-      translations: {
+      translation: {
         fr: 'Que Dieu te bénisse (admiration)',
         en: 'God bless you (admiration)',
         es: 'Dios te bendiga (admiración)',
@@ -304,7 +305,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_bslama',
     arabizi: 'Bslama',
     arabic: 'بْسْلَامَة',
-    translations: {
+    translation: {
       fr: 'Au revoir',
       en: 'Goodbye',
       es: 'Adiós',
@@ -312,10 +313,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'polite_social',
     illustration: { iconName: 'LogOut' },
-    exampleSentence: {
+    example: {
       arabizi: 'Yallah bslama',
       arabic: 'يالاه بسلامة',
-      translations: {
+      translation: {
         fr: 'Allez, au revoir',
         en: 'Alright, goodbye',
         es: 'Venga, adiós',
@@ -327,7 +328,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_merhba',
     arabizi: 'Merhba',
     arabic: 'مَرْحْبَا',
-    translations: {
+    translation: {
       fr: 'Bienvenue',
       en: 'Welcome',
       es: 'Bienvenido',
@@ -335,10 +336,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'polite_social',
     illustration: { iconName: 'DoorOpen' },
-    exampleSentence: {
+    example: {
       arabizi: 'Merhba bik',
       arabic: 'مرحبا بيك',
-      translations: {
+      translation: {
         fr: 'Bienvenue à toi',
         en: 'Welcome to you',
         es: 'Bienvenido seas',
@@ -350,7 +351,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_wakha',
     arabizi: 'Wakha',
     arabic: 'وَاخَّا',
-    translations: {
+    translation: {
       fr: 'D\'accord / Entendu',
       en: 'Okay / Understood',
       es: 'De acuerdo / Entendido',
@@ -358,10 +359,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'polite_social',
     illustration: { iconName: 'Check' },
-    exampleSentence: {
+    example: {
       arabizi: 'Wakha, machi moshkil',
       arabic: 'واخا، ماشي مشكيل',
-      translations: {
+      translation: {
         fr: 'D\'accord, pas de problème',
         en: 'Okay, no problem',
         es: 'Vale, no hay problema',
@@ -373,7 +374,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_iyeh',
     arabizi: 'Iyeh',
     arabic: 'إِيِّيهْ',
-    translations: {
+    translation: {
       fr: 'Oui',
       en: 'Yes',
       es: 'Sí',
@@ -381,10 +382,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'polite_social',
     illustration: { iconName: 'CheckCircle' },
-    exampleSentence: {
+    example: {
       arabizi: 'Iyeh, bghit',
       arabic: 'إييه، بغيت',
-      translations: {
+      translation: {
         fr: 'Oui, je veux',
         en: 'Yes, I want',
         es: 'Sí, quiero',
@@ -396,7 +397,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_lla',
     arabizi: 'Lla',
     arabic: 'لَّا',
-    translations: {
+    translation: {
       fr: 'Non',
       en: 'No',
       es: 'No',
@@ -404,10 +405,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'polite_social',
     illustration: { iconName: 'XCircle' },
-    exampleSentence: {
+    example: {
       arabizi: 'Lla, shukran',
       arabic: 'لا، شكرا',
-      translations: {
+      translation: {
         fr: 'Non, merci',
         en: 'No, thank you',
         es: 'No, gracias',
@@ -419,7 +420,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_hchouma',
     arabizi: 'Hchouma',
     arabic: 'حْشُومَة',
-    translations: {
+    translation: {
       fr: 'C\'est honteux / C\'est déplacé',
       en: 'It\'s shameful',
       es: 'Es vergonzoso',
@@ -427,10 +428,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'polite_social',
     illustration: { iconName: 'AlertCircle' },
-    exampleSentence: {
+    example: {
       arabizi: 'Hchouma 3lik',
       arabic: 'حشومة عليك',
-      translations: {
+      translation: {
         fr: 'Honte à toi',
         en: 'Shame on you',
         es: 'Qué vergüenza',
@@ -442,7 +443,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_mashi_moshkil',
     arabizi: 'Mashi moshkil',
     arabic: 'مَاشِي مُشْكِيلْ',
-    translations: {
+    translation: {
       fr: 'Pas de problème',
       en: 'No problem',
       es: 'Ningún problema',
@@ -450,10 +451,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'polite_social',
     illustration: { iconName: 'ThumbsUp' },
-    exampleSentence: {
+    example: {
       arabizi: 'Wakha, mashi moshkil',
       arabic: 'واخا، ماشي مشكيل',
-      translations: {
+      translation: {
         fr: 'D\'accord, pas de problème',
         en: 'Okay, no problem',
         es: 'Vale, ningún problema',
@@ -465,7 +466,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_atay',
     arabizi: 'Atay',
     arabic: 'أَتَايْ',
-    translations: {
+    translation: {
       fr: 'Thé à la menthe',
       en: 'Mint tea',
       es: 'Té de menta',
@@ -473,10 +474,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'cafe_resto',
     illustration: { iconName: 'Coffee' },
-    exampleSentence: {
+    example: {
       arabizi: 'Bghit atay b n3na3',
       arabic: 'بغيت اتاي ب النعناع',
-      translations: {
+      translation: {
         fr: 'Je veux un thé à la menthe',
         en: 'I want mint tea',
         es: 'Quiero un té con menta',
@@ -488,7 +489,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_qhwa',
     arabizi: '9hwa',
     arabic: 'قَهْوَة',
-    translations: {
+    translation: {
       fr: 'Café',
       en: 'Coffee',
       es: 'Café',
@@ -496,10 +497,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'cafe_resto',
     illustration: { iconName: 'Coffee' },
-    exampleSentence: {
+    example: {
       arabizi: '9hwa kahla 3afak',
       arabic: 'قهوة كحلة عفاك',
-      translations: {
+      translation: {
         fr: 'Un café noir s\'il te plaît',
         en: 'Black coffee please',
         es: 'Un café solo por favor',
@@ -511,7 +512,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_qhwa_nss',
     arabizi: '9hwa nss-nss',
     arabic: 'قَهْوَة نُصْ نُصْ',
-    translations: {
+    translation: {
       fr: 'Café au lait',
       en: 'Coffee with milk',
       es: 'Café con leche',
@@ -519,10 +520,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'cafe_resto',
     illustration: { iconName: 'Coffee' },
-    exampleSentence: {
+    example: {
       arabizi: 'Jib li 9hwa nss-nss',
       arabic: 'جيب لي قهوة نص نص',
-      translations: {
+      translation: {
         fr: 'Apporte-moi un café au lait',
         en: 'Bring me a coffee with milk',
         es: 'Tráeme un café con leche',
@@ -534,7 +535,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_lma',
     arabizi: 'Lma',
     arabic: 'المَا',
-    translations: {
+    translation: {
       fr: 'L\'eau',
       en: 'Water',
       es: 'Agua',
@@ -542,10 +543,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'cafe_resto',
     illustration: { iconName: 'Droplets' },
-    exampleSentence: {
+    example: {
       arabizi: '3tini lma',
       arabic: 'عطيني لما',
-      translations: {
+      translation: {
         fr: 'Donne-moi de l\'eau',
         en: 'Give me water',
         es: 'Dame agua',
@@ -557,7 +558,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_lma_skhoun',
     arabizi: 'Lma skhoun',
     arabic: 'المَا سْخُونْ',
-    translations: {
+    translation: {
       fr: 'Eau chaude',
       en: 'Hot water',
       es: 'Agua caliente',
@@ -565,10 +566,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'cafe_resto',
     illustration: { iconName: 'Flame' },
-    exampleSentence: {
+    example: {
       arabizi: 'Lma skhoun bzzaf',
       arabic: 'لما سخون بزاف',
-      translations: {
+      translation: {
         fr: 'L\'eau est très chaude',
         en: 'The water is very hot',
         es: 'El agua está muy caliente',
@@ -580,7 +581,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_lma_bared',
     arabizi: 'Lma bared',
     arabic: 'المَا بَارِدْ',
-    translations: {
+    translation: {
       fr: 'Eau fraîche',
       en: 'Cold water',
       es: 'Agua fría',
@@ -588,10 +589,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'cafe_resto',
     illustration: { iconName: 'Snowflake' },
-    exampleSentence: {
+    example: {
       arabizi: 'Bghit lma bared',
       arabic: 'بغيت لما بارد',
-      translations: {
+      translation: {
         fr: 'Je veux de l\'eau fraîche',
         en: 'I want cold water',
         es: 'Quiero agua fría',
@@ -603,7 +604,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_asir',
     arabizi: '3asir',
     arabic: 'عَصِيرْ',
-    translations: {
+    translation: {
       fr: 'Jus de fruit',
       en: 'Juice',
       es: 'Zumo',
@@ -611,10 +612,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'cafe_resto',
     illustration: { iconName: 'GlassWater' },
-    exampleSentence: {
+    example: {
       arabizi: '3asir l-limoun',
       arabic: 'عصير الليمون',
-      translations: {
+      translation: {
         fr: 'Jus d\'orange',
         en: 'Orange juice',
         es: 'Zumo de naranja',
@@ -626,7 +627,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_khobz',
     arabizi: 'Khobz',
     arabic: 'خُبْزْ',
-    translations: {
+    translation: {
       fr: 'Pain',
       en: 'Bread',
       es: 'Pan',
@@ -634,10 +635,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'cafe_resto',
     illustration: { iconName: 'Croissant' },
-    exampleSentence: {
+    example: {
       arabizi: 'Jib l-khobz',
       arabic: 'جيب الخبز',
-      translations: {
+      translation: {
         fr: 'Apporte le pain',
         en: 'Bring the bread',
         es: 'Trae el pan',
@@ -649,7 +650,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_sukkar',
     arabizi: 'Sukkar',
     arabic: 'سُكَّارْ',
-    translations: {
+    translation: {
       fr: 'Sucre',
       en: 'Sugar',
       es: 'Azúcar',
@@ -657,10 +658,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'cafe_resto',
     illustration: { iconName: 'Box' },
-    exampleSentence: {
+    example: {
       arabizi: 'Zid s-sukkar',
       arabic: 'زيد السكر',
-      translations: {
+      translation: {
         fr: 'Ajoute du sucre',
         en: 'Add sugar',
         es: 'Añade azúcar',
@@ -672,7 +673,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_bla_sekkar',
     arabizi: 'Bla sekkar',
     arabic: 'بْلَا سُكَّارْ',
-    translations: {
+    translation: {
       fr: 'Sans sucre',
       en: 'Without sugar',
       es: 'Sin azúcar',
@@ -680,10 +681,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'cafe_resto',
     illustration: { iconName: 'Ban' },
-    exampleSentence: {
+    example: {
       arabizi: '9hwa bla sekkar',
       arabic: 'قهوة بلا سكار',
-      translations: {
+      translation: {
         fr: 'Café sans sucre',
         en: 'Coffee without sugar',
         es: 'Café sin azúcar',
@@ -695,7 +696,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_bghit',
     arabizi: 'Bghit',
     arabic: 'بْغِيتْ',
-    translations: {
+    translation: {
       fr: 'Je veux',
       en: 'I want',
       es: 'Quiero',
@@ -703,10 +704,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'cafe_resto',
     illustration: { iconName: 'Pointer' },
-    exampleSentence: {
+    example: {
       arabizi: 'Bghit nakoul',
       arabic: 'بغيت ناكل',
-      translations: {
+      translation: {
         fr: 'Je veux manger',
         en: 'I want to eat',
         es: 'Quiero comer',
@@ -718,7 +719,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_mabghitch',
     arabizi: 'Ma-bghit-ch',
     arabic: 'مَا بْغِيتْشْ',
-    translations: {
+    translation: {
       fr: 'Je ne veux pas',
       en: 'I do not want',
       es: 'No quiero',
@@ -726,10 +727,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'cafe_resto',
     illustration: { iconName: 'XSquare' },
-    exampleSentence: {
+    example: {
       arabizi: 'Ma-bghit-ch hada',
       arabic: 'ما بغيتش هادا',
-      translations: {
+      translation: {
         fr: 'Je ne veux pas ça',
         en: 'I do not want this',
         es: 'No quiero esto',
@@ -741,7 +742,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_lhsab',
     arabizi: 'L-hsab',
     arabic: 'الحْسَابْ',
-    translations: {
+    translation: {
       fr: 'L\'addition',
       en: 'The bill',
       es: 'La cuenta',
@@ -749,10 +750,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'cafe_resto',
     illustration: { iconName: 'Receipt' },
-    exampleSentence: {
+    example: {
       arabizi: 'L-hsab 3afak',
       arabic: 'الحساب عفاك',
-      translations: {
+      translation: {
         fr: 'L\'addition s\'il te plaît',
         en: 'The bill please',
         es: 'La cuenta por favor',
@@ -764,7 +765,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_ftour',
     arabizi: 'Ftour',
     arabic: 'فْطُورْ',
-    translations: {
+    translation: {
       fr: 'Petit-déjeuner',
       en: 'Breakfast',
       es: 'Desayuno',
@@ -772,10 +773,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'cafe_resto',
     illustration: { iconName: 'Sunrise' },
-    exampleSentence: {
+    example: {
       arabizi: 'Waqt l-ftour',
       arabic: 'وقت الفطور',
-      translations: {
+      translation: {
         fr: 'L\'heure du petit-déjeuner',
         en: 'Breakfast time',
         es: 'Hora del desayuno',
@@ -787,7 +788,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_ghdha',
     arabizi: 'Ghdha',
     arabic: 'غْدَا',
-    translations: {
+    translation: {
       fr: 'Déjeuner',
       en: 'Lunch',
       es: 'Almuerzo',
@@ -795,10 +796,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'cafe_resto',
     illustration: { iconName: 'Sun' },
-    exampleSentence: {
+    example: {
       arabizi: 'Shnu kayn f l-ghdha?',
       arabic: 'شنو كاين ف الغدا؟',
-      translations: {
+      translation: {
         fr: 'Qu\'y a-t-il pour le déjeuner ?',
         en: 'What is for lunch?',
         es: '¿Qué hay para almorzar?',
@@ -810,7 +811,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_asha',
     arabizi: '3sha',
     arabic: 'عْشَا',
-    translations: {
+    translation: {
       fr: 'Dîner',
       en: 'Dinner',
       es: 'Cena',
@@ -818,10 +819,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'cafe_resto',
     illustration: { iconName: 'Moon' },
-    exampleSentence: {
+    example: {
       arabizi: 'L-3sha wajed',
       arabic: 'العشا واجد',
-      translations: {
+      translation: {
         fr: 'Le dîner est prêt',
         en: 'Dinner is ready',
         es: 'La cena está lista',
@@ -833,7 +834,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_tajine',
     arabizi: 'Tajine',
     arabic: 'طَاجِينْ',
-    translations: {
+    translation: {
       fr: 'Tajine',
       en: 'Tajine',
       es: 'Tayín',
@@ -841,10 +842,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'cafe_resto',
     illustration: { iconName: 'Utensils' },
-    exampleSentence: {
+    example: {
       arabizi: 'Tajine d l-l7em',
       arabic: 'طاجين د اللحم',
-      translations: {
+      translation: {
         fr: 'Tajine de viande',
         en: 'Meat tajine',
         es: 'Tayín de carne',
@@ -856,7 +857,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_zit_zitoun',
     arabizi: 'Zit zitoun',
     arabic: 'زِيتْ زِيتُونْ',
-    translations: {
+    translation: {
       fr: 'Huile d\'olive',
       en: 'Olive oil',
       es: 'Aceite de oliva',
@@ -864,10 +865,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'cafe_resto',
     illustration: { iconName: 'Droplet' },
-    exampleSentence: {
+    example: {
       arabizi: 'Khobz b zit zitoun',
       arabic: 'خبز ب زيت زيتون',
-      translations: {
+      translation: {
         fr: 'Pain avec de l\'huile d\'olive',
         en: 'Bread with olive oil',
         es: 'Pan con aceite de oliva',
@@ -879,7 +880,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_m3elqa',
     arabizi: 'M3elqa',
     arabic: 'مْعَلْقَة',
-    translations: {
+    translation: {
       fr: 'Cuillère',
       en: 'Spoon',
       es: 'Cuchara',
@@ -887,10 +888,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'cafe_resto',
     illustration: { iconName: 'Utensils' },
-    exampleSentence: {
+    example: {
       arabizi: '3tini m3elqa',
       arabic: 'عطيني معلقة',
-      translations: {
+      translation: {
         fr: 'Donne-moi une cuillère',
         en: 'Give me a spoon',
         es: 'Dame una cuchara',
@@ -902,7 +903,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_farshita',
     arabizi: 'Farshita',
     arabic: 'فَرْشِيطَة',
-    translations: {
+    translation: {
       fr: 'Fourchette',
       en: 'Fork',
       es: 'Tenedor',
@@ -910,10 +911,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'cafe_resto',
     illustration: { iconName: 'Utensils' },
-    exampleSentence: {
+    example: {
       arabizi: 'Khasni farshita',
       arabic: 'خصني فرشيطة',
-      translations: {
+      translation: {
         fr: 'J\'ai besoin d\'une fourchette',
         en: 'I need a fork',
         es: 'Necesito un tenedor',
@@ -925,7 +926,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_korsa',
     arabizi: 'Korsa',
     arabic: 'كُورْسَا',
-    translations: {
+    translation: {
       fr: 'Course en taxi',
       en: 'Taxi ride',
       es: 'Viaje en taxi',
@@ -933,10 +934,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'taxi_transport',
     illustration: { iconName: 'Car' },
-    exampleSentence: {
+    example: {
       arabizi: 'Korsa l medina',
       arabic: 'كورسا ل مدينة',
-      translations: {
+      translation: {
         fr: 'Course vers la médina',
         en: 'Ride to the medina',
         es: 'Viaje a la medina',
@@ -948,7 +949,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_kuntur',
     arabizi: 'Khdem l-kuntur',
     arabic: 'خَدَّمْ الكُونْتُورْ',
-    translations: {
+    translation: {
       fr: 'Mettez le compteur',
       en: 'Turn on the meter',
       es: 'Ponga el taxímetro',
@@ -956,10 +957,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'taxi_transport',
     illustration: { iconName: 'Gauge' },
-    exampleSentence: {
+    example: {
       arabizi: 'Khdem l-kuntur 3afak',
       arabic: 'خدم الكونتور عفاك',
-      translations: {
+      translation: {
         fr: 'Mettez le compteur s\'il vous plaît',
         en: 'Turn on the meter please',
         es: 'Ponga el taxímetro por favor',
@@ -971,7 +972,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_dor_limen',
     arabizi: 'Dor 3la limen',
     arabic: 'دُورْ عَلَى لِيمِينْ',
-    translations: {
+    translation: {
       fr: 'Tourne à droite',
       en: 'Turn right',
       es: 'Gira a la derecha',
@@ -979,10 +980,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'taxi_transport',
     illustration: { iconName: 'CornerUpRight' },
-    exampleSentence: {
+    example: {
       arabizi: 'Dor 3la limen hna',
       arabic: 'دور على ليمين هنا',
-      translations: {
+      translation: {
         fr: 'Tourne à droite ici',
         en: 'Turn right here',
         es: 'Gira a la derecha aquí',
@@ -994,7 +995,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_dor_lisir',
     arabizi: 'Dor 3la lisir',
     arabic: 'دُورْ عَلَى لِيسِيرْ',
-    translations: {
+    translation: {
       fr: 'Tourne à gauche',
       en: 'Turn left',
       es: 'Gira a la izquierda',
@@ -1002,10 +1003,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'taxi_transport',
     illustration: { iconName: 'CornerUpLeft' },
-    exampleSentence: {
+    example: {
       arabizi: 'Dor 3la lisir mor d-dar',
       arabic: 'دور على ليسير مور الدار',
-      translations: {
+      translation: {
         fr: 'Tourne à gauche après la maison',
         en: 'Turn left after the house',
         es: 'Gira a la izquierda después de la casa',
@@ -1017,7 +1018,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_sir_nishan',
     arabizi: 'Sir nishan',
     arabic: 'سِيرْ نِيشَانْ',
-    translations: {
+    translation: {
       fr: 'Va tout droit',
       en: 'Go straight',
       es: 'Sigue todo recto',
@@ -1025,10 +1026,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'taxi_transport',
     illustration: { iconName: 'ArrowUp' },
-    exampleSentence: {
+    example: {
       arabizi: 'Sir nishan tal chanti',
       arabic: 'سير نيشان تال شانطي',
-      translations: {
+      translation: {
         fr: 'Va tout droit jusqu\'à la route',
         en: 'Go straight until the road',
         es: 'Sigue recto hasta la carretera',
@@ -1040,7 +1041,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_wqef_hna',
     arabizi: 'Wqef hna',
     arabic: 'وقَفْ هْنَا',
-    translations: {
+    translation: {
       fr: 'Arrête-toi ici',
       en: 'Stop here',
       es: 'Para aquí',
@@ -1048,10 +1049,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'taxi_transport',
     illustration: { iconName: 'Octagon' },
-    exampleSentence: {
+    example: {
       arabizi: 'Wqef hna 3afak',
       arabic: 'وقف هنا عفاك',
-      translations: {
+      translation: {
         fr: 'Arrête-toi ici s\'il te plaît',
         en: 'Stop here please',
         es: 'Para aquí por favor',
@@ -1063,7 +1064,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_lmahetta',
     arabizi: 'L-ma7etta',
     arabic: 'المَحَطَّة',
-    translations: {
+    translation: {
       fr: 'La gare / station',
       en: 'The station',
       es: 'La estación',
@@ -1071,10 +1072,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'taxi_transport',
     illustration: { iconName: 'Train' },
-    exampleSentence: {
+    example: {
       arabizi: 'Bghit nemchi l-ma7etta d tran',
       arabic: 'بغيت نمشي ل محطة د تران',
-      translations: {
+      translation: {
         fr: 'Je veux aller à la gare',
         en: 'I want to go to the train station',
         es: 'Quiero ir a la estación de tren',
@@ -1086,7 +1087,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_lmatar',
     arabizi: 'L-matar',
     arabic: 'المَطَارْ',
-    translations: {
+    translation: {
       fr: 'L\'aéroport',
       en: 'The airport',
       es: 'El aeropuerto',
@@ -1094,10 +1095,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'taxi_transport',
     illustration: { iconName: 'Plane' },
-    exampleSentence: {
+    example: {
       arabizi: 'Korsa l-matar',
       arabic: 'كورسا ل مطار',
-      translations: {
+      translation: {
         fr: 'Course vers l\'aéroport',
         en: 'Ride to the airport',
         es: 'Viaje al aeropuerto',
@@ -1109,7 +1110,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_bab',
     arabizi: 'Bab',
     arabic: 'بَابْ',
-    translations: {
+    translation: {
       fr: 'Porte',
       en: 'Door / Gate',
       es: 'Puerta',
@@ -1117,10 +1118,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'taxi_transport',
     illustration: { iconName: 'DoorClosed' },
-    exampleSentence: {
+    example: {
       arabizi: 'Wqef f bab boujeloud',
       arabic: 'وقف ف باب بوجلود',
-      translations: {
+      translation: {
         fr: 'Arrête-toi à Bab Boujeloud',
         en: 'Stop at Bab Boujeloud',
         es: 'Para en Bab Boujeloud',
@@ -1132,7 +1133,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_zanqa',
     arabizi: 'Zanqa',
     arabic: 'زَنْقَة',
-    translations: {
+    translation: {
       fr: 'Ruelle / Rue',
       en: 'Street / Alley',
       es: 'Calle / Callejón',
@@ -1140,10 +1141,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'taxi_transport',
     illustration: { iconName: 'Map' },
-    exampleSentence: {
+    example: {
       arabizi: 'Dor f had z-zanqa',
       arabic: 'دور ف هاد الزنقة',
-      translations: {
+      translation: {
         fr: 'Tourne dans cette rue',
         en: 'Turn into this street',
         es: 'Gira en esta calle',
@@ -1155,7 +1156,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_medina',
     arabizi: 'Medina qdima',
     arabic: 'المَدِينَة القْدِيمَة',
-    translations: {
+    translation: {
       fr: 'L\'ancienne médina',
       en: 'The old medina',
       es: 'La antigua medina',
@@ -1163,10 +1164,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'taxi_transport',
     illustration: { iconName: 'Castle' },
-    exampleSentence: {
+    example: {
       arabizi: 'Nemchiw l-medina l-qdima',
       arabic: 'نمشيو ل مدينة ل قديمة',
-      translations: {
+      translation: {
         fr: 'Allons à l\'ancienne médina',
         en: 'Let\'s go to the old medina',
         es: 'Vamos a la antigua medina',
@@ -1178,7 +1179,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_qrib',
     arabizi: 'Qrib',
     arabic: 'قْرِيبْ',
-    translations: {
+    translation: {
       fr: 'Proche',
       en: 'Near',
       es: 'Cerca',
@@ -1186,10 +1187,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'taxi_transport',
     illustration: { iconName: 'MapPin' },
-    exampleSentence: {
+    example: {
       arabizi: 'Wesh qrib mn hna?',
       arabic: 'واش قريب من هنا؟',
-      translations: {
+      translation: {
         fr: 'Est-ce proche d\'ici ?',
         en: 'Is it near here?',
         es: '¿Está cerca de aquí?',
@@ -1201,7 +1202,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_b3id',
     arabizi: 'B3id',
     arabic: 'بْعِيدْ',
-    translations: {
+    translation: {
       fr: 'Loin',
       en: 'Far',
       es: 'Lejos',
@@ -1209,10 +1210,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'taxi_transport',
     illustration: { iconName: 'Navigation' },
-    exampleSentence: {
+    example: {
       arabizi: 'L-matar b3id bzzaf',
       arabic: 'المطار بعيد بزاف',
-      translations: {
+      translation: {
         fr: 'L\'aéroport est très loin',
         en: 'The airport is very far',
         es: 'El aeropuerto está muy lejos',
@@ -1224,7 +1225,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_fin_ghadi',
     arabizi: 'Fin ghadi',
     arabic: 'فِينْ غَادِي',
-    translations: {
+    translation: {
       fr: 'Où vas-tu ?',
       en: 'Where are you going?',
       es: '¿A dónde vas?',
@@ -1232,10 +1233,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'taxi_transport',
     illustration: { iconName: 'Compass' },
-    exampleSentence: {
+    example: {
       arabizi: 'Fin ghadi a sidi?',
       arabic: 'فين غادي ا سيدي؟',
-      translations: {
+      translation: {
         fr: 'Où allez-vous monsieur ?',
         en: 'Where are you going sir?',
         es: '¿A dónde va señor?',
@@ -1247,7 +1248,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_wselna',
     arabizi: 'Wsel-na',
     arabic: 'وْصَلْنَا',
-    translations: {
+    translation: {
       fr: 'Nous sommes arrivés',
       en: 'We have arrived',
       es: 'Hemos llegado',
@@ -1255,10 +1256,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'taxi_transport',
     illustration: { iconName: 'CheckCircle' },
-    exampleSentence: {
+    example: {
       arabizi: 'Hamdullah wsel-na',
       arabic: 'الحمد لله وصلنا',
-      translations: {
+      translation: {
         fr: 'Dieu merci, nous sommes arrivés',
         en: 'Thank God we arrived',
         es: 'Gracias a Dios hemos llegado',
@@ -1270,7 +1271,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_sh7al',
     arabizi: 'Sh7al hada',
     arabic: 'شْحَالْ هَادَا',
-    translations: {
+    translation: {
       fr: 'Combien ça coûte ?',
       en: 'How much is this?',
       es: '¿Cuánto cuesta?',
@@ -1278,10 +1279,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'souk_shopping',
     illustration: { iconName: 'Tag' },
-    exampleSentence: {
+    example: {
       arabizi: 'B sh7al had z-zerbiya?',
       arabic: 'ب شحال هاد الزربية؟',
-      translations: {
+      translation: {
         fr: 'Combien coûte ce tapis ?',
         en: 'How much is this carpet?',
         es: '¿Cuánto cuesta esta alfombra?',
@@ -1293,7 +1294,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_ghali',
     arabizi: 'Ghali bzzaf',
     arabic: 'غَالِي بْزَّافْ',
-    translations: {
+    translation: {
       fr: 'Trop cher',
       en: 'Too expensive',
       es: 'Demasiado caro',
@@ -1301,10 +1302,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'souk_shopping',
     illustration: { iconName: 'TrendingUp' },
-    exampleSentence: {
+    example: {
       arabizi: 'Hada ghali bzzaf',
       arabic: 'هادا غالي بزاف',
-      translations: {
+      translation: {
         fr: 'C\'est trop cher',
         en: 'This is too expensive',
         es: 'Esto es demasiado caro',
@@ -1316,7 +1317,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_nqess',
     arabizi: 'Nqess shwiya',
     arabic: 'نْقَّصْ شْوِيَّة',
-    translations: {
+    translation: {
       fr: 'Baisse un peu le prix',
       en: 'Lower the price a bit',
       es: 'Baja un poco el precio',
@@ -1324,10 +1325,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'souk_shopping',
     illustration: { iconName: 'TrendingDown' },
-    exampleSentence: {
+    example: {
       arabizi: 'Nqess shwiya 3afak',
       arabic: 'نقص شوية عفاك',
-      translations: {
+      translation: {
         fr: 'Baisse un peu s\'il te plaît',
         en: 'Lower it a bit please',
         es: 'Baja un poco por favor',
@@ -1339,7 +1340,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_flus',
     arabizi: 'Flus',
     arabic: 'فْلُوسْ',
-    translations: {
+    translation: {
       fr: 'Argent',
       en: 'Money',
       es: 'Dinero',
@@ -1347,10 +1348,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'souk_shopping',
     illustration: { iconName: 'Coins' },
-    exampleSentence: {
+    example: {
       arabizi: 'Ma-3endi-ch l-flus',
       arabic: 'ما عنديش الفلوس',
-      translations: {
+      translation: {
         fr: 'Je n\'ai pas d\'argent',
         en: 'I don\'t have money',
         es: 'No tengo dinero',
@@ -1362,7 +1363,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_sarf',
     arabizi: 'Sarf',
     arabic: 'الصَّرْفْ',
-    translations: {
+    translation: {
       fr: 'Monnaie / Pièces',
       en: 'Change / Coins',
       es: 'Cambio / Monedas',
@@ -1370,10 +1371,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'souk_shopping',
     illustration: { iconName: 'CircleDollarSign' },
-    exampleSentence: {
+    example: {
       arabizi: 'Wesh 3endek s-sarf?',
       arabic: 'واش عندك الصرف؟',
-      translations: {
+      translation: {
         fr: 'As-tu de la monnaie ?',
         en: 'Do you have change?',
         es: '¿Tienes cambio?',
@@ -1385,7 +1386,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_akher_taman',
     arabizi: 'Akher taman',
     arabic: 'آخِرْ تَمَانْ',
-    translations: {
+    translation: {
       fr: 'Le dernier prix',
       en: 'The last price',
       es: 'El último precio',
@@ -1393,10 +1394,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'souk_shopping',
     illustration: { iconName: 'BadgeCent' },
-    exampleSentence: {
+    example: {
       arabizi: 'Shnu akher taman?',
       arabic: 'شنو آخر ثمن؟',
-      translations: {
+      translation: {
         fr: 'Quel est le dernier prix ?',
         en: 'What is the last price?',
         es: '¿Cuál es el último precio?',
@@ -1408,7 +1409,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_zwin',
     arabizi: 'Zwin',
     arabic: 'زْوِينْ',
-    translations: {
+    translation: {
       fr: 'Beau / Joli (masc)',
       en: 'Beautiful / Nice (masc)',
       es: 'Bonito (masc)',
@@ -1416,10 +1417,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'souk_shopping',
     illustration: { iconName: 'Sparkles' },
-    exampleSentence: {
+    example: {
       arabizi: 'Had s-sebbat zwin',
       arabic: 'هاد الصباط زوين',
-      translations: {
+      translation: {
         fr: 'Ces chaussures sont belles',
         en: 'These shoes are nice',
         es: 'Estos zapatos son bonitos',
@@ -1431,7 +1432,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_zwina',
     arabizi: 'Zwina',
     arabic: 'زْوِينَة',
-    translations: {
+    translation: {
       fr: 'Belle / Jolie (fém)',
       en: 'Beautiful / Nice (fem)',
       es: 'Bonita (fem)',
@@ -1439,10 +1440,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'souk_shopping',
     illustration: { iconName: 'Star' },
-    exampleSentence: {
+    example: {
       arabizi: 'Jellaba zwina',
       arabic: 'جلابة زوينة',
-      translations: {
+      translation: {
         fr: 'Une belle djellaba',
         en: 'A beautiful djellaba',
         es: 'Una bonita chilaba',
@@ -1454,7 +1455,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_kbir',
     arabizi: 'Kbir',
     arabic: 'كْبِيرْ',
-    translations: {
+    translation: {
       fr: 'Grand',
       en: 'Big / Large',
       es: 'Grande',
@@ -1462,10 +1463,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'souk_shopping',
     illustration: { iconName: 'Maximize' },
-    exampleSentence: {
+    example: {
       arabizi: 'Hada kbir bzzaf',
       arabic: 'هادا كبير بزاف',
-      translations: {
+      translation: {
         fr: 'C\'est trop grand',
         en: 'This is too big',
         es: 'Esto es demasiado grande',
@@ -1477,7 +1478,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_sghir',
     arabizi: 'Sghir',
     arabic: 'صْغِيرْ',
-    translations: {
+    translation: {
       fr: 'Petit',
       en: 'Small',
       es: 'Pequeño',
@@ -1485,10 +1486,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'souk_shopping',
     illustration: { iconName: 'Minimize' },
-    exampleSentence: {
+    example: {
       arabizi: '3tini wahed sghir',
       arabic: 'عطيني واحد صغير',
-      translations: {
+      translation: {
         fr: 'Donne-moi un petit',
         en: 'Give me a small one',
         es: 'Dame uno pequeño',
@@ -1500,7 +1501,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_zerbiya',
     arabizi: 'Zerbiya',
     arabic: 'زَرْبِيَّة',
-    translations: {
+    translation: {
       fr: 'Tapis',
       en: 'Carpet',
       es: 'Alfombra',
@@ -1508,10 +1509,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'souk_shopping',
     illustration: { iconName: 'Layout' },
-    exampleSentence: {
+    example: {
       arabizi: 'Bghit nchri zerbiya',
       arabic: 'بغيت نشري زربية',
-      translations: {
+      translation: {
         fr: 'Je veux acheter un tapis',
         en: 'I want to buy a carpet',
         es: 'Quiero comprar una alfombra',
@@ -1523,7 +1524,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_belgha',
     arabizi: 'Belgha',
     arabic: 'بَلْغَة',
-    translations: {
+    translation: {
       fr: 'Babouche',
       en: 'Babouche (shoes)',
       es: 'Babucha',
@@ -1531,10 +1532,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'souk_shopping',
     illustration: { iconName: 'Footprints' },
-    exampleSentence: {
+    example: {
       arabizi: 'Belgha fs-sfar',
       arabic: 'بلغة ف الصفر',
-      translations: {
+      translation: {
         fr: 'Babouche en jaune',
         en: 'Babouche in yellow',
         es: 'Babucha en amarillo',
@@ -1546,7 +1547,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_jellaba',
     arabizi: 'Jellaba',
     arabic: 'جَلَّابَة',
-    translations: {
+    translation: {
       fr: 'Djellaba',
       en: 'Djellaba',
       es: 'Chilaba',
@@ -1554,10 +1555,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'souk_shopping',
     illustration: { iconName: 'Shirt' },
-    exampleSentence: {
+    example: {
       arabizi: 'Jellaba maghribiya',
       arabic: 'جلابة مغربية',
-      translations: {
+      translation: {
         fr: 'Djellaba marocaine',
         en: 'Moroccan djellaba',
         es: 'Chilaba marroquí',
@@ -1569,7 +1570,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_chrit',
     arabizi: 'Chri-t',
     arabic: 'شْرِيتْ',
-    translations: {
+    translation: {
       fr: 'J\'ai acheté',
       en: 'I bought',
       es: 'Compré',
@@ -1577,10 +1578,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'souk_shopping',
     illustration: { iconName: 'ShoppingBag' },
-    exampleSentence: {
+    example: {
       arabizi: 'Chri-t hada l-bare7',
       arabic: 'شريت هادا البارح',
-      translations: {
+      translation: {
         fr: 'J\'ai acheté ça hier',
         en: 'I bought this yesterday',
         es: 'Compré esto ayer',
@@ -1592,7 +1593,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_baraka',
     arabizi: 'Baraka',
     arabic: 'بَرَكَة',
-    translations: {
+    translation: {
       fr: 'Ça suffit / C\'est assez',
       en: 'That\'s enough',
       es: 'Basta / Es suficiente',
@@ -1600,10 +1601,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'souk_shopping',
     illustration: { iconName: 'StopCircle' },
-    exampleSentence: {
+    example: {
       arabizi: 'Baraka 3afak',
       arabic: 'بركة عفاك',
-      translations: {
+      translation: {
         fr: 'Ça suffit s\'il te plaît',
         en: 'That\'s enough please',
         es: 'Basta por favor',
@@ -1615,7 +1616,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_dar',
     arabizi: 'Dar',
     arabic: 'دَارْ',
-    translations: {
+    translation: {
       fr: 'Maison',
       en: 'House',
       es: 'Casa',
@@ -1623,10 +1624,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'housing_riad',
     illustration: { iconName: 'Home' },
-    exampleSentence: {
+    example: {
       arabizi: 'Dar kbira',
       arabic: 'دار كبيرة',
-      translations: {
+      translation: {
         fr: 'Grande maison',
         en: 'Big house',
         es: 'Casa grande',
@@ -1638,7 +1639,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_riad',
     arabizi: 'Riad',
     arabic: 'رِيَاضْ',
-    translations: {
+    translation: {
       fr: 'Riad',
       en: 'Riad (Traditional house)',
       es: 'Riad',
@@ -1646,10 +1647,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'housing_riad',
     illustration: { iconName: 'Home' },
-    exampleSentence: {
+    example: {
       arabizi: 'Riad zwin f l-medina',
       arabic: 'رياض زوين ف لمدينة',
-      translations: {
+      translation: {
         fr: 'Un beau riad dans la médina',
         en: 'A beautiful riad in the medina',
         es: 'Un hermoso riad en la medina',
@@ -1661,7 +1662,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_bit',
     arabizi: 'Bit',
     arabic: 'بِيتْ',
-    translations: {
+    translation: {
       fr: 'Chambre',
       en: 'Room',
       es: 'Habitación',
@@ -1669,10 +1670,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'housing_riad',
     illustration: { iconName: 'Bed' },
-    exampleSentence: {
+    example: {
       arabizi: 'Bit n3as',
       arabic: 'بيت النعاس',
-      translations: {
+      translation: {
         fr: 'Chambre à coucher',
         en: 'Bedroom',
         es: 'Dormitorio',
@@ -1684,7 +1685,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_sarout',
     arabizi: 'Sarout',
     arabic: 'سَارُوتْ',
-    translations: {
+    translation: {
       fr: 'Clé',
       en: 'Key',
       es: 'Llave',
@@ -1692,10 +1693,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'housing_riad',
     illustration: { iconName: 'Key' },
-    exampleSentence: {
+    example: {
       arabizi: '3tini s-sarout',
       arabic: 'عطيني الساروت',
-      translations: {
+      translation: {
         fr: 'Donne-moi la clé',
         en: 'Give me the key',
         es: 'Dame la llave',
@@ -1707,7 +1708,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_lkra',
     arabizi: 'L-kra',
     arabic: 'الكْرَا',
-    translations: {
+    translation: {
       fr: 'Le loyer',
       en: 'The rent',
       es: 'El alquiler',
@@ -1715,10 +1716,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'housing_riad',
     illustration: { iconName: 'Banknote' },
-    exampleSentence: {
+    example: {
       arabizi: 'Khelest l-kra',
       arabic: 'خلصت الكرا',
-      translations: {
+      translation: {
         fr: 'J\'ai payé le loyer',
         en: 'I paid the rent',
         es: 'He pagado el alquiler',
@@ -1730,7 +1731,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_dman',
     arabizi: 'Dman',
     arabic: 'الضْمَانْ',
-    translations: {
+    translation: {
       fr: 'La caution',
       en: 'The deposit',
       es: 'La fianza',
@@ -1738,10 +1739,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'housing_riad',
     illustration: { iconName: 'Shield' },
-    exampleSentence: {
+    example: {
       arabizi: 'Dman ghali',
       arabic: 'الضمان غالي',
-      translations: {
+      translation: {
         fr: 'La caution est chère',
         en: 'The deposit is expensive',
         es: 'La fianza es cara',
@@ -1753,7 +1754,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_moul_ddar',
     arabizi: 'Moul d-dar',
     arabic: 'مُولْ الدَّارْ',
-    translations: {
+    translation: {
       fr: 'Le propriétaire',
       en: 'The owner',
       es: 'El propietario',
@@ -1761,10 +1762,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'housing_riad',
     illustration: { iconName: 'UserCircle' },
-    exampleSentence: {
+    example: {
       arabizi: 'Moul d-dar mzyan',
       arabic: 'مول الدار مزيان',
-      translations: {
+      translation: {
         fr: 'Le propriétaire est gentil',
         en: 'The owner is nice',
         es: 'El propietario es amable',
@@ -1776,7 +1777,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_lberd',
     arabizi: 'L-berd',
     arabic: 'البَرْدْ',
-    translations: {
+    translation: {
       fr: 'Climatisation / Frais',
       en: 'AC / Cold',
       es: 'Aire acondicionado / Frío',
@@ -1784,10 +1785,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'housing_riad',
     illustration: { iconName: 'Wind' },
-    exampleSentence: {
+    example: {
       arabizi: 'Kayn l-berd hna',
       arabic: 'كاين البرد هنا',
-      translations: {
+      translation: {
         fr: 'Il fait froid ici',
         en: 'It is cold here',
         es: 'Hace frío aquí',
@@ -1799,7 +1800,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_sskhona',
     arabizi: 'S-skhona',
     arabic: 'السّْخُونَة',
-    translations: {
+    translation: {
       fr: 'Chauffage / Chaleur',
       en: 'Heating / Heat',
       es: 'Calefacción / Calor',
@@ -1807,10 +1808,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'housing_riad',
     illustration: { iconName: 'Flame' },
-    exampleSentence: {
+    example: {
       arabizi: 'S-skhona bzzaf l-youm',
       arabic: 'السخونة بزاف اليوم',
-      translations: {
+      translation: {
         fr: 'Il fait très chaud aujourd\'hui',
         en: 'It is very hot today',
         es: 'Hace mucho calor hoy',
@@ -1822,7 +1823,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_sstah',
     arabizi: 'S-stah',
     arabic: 'السّْطَحْ',
-    translations: {
+    translation: {
       fr: 'La terrasse / toit',
       en: 'Terrace / Roof',
       es: 'Terraza / Tejado',
@@ -1830,10 +1831,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'housing_riad',
     illustration: { iconName: 'LayoutPanelTop' },
-    exampleSentence: {
+    example: {
       arabizi: 'Ntl3o l s-stah',
       arabic: 'نطلعو ل السطح',
-      translations: {
+      translation: {
         fr: 'Montons sur la terrasse',
         en: 'Let\'s go up to the roof',
         es: 'Subamos a la terraza',
@@ -1845,7 +1846,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_lmoushkil',
     arabizi: 'L-moushkil',
     arabic: 'المُشْكِيلْ',
-    translations: {
+    translation: {
       fr: 'Le problème',
       en: 'The problem',
       es: 'El problema',
@@ -1853,10 +1854,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'housing_riad',
     illustration: { iconName: 'AlertTriangle' },
-    exampleSentence: {
+    example: {
       arabizi: '3endi moushkil',
       arabic: 'عندي مشكيل',
-      translations: {
+      translation: {
         fr: 'J\'ai un problème',
         en: 'I have a problem',
         es: 'Tengo un problema',
@@ -1868,7 +1869,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_kheddam',
     arabizi: 'Kheddam',
     arabic: 'خَدَّامْ',
-    translations: {
+    translation: {
       fr: 'Ça fonctionne',
       en: 'It works',
       es: 'Funciona',
@@ -1876,10 +1877,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'housing_riad',
     illustration: { iconName: 'CheckCircle' },
-    exampleSentence: {
+    example: {
       arabizi: 'Dou kheddam',
       arabic: 'الضو خدام',
-      translations: {
+      translation: {
         fr: 'L\'électricité fonctionne',
         en: 'The electricity is working',
         es: 'La luz funciona',
@@ -1891,7 +1892,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_khaser',
     arabizi: 'Khaser',
     arabic: 'خَاسِرْ',
-    translations: {
+    translation: {
       fr: 'En panne',
       en: 'Broken',
       es: 'Estropeado',
@@ -1899,10 +1900,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'housing_riad',
     illustration: { iconName: 'Wrench' },
-    exampleSentence: {
+    example: {
       arabizi: 'Tele khasra',
       arabic: 'التلفازة خاسرة',
-      translations: {
+      translation: {
         fr: 'La télé est en panne',
         en: 'The TV is broken',
         es: 'La televisión está estropeada',
@@ -1914,7 +1915,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_nqi',
     arabizi: 'Nqi',
     arabic: 'نْقِي',
-    translations: {
+    translation: {
       fr: 'Propre',
       en: 'Clean',
       es: 'Limpio',
@@ -1922,10 +1923,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'housing_riad',
     illustration: { iconName: 'Sparkles' },
-    exampleSentence: {
+    example: {
       arabizi: 'Bit nqi',
       arabic: 'بيت نقي',
-      translations: {
+      translation: {
         fr: 'Chambre propre',
         en: 'Clean room',
         es: 'Habitación limpia',
@@ -1937,7 +1938,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_moussek',
     arabizi: 'Moussek',
     arabic: 'مْوَسَّخْ',
-    translations: {
+    translation: {
       fr: 'Sale',
       en: 'Dirty',
       es: 'Sucio',
@@ -1945,10 +1946,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'housing_riad',
     illustration: { iconName: 'Trash2' },
-    exampleSentence: {
+    example: {
       arabizi: 'L-kachkoula mouskha',
       arabic: 'الكشكولة موسخة',
-      translations: {
+      translation: {
         fr: 'L\'écharpe est sale',
         en: 'The scarf is dirty',
         es: 'La bufanda está sucia',
@@ -1960,7 +1961,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_farmasiyan',
     arabizi: 'Farmasiyan',
     arabic: 'فَرْمَسْيَانْ',
-    translations: {
+    translation: {
       fr: 'Pharmacie',
       en: 'Pharmacy',
       es: 'Farmacia',
@@ -1968,10 +1969,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'urgencies_health',
     illustration: { iconName: 'Pill' },
-    exampleSentence: {
+    example: {
       arabizi: 'Fin jat l-farmasiyan?',
       arabic: 'فين جات الفرمسيان؟',
-      translations: {
+      translation: {
         fr: 'Où se trouve la pharmacie ?',
         en: 'Where is the pharmacy?',
         es: '¿Dónde está la farmacia?',
@@ -1983,7 +1984,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_tbib',
     arabizi: 'Tbib',
     arabic: 'طْبِيبْ',
-    translations: {
+    translation: {
       fr: 'Médecin',
       en: 'Doctor',
       es: 'Médico',
@@ -1991,10 +1992,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'urgencies_health',
     illustration: { iconName: 'Stethoscope' },
-    exampleSentence: {
+    example: {
       arabizi: 'Khasni nchouf tbib',
       arabic: 'خصني نشوف طبيب',
-      translations: {
+      translation: {
         fr: 'Je dois voir un médecin',
         en: 'I need to see a doctor',
         es: 'Necesito ver a un médico',
@@ -2006,7 +2007,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_sbitar',
     arabizi: 'Sbitar',
     arabic: 'سْبِيطَارْ',
-    translations: {
+    translation: {
       fr: 'Hôpital',
       en: 'Hospital',
       es: 'Hospital',
@@ -2014,10 +2015,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'urgencies_health',
     illustration: { iconName: 'Building' },
-    exampleSentence: {
+    example: {
       arabizi: 'Sbitar qrib',
       arabic: 'سبيطار قريب',
-      translations: {
+      translation: {
         fr: 'Hôpital proche',
         en: 'Near hospital',
         es: 'Hospital cercano',
@@ -2029,7 +2030,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_awenni',
     arabizi: '3awenni',
     arabic: 'عَاوْنِّي',
-    translations: {
+    translation: {
       fr: 'Aidez-moi',
       en: 'Help me',
       es: 'Ayúdeme',
@@ -2037,10 +2038,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'urgencies_health',
     illustration: { iconName: 'LifeBuoy' },
-    exampleSentence: {
+    example: {
       arabizi: '3awenni 3afak',
       arabic: 'عاوني عفاك',
-      translations: {
+      translation: {
         fr: 'Aidez-moi s\'il vous plaît',
         en: 'Help me please',
         es: 'Ayúdeme por favor',
@@ -2052,7 +2053,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_ddwa',
     arabizi: 'D-dwa',
     arabic: 'الدّْوَا',
-    translations: {
+    translation: {
       fr: 'Le médicament',
       en: 'The medicine',
       es: 'El medicamento',
@@ -2060,10 +2061,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'urgencies_health',
     illustration: { iconName: 'Syringe' },
-    exampleSentence: {
+    example: {
       arabizi: 'Bghit d-dwa',
       arabic: 'بغيت الدوا',
-      translations: {
+      translation: {
         fr: 'Je veux le médicament',
         en: 'I want the medicine',
         es: 'Quiero el medicamento',
@@ -2075,7 +2076,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_darni_rasi',
     arabizi: 'Darni rasi',
     arabic: 'ضَرْنِي رَاسِي',
-    translations: {
+    translation: {
       fr: 'J\'ai mal à la tête',
       en: 'I have a headache',
       es: 'Me duele la cabeza',
@@ -2083,10 +2084,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'urgencies_health',
     illustration: { iconName: 'Frown' },
-    exampleSentence: {
+    example: {
       arabizi: 'Darni rasi bzzaf',
       arabic: 'ضرني راسي بزاف',
-      translations: {
+      translation: {
         fr: 'J\'ai très mal à la tête',
         en: 'I have a bad headache',
         es: 'Me duele mucho la cabeza',
@@ -2098,7 +2099,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_lkrash',
     arabizi: 'L-krash',
     arabic: 'الكْرْشْ',
-    translations: {
+    translation: {
       fr: 'Le ventre / estomac',
       en: 'The belly / stomach',
       es: 'El vientre / estómago',
@@ -2106,10 +2107,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'urgencies_health',
     illustration: { iconName: 'Activity' },
-    exampleSentence: {
+    example: {
       arabizi: 'Dratni kershi',
       arabic: 'ضراتني كرشي',
-      translations: {
+      translation: {
         fr: 'J\'ai mal au ventre',
         en: 'My stomach hurts',
         es: 'Me duele la barriga',
@@ -2121,7 +2122,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_bolis',
     arabizi: 'Bolis',
     arabic: 'البُولِيسْ',
-    translations: {
+    translation: {
       fr: 'La police',
       en: 'The police',
       es: 'La policía',
@@ -2129,10 +2130,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'urgencies_health',
     illustration: { iconName: 'ShieldAlert' },
-    exampleSentence: {
+    example: {
       arabizi: '3eyet l-bolis',
       arabic: 'عيط ل البوليس',
-      translations: {
+      translation: {
         fr: 'Appelle la police',
         en: 'Call the police',
         es: 'Llama a la policía',
@@ -2144,7 +2145,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_daba',
     arabizi: 'Daba',
     arabic: 'دَابَا',
-    translations: {
+    translation: {
       fr: 'Maintenant',
       en: 'Now',
       es: 'Ahora',
@@ -2152,10 +2153,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'urgencies_health',
     illustration: { iconName: 'Clock' },
-    exampleSentence: {
+    example: {
       arabizi: 'Daba awla b3din?',
       arabic: 'دابا اولا بعدين؟',
-      translations: {
+      translation: {
         fr: 'Maintenant ou plus tard ?',
         en: 'Now or later?',
         es: '¿Ahora o más tarde?',
@@ -2167,7 +2168,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_ghedda',
     arabizi: 'Ghedda',
     arabic: 'غَدًّا',
-    translations: {
+    translation: {
       fr: 'Demain',
       en: 'Tomorrow',
       es: 'Mañana',
@@ -2175,10 +2176,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'urgencies_health',
     illustration: { iconName: 'CalendarDays' },
-    exampleSentence: {
+    example: {
       arabizi: 'Nchoufek ghedda',
       arabic: 'نشوفك غدا',
-      translations: {
+      translation: {
         fr: 'Je te vois demain',
         en: 'See you tomorrow',
         es: 'Te veo mañana',
@@ -2190,7 +2191,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_lbareh',
     arabizi: 'L-bare7',
     arabic: 'البَارِحْ',
-    translations: {
+    translation: {
       fr: 'Hier',
       en: 'Yesterday',
       es: 'Ayer',
@@ -2198,10 +2199,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'urgencies_health',
     illustration: { iconName: 'CalendarClock' },
-    exampleSentence: {
+    example: {
       arabizi: 'Kunt mrid l-bare7',
       arabic: 'كنت مريض البارح',
-      translations: {
+      translation: {
         fr: 'J\'étais malade hier',
         en: 'I was sick yesterday',
         es: 'Ayer estuve enfermo',
@@ -2213,7 +2214,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_shwiya',
     arabizi: 'Shwiya',
     arabic: 'شْوِيَّة',
-    translations: {
+    translation: {
       fr: 'Un peu / Lentement',
       en: 'A little / Slowly',
       es: 'Un poco / Despacio',
@@ -2221,10 +2222,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'urgencies_health',
     illustration: { iconName: 'TrendingDown' },
-    exampleSentence: {
+    example: {
       arabizi: 'Sog shwiya 3afak',
       arabic: 'صوك شوية عفاك',
-      translations: {
+      translation: {
         fr: 'Conduis doucement s\'il te plaît',
         en: 'Drive slowly please',
         es: 'Conduce despacio por favor',
@@ -2236,7 +2237,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_bzzaf',
     arabizi: 'Bzzaf',
     arabic: 'بْزَّافْ',
-    translations: {
+    translation: {
       fr: 'Beaucoup',
       en: 'A lot / Much',
       es: 'Mucho',
@@ -2244,10 +2245,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'urgencies_health',
     illustration: { iconName: 'TrendingUp' },
-    exampleSentence: {
+    example: {
       arabizi: 'Mrid bzzaf',
       arabic: 'مريض بزاف',
-      translations: {
+      translation: {
         fr: 'Très malade',
         en: 'Very sick',
         es: 'Muy enfermo',
@@ -2259,7 +2260,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_waqt',
     arabizi: 'Waqt',
     arabic: 'وَقْتْ',
-    translations: {
+    translation: {
       fr: 'L\'heure / le temps',
       en: 'Time',
       es: 'Tiempo',
@@ -2267,10 +2268,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'urgencies_health',
     illustration: { iconName: 'Timer' },
-    exampleSentence: {
+    example: {
       arabizi: 'Ma-3endich l-waqt',
       arabic: 'ما عنديش الوقت',
-      translations: {
+      translation: {
         fr: 'Je n\'ai pas le temps',
         en: 'I don\'t have time',
         es: 'No tengo tiempo',
@@ -2282,7 +2283,7 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     id: 'srs_mzyan',
     arabizi: 'Mzyan',
     arabic: 'مْزْيَانْ',
-    translations: {
+    translation: {
       fr: 'Bien / Parfait',
       en: 'Good / Perfect',
       es: 'Bien / Perfecto',
@@ -2290,10 +2291,10 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     },
     category: 'urgencies_health',
     illustration: { iconName: 'ThumbsUp' },
-    exampleSentence: {
+    example: {
       arabizi: 'Kulshi mzyan',
       arabic: 'كلشي مزيان',
-      translations: {
+      translation: {
         fr: 'Tout va bien',
         en: 'Everything is good',
         es: 'Todo está bien',
@@ -2302,3 +2303,6 @@ export const srsVocabulary: SRSDictionaryItem[] = [
     }
   },
 ];
+
+
+export const getWordFromDictionary = (id: string): VocabularySRSData | undefined => { return srsVocabulary.find(w => w.id === id); };

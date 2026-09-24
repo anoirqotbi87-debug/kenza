@@ -20,42 +20,115 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation();
 
+  const [message, setMessage] = useState<string | null>(null);
+
   if (!isOpen) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setMessage(null);
 
     try {
-      if (isLogin) {
-        const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
-        if (authError) throw authError;
-        
-        if (data.user) {
-          await syncService.syncCloudToLocal(data.user.id);
-          onSuccess();
-        }
-      } else {
-        const { data, error: authError } = await supabase.auth.signUp({ email, password });
-        if (authError) throw authError;
-        
-        if (data.user) {
-          // Immediately migrate guest data to the new account
-          await syncService.migrateGuestDataToCloud(data.user.id);
-          onSuccess();
-        }
+      const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
+      if (authError) throw authError;
+      
+      if (data.user) {
+        await syncService.syncCloudToLocal(data.user.id);
+        onSuccess();
       }
     } catch (err: any) {
-      setError(err.message || "Erreur / Error");
+      if (err.message?.includes("Email not confirmed")) {
+        setError("Email non confirmé. Vérifiez votre boîte de réception.");
+      } else {
+        setError(err.message || "Erreur lors de la connexion");
+      }
     } finally {
       setLoading(false);
     }
   };
 
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setMessage(null);
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username: email.split('@')[0],
+          },
+        },
+      });
+
+      if (error) throw error;
+
+      // Cas 1 : Supabase autorise la connexion immédiate (Confirm email désactivé)
+      if (data.session && data.user) {
+        // Synchronisation immédiate des données locales du mode invité
+        await syncService.migrateGuestDataToCloud(data.user.id);
+        setMessage("Compte créé avec succès ! Bienvenue sur KENZA.");
+        setTimeout(() => {
+          onClose();
+          window.location.reload();
+        }, 1000);
+        return;
+      }
+
+      // Cas 2 : Si la confirmation email est encore requise par Supabase
+      if (data.user && !data.session) {
+        setMessage("Compte créé ! Si un email de confirmation est requis, veuillez vérifier votre boîte de réception et vos courriers indésirables (Spam).");
+      }
+    } catch (err: any) {
+      console.error("Erreur Inscription :", err);
+      // Traduction des erreurs Supabase courantes
+      if (err.message?.includes("User already registered")) {
+        setError("Cette adresse email est déjà enregistrée. Veuillez vous connecter.");
+      } else if (err.message?.includes("Password should be")) {
+        setError("Le mot de passe doit contenir au moins 6 caractères.");
+      } else {
+        setError(err.message || "Erreur lors de l'inscription.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    if (isLogin) {
+      handleLogin(e);
+    } else {
+      handleSignUp(e);
+    }
+  };
+
   const handleOAuth = async (provider: 'google' | 'github') => {
-    const { error } = await supabase.auth.signInWithOAuth({ provider });
-    if (error) setError(error.message);
+    setError(null);
+    try {
+      const redirectUrl = typeof window !== 'undefined' ? window.location.origin : 'https://kenza-dusky.vercel.app';
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: redirectUrl,
+        },
+      });
+      if (error) {
+        // Message explicatif si Google n'est pas encore configuré côté Supabase
+        if (error.message?.includes("provider is not enabled") || error.message?.includes("unsupported")) {
+          setError(`La connexion ${provider} nécessite l'activation du fournisseur dans le dashboard Supabase. Utilisez l'email en attendant.`);
+        } else {
+          throw error;
+        }
+      }
+    } catch (err: any) {
+      console.error(`Erreur ${provider} OAuth :`, err);
+      setError(err.message || `Impossible de se connecter avec ${provider} pour le moment.`);
+    }
   };
 
   return (
@@ -90,9 +163,28 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             </button>
           </div>
 
+          {message && (
+            <div className="bg-green-50 text-green-700 p-3 rounded-xl text-sm font-medium mb-4 text-center">
+              {message}
+            </div>
+          )}
+
           {error && (
             <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm font-medium mb-4 text-center">
               {error}
+              {error.includes("Email non confirmé") && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await supabase.auth.resend({ type: 'signup', email });
+                    setMessage("Un nouvel email de confirmation vient d'être envoyé.");
+                    setError(null);
+                  }}
+                  className="text-xs text-blue-600 underline mt-2 block w-full text-center"
+                >
+                  Renvoyer le lien de confirmation
+                </button>
+              )}
             </div>
           )}
 
