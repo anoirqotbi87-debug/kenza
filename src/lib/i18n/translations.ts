@@ -41,7 +41,17 @@ export const translations = {
     },
     auth: {
       login: "Connexion", signup: "Inscription", email: "Email", password: "Mot de passe",
-      continueGuest: "Continuer en mode invité", google: "Continuer avec Google"
+      continueGuest: "Continuer en mode invité", google: "Continuer avec Google",
+      headerLogin: "Se connecter", checkEmail: "Compte créé. Confirmez votre adresse via l'e-mail que nous venons d'envoyer, puis revenez ici : votre progression sera sauvegardée."
+    },
+    savePrompt: {
+      title: "Ne perdez pas vos progrès",
+      body: "Créez votre compte gratuit pour garder vos XP, votre série et reprendre sur n'importe quel appareil.",
+      reminderTitle: "Vos progrès ne sont pas encore sauvegardés",
+      reminderBody: "Vous avez déjà {xp} XP et {lessons} leçons terminées. Ils ne sont enregistrés que sur cet appareil : créez un compte gratuit pour ne rien perdre.",
+      cta: "Sauvegarder ma progression",
+      later: "Plus tard",
+      reassurance: "Gratuit · 30 secondes · Avec Google ou e-mail"
     }
   },
   en: {
@@ -84,7 +94,17 @@ export const translations = {
     },
     auth: {
       login: "Login", signup: "Sign up", email: "Email", password: "Password",
-      continueGuest: "Continue as guest", google: "Continue with Google"
+      continueGuest: "Continue as guest", google: "Continue with Google",
+      headerLogin: "Log in", checkEmail: "Account created. Confirm your address using the email we just sent, then come back here: your progress will be saved."
+    },
+    savePrompt: {
+      title: "Don't lose your progress",
+      body: "Create your free account to keep your XP and streak, and pick up on any device.",
+      reminderTitle: "Your progress isn't saved yet",
+      reminderBody: "You already have {xp} XP and {lessons} lessons completed. They're only stored on this device: create a free account so you don't lose anything.",
+      cta: "Save my progress",
+      later: "Later",
+      reassurance: "Free · 30 seconds · With Google or email"
     }
   },
   es: {
@@ -127,7 +147,17 @@ export const translations = {
     },
     auth: {
       login: "Iniciar sesión", signup: "Registrarse", email: "Correo", password: "Contraseña",
-      continueGuest: "Continuar como invitado", google: "Continuar con Google"
+      continueGuest: "Continuar como invitado", google: "Continuar con Google",
+      headerLogin: "Iniciar sesión", checkEmail: "Cuenta creada. Confirma tu dirección con el correo que te acabamos de enviar y vuelve aquí: tu progreso se guardará."
+    },
+    savePrompt: {
+      title: "No pierdas tu progreso",
+      body: "Crea tu cuenta gratuita para conservar tus XP y tu racha, y continuar en cualquier dispositivo.",
+      reminderTitle: "Tu progreso aún no está guardado",
+      reminderBody: "Ya tienes {xp} XP y {lessons} lecciones completadas. Solo están guardados en este dispositivo: crea una cuenta gratuita para no perder nada.",
+      cta: "Guardar mi progreso",
+      later: "Más tarde",
+      reassurance: "Gratis · 30 segundos · Con Google o correo"
     }
   },
   ar: {
@@ -170,7 +200,17 @@ export const translations = {
     },
     auth: {
       login: "تسجيل الدخول", signup: "إنشاء حساب", email: "البريد الإلكتروني", password: "كلمة المرور",
-      continueGuest: "الاستمرار كضيف", google: "الاستمرار مع جوجل"
+      continueGuest: "الاستمرار كضيف", google: "الاستمرار مع جوجل",
+      headerLogin: "تسجيل الدخول", checkEmail: "تم إنشاء الحساب. أكّد بريدك الإلكتروني عبر الرسالة التي أرسلناها للتو، ثم عد إلى هنا: سيتم حفظ تقدّمك."
+    },
+    savePrompt: {
+      title: "لا تفقد تقدّمك",
+      body: "أنشئ حسابك المجاني للاحتفاظ بنقاط XP وسلسلة أيامك، والمتابعة على أي جهاز.",
+      reminderTitle: "تقدّمك غير محفوظ بعد",
+      reminderBody: "لديك بالفعل {xp} XP و{lessons} دروس مكتملة. إنها محفوظة على هذا الجهاز فقط: أنشئ حسابًا مجانيًا حتى لا تفقد شيئًا.",
+      cta: "احفظ تقدّمي",
+      later: "لاحقًا",
+      reassurance: "مجاني · 30 ثانية · عبر جوجل أو البريد الإلكتروني"
     }
   }
 };

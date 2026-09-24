@@ -98,7 +98,10 @@ export async function signUpWithTracking(email: string, password: string, extra:
   return supabase.auth.signUp({
     email,
     password,
-    options: { data: { ...extra, ...getFirstTouch(), anonymous_id: getAnonymousId() } },
+    options: {
+      data: { ...extra, ...getFirstTouch(), anonymous_id: getAnonymousId() },
+      emailRedirectTo: isBrowser() ? window.location.origin : undefined,
+    },
   });
 }
 

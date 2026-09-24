@@ -11,10 +11,12 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  initialMode?: 'login' | 'signup';
 }
 
-export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
-  const [isLogin, setIsLogin] = useState(true);
+export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 'login' }: AuthModalProps) {
+  const [isLogin, setIsLogin] = useState(initialMode === 'login');
+  const [info, setInfo] = useState<string | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -22,8 +24,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   const { t } = useTranslation();
 
   useEffect(() => {
-    if (isOpen) track('auth_modal_viewed', {}, '/auth');
-  }, [isOpen]);
+    if (isOpen) track('auth_modal_viewed', { mode: initialMode }, '/auth');
+  }, [isOpen, initialMode]);
 
   if (!isOpen) return null;
 
@@ -49,6 +51,12 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           throw authError;
         }
         
+        if (data.user && !data.session) {
+          // Confirmation d'e-mail requise : la progression sera envoyée à la 1re connexion (useAuthUser)
+          setInfo(t.auth.checkEmail);
+          return;
+        }
+
         if (data.user) {
           // Immediately migrate guest data to the new account
           await syncService.migrateGuestDataToCloud(data.user.id);
@@ -69,7 +77,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl relative">
         <button 
           onClick={onClose}
@@ -99,6 +107,12 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               {t.auth.signup}
             </button>
           </div>
+
+          {info && (
+            <div className="bg-green-50 text-green-700 p-3 rounded-xl text-sm font-medium mb-4 text-center">
+              {info}
+            </div>
+          )}
 
           {error && (
             <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm font-medium mb-4 text-center">

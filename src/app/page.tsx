@@ -2,13 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import { track } from '@/lib/tracking';
+import { useAuthUser } from '@/lib/useAuthUser';
+import { dismissSavePrompt, getSavePromptVariant } from '@/lib/savePrompt';
+import AuthModal from '@/components/auth/AuthModal';
+import SaveProgressCard from '@/components/auth/SaveProgressCard';
 import Dashboard from '@/components/Dashboard';
 import ExerciseRunner from '@/components/ExerciseRunner';
 import SRSDashboard from '@/components/srs/SRSDashboard';
 import { allLessonsList, fullCurriculum } from '@/data/curriculum';
 import { useAppStore, useTranslation } from '@/store/useAppStore';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { CheckCircle2, Play } from 'lucide-react';
+import { CheckCircle2, LogIn, Play } from 'lucide-react';
 import { getLocalizedText } from '@/lib/i18n/utils';
 import { Navigation } from '@/components/Navigation';
 import PhrasebookView from '@/components/tools/PhrasebookView';
@@ -19,7 +23,10 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<'grammar' | 'conversation'>('grammar');
   const { t, lang } = useTranslation();
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
-  const { completeLesson, completedLessons, devUnlockAll } = useAppStore();
+  const { completeLesson, completedLessons, devUnlockAll, streakDays } = useAppStore();
+  const { isGuest } = useAuthUser();
+  const [authMode, setAuthMode] = useState<'login' | 'signup' | null>(null);
+  const [savePromptHidden, setSavePromptHidden] = useState(false);
 
   // Chaque onglet est suivi comme une « page » virtuelle (/learn, /phrasebook, /speech, /profile)
   useEffect(() => {
@@ -32,6 +39,7 @@ export default function Home() {
       lesson_index: allLessonsList.findIndex(l => l.id === lessonId),
       is_first_lesson: completedLessons.length === 0,
     }, '/lesson');
+    setSavePromptHidden(false);
     setActiveLessonId(lessonId);
   };
 
@@ -123,6 +131,24 @@ export default function Home() {
     ? allLessonsList.find(l => l.id === activeLessonId) 
     : null;
 
+  // Invitation à sauvegarder sur l'écran de fin de leçon (invités uniquement)
+  const lessonsAfterThis = completedLessons.length +
+    (activeLessonId && !completedLessons.includes(activeLessonId) ? 1 : 0);
+  const savePromptVariant = isGuest && !savePromptHidden
+    ? getSavePromptVariant(lessonsAfterThis, streakDays)
+    : null;
+  const saveProgressCard = savePromptVariant ? (
+    <SaveProgressCard
+      variant={savePromptVariant}
+      lessonsCompleted={lessonsAfterThis}
+      onSave={() => setAuthMode('signup')}
+      onLater={() => {
+        dismissSavePrompt(lessonsAfterThis);
+        setSavePromptHidden(true);
+      }}
+    />
+  ) : null;
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-20">
       {!activeLessonId && (
@@ -130,8 +156,22 @@ export default function Home() {
           <h1 className="text-2xl font-bold text-blue-600 flex items-center gap-2 w-full md:w-auto">
             <span className="text-3xl">🐪</span> KENZA <span className="text-sm font-medium text-slate-400 font-arabic ml-1">كنزة</span>
           </h1>
-          <div className="w-full md:w-auto">
-            <Navigation currentTab={currentTab} onTabChange={setCurrentTab} />
+          <div className="w-full md:w-auto flex items-center gap-3">
+            <div className="flex-1 md:flex-none">
+              <Navigation currentTab={currentTab} onTabChange={setCurrentTab} />
+            </div>
+            {isGuest && (
+              <button
+                onClick={() => {
+                  track('cta_click', { cta: 'header_login' }, `/${currentTab}`);
+                  setAuthMode('login');
+                }}
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-bold text-slate-600 hover:text-blue-600 border border-slate-200 hover:border-blue-300 rounded-xl transition-colors whitespace-nowrap"
+              >
+                <LogIn className="w-4 h-4" />
+                {t.auth.headerLogin}
+              </button>
+            )}
           </div>
         </header>
       )}
@@ -226,9 +266,20 @@ export default function Home() {
               lesson={activeLesson}
               onComplete={handleCompleteLesson}
               onClose={handleCloseLesson}
+              finishExtra={saveProgressCard}
             />
           </ErrorBoundary>
         )
+      )}
+
+      {authMode && (
+        <AuthModal
+          key={authMode}
+          isOpen
+          initialMode={authMode}
+          onClose={() => setAuthMode(null)}
+          onSuccess={() => setAuthMode(null)}
+        />
       )}
     </main>
   );

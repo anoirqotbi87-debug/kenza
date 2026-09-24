@@ -19,9 +19,11 @@ interface ExerciseRunnerProps {
   lesson: Lesson;
   onComplete: () => void;
   onClose: () => void;
+  /** Contenu optionnel affiché sur l'écran de félicitations (ex. invitation à sauvegarder). */
+  finishExtra?: React.ReactNode;
 }
 
-export default function ExerciseRunner({ lesson, onComplete, onClose }: ExerciseRunnerProps) {
+export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtra }: ExerciseRunnerProps) {
   if (!lesson || !lesson.steps || lesson.steps.length === 0) {
     console.error("[ExerciseRunner Crash Guard] Leçon manquante ou sans steps :", lesson);
     return (
@@ -151,7 +153,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
         </div>
         <h2 className="text-4xl font-black text-amber-500 mb-2">{t.lessons.congrats}</h2>
 
-        <div className="flex gap-8 mb-12">
+        <div className={`flex gap-8 ${finishExtra ? 'mb-6' : 'mb-12'}`}>
           <div className="bg-blue-50 border border-blue-100 p-6 rounded-3xl min-w-[140px]">
             <div className="text-blue-500 text-sm font-bold uppercase mb-1">XP</div>
             <div className="text-3xl font-black text-blue-600">+{xpGained}</div>
@@ -165,6 +167,8 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
             </div>
           </div>
         </div>
+
+        {finishExtra}
 
         <button onClick={onComplete} className="px-12 py-4 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-bold text-xl shadow-lg transition-transform hover:scale-105 active:scale-95 w-full max-w-sm">
           {t.lessons.continue}
