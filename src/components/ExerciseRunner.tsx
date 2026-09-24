@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { track } from '../lib/tracking';
 import { Lesson, Notation } from '../types/curriculum';
 import { useAppStore, useTranslation } from '../store/useAppStore';
 import { X, Check, Volume2, Info, ArrowRight, Heart, HeartCrack, Trophy } from 'lucide-react';
@@ -18,9 +19,11 @@ interface ExerciseRunnerProps {
   lesson: Lesson;
   onComplete: () => void;
   onClose: () => void;
+  /** Contenu optionnel affiché sur l'écran de félicitations (ex. invitation à sauvegarder). */
+  finishExtra?: React.ReactNode;
 }
 
-export default function ExerciseRunner({ lesson, onComplete, onClose }: ExerciseRunnerProps) {
+export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtra }: ExerciseRunnerProps) {
   if (!lesson || !lesson.steps || lesson.steps.length === 0) {
     console.error("[ExerciseRunner Crash Guard] Leçon manquante ou sans steps :", lesson);
     return (
@@ -85,6 +88,17 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
 
     setIsCorrect(correct);
     setIsAnswerChecked(true);
+
+    track('exercise_answered', {
+      lesson_id: lesson.id,
+      step: currentStepIndex,
+      total_steps: lesson.steps.length,
+      exercise_type: type,
+      correct,
+    }, '/lesson');
+    if (!correct && lives === 1) {
+      track('lesson_failed', { lesson_id: lesson.id, step: currentStepIndex, total_steps: lesson.steps.length }, '/lesson');
+    }
     
     if (correct) {
       setXpGained(prev => prev + 10);
@@ -139,7 +153,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
         </div>
         <h2 className="text-4xl font-black text-amber-500 mb-2">{t.lessons.congrats}</h2>
 
-        <div className="flex gap-8 mb-12">
+        <div className={`flex gap-8 ${finishExtra ? 'mb-6' : 'mb-12'}`}>
           <div className="bg-blue-50 border border-blue-100 p-6 rounded-3xl min-w-[140px]">
             <div className="text-blue-500 text-sm font-bold uppercase mb-1">XP</div>
             <div className="text-3xl font-black text-blue-600">+{xpGained}</div>
@@ -153,6 +167,8 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
             </div>
           </div>
         </div>
+
+        {finishExtra}
 
         <button onClick={onComplete} className="px-12 py-4 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-bold text-xl shadow-lg transition-transform hover:scale-105 active:scale-95 w-full max-w-sm">
           {t.lessons.continue}
@@ -303,7 +319,17 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
     <div className="fixed inset-0 bg-white z-50 flex flex-col">
       {/* Header */}
       <header className="p-4 flex items-center gap-6 max-w-5xl mx-auto w-full">
-        <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors">
+        <button
+          onClick={() => {
+            track('lesson_abandoned', {
+              lesson_id: lesson.id,
+              step: currentStepIndex,
+              total_steps: lesson.steps.length,
+              lives,
+            }, '/lesson');
+            onClose();
+          }}
+          className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors">
           <X className="w-6 h-6" />
         </button>
         <div className="flex-1 h-4 bg-slate-100 rounded-full overflow-hidden">

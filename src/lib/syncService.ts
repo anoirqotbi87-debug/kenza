@@ -68,6 +68,18 @@ export const syncService = {
    */
   async syncCloudToLocal(userId: string) {
     const store = useAppStore.getState();
+
+    // Compte cloud encore vide (nouvelle inscription, e-mail confirmé, Google...) alors que
+    // l'invité a déjà progressé : on envoie la progression locale au lieu de l'écraser.
+    const { count: cloudLessons } = await supabase
+      .from('lesson_progress')
+      .select('lesson_id', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('completed', true);
+    if ((cloudLessons ?? 0) === 0 && store.completedLessons.length > 0) {
+      await this.migrateGuestDataToCloud(userId);
+      return;
+    }
     
     // 1. Fetch Profile
     const { data: profile } = await supabase

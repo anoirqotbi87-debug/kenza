@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { signUpWithTracking, track } from '../../lib/tracking';
 import { supabase } from '../../lib/supabase';
 import { X, Mail, Lock, User, LogIn } from 'lucide-react';
 import { syncService } from '../../lib/syncService';
@@ -10,15 +11,21 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  initialMode?: 'login' | 'signup';
 }
 
-export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
-  const [isLogin, setIsLogin] = useState(true);
+export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 'login' }: AuthModalProps) {
+  const [isLogin, setIsLogin] = useState(initialMode === 'login');
+  const [info, setInfo] = useState<string | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation();
+
+  useEffect(() => {
+    if (isOpen) track('auth_modal_viewed', { mode: initialMode }, '/auth');
+  }, [isOpen, initialMode]);
 
   if (!isOpen) return null;
 
@@ -37,9 +44,19 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           onSuccess();
         }
       } else {
-        const { data, error: authError } = await supabase.auth.signUp({ email, password });
-        if (authError) throw authError;
+        track('signup_started', { method: 'email' }, '/auth');
+        const { data, error: authError } = await signUpWithTracking(email, password);
+        if (authError) {
+          track('signup_failed', { method: 'email', error: authError.message?.slice(0, 200) }, '/auth');
+          throw authError;
+        }
         
+        if (data.user && !data.session) {
+          // Confirmation d'e-mail requise : la progression sera envoyée à la 1re connexion (useAuthUser)
+          setInfo(t.auth.checkEmail);
+          return;
+        }
+
         if (data.user) {
           // Immediately migrate guest data to the new account
           await syncService.migrateGuestDataToCloud(data.user.id);
@@ -54,12 +71,13 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   };
 
   const handleOAuth = async (provider: 'google' | 'github') => {
+    await track(isLogin ? 'login_started' : 'signup_started', { method: provider }, '/auth');
     const { error } = await supabase.auth.signInWithOAuth({ provider });
     if (error) setError(error.message);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl relative">
         <button 
           onClick={onClose}
@@ -89,6 +107,12 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               {t.auth.signup}
             </button>
           </div>
+
+          {info && (
+            <div className="bg-green-50 text-green-700 p-3 rounded-xl text-sm font-medium mb-4 text-center">
+              {info}
+            </div>
+          )}
 
           {error && (
             <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm font-medium mb-4 text-center">

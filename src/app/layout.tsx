@@ -24,13 +24,16 @@ export const metadata: Metadata = {
   }
 };
 import I18nProvider from '../components/I18nProvider';
+import TrackingProvider from '../components/TrackingProvider';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr" dir="ltr">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-50 text-slate-900 min-h-screen`}>
         <I18nProvider>
-          {children}
+          <TrackingProvider>
+            {children}
+          </TrackingProvider>
         </I18nProvider>
       </body>
     </html>
