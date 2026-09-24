@@ -52,6 +52,30 @@ export default function Home() {
     };
   }, [setUser]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // Analyser les paramètres de requête et le hash de l'URL
+    const searchParams = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    
+    const error = searchParams.get('error') || hashParams.get('error');
+    const errorDesc = searchParams.get('error_description') || hashParams.get('error_description');
+
+    if (error || errorDesc) {
+      console.error("[OAuth Callback Error]:", { error, errorDesc });
+
+      if (errorDesc?.includes("Unable to exchange external code")) {
+        alert("Échec de connexion Google :\nLe Secret Client (Client Secret) configuré dans votre dashboard Supabase ne correspond pas à celui de votre console Google Cloud.\n\nVeuillez vérifier et recoller le Client Secret dans Supabase > Auth > Providers > Google.");
+      } else {
+        alert(`Erreur d'authentification : ${errorDesc || error}`);
+      }
+
+      // Nettoyer l'URL proprement sans recharger la page
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
   const handleStartLesson = (lessonId: string) => {
     setActiveLessonId(lessonId);
   };
