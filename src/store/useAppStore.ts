@@ -44,6 +44,8 @@ interface AppState {
   toggleDevUnlockAll: () => void;
 }
 
+const DEV_UNLOCK_ALL = process.env.NEXT_PUBLIC_DEV_UNLOCK_ALL === 'true';
+
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
@@ -59,7 +61,8 @@ export const useAppStore = create<AppState>()(
       soundEnabled: true,
       audioSpeed: 1.0,
       uiLanguage: 'fr',
-      devUnlockAll: true, // Activated by default for dev/testing
+      // Désactivé en production. Pour tout débloquer en local : NEXT_PUBLIC_DEV_UNLOCK_ALL=true dans .env.local
+      devUnlockAll: DEV_UNLOCK_ALL,
       
       toggleDevUnlockAll: () => set((state) => ({ devUnlockAll: !state.devUnlockAll })),
       
@@ -195,7 +198,13 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'darija-quest-storage',
-      version: 2,
+      version: 3,
+      // devUnlockAll n'est plus sauvegardé : il dépend uniquement de la variable d'environnement
+      partialize: (state) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { devUnlockAll, ...rest } = state;
+        return rest;
+      },
       migrate: (persistedState: any, version: number) => {
         if (version < 2) {
           if (persistedState.srsDeck) {
@@ -207,6 +216,10 @@ export const useAppStore = create<AppState>()(
               persistedState.srsDeck = {};
             }
           }
+        }
+        if (version < 3 && persistedState) {
+          // Les navigateurs ayant reçu devUnlockAll: true ne gardent pas les leçons débloquées
+          delete persistedState.devUnlockAll;
         }
         return persistedState;
       }
