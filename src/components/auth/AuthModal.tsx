@@ -110,7 +110,10 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   const handleOAuth = async (provider: 'google' | 'github') => {
     setError(null);
     try {
-      const redirectUrl = typeof window !== 'undefined' ? window.location.origin : 'https://kenza-dusky.vercel.app';
+      const redirectUrl = typeof window !== 'undefined' && window.location.hostname !== 'localhost'
+        ? 'https://kenza-dusky.vercel.app'
+        : (typeof window !== 'undefined' ? window.location.origin : 'https://kenza-dusky.vercel.app');
+        
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
