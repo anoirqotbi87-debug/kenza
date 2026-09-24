@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import { Cairo, Inter } from 'next/font/google';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const cairo = Cairo({ 
+  subsets: ['arabic', 'latin'], 
+  weight: ['400', '600', '700', '800'],
+  variable: '--font-cairo',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -23,12 +20,13 @@ export const metadata: Metadata = {
     type: "website",
   }
 };
+import "./globals.css";
 import I18nProvider from '../components/I18nProvider';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" dir="ltr">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-50 text-slate-900 min-h-screen`}>
+    <html lang="fr" dir="ltr" className={`${inter.variable} ${cairo.variable}`}>
+      <body className="font-sans antialiased bg-slate-50 text-slate-900 min-h-screen">
         <I18nProvider>
           {children}
         </I18nProvider>
