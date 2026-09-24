@@ -6,6 +6,7 @@ import Leaderboard from './gamification/Leaderboard';
 import BadgesList from './gamification/BadgesList';
 import StreakHeatmap from './gamification/StreakHeatmap';
 import SmartReviewSession from './srs/SmartReviewSession';
+import { track } from '../lib/tracking';
 
 interface DashboardProps {
   onStartLesson: (lessonId: string) => void;
@@ -32,7 +33,10 @@ export default function Dashboard({ onStartLesson }: DashboardProps) {
             <p className="text-blue-700">{t.dashboard.reviewPrompt}</p>
           </div>
           <button 
-            onClick={() => setIsReviewSessionOpen(true)}
+            onClick={() => {
+              track('cta_click', { cta: 'daily_practice' }, '/learn');
+              setIsReviewSessionOpen(true);
+            }}
             className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-2xl font-bold shadow-md transition-transform hover:scale-105 active:scale-95"
           >
             {t.dashboard.dailyPractice}

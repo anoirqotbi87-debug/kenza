@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { track } from '@/lib/tracking';
 import Dashboard from '@/components/Dashboard';
 import ExerciseRunner from '@/components/ExerciseRunner';
 import SRSDashboard from '@/components/srs/SRSDashboard';
@@ -20,7 +21,17 @@ export default function Home() {
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
   const { completeLesson, completedLessons, devUnlockAll } = useAppStore();
 
+  // Chaque onglet est suivi comme une « page » virtuelle (/learn, /phrasebook, /speech, /profile)
+  useEffect(() => {
+    track('page_view', { tab: currentTab }, `/${currentTab}`);
+  }, [currentTab]);
+
   const handleStartLesson = (lessonId: string) => {
+    track('lesson_started', {
+      lesson_id: lessonId,
+      lesson_index: allLessonsList.findIndex(l => l.id === lessonId),
+      is_first_lesson: completedLessons.length === 0,
+    }, '/lesson');
     setActiveLessonId(lessonId);
   };
 
@@ -30,6 +41,10 @@ export default function Home() {
 
   const handleCompleteLesson = () => {
     if (activeLessonId) {
+      track('lesson_completed', {
+        lesson_id: activeLessonId,
+        lessons_completed_total: completedLessons.length + 1,
+      }, '/lesson');
       completeLesson(activeLessonId);
     }
     setActiveLessonId(null);

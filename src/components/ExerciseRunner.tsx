@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { track } from '../lib/tracking';
 import { Lesson, Notation } from '../types/curriculum';
 import { useAppStore, useTranslation } from '../store/useAppStore';
 import { X, Check, Volume2, Info, ArrowRight, Heart, HeartCrack, Trophy } from 'lucide-react';
@@ -85,6 +86,17 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
 
     setIsCorrect(correct);
     setIsAnswerChecked(true);
+
+    track('exercise_answered', {
+      lesson_id: lesson.id,
+      step: currentStepIndex,
+      total_steps: lesson.steps.length,
+      exercise_type: type,
+      correct,
+    }, '/lesson');
+    if (!correct && lives === 1) {
+      track('lesson_failed', { lesson_id: lesson.id, step: currentStepIndex, total_steps: lesson.steps.length }, '/lesson');
+    }
     
     if (correct) {
       setXpGained(prev => prev + 10);
@@ -303,7 +315,17 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
     <div className="fixed inset-0 bg-white z-50 flex flex-col">
       {/* Header */}
       <header className="p-4 flex items-center gap-6 max-w-5xl mx-auto w-full">
-        <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors">
+        <button
+          onClick={() => {
+            track('lesson_abandoned', {
+              lesson_id: lesson.id,
+              step: currentStepIndex,
+              total_steps: lesson.steps.length,
+              lives,
+            }, '/lesson');
+            onClose();
+          }}
+          className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors">
           <X className="w-6 h-6" />
         </button>
         <div className="flex-1 h-4 bg-slate-100 rounded-full overflow-hidden">

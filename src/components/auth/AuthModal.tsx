@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { signUpWithTracking, track } from '../../lib/tracking';
 import { supabase } from '../../lib/supabase';
 import { X, Mail, Lock, User, LogIn } from 'lucide-react';
 import { syncService } from '../../lib/syncService';
@@ -20,6 +21,10 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation();
 
+  useEffect(() => {
+    if (isOpen) track('auth_modal_viewed', {}, '/auth');
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,8 +42,12 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           onSuccess();
         }
       } else {
-        const { data, error: authError } = await supabase.auth.signUp({ email, password });
-        if (authError) throw authError;
+        track('signup_started', { method: 'email' }, '/auth');
+        const { data, error: authError } = await signUpWithTracking(email, password);
+        if (authError) {
+          track('signup_failed', { method: 'email', error: authError.message?.slice(0, 200) }, '/auth');
+          throw authError;
+        }
         
         if (data.user) {
           // Immediately migrate guest data to the new account
@@ -54,6 +63,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   };
 
   const handleOAuth = async (provider: 'google' | 'github') => {
+    await track(isLogin ? 'login_started' : 'signup_started', { method: provider }, '/auth');
     const { error } = await supabase.auth.signInWithOAuth({ provider });
     if (error) setError(error.message);
   };
