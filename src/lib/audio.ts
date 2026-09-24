@@ -37,15 +37,18 @@ export const playAudio = async (text: string, audioUrl?: string, soundEnabled: b
     await ctx.resume();
   }
 
-  // Si on a une URL de fichier statique, on la joue
-  if (audioUrl) {
+  // Si on a une URL de fichier statique (contient un /, .mp3, .wav), on la joue
+  const isAudioUrl = audioUrl && (audioUrl.includes('/') || audioUrl.endsWith('.mp3') || audioUrl.endsWith('.wav') || audioUrl.endsWith('.m4a'));
+  const arabicText = audioUrl && !isAudioUrl ? audioUrl : undefined;
+
+  if (isAudioUrl) {
     try {
-      let audioBuffer = audioCache.get(audioUrl);
+      let audioBuffer = audioCache.get(audioUrl!);
       if (!audioBuffer) {
-        const response = await fetch(audioUrl);
+        const response = await fetch(audioUrl!);
         const arrayBuffer = await response.arrayBuffer();
         audioBuffer = await ctx.decodeAudioData(arrayBuffer);
-        audioCache.set(audioUrl, audioBuffer);
+        audioCache.set(audioUrl!, audioBuffer);
       }
 
       const source = ctx.createBufferSource();
@@ -63,14 +66,15 @@ export const playAudio = async (text: string, audioUrl?: string, soundEnabled: b
   if (text && text !== 'correct' && text !== 'error') {
     try {
       // Clé de cache pour le TTS
-      const cacheKey = `tts_${text}`;
+      const textToSpeak = arabicText || text;
+      const cacheKey = `tts_${textToSpeak}`;
       let audioBuffer = audioCache.get(cacheKey);
 
       if (!audioBuffer) {
         const response = await fetch('/api/tts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ arabicText: text, text: text })
+          body: JSON.stringify({ arabicText: textToSpeak, text: text })
         });
 
         if (!response.ok) throw new Error('TTS API failed');

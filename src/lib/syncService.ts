@@ -6,7 +6,9 @@ export const syncService = {
   /**
    * Migrate local data from Zustand store to Supabase when a user signs up/logs in for the first time.
    */
-  async migrateGuestDataToCloud(userId: string) {
+  async migrateGuestDataToCloud(userId: string | null) {
+    if (!userId) return false;
+    
     const store = useAppStore.getState();
     
     // 1. Update Profile (XP, streak, notation)
@@ -66,8 +68,8 @@ export const syncService = {
   /**
    * Pull data from Supabase and update local Zustand store
    */
-  async syncCloudToLocal(userId: string) {
-    const store = useAppStore.getState();
+  async syncCloudToLocal(userId: string | null) {
+    if (!userId) return false;
     
     // 1. Fetch Profile
     const { data: profile } = await supabase
@@ -126,11 +128,11 @@ export const syncService = {
   async updateXp(userId: string | null, newXp: number) {
     useAppStore.getState().addXp(newXp - useAppStore.getState().xp); // just force set conceptually
     
-    if (userId) {
-      await supabase
-        .from('profiles')
-        .update({ xp: newXp })
-        .eq('id', userId);
-    }
+    if (!userId) return;
+    
+    await supabase
+      .from('profiles')
+      .update({ xp: newXp })
+      .eq('id', userId);
   }
 };

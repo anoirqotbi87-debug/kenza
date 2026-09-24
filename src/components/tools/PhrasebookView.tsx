@@ -1,12 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { Search, Volume2, BookOpen, Coffee, Car, ShoppingBag, Heart, Home, Stethoscope } from 'lucide-react';
 import { srsVocabulary, SRSDictionaryItem } from '../../data/srs-deck';
-import { useTranslation } from '../../store/useAppStore';
+import { useTranslation, useAppStore } from '../../store/useAppStore';
+import { playAudio } from '../../lib/audio';
 
 type CategoryType = SRSDictionaryItem['category'] | 'all';
 
 export default function PhrasebookView() {
   const { lang } = useTranslation();
+  const { soundEnabled } = useAppStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState<CategoryType>('all');
   const [activeTab, setActiveTab] = useState<'dictionary' | 'grammar'>('dictionary');
@@ -36,12 +38,7 @@ export default function PhrasebookView() {
     });
   }, [searchTerm, activeCategory]);
 
-  const playAudio = (text: string) => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'ar-SA'; // Fallback to MSA if Moroccan not available
-    utterance.rate = 0.9;
-    window.speechSynthesis.speak(utterance);
-  };
+
 
   const renderDictionary = () => (
     <div className="space-y-6">
@@ -99,7 +96,7 @@ export default function PhrasebookView() {
                 )}
               </div>
               <button 
-                onClick={() => playAudio(word.arabic)}
+                onClick={() => playAudio(word.arabizi, word.arabic, soundEnabled)}
                 className="w-10 h-10 rounded-full bg-slate-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition-colors flex-shrink-0"
               >
                 <Volume2 className="w-5 h-5" />
