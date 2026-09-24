@@ -2,9 +2,6 @@
 
 import React, { useState } from 'react';
 import { useAppStore, useTranslation } from '../store/useAppStore';
-import Leaderboard from './gamification/Leaderboard';
-import BadgesList from './gamification/BadgesList';
-import StreakHeatmap from './gamification/StreakHeatmap';
 import SmartReviewSession from './srs/SmartReviewSession';
 
 interface DashboardProps {
@@ -22,8 +19,6 @@ export default function Dashboard({ onStartLesson }: DashboardProps) {
         <SmartReviewSession onClose={() => setIsReviewSessionOpen(false)} />
       )}
 
-
-
       {/* Gamification Dashboard */}
       <section className="flex flex-col gap-6 animate-in slide-in-from-bottom-4">
         <div className="flex justify-between items-center bg-blue-50 border border-blue-100 p-6 rounded-3xl shadow-sm">
@@ -38,30 +33,7 @@ export default function Dashboard({ onStartLesson }: DashboardProps) {
             {t.dashboard.dailyPractice}
           </button>
         </div>
-        
-        <StreakHeatmap />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Leaderboard />
-          <BadgesList />
-        </div>
       </section>
-
-      {/* Footer / Dev Utilities */}
-      <footer className="pt-12 pb-6 flex justify-center">
-        <button 
-          onClick={() => {
-            if (confirm("Voulez-vous vraiment vider le cache local ? Vous perdrez votre progression (XP, leçons).")) {
-              localStorage.clear();
-              sessionStorage.clear();
-              window.location.reload();
-            }
-          }}
-          className="text-xs text-slate-400 hover:text-red-500 transition-colors bg-transparent border border-slate-200 hover:border-red-200 px-4 py-2 rounded-lg"
-        >
-          Vider le cache local / Réinitialiser
-        </button>
-      </footer>
     </div>
   );
 }

@@ -13,6 +13,7 @@ import { playAudio } from '../lib/audio';
 import ConjugationTable from './grammar/ConjugationTable';
 import { getLocalizedText } from '../lib/i18n/utils';
 import { renderArabiziWithBadges } from './ui/PhoneticBadge';
+import confetti from 'canvas-confetti';
 
 interface ExerciseRunnerProps {
   lesson: Lesson;
@@ -112,6 +113,13 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
     } else {
       setIsLessonFinished(true);
       addXp(xpGained);
+      
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#047857', '#dc2626', '#fbbf24', '#2563eb'] // Moroccan colors (Green, Red, Gold, Blue)
+      });
     }
   };
 
