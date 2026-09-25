@@ -85,10 +85,14 @@ export const module3Lessons: Lesson[] = [
         type: 'exercise',
         exercise: {
           id: 'ex_m3_l1_3',
-          type: 'translation',
+          type: 'mcq',
           prompt: { fr: 'Traduisez : "Où est ma chambre ?"', en: 'Translate: "Where is my room?"', es: 'Traduce: "¿Dónde está mi habitación?"', ar: 'ترجم: "أين غرفتي؟"' },
-          options: [],
-          answer: 'Fin jate l-bit dyali ?',
+          options: [
+            { id: 'o1', text: 'Fin jate l-bit dyali ?', isCorrect: true },
+            { id: 'o2', text: 'Fin jate l-mdina ?', isCorrect: false },
+            { id: 'o3', text: 'Bch7al l-bit ?', isCorrect: false }
+          ],
+          answer: 'o1',
           explanation: { fr: '"Fin jate" s\'utilise pour demander où se trouve un lieu.', en: '"Fin jate" is used for locations.', es: 'Se usa "Fin jate" para ubicaciones.', ar: 'تستخدم "فين جات" للسؤال عن المكان.' }
         }
       }
@@ -168,10 +172,14 @@ export const module3Lessons: Lesson[] = [
         type: 'exercise',
         exercise: {
           id: 'ex_m3_l2_3',
-          type: 'translation',
+          type: 'mcq',
           prompt: { fr: 'Traduisez : "Il me faut une autre serviette"', en: 'Translate: "I need another towel"', es: 'Traduce: "Necesito otra toalla"', ar: 'ترجم: "أحتاج منشفة أخرى"' },
-          options: [],
-          answer: 'Khesni fota okhra',
+          options: [
+            { id: 'o1', text: 'Khesni fota okhra', isCorrect: true },
+            { id: 'o2', text: 'Bghit l-ma', isCorrect: false },
+            { id: 'o3', text: 'Khesni sarout', isCorrect: false }
+          ],
+          answer: 'o1',
           explanation: { fr: 'Khesni = Il me faut. Fota = Serviette.', en: 'Khesni = I need. Fota = Towel.', es: 'Khesni = Necesito. Fota = Toalla.', ar: 'خصني = أحتاج. فوطة = منشفة.' }
         }
       }
@@ -251,10 +259,14 @@ export const module3Lessons: Lesson[] = [
         type: 'exercise',
         exercise: {
           id: 'ex_m3_l3_3',
-          type: 'translation',
+          type: 'mcq',
           prompt: { fr: 'Traduisez : "J\'ai très mal à la tête"', en: 'Translate: "My head hurts a lot"', es: 'Traduce: "Me duele mucho la cabeza"', ar: 'ترجم: "يؤلمني رأسي كثيرا"' },
-          options: [],
-          answer: 'Kayderrni rasi bezzaf',
+          options: [
+            { id: 'o1', text: 'Kayderrni rasi bezzaf', isCorrect: true },
+            { id: 'o2', text: 'Ana mrid', isCorrect: false },
+            { id: 'o3', text: 'Kayderrni l-kersh bezzaf', isCorrect: false }
+          ],
+          answer: 'o1',
           explanation: { fr: 'Kayderrni = ça me fait mal. rasi = ma tête. bezzaf = beaucoup.', en: 'Kayderrni = hurts me.', es: 'Kayderrni = me duele.', ar: 'كيضرني = يؤلمني.' }
         }
       }
@@ -333,10 +345,14 @@ export const module3Lessons: Lesson[] = [
         type: 'exercise',
         exercise: {
           id: 'ex_m3_l4_3',
-          type: 'translation',
+          type: 'mcq',
           prompt: { fr: 'Traduisez : "Aide-moi s\'il te plaît"', en: 'Translate: "Help me please"', es: 'Traduce: "Ayúdame por favor"', ar: 'ترجم: "ساعدني من فضلك"' },
-          options: [],
-          answer: '3awenni 3afak',
+          options: [
+            { id: 'o1', text: '3awenni 3afak', isCorrect: true },
+            { id: 'o2', text: 'Khellini 3afak', isCorrect: false },
+            { id: 'o3', text: 'Shoukrane bezzaf', isCorrect: false }
+          ],
+          answer: 'o1',
           explanation: { fr: 'Le verbe est 3awen (aider). 3awen-ni = aide-moi.', en: 'Verb 3awen (to help).', es: 'Verbo 3awen (ayudar).', ar: 'الفصل عاون.' }
         }
       }

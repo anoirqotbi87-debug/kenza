@@ -49,7 +49,7 @@ export default function ReorderExercise({ exercise, preferredNotation, onUpdate,
 
   useEffect(() => {
     if (exercise.options) {
-      const words = exercise.options.map(opt => ({
+      const words = exercise.options.map((opt: any) => ({
         ...opt,
         id: opt.id || getWordText(opt),
         displayText: getTextForNotation(opt, preferredNotation)

@@ -51,7 +51,7 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
         
       const options = [word, ...distractors]
         .sort(() => 0.5 - Math.random())
-        .map(opt => {
+        .map((opt: any) => {
           const variant = getVariantForWord(opt.arabizi, regionalVariant);
           const tMap: any = (opt as any).translations || (opt as any).translation || { fr: '' };
           const translated = typeof tMap === 'string' ? tMap : tMap[lang] || tMap.fr;
@@ -164,7 +164,7 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-auto sm:mt-8">
-          {currentQ.options.map(opt => {
+          {currentQ.options.map((opt: any) => {
             const isSelected = selectedOption === opt.id;
             const isCorrectOption = isAnswerChecked && opt.id === currentQ.answerId;
             const isWrongSelection = isAnswerChecked && isSelected && opt.id !== currentQ.answerId;
