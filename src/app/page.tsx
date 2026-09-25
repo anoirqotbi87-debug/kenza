@@ -26,35 +26,55 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<'grammar' | 'conversation'>('grammar');
   const { t, lang } = useTranslation();
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
-  const { completeLesson, completedLessons, devUnlockAll, setUser } = useAppStore();
+  const { completeLesson, completedLessons, devUnlockAll, setUser, resetData } = useAppStore();
   const [checkpointOpen, setCheckpointOpen] = useState<{ id: string, name: string } | null>(null);
   const { hasPassedLevel } = useCheckpointProgress();
 
   useEffect(() => {
+    const handleAuthSync = async (user: any) => {
+      setUser(user);
+      
+      // Check if the user has existing cloud data
+      const { data: profile } = await supabase.from('profiles').select('xp').eq('id', user.id).single();
+      const { count: lessonsCount } = await supabase.from('lesson_progress').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
+      
+      if ((profile && profile.xp > 0) || (lessonsCount && lessonsCount > 0)) {
+        // Existing user: pull their cloud data down, overwriting any local guest data
+        console.log("[Auth] Existing user detected. Restoring cloud data.");
+        await syncService.syncCloudToLocal(user.id);
+      } else {
+        // New user: push their local guest data up to the cloud
+        console.log("[Auth] New user detected. Migrating local guest data to cloud.");
+        await syncService.migrateGuestDataToCloud(user.id);
+      }
+    };
+
     // 1. Récupérer immédiatement la session active au chargement de la page
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         console.log("[Auth] Session active détectée :", session.user.email);
-        setUser(session.user);
-        syncService.migrateGuestDataToCloud(session.user.id);
+        // On init, we just ensure the store knows the user. If they were already logged in,
+        // their local storage is already their cloud storage. We can do a pull to be safe.
+        handleAuthSync(session.user);
       }
     });
 
     // 2. Écouter les changements d'état (CRUCIAL pour le retour de Google OAuth !)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("[Auth Event]:", event, session?.user?.email);
-      if (session?.user) {
-        setUser(session.user);
-        await syncService.migrateGuestDataToCloud(session.user.id);
+      if (event === 'SIGNED_IN' && session?.user) {
+        handleAuthSync(session.user);
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
+        resetData();
+        localStorage.removeItem('kenza_checkpoints');
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [setUser]);
+  }, [setUser, resetData]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;

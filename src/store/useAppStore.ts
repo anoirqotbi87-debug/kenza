@@ -46,6 +46,7 @@ interface AppState {
   
   devUnlockAll: boolean;
   toggleDevUnlockAll: () => void;
+  resetData: () => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -70,6 +71,18 @@ export const useAppStore = create<AppState>()(
       
       toggleDevUnlockAll: () => set((state) => ({ devUnlockAll: !state.devUnlockAll })),
       setRegionalVariant: (variant) => set({ regionalVariant: variant }),
+      
+      resetData: () => set({
+        user: null,
+        xp: 0,
+        streakDays: 1,
+        streakFreezes: 1,
+        activityDates: [],
+        unlockedBadges: [],
+        currentLevel: 1,
+        completedLessons: [],
+        srsDeck: {}
+      }),
       
       addXp: (amount) => set((state) => {
         const newXp = state.xp + amount;
