@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { supabase, withSessionRefresh } from '../lib/supabase';
 import { CheckpointResultData } from '../hooks/useCheckpointProgress';
 
 /**
@@ -11,21 +11,23 @@ export const checkpointService = {
    */
   async syncResultToCloud(userId: string, result: CheckpointResultData): Promise<void> {
     try {
-      const { error } = await supabase
-        .from('user_checkpoints')
-        .upsert({
-          user_id: userId,
-          checkpoint_id: result.levelId,
-          score: result.score,
-          certificate_code: result.passportId,
-          passed_at: new Date().toISOString()
-        }, {
-          onConflict: 'user_id,checkpoint_id'
-        });
+      await withSessionRefresh(async () => {
+        const { error } = await supabase
+          .from('user_checkpoints')
+          .upsert({
+            user_id: userId,
+            checkpoint_id: result.levelId,
+            score: result.score,
+            certificate_code: result.passportId,
+            passed_at: new Date().toISOString()
+          }, {
+            onConflict: 'user_id,checkpoint_id'
+          });
 
-      if (error) {
-        console.warn("[Sync Checkpoint] Failed to sync to cloud:", error.message);
-      }
+        if (error) {
+          console.warn("[Sync Checkpoint] Failed to sync to cloud:", error.message);
+        }
+      });
     } catch (e) {
       console.warn("[Sync Checkpoint] Network error:", e);
     }

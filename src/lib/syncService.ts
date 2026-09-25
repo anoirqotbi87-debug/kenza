@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { supabase, withSessionRefresh } from './supabase';
 import { useAppStore } from '../store/useAppStore';
 import { SRSCard } from '../types/srs';
 
@@ -11,56 +11,58 @@ export const syncService = {
     
     const store = useAppStore.getState();
     
-    // 1. Update Profile (XP, streak, notation)
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .update({
-        xp: store.xp,
-        streak_days: store.streakDays,
-        script_preference: store.preferredNotation,
-      })
-      .eq('id', userId);
+    await withSessionRefresh(async () => {
+      // 1. Update Profile (XP, streak, notation)
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          xp: store.xp,
+          streak_days: store.streakDays,
+          script_preference: store.preferredNotation,
+        })
+        .eq('id', userId);
 
-    if (profileError) console.error("Error migrating profile:", profileError);
+      if (profileError) console.error("Error migrating profile:", profileError);
 
-    // 2. Migrate Lesson Progress
-    if (store.completedLessons.length > 0) {
-      const lessonInserts = store.completedLessons.map(lessonId => ({
-        user_id: userId,
-        lesson_id: lessonId,
-        completed: true,
-        completed_at: new Date().toISOString()
-      }));
-
-      const { error: lessonError } = await supabase
-        .from('lesson_progress')
-        .upsert(lessonInserts, { onConflict: 'user_id,lesson_id' });
-        
-      if (lessonError) console.error("Error migrating lessons:", lessonError);
-    }
-
-    // 3. Migrate SRS Deck
-    const srsKeys = Object.keys(store.srsDeck);
-    if (srsKeys.length > 0) {
-      const srsInserts = srsKeys.map(wordId => {
-        const card = store.srsDeck[wordId];
-        return {
+      // 2. Migrate Lesson Progress
+      if (store.completedLessons.length > 0) {
+        const lessonInserts = store.completedLessons.map(lessonId => ({
           user_id: userId,
-          word_id: wordId,
-          interval: card.interval,
-          repetition: card.repetition,
-          ease_factor: card.easeFactor,
-          due_date: card.dueDate,
-          state: card.state
-        };
-      });
+          lesson_id: lessonId,
+          completed: true,
+          completed_at: new Date().toISOString()
+        }));
 
-      const { error: srsError } = await supabase
-        .from('srs_items')
-        .upsert(srsInserts, { onConflict: 'user_id,word_id' });
+        const { error: lessonError } = await supabase
+          .from('lesson_progress')
+          .upsert(lessonInserts, { onConflict: 'user_id,lesson_id' });
+          
+        if (lessonError) console.error("Error migrating lessons:", lessonError);
+      }
 
-      if (srsError) console.error("Error migrating SRS:", srsError);
-    }
+      // 3. Migrate SRS Deck
+      const srsKeys = Object.keys(store.srsDeck);
+      if (srsKeys.length > 0) {
+        const srsInserts = srsKeys.map(wordId => {
+          const card = store.srsDeck[wordId];
+          return {
+            user_id: userId,
+            word_id: wordId,
+            interval: card.interval,
+            repetition: card.repetition,
+            ease_factor: card.easeFactor,
+            due_date: card.dueDate,
+            state: card.state
+          };
+        });
+
+        const { error: srsError } = await supabase
+          .from('srs_items')
+          .upsert(srsInserts, { onConflict: 'user_id,word_id' });
+
+        if (srsError) console.error("Error migrating SRS:", srsError);
+      }
+    });
     
     return true;
   },

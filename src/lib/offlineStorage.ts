@@ -4,9 +4,26 @@ const DB_NAME = 'kenza_offline_db';
 const STORE_NAME = 'audio_cache';
 const DB_VERSION = 1;
 
+export async function requestPersistentStorage(): Promise<boolean> {
+  if (typeof window !== 'undefined' && navigator.storage && navigator.storage.persist) {
+    try {
+      const isPersisted = await navigator.storage.persist();
+      console.log('[Storage] Persistance garantie :', isPersisted);
+      return isPersisted;
+    } catch (e) {
+      console.warn('[Storage] Error requesting persistence:', e);
+      return false;
+    }
+  }
+  return false;
+}
+
 export async function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     if (typeof window === 'undefined') return reject(new Error('IndexedDB not available on server'));
+    
+    // Request persistence silently in background
+    requestPersistentStorage();
     
     const request = indexedDB.open(DB_NAME, DB_VERSION);
     request.onerror = () => reject(request.error);
@@ -27,11 +44,31 @@ export async function saveAudio(key: string, blob: Blob): Promise<void> {
       const transaction = db.transaction(STORE_NAME, 'readwrite');
       const store = transaction.objectStore(STORE_NAME);
       const request = store.put(blob, key);
+      
       request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
+      request.onerror = () => {
+        if (request.error?.name === 'QuotaExceededError') {
+          console.warn('[Storage] QuotaExceededError: Pack audio trop volumineux. Lecture basculée en streaming.');
+          // Resolve anyway so the app doesn't crash, it just won't be saved offline
+          resolve();
+        } else {
+          reject(request.error);
+        }
+      };
+      
+      transaction.onerror = () => {
+        if (transaction.error?.name === 'QuotaExceededError') {
+          console.warn('[Storage] QuotaExceededError (Transaction): Pack audio trop volumineux. Lecture basculée en streaming.');
+          resolve();
+        }
+      };
     });
-  } catch (e) {
-    console.warn('saveAudio failed:', e);
+  } catch (e: any) {
+    if (e.name === 'QuotaExceededError') {
+      console.warn('[Storage] QuotaExceededError (Catch): Pack audio trop volumineux. Lecture basculée en streaming.');
+    } else {
+      console.warn('saveAudio failed:', e);
+    }
   }
 }
 

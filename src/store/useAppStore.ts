@@ -4,6 +4,7 @@ import { Notation } from '../types/curriculum';
 import { SRSCard, ReviewGrade } from '../types/srs';
 
 import { UILanguage, translations } from '../lib/i18n/translations';
+import { getLocalTodayDateString, getDaysDifference } from '../utils/dateUtils';
 
 interface AppState {
   // User Progress
@@ -120,14 +121,36 @@ export const useAppStore = create<AppState>()(
       })),
 
       recordActivity: () => set((state) => {
-        const today = new Date().toISOString().split('T')[0];
-        if (state.activityDates.includes(today)) return state;
+        const today = getLocalTodayDateString();
         
-        // Simple streak logic: if yesterday is not in activityDates, check if streak freeze was used
-        // For simplicity in this demo, just add the date. Real app would calculate gap.
+        if (state.activityDates.includes(today)) {
+          // Already recorded today
+          return state;
+        }
+
+        const newActivityDates = [...state.activityDates, today];
+        let newStreak = state.streakDays;
+
+        if (state.activityDates.length === 0) {
+          newStreak = 1;
+        } else {
+          // Sort dates to find the last activity date safely
+          const sortedDates = [...state.activityDates].sort();
+          const lastActivity = sortedDates[sortedDates.length - 1];
+          const diffDays = getDaysDifference(today, lastActivity);
+
+          if (diffDays === 1) {
+            // Consecutive day
+            newStreak += 1;
+          } else if (diffDays > 1) {
+            // Gap > 1 day, streak breaks (streak freezes logic would go here if fully implemented)
+            newStreak = 1;
+          }
+        }
+
         return { 
-          activityDates: [...state.activityDates, today],
-          streakDays: state.activityDates.length === 0 ? 1 : state.streakDays + 1
+          activityDates: newActivityDates,
+          streakDays: newStreak
         };
       }),
       

@@ -119,7 +119,11 @@ export default function ProfileView() {
               disabled={isDownloading}
               className={`w-full py-3 rounded-xl font-bold text-white transition-all ${isDownloading ? 'bg-slate-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 active:scale-95'}`}
             >
-              {isDownloading ? 'Téléchargement en cours...' : 'Télécharger le pack complet (100 sons ~ 4 Mo)'}
+              {isDownloading 
+                ? 'Téléchargement en cours...' 
+                : downloadProgress > 0 && downloadProgress < 100
+                  ? 'Restaurer le pack audio hors-ligne (fichiers manquants)'
+                  : 'Télécharger le pack complet (100 sons ~ 4 Mo)'}
             </button>
             
             {isDownloading && (
