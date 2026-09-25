@@ -2,13 +2,20 @@ import React from 'react';
 import { useAppStore } from '../../store/useAppStore';
 import { X, CheckCircle2, Crown, Zap, BookOpen, Headphones } from 'lucide-react';
 
+import { trackEvent } from '../../utils/analytics';
+
 interface PricingModalProps {
   onClose: () => void;
+  source: string;
 }
 
-export default function PricingModal({ onClose }: PricingModalProps) {
+export default function PricingModal({ onClose, source }: PricingModalProps) {
   const { setSubscriptionTier } = useAppStore();
   const [currency, setCurrency] = React.useState<'EUR' | 'MAD'>('EUR');
+
+  React.useEffect(() => {
+    trackEvent('pricing_modal_opened', { source });
+  }, [source]);
 
   const prices = {
     EUR: { monthly: 9, yearly: 59, symbol: '€' },
@@ -17,10 +24,26 @@ export default function PricingModal({ onClose }: PricingModalProps) {
 
   const currentPrices = prices[currency];
 
+  const handleCurrencyToggle = (newCurrency: 'EUR' | 'MAD') => {
+    setCurrency(newCurrency);
+    trackEvent('currency_toggled', { currency: newCurrency });
+  };
+
   const handleSubscribe = (plan: 'monthly' | 'yearly') => {
+    trackEvent('plan_selected', { 
+      plan, 
+      currency, 
+      price: currentPrices[plan] 
+    });
     // In real app, redirect to Stripe
+    alert("Redirection vers le paiement en cours...");
     // Here we just unlock for demo
     setSubscriptionTier('premium');
+    onClose();
+  };
+
+  const handleClose = () => {
+    trackEvent('pricing_modal_dismissed');
     onClose();
   };
 
@@ -29,7 +52,7 @@ export default function PricingModal({ onClose }: PricingModalProps) {
       <div className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-300 flex flex-col md:flex-row">
         
         <button 
-          onClick={onClose}
+          onClick={handleClose}
           className="absolute top-4 right-4 p-2 bg-slate-800/10 hover:bg-slate-800/20 md:bg-slate-100 md:hover:bg-slate-200 backdrop-blur-sm rounded-full z-50 transition-colors border border-white/20 shadow-sm"
           aria-label="Fermer"
         >
@@ -53,13 +76,13 @@ export default function PricingModal({ onClose }: PricingModalProps) {
             
             <div className="flex bg-slate-200 rounded-lg p-1">
               <button
-                onClick={() => setCurrency('EUR')}
+                onClick={() => handleCurrencyToggle('EUR')}
                 className={`px-3 py-1 rounded-md text-xs font-bold transition-colors ${currency === 'EUR' ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
               >
                 EUR
               </button>
               <button
-                onClick={() => setCurrency('MAD')}
+                onClick={() => handleCurrencyToggle('MAD')}
                 className={`px-3 py-1 rounded-md text-xs font-bold transition-colors ${currency === 'MAD' ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
               >
                 MAD

@@ -39,7 +39,7 @@ export default function Home() {
 
   const [showScenarioSelector, setShowScenarioSelector] = useState(false);
   const [activeScenario, setActiveScenario] = useState<DialogueScenario | null>(null);
-  const [showPricingModal, setShowPricingModal] = useState(false);
+  const [pricingSource, setPricingSource] = useState<string | null>(null);
 
   useEffect(() => {
     const handleAuthSync = async (user: any) => {
@@ -204,7 +204,7 @@ export default function Home() {
                   disabled={!isCheckpointUnlocked}
                   onClick={() => {
                     if (subscriptionTier === 'free') {
-                      setShowPricingModal(true);
+                      setPricingSource('checkpoint_locked');
                     } else {
                       setCheckpointOpen({ id: moduleId, name: titleStr });
                     }
@@ -355,7 +355,7 @@ export default function Home() {
             setActiveScenario(scenario);
             setShowScenarioSelector(false);
           }}
-          onRequirePremium={() => setShowPricingModal(true)}
+          onRequirePremium={() => setPricingSource('roleplay_locked')}
         />
       )}
 
@@ -370,8 +370,11 @@ export default function Home() {
         <OnboardingModal />
       )}
 
-      {showPricingModal && (
-        <PricingModal onClose={() => setShowPricingModal(false)} />
+      {pricingSource && (
+        <PricingModal 
+          onClose={() => setPricingSource(null)} 
+          source={pricingSource} 
+        />
       )}
 
       <InstallPwaBanner />
