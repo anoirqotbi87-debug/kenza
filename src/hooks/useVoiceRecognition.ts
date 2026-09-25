@@ -109,12 +109,15 @@ export function useVoiceRecognition(lang = 'ar-MA', timeoutMs = 5000) {
     }
   }, [lang, timeoutMs, stopListening]);
 
+  const resetTranscript = useCallback(() => setTranscript(''), []);
+
   return {
     isSupported,
     isListening,
     transcript,
     error,
     startListening,
-    stopListening
+    stopListening,
+    resetTranscript
   };
 }
