@@ -7,6 +7,7 @@ import { playAudio } from '../../lib/audio';
 import { useVoiceRecognition } from '../../hooks/useVoiceRecognition';
 import { calculateSimilarity } from '../../utils/phonemeMatcher';
 import VoiceFeedbackCard from '../voice/VoiceFeedbackCard';
+import { trackEvent } from '../../utils/analytics';
 
 // ---------------------------
 // DONNÉES : MODE ÉLOCUTION
@@ -106,6 +107,11 @@ export default function SpeechTrainer() {
     if (!isListening && transcript && activeTab === 'elocution') {
       const result = calculateSimilarity(transcript, currentExercise.arabizi, currentExercise.arabic);
       setEvaluation(result);
+      trackEvent('voice_evaluation_completed', { 
+        score: result.score, 
+        passedPhonemes: result.phonemeResults.filter((p: any) => p.passed).length,
+        totalPhonemes: result.phonemeResults.length
+      });
     }
   }, [isListening, transcript, activeTab, currentExercise]);
 

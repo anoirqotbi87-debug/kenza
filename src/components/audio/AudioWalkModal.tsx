@@ -4,6 +4,7 @@ import React from 'react';
 import { X, Play, Pause, SkipBack, SkipForward, Settings2, Repeat, Shuffle, Repeat1 } from 'lucide-react';
 import { useAudioWalkPlayer, AudioWalkItem } from '../../hooks/useAudioWalkPlayer';
 import { useMediaSession } from '../../hooks/useMediaSession';
+import { trackEvent } from '../../utils/analytics';
 
 interface AudioWalkModalProps {
   isOpen: boolean;
@@ -41,6 +42,12 @@ export default function AudioWalkModal({ isOpen, onClose, items, moduleName }: A
     onPrevious: previousTrack,
     onNext: nextTrack
   });
+
+  React.useEffect(() => {
+    if (isOpen) {
+      trackEvent('audio_walk_started', { moduleName, itemCount: items.length });
+    }
+  }, [isOpen, moduleName, items.length]);
 
   if (!isOpen) return null;
 

@@ -6,6 +6,7 @@ import DarijaPassportCard from '../certificate/DarijaPassportCard';
 import { PassportData } from '../../utils/certificateGenerator';
 import { useCheckpointProgress } from '../../hooks/useCheckpointProgress';
 import { useAppStore } from '../../store/useAppStore';
+import { trackEvent } from '../../utils/analytics';
 
 interface CheckpointResultProps {
   levelId: string;
@@ -35,6 +36,8 @@ export default function CheckpointResult({ levelId, levelName, score, totalQuest
   };
 
   useEffect(() => {
+    trackEvent('checkpoint_attempted', { levelId, score: percentage, passed });
+
     if (passed) {
       saveResult({
         levelId,

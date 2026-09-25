@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Download, Share2, Check, Award } from 'lucide-react';
 import { PassportData, exportPassportToBlob } from '../../utils/certificateGenerator';
+import { trackEvent } from '../../utils/analytics';
 
 interface DarijaPassportCardProps {
   data: PassportData;
@@ -14,6 +15,7 @@ export default function DarijaPassportCard({ data }: DarijaPassportCardProps) {
 
   const handleDownload = async () => {
     try {
+      trackEvent('passport_shared', { method: 'download_only', levelName: data.levelName });
       setIsExporting(true);
       const blob = await exportPassportToBlob(data);
       const url = URL.createObjectURL(blob);
@@ -38,6 +40,7 @@ export default function DarijaPassportCard({ data }: DarijaPassportCardProps) {
       const file = new File([blob], `Passeport_Darija.png`, { type: 'image/png' });
 
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        trackEvent('passport_shared', { method: 'native_share', levelName: data.levelName });
         await navigator.share({
           title: 'Mon Passeport Darija',
           text: `J'ai validé mon ${data.levelName} de Darija marocaine sur KENZA avec un score de ${data.score}% !`,
@@ -45,6 +48,7 @@ export default function DarijaPassportCard({ data }: DarijaPassportCardProps) {
         });
       } else {
         // Fallback: Copy to clipboard and download
+        trackEvent('passport_shared', { method: 'fallback_download', levelName: data.levelName });
         await navigator.clipboard.writeText(`J'ai validé mon ${data.levelName} de Darija marocaine sur KENZA avec un score de ${data.score}% !`);
         setShareSuccess(true);
         setTimeout(() => setShareSuccess(false), 3000);

@@ -5,6 +5,7 @@ import { Exercise, Notation } from '../../../types/curriculum';
 
 import { getExerciseText } from '../../../lib/i18n/utils';
 import { useTranslation } from '../../../store/useAppStore';
+import { trackEvent } from '../../../utils/analytics';
 
 interface McqExerciseProps {
   exercise: Exercise;
@@ -58,7 +59,12 @@ export default function McqExercise({ exercise, preferredNotation, selectedOptio
             {isWrongSelection && (
               <div className="mt-3 text-center animate-in fade-in slide-in-from-top-2">
                 <button 
-                  onClick={() => setShowExplanation(!showExplanation)}
+                  onClick={() => {
+                    if (!showExplanation) {
+                      trackEvent('explain_mistake_clicked', { exerciseId: exercise.id, explanation: exercise.explanation });
+                    }
+                    setShowExplanation(!showExplanation);
+                  }}
                   className="text-sm font-bold text-slate-500 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-full transition-colors flex items-center gap-2 mx-auto"
                 >
                   💡 {lang === 'fr' ? 'Pourquoi ai-je faux ?' : 'Why is this wrong?'}
