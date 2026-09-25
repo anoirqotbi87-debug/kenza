@@ -81,12 +81,14 @@ export const playAudio = async (text: string, audioUrl?: string, soundEnabled: b
         audioCache.set(audioUrl!, audioBuffer);
       }
 
-      const source = ctx.createBufferSource();
-      source.buffer = audioBuffer;
-      source.playbackRate.value = speed;
-      source.connect(ctx.destination);
-      source.start();
-      return;
+      return new Promise<void>((resolve) => {
+        const source = ctx.createBufferSource();
+        source.buffer = audioBuffer;
+        source.playbackRate.value = speed;
+        source.connect(ctx.destination);
+        source.onended = () => resolve();
+        source.start();
+      });
     } catch (e) {
       console.error("Error playing audio url with Web Audio API:", e);
     }
@@ -122,12 +124,14 @@ export const playAudio = async (text: string, audioUrl?: string, soundEnabled: b
         audioCache.set(cacheKey, audioBuffer);
       }
 
-      const source = ctx.createBufferSource();
-      source.buffer = audioBuffer;
-      source.playbackRate.value = speed;
-      source.connect(ctx.destination);
-      source.start();
-      return; // Succès TTS
+      return new Promise<void>((resolve) => {
+        const source = ctx.createBufferSource();
+        source.buffer = audioBuffer;
+        source.playbackRate.value = speed;
+        source.connect(ctx.destination);
+        source.onended = () => resolve();
+        source.start();
+      });
     } catch (e) {
       console.error("Error with Edge TTS, falling back to Web Speech API:", e);
     }
@@ -135,16 +139,21 @@ export const playAudio = async (text: string, audioUrl?: string, soundEnabled: b
 
   // Fallback ultime : Web Speech API du navigateur
   if ('speechSynthesis' in window && text && text !== 'correct' && text !== 'error') {
-    const voices = window.speechSynthesis.getVoices();
-    const voice = voices.find(v => v.lang.includes('ar-MA')) || voices.find(v => v.lang.includes('ar-'));
-    
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'ar-MA';
-    utterance.rate = speed;
-    if (voice) {
-      utterance.voice = voice;
-    }
-    
-    window.speechSynthesis.speak(utterance);
+    return new Promise<void>((resolve) => {
+      const voices = window.speechSynthesis.getVoices();
+      const voice = voices.find(v => v.lang.includes('ar-MA')) || voices.find(v => v.lang.includes('ar-'));
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'ar-MA';
+      utterance.rate = speed;
+      if (voice) {
+        utterance.voice = voice;
+      }
+      
+      utterance.onend = () => resolve();
+      utterance.onerror = () => resolve();
+      
+      window.speechSynthesis.speak(utterance);
+    });
   }
 };

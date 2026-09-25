@@ -4,6 +4,8 @@ import { srsVocabulary, SRSDictionaryItem } from '../../data/srs-deck';
 import { useTranslation, useAppStore } from '../../store/useAppStore';
 import { playAudio } from '../../lib/audio';
 import { getVariantForWord } from '../../data/regionalVariants';
+import AudioWalkModal from '../audio/AudioWalkModal';
+import { AudioWalkItem } from '../../hooks/useAudioWalkPlayer';
 
 type CategoryType = SRSDictionaryItem['category'] | 'all';
 
@@ -13,6 +15,7 @@ export default function PhrasebookView() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState<CategoryType>('all');
   const [activeTab, setActiveTab] = useState<'dictionary' | 'grammar'>('dictionary');
+  const [isAudioWalkOpen, setIsAudioWalkOpen] = useState(false);
 
   const categories: { id: CategoryType; label: string; icon: React.FC<any> }[] = [
     { id: 'all', label: 'Tout', icon: BookOpen },
@@ -41,18 +44,43 @@ export default function PhrasebookView() {
 
 
 
+  const audioWalkItems: AudioWalkItem[] = useMemo(() => {
+    return filteredWords.map(word => {
+      const variant = getVariantForWord(word.arabizi, regionalVariant);
+      const displayArabizi = variant ? variant.variant : word.arabizi;
+      const displayArabic = variant ? variant.variantArabic : word.arabic;
+      const tMap: any = (word as any).translations || (word as any).translation || { fr: '' };
+      const translated = typeof tMap === 'string' ? tMap : tMap[lang] || tMap.fr;
+      return {
+        id: word.id,
+        phraseSource: translated,
+        phraseDarijaArabizi: displayArabizi,
+        phraseDarijaArabe: displayArabic
+      };
+    });
+  }, [filteredWords, regionalVariant, lang]);
+
   const renderDictionary = () => (
     <div className="space-y-6">
-      {/* Search Bar */}
-      <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-        <input
-          type="text"
-          placeholder="Rechercher un mot (ex: café, chokran)..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full bg-white border-2 border-slate-100 rounded-2xl py-4 pl-12 pr-4 font-medium text-slate-700 focus:outline-none focus:border-blue-400 transition-colors shadow-sm"
-        />
+      {/* Search Bar & Actions */}
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+          <input
+            type="text"
+            placeholder="Rechercher un mot (ex: café, chokran)..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full bg-white border-2 border-slate-100 rounded-2xl py-4 pl-12 pr-4 font-medium text-slate-700 focus:outline-none focus:border-blue-400 transition-colors shadow-sm"
+          />
+        </div>
+        <button 
+          onClick={() => setIsAudioWalkOpen(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white rounded-2xl px-4 flex items-center justify-center gap-2 font-bold shadow-md transition-all active:scale-95 whitespace-nowrap"
+        >
+          <Volume2 className="w-5 h-5" />
+          <span className="hidden sm:inline">Mains-Libres</span>
+        </button>
       </div>
 
       {/* Categories */}
@@ -200,6 +228,13 @@ export default function PhrasebookView() {
       </div>
 
       {activeTab === 'dictionary' ? renderDictionary() : renderGrammar()}
+
+      <AudioWalkModal 
+        isOpen={isAudioWalkOpen}
+        onClose={() => setIsAudioWalkOpen(false)}
+        items={audioWalkItems}
+        moduleName="Lexique Global"
+      />
     </div>
   );
 }
