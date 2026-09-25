@@ -8,6 +8,14 @@ interface PricingModalProps {
 
 export default function PricingModal({ onClose }: PricingModalProps) {
   const { setSubscriptionTier } = useAppStore();
+  const [currency, setCurrency] = React.useState<'EUR' | 'MAD'>('EUR');
+
+  const prices = {
+    EUR: { monthly: 9, yearly: 59, symbol: '€' },
+    MAD: { monthly: 99, yearly: 590, symbol: ' DH' }
+  };
+
+  const currentPrices = prices[currency];
 
   const handleSubscribe = (plan: 'monthly' | 'yearly') => {
     // In real app, redirect to Stripe
@@ -22,13 +30,14 @@ export default function PricingModal({ onClose }: PricingModalProps) {
         
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 bg-slate-100 hover:bg-slate-200 rounded-full z-10 transition-colors"
+          className="absolute top-4 right-4 p-2 bg-slate-800/10 hover:bg-slate-800/20 md:bg-slate-100 md:hover:bg-slate-200 backdrop-blur-sm rounded-full z-50 transition-colors border border-white/20 shadow-sm"
+          aria-label="Fermer"
         >
-          <X className="w-5 h-5 text-slate-500" />
+          <X className="w-6 h-6 text-slate-800 md:text-slate-500" />
         </button>
 
         {/* Hero Section */}
-        <div className="bg-gradient-to-br from-amber-400 to-orange-500 p-8 md:w-2/5 flex flex-col justify-center text-white relative overflow-hidden">
+        <div className="bg-gradient-to-br from-amber-400 to-orange-500 p-8 pt-12 md:p-8 md:w-2/5 flex flex-col justify-center text-white relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-white opacity-10 pattern-dots" />
           <div className="relative z-10">
             <Crown className="w-16 h-16 mb-4 text-amber-100 drop-shadow-lg" />
@@ -39,7 +48,24 @@ export default function PricingModal({ onClose }: PricingModalProps) {
 
         {/* Pricing & Features Section */}
         <div className="p-8 md:w-3/5 bg-slate-50 flex flex-col">
-          <h3 className="font-bold text-slate-800 mb-6 text-lg">Tout ce qui est inclus :</h3>
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="font-bold text-slate-800 text-lg">Tout ce qui est inclus :</h3>
+            
+            <div className="flex bg-slate-200 rounded-lg p-1">
+              <button
+                onClick={() => setCurrency('EUR')}
+                className={`px-3 py-1 rounded-md text-xs font-bold transition-colors ${currency === 'EUR' ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                EUR
+              </button>
+              <button
+                onClick={() => setCurrency('MAD')}
+                className={`px-3 py-1 rounded-md text-xs font-bold transition-colors ${currency === 'MAD' ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                MAD
+              </button>
+            </div>
+          </div>
           
           <ul className="space-y-4 mb-8 flex-1">
             <li className="flex items-start gap-3">
@@ -66,7 +92,11 @@ export default function PricingModal({ onClose }: PricingModalProps) {
               className="bg-white border-2 border-slate-200 hover:border-amber-400 p-4 rounded-2xl text-center transition-all group"
             >
               <div className="text-sm font-bold text-slate-500 group-hover:text-amber-600">Mensuel</div>
-              <div className="text-2xl font-black text-slate-800">9€<span className="text-sm font-normal text-slate-500">/mois</span></div>
+              <div className="text-2xl font-black text-slate-800">
+                {currentPrices.monthly}
+                <span className={currency === 'MAD' ? 'text-lg' : ''}>{currentPrices.symbol}</span>
+                <span className="text-sm font-normal text-slate-500">/mois</span>
+              </div>
             </button>
             <button 
               onClick={() => handleSubscribe('yearly')}
@@ -76,7 +106,11 @@ export default function PricingModal({ onClose }: PricingModalProps) {
                 -35%
               </div>
               <div className="text-sm font-bold text-amber-700">Annuel</div>
-              <div className="text-2xl font-black text-slate-800">59€<span className="text-sm font-normal text-slate-500">/an</span></div>
+              <div className="text-2xl font-black text-slate-800">
+                {currentPrices.yearly}
+                <span className={currency === 'MAD' ? 'text-lg' : ''}>{currentPrices.symbol}</span>
+                <span className="text-sm font-normal text-slate-500">/an</span>
+              </div>
             </button>
           </div>
         </div>
