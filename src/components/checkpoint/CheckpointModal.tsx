@@ -27,6 +27,17 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
 
   // Generate 12 random questions from vocabulary
   const questions = useMemo(() => {
+    if (levelId === '3') {
+      return require('../../data/checkpoints/checkpointA2').checkpointA2.questions.map((q: any) => ({
+        id: q.id,
+        prompt: q.prompt,
+        answerId: q.answerId,
+        arabizi: q.arabizi,
+        arabic: q.arabic,
+        options: q.options
+      })).sort(() => 0.5 - Math.random()).slice(0, 12);
+    }
+
     // Shuffle all words
     const shuffled = [...srsVocabulary].sort(() => 0.5 - Math.random());
     const selected = shuffled.slice(0, 12);
@@ -65,7 +76,7 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
         options
       };
     });
-  }, [lang, regionalVariant]);
+  }, [lang, regionalVariant, levelId]);
 
   const currentQ = questions[currentIndex];
   const progress = ((currentIndex) / questions.length) * 100;

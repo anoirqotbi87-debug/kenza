@@ -32,7 +32,7 @@ export const fullCurriculum: Record<string, { title: MultiLangText, lessons: Les
     lessons: module2Lessons 
   },
   3: { 
-    title: { fr: "Grammaire Active", en: "Active Grammar", es: "Gramática Activa", ar: "قواعد نشطة" }, 
+    title: { fr: "Autonomie & Riad", en: "Autonomy & Riad", es: "Autonomía y Riad", ar: "الاستقلالية والرياض" }, 
     lessons: module3Lessons 
   },
   4: { 

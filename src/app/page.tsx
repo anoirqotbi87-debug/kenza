@@ -148,6 +148,12 @@ export default function Home() {
             let isNext = !isCompleted && (globalIndex === 0 || completedLessons.includes(allLessonsList[globalIndex - 1].id));
             let isLocked = !isCompleted && !isNext;
 
+            // Enforce Checkpoint prerequisites
+            if (moduleId === '3' && !hasPassedLevel('2')) {
+              isLocked = true;
+              isNext = false;
+            }
+
             if (devUnlockAll) {
               isLocked = false;
               isNext = !isCompleted;
@@ -198,6 +204,17 @@ export default function Home() {
             const passed = hasPassedLevel(moduleId);
             const titleStr = getLocalizedText(moduleData.title, lang);
 
+            const checkpointTitles: Record<string, string> = {
+              '1': 'A1.1',
+              '2': 'A1.2',
+              '3': 'A2',
+              '4': 'B1.1',
+              '5': 'B1.2',
+              '6': 'B2.1',
+              '7': 'B2.2',
+            };
+            const levelLabel = checkpointTitles[moduleId] || moduleId;
+
             return (
               <div className="relative z-10 w-full max-w-md mt-4">
                 <button 
@@ -220,7 +237,7 @@ export default function Home() {
                 >
                   <div className="text-4xl mb-3">{passed ? '🏆' : '🔒'}</div>
                   <h3 className={`font-bold text-xl mb-1 ${passed ? 'text-amber-600' : isCheckpointUnlocked ? 'text-white' : 'text-slate-500'}`}>
-                    Checkpoint {moduleId}
+                    Checkpoint {levelLabel}
                   </h3>
                   <p className={`text-sm ${passed ? 'text-amber-700/80' : isCheckpointUnlocked ? 'text-blue-100' : 'text-slate-400'}`}>
                     {passed ? 'Passeport obtenu !' : 'Examen de niveau'}

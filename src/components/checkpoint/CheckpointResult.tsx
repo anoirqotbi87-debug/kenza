@@ -24,7 +24,17 @@ export default function CheckpointResult({ levelId, levelName, score, totalQuest
   const { user } = useAppStore();
   const { saveResult } = useCheckpointProgress();
 
-  const passportId = `KNZ-${levelId.toUpperCase()}-${Math.floor(Math.random() * 9000) + 1000}`;
+  const levelCodeMap: Record<string, string> = {
+    '1': 'A1.1',
+    '2': 'A1.2',
+    '3': 'A2',
+    '4': 'B1.1',
+    '5': 'B1.2',
+    '6': 'B2.1',
+    '7': 'B2.2'
+  };
+  const codeLevel = levelCodeMap[levelId] || levelId.toUpperCase();
+  const passportId = `KNZ-${codeLevel}-${Math.floor(Math.random() * 9000) + 1000}`;
   const dateStr = new Date().toLocaleDateString('fr-FR');
 
   const passportData: PassportData = {
