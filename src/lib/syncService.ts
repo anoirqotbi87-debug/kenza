@@ -18,6 +18,8 @@ export const syncService = {
         .update({
           xp: store.xp,
           streak_days: store.streakDays,
+          streak_freezes: store.streakFreezes,
+          unlocked_badges: store.unlockedBadges,
           script_preference: store.preferredNotation,
         })
         .eq('id', userId);
@@ -81,9 +83,16 @@ export const syncService = {
       .single();
 
     if (profile) {
+      // Merge badges
+      const cloudBadges = Array.isArray(profile.unlocked_badges) ? profile.unlocked_badges : [];
+      const localBadges = useAppStore.getState().unlockedBadges;
+      const mergedBadges = Array.from(new Set([...cloudBadges, ...localBadges]));
+
       useAppStore.setState({
         xp: profile.xp,
         streakDays: profile.streak_days,
+        streakFreezes: profile.streak_freezes ?? 1,
+        unlockedBadges: mergedBadges,
         preferredNotation: profile.script_preference
       });
     }

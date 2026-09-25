@@ -68,7 +68,7 @@ export const useAppStore = create<AppState>()(
       audioSpeed: 1.0,
       uiLanguage: 'fr',
       regionalVariant: 'casablanca',
-      devUnlockAll: true, // Activated by default for dev/testing
+      devUnlockAll: false, // Prod: locked progression
       
       toggleDevUnlockAll: () => set((state) => ({ devUnlockAll: !state.devUnlockAll })),
       setRegionalVariant: (variant) => set({ regionalVariant: variant }),

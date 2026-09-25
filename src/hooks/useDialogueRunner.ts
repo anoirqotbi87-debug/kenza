@@ -118,14 +118,14 @@ export function useDialogueRunner(scenario: DialogueScenario, soundEnabled: bool
         score: s.score + result.score,
         validationError: null
       }));
-      resetTranscript();
+      if (typeof resetTranscript === 'function') resetTranscript();
     } else {
       setState(s => ({
         ...s,
         validationError: "Je n'ai pas bien compris. Essayez encore !"
       }));
       playAudio('error', undefined, soundEnabled);
-      resetTranscript();
+      if (typeof resetTranscript === 'function') resetTranscript();
     }
   };
 

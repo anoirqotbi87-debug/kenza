@@ -134,7 +134,21 @@ function normalizeDarija(text: string, arabicText?: string): string {
 
 export async function POST(req: NextRequest) {
   try {
+    // Basic Security: Check referer or sec-fetch-site
+    const secFetchSite = req.headers.get('sec-fetch-site');
+    if (secFetchSite && secFetchSite !== 'same-origin' && secFetchSite !== 'same-site') {
+      return NextResponse.json({ error: 'UNAUTHORIZED_ORIGIN' }, { status: 403 });
+    }
+
     const { text, arabicText } = await req.json();
+
+    if (!text || typeof text !== 'string' || text.trim().length === 0) {
+      return NextResponse.json({ error: 'INVALID_TEXT' }, { status: 400 });
+    }
+    if (text.length > 300) {
+      return NextResponse.json({ error: 'TEXT_TOO_LONG' }, { status: 400 });
+    }
+
     const textToSpeak = normalizeDarija(text, arabicText);
 
     const tts = new MsEdgeTTS();
@@ -150,17 +164,17 @@ export async function POST(req: NextRequest) {
         resolve(new NextResponse(audioBuffer, {
           headers: {
             'Content-Type': 'audio/mpeg',
-            'Cache-Control': 'public, max-age=31536000, immutable',
+            'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400',
           },
         }));
       });
       readable.audioStream.on('error', (err: any) => {
         console.error('TTS Stream Error:', err);
-        reject(NextResponse.json({ error: 'TTS Error' }, { status: 500 }));
+        resolve(NextResponse.json({ error: 'TTS_GENERATION_FAILED' }, { status: 500 }));
       });
     });
   } catch (error) {
     console.error('API TTS Error:', error);
-    return NextResponse.json({ error: 'Failed to generate audio' }, { status: 500 });
+    return NextResponse.json({ error: 'TTS_GENERATION_FAILED' }, { status: 500 });
   }
 }
