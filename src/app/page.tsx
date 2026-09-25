@@ -21,6 +21,10 @@ import { supabase } from '@/lib/supabase';
 import { syncService } from '@/lib/syncService';
 import { useEffect } from 'react';
 
+import ScenarioSelectorModal from '@/components/dialogue/ScenarioSelectorModal';
+import DialogueView from '@/components/dialogue/DialogueView';
+import { DialogueScenario } from '@/types/dialogue';
+
 export default function Home() {
   const [currentTab, setCurrentTab] = useState<'learn' | 'phrasebook' | 'speech' | 'profile'>('learn');
   const [activeTab, setActiveTab] = useState<'grammar' | 'conversation'>('grammar');
@@ -29,6 +33,9 @@ export default function Home() {
   const { completeLesson, completedLessons, devUnlockAll, setUser, resetData } = useAppStore();
   const [checkpointOpen, setCheckpointOpen] = useState<{ id: string, name: string } | null>(null);
   const { hasPassedLevel } = useCheckpointProgress();
+
+  const [showScenarioSelector, setShowScenarioSelector] = useState(false);
+  const [activeScenario, setActiveScenario] = useState<DialogueScenario | null>(null);
 
   useEffect(() => {
     const handleAuthSync = async (user: any) => {
@@ -234,6 +241,20 @@ export default function Home() {
               <Dashboard onStartLesson={handleStartLesson} />
               
               <div className="max-w-6xl mx-auto p-4 space-y-8">
+                {/* Roleplay Banner */}
+                <div 
+                  className="bg-gradient-to-r from-amber-400 to-rose-400 rounded-3xl p-6 md:p-8 flex items-center justify-between shadow-lg cursor-pointer transform hover:scale-[1.02] transition-transform text-white" 
+                  onClick={() => setShowScenarioSelector(true)}
+                >
+                  <div>
+                    <h2 className="text-2xl font-black mb-2">💬 Mises en situation</h2>
+                    <p className="font-medium text-amber-50">Pratiquez la Darija au café, au taxi ou au souk !</p>
+                  </div>
+                  <div className="bg-white/20 p-3 rounded-full backdrop-blur-sm shrink-0 ml-4">
+                    <Play className="w-8 h-8 fill-white" />
+                  </div>
+                </div>
+
                 {/* Sélecteur d'onglets pour Mobile */}
                 <div className="flex lg:hidden justify-center gap-2 mb-6">
                   <button 
@@ -314,6 +335,23 @@ export default function Home() {
           levelId={checkpointOpen.id} 
           levelName={checkpointOpen.name}
           onClose={() => setCheckpointOpen(null)} 
+        />
+      )}
+
+      {showScenarioSelector && (
+        <ScenarioSelectorModal 
+          onClose={() => setShowScenarioSelector(false)}
+          onSelect={(scenario) => {
+            setActiveScenario(scenario);
+            setShowScenarioSelector(false);
+          }}
+        />
+      )}
+
+      {activeScenario && (
+        <DialogueView 
+          scenario={activeScenario}
+          onExit={() => setActiveScenario(null)}
         />
       )}
     </main>
