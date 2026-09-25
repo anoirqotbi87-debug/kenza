@@ -14,6 +14,8 @@ import Header from '@/components/Header';
 import PhrasebookView from '@/components/tools/PhrasebookView';
 import SpeechTrainer from '@/components/audio/SpeechTrainer';
 import ProfileView from '@/components/profile/ProfileView';
+import CheckpointModal from '@/components/checkpoint/CheckpointModal';
+import { useCheckpointProgress } from '@/hooks/useCheckpointProgress';
 
 import { supabase } from '@/lib/supabase';
 import { syncService } from '@/lib/syncService';
@@ -25,6 +27,8 @@ export default function Home() {
   const { t, lang } = useTranslation();
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
   const { completeLesson, completedLessons, devUnlockAll, setUser } = useAppStore();
+  const [checkpointOpen, setCheckpointOpen] = useState<{ id: string, name: string } | null>(null);
+  const { hasPassedLevel } = useCheckpointProgress();
 
   useEffect(() => {
     // 1. Récupérer immédiatement la session active au chargement de la page
@@ -155,6 +159,39 @@ export default function Home() {
               </div>
             );
           })}
+
+          {/* CHECKPOINT NODE */}
+          {(() => {
+            const lastLessonId = moduleData.lessons[moduleData.lessons.length - 1].id;
+            const isCheckpointUnlocked = completedLessons.includes(lastLessonId) || devUnlockAll;
+            const passed = hasPassedLevel(moduleId);
+            const titleStr = getLocalizedText(moduleData.title, lang);
+
+            return (
+              <div className="relative z-10 w-full max-w-md mt-4">
+                <button 
+                  disabled={!isCheckpointUnlocked}
+                  onClick={() => setCheckpointOpen({ id: moduleId, name: titleStr })}
+                  className={`
+                    w-full relative p-6 rounded-3xl border-4 transition-all duration-300 flex flex-col items-center text-center
+                    ${passed 
+                      ? 'bg-amber-50 border-amber-500 shadow-lg cursor-pointer' 
+                      : isCheckpointUnlocked 
+                        ? 'bg-blue-600 border-blue-700 text-white shadow-xl hover:scale-105 cursor-pointer' 
+                        : 'bg-slate-100 border-slate-300 opacity-60 cursor-not-allowed'}
+                  `}
+                >
+                  <div className="text-4xl mb-3">{passed ? '🏆' : '🔒'}</div>
+                  <h3 className={`font-bold text-xl mb-1 ${passed ? 'text-amber-600' : isCheckpointUnlocked ? 'text-white' : 'text-slate-500'}`}>
+                    Checkpoint {moduleId}
+                  </h3>
+                  <p className={`text-sm ${passed ? 'text-amber-700/80' : isCheckpointUnlocked ? 'text-blue-100' : 'text-slate-400'}`}>
+                    {passed ? 'Passeport obtenu !' : 'Examen de niveau'}
+                  </p>
+                </button>
+              </div>
+            );
+          })()}
         </div>
       </div>
     );
@@ -250,6 +287,14 @@ export default function Home() {
             />
           </ErrorBoundary>
         )
+      )}
+
+      {checkpointOpen && (
+        <CheckpointModal 
+          levelId={checkpointOpen.id} 
+          levelName={checkpointOpen.name}
+          onClose={() => setCheckpointOpen(null)} 
+        />
       )}
     </main>
   );
