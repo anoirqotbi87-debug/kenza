@@ -109,8 +109,8 @@ export default function SpeechTrainer() {
       setEvaluation(result);
       trackEvent('voice_evaluation_completed', { 
         score: result.score, 
-        passedPhonemes: result.phonemeResults.filter((p: any) => p.passed).length,
-        totalPhonemes: result.phonemeResults.length
+        passedPhonemes: result.targetPhonemes.filter((p: any) => p.detected).length,
+        totalPhonemes: result.targetPhonemes.length
       });
     }
   }, [isListening, transcript, activeTab, currentExercise]);
