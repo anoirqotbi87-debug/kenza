@@ -6,14 +6,20 @@ import { useAudioWalkPlayer, AudioWalkItem } from '../../hooks/useAudioWalkPlaye
 import { useMediaSession } from '../../hooks/useMediaSession';
 import { trackEvent } from '../../utils/analytics';
 
+import { useAppStore } from '../../store/useAppStore';
+
 interface AudioWalkModalProps {
   isOpen: boolean;
   onClose: () => void;
   items: AudioWalkItem[];
   moduleName: string;
+  onRequirePremium?: () => void;
 }
 
-export default function AudioWalkModal({ isOpen, onClose, items, moduleName }: AudioWalkModalProps) {
+export default function AudioWalkModal({ isOpen, onClose, items, moduleName, onRequirePremium }: AudioWalkModalProps) {
+  const { subscriptionTier } = useAppStore();
+  const [playTime, setPlayTime] = React.useState(0);
+
   const {
     isPlaying,
     currentIndex,
@@ -32,6 +38,28 @@ export default function AudioWalkModal({ isOpen, onClose, items, moduleName }: A
     setRepeatDarija,
     setIsShuffle
   } = useAudioWalkPlayer(items);
+
+  React.useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isPlaying && subscriptionTier === 'free') {
+      interval = setInterval(() => {
+        setPlayTime(t => {
+          const next = t + 1;
+          if (next >= 300) { // 5 minutes
+            pause();
+            if (onRequirePremium) {
+              onRequirePremium();
+            } else {
+              alert("Limite de 5 minutes atteinte pour la version gratuite.");
+            }
+            return 300;
+          }
+          return next;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isPlaying, subscriptionTier, onRequirePremium, pause]);
 
   useMediaSession({
     title: currentItem?.phraseDarijaArabizi || 'Kenza Audio Walk',

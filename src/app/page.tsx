@@ -24,18 +24,22 @@ import { useEffect } from 'react';
 import ScenarioSelectorModal from '@/components/dialogue/ScenarioSelectorModal';
 import DialogueView from '@/components/dialogue/DialogueView';
 import { DialogueScenario } from '@/types/dialogue';
+import OnboardingModal from '@/components/onboarding/OnboardingModal';
+import InstallPwaBanner from '@/components/pwa/InstallPwaBanner';
+import PricingModal from '@/components/monetization/PricingModal';
 
 export default function Home() {
   const [currentTab, setCurrentTab] = useState<'learn' | 'phrasebook' | 'speech' | 'profile'>('learn');
   const [activeTab, setActiveTab] = useState<'grammar' | 'conversation'>('grammar');
   const { t, lang } = useTranslation();
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
-  const { completeLesson, completedLessons, devUnlockAll, setUser, resetData } = useAppStore();
+  const { completeLesson, completedLessons, devUnlockAll, setUser, resetData, hasCompletedOnboarding, subscriptionTier } = useAppStore();
   const [checkpointOpen, setCheckpointOpen] = useState<{ id: string, name: string } | null>(null);
   const { hasPassedLevel } = useCheckpointProgress();
 
   const [showScenarioSelector, setShowScenarioSelector] = useState(false);
   const [activeScenario, setActiveScenario] = useState<DialogueScenario | null>(null);
+  const [showPricingModal, setShowPricingModal] = useState(false);
 
   useEffect(() => {
     const handleAuthSync = async (user: any) => {
@@ -198,7 +202,13 @@ export default function Home() {
               <div className="relative z-10 w-full max-w-md mt-4">
                 <button 
                   disabled={!isCheckpointUnlocked}
-                  onClick={() => setCheckpointOpen({ id: moduleId, name: titleStr })}
+                  onClick={() => {
+                    if (subscriptionTier === 'free') {
+                      setShowPricingModal(true);
+                    } else {
+                      setCheckpointOpen({ id: moduleId, name: titleStr });
+                    }
+                  }}
                   className={`
                     w-full relative p-6 rounded-3xl border-4 transition-all duration-300 flex flex-col items-center text-center
                     ${passed 
@@ -345,6 +355,7 @@ export default function Home() {
             setActiveScenario(scenario);
             setShowScenarioSelector(false);
           }}
+          onRequirePremium={() => setShowPricingModal(true)}
         />
       )}
 
@@ -354,6 +365,16 @@ export default function Home() {
           onExit={() => setActiveScenario(null)}
         />
       )}
+
+      {!hasCompletedOnboarding && (
+        <OnboardingModal />
+      )}
+
+      {showPricingModal && (
+        <PricingModal onClose={() => setShowPricingModal(false)} />
+      )}
+
+      <InstallPwaBanner />
     </main>
   );
 }

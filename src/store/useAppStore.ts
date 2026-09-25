@@ -48,6 +48,15 @@ interface AppState {
   devUnlockAll: boolean;
   toggleDevUnlockAll: () => void;
   resetData: () => void;
+  
+  // Onboarding & Premium
+  hasCompletedOnboarding: boolean;
+  userGoal: string | null;
+  dailyTargetMinutes: number | null;
+  subscriptionTier: 'free' | 'premium';
+  
+  completeOnboarding: (goal: string, minutes: number) => void;
+  setSubscriptionTier: (tier: 'free' | 'premium') => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -69,6 +78,18 @@ export const useAppStore = create<AppState>()(
       uiLanguage: 'fr',
       regionalVariant: 'casablanca',
       devUnlockAll: false, // Prod: locked progression
+      
+      hasCompletedOnboarding: false,
+      userGoal: null,
+      dailyTargetMinutes: null,
+      subscriptionTier: 'free',
+      
+      completeOnboarding: (goal, minutes) => set({
+        hasCompletedOnboarding: true,
+        userGoal: goal,
+        dailyTargetMinutes: minutes
+      }),
+      setSubscriptionTier: (tier) => set({ subscriptionTier: tier }),
       
       toggleDevUnlockAll: () => set((state) => ({ devUnlockAll: !state.devUnlockAll })),
       setRegionalVariant: (variant) => set({ regionalVariant: variant }),
@@ -187,42 +208,13 @@ export const useAppStore = create<AppState>()(
         const card = state.srsDeck[wordId];
         if (!card) return state;
 
-        let { interval, repetition, easeFactor } = card;
-
-        if (grade === 'again') {
-          repetition = 0;
-          interval = 1;
-        } else {
-          if (grade === 'hard') {
-            easeFactor = Math.max(1.3, easeFactor - 0.15);
-          } else if (grade === 'easy') {
-            easeFactor += 0.15;
-          }
-          
-          if (repetition === 0) {
-            interval = 1;
-          } else if (repetition === 1) {
-            interval = 6;
-          } else {
-            interval = Math.round(interval * easeFactor);
-          }
-          
-          repetition += 1;
-        }
-
-        const nextDate = new Date();
-        nextDate.setDate(nextDate.getDate() + interval);
+        // Use srsService to calculate next review based on the 5-box system
+        const { srsService } = require('../services/srsService');
+        const updatedCard = srsService.calculateNextReview(card, grade);
 
         const newDeck = {
           ...state.srsDeck,
-          [wordId]: {
-            ...card,
-            interval,
-            repetition,
-            easeFactor,
-            dueDate: nextDate.toISOString(),
-            state: 'review' as const
-          }
+          [wordId]: updatedCard
         };
 
         // Add 5 XP for reviewing a card
@@ -231,10 +223,8 @@ export const useAppStore = create<AppState>()(
       
       getDueCards: () => {
         const deck = get().srsDeck;
-        const now = new Date().getTime();
-        return Object.values(deck).filter(card => {
-          return new Date(card.dueDate).getTime() <= now;
-        });
+        const { srsService } = require('../services/srsService');
+        return srsService.getDueCards(deck);
       }
     }),
     {
