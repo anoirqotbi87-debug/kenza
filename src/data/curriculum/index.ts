@@ -36,7 +36,7 @@ export const fullCurriculum: Record<string, { title: MultiLangText, lessons: Les
     lessons: module3Lessons 
   },
   4: { 
-    title: { fr: "Temps & Modaux", en: "Tenses & Modals", es: "Tiempos y Modales", ar: "الأزمنة والأفعال الناقصة" }, 
+    title: { fr: "Grammaire Active & Temps", en: "Active Grammar & Tenses", es: "Gramática Activa y Tiempos", ar: "قواعد نشطة والأزمنة" }, 
     lessons: module4Lessons 
   },
   5: { 

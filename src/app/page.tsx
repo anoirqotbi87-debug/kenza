@@ -153,6 +153,10 @@ export default function Home() {
               isLocked = true;
               isNext = false;
             }
+            if (moduleId === '4' && !hasPassedLevel('3')) {
+              isLocked = true;
+              isNext = false;
+            }
 
             if (devUnlockAll) {
               isLocked = false;

@@ -9,6 +9,32 @@ import LanguageSelector from './ui/LanguageSelector';
 import { supabase } from '../lib/supabase';
 import { Session } from '@supabase/supabase-js';
 import { Navigation } from './Navigation';
+import { useNetworkStatus } from '../hooks/useNetworkStatus';
+import { Wifi, WifiOff } from 'lucide-react';
+
+function NetworkStatusIndicator() {
+  const { isOnline, swRegistered } = useNetworkStatus();
+  
+  if (!isOnline) {
+    return (
+      <div className="flex items-center gap-1 bg-red-50 text-red-600 px-2 py-1 rounded-full text-xs font-bold" title="Mode Hors-Ligne">
+        <WifiOff className="w-3 h-3" />
+        Offline
+      </div>
+    );
+  }
+
+  if (swRegistered) {
+    return (
+      <div className="flex items-center gap-1 bg-green-50 text-green-600 px-2 py-1 rounded-full text-xs font-bold" title="Mode Hors-Ligne Prêt">
+        <Wifi className="w-3 h-3" />
+        Prêt
+      </div>
+    );
+  }
+
+  return null;
+}
 
 interface HeaderProps {
   currentTab: 'learn' | 'phrasebook' | 'speech' | 'profile';
@@ -62,6 +88,7 @@ export default function Header({ currentTab, onTabChange }: HeaderProps) {
               {t.header?.guestMode || "Invité"}
             </button>
           )}
+          <NetworkStatusIndicator />
 
           <div className="flex items-center gap-1.5 sm:gap-2 text-amber-500 font-bold">
             <Flame className="w-5 h-5 fill-amber-500" />

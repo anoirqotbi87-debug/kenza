@@ -18,8 +18,16 @@ export interface DialogueTurn {
 export interface DialogueScenario {
   id: string;
   title: string;
-  category: 'transport' | 'souk' | 'restaurant' | 'daily';
+  titleFr?: string;
+  description?: string;
+  category?: 'transport' | 'souk' | 'restaurant' | 'daily';
   location: string;
-  level: 'A1' | 'A2';
+  level?: 'A1' | 'A2' | 'B1';
+  npcName?: string;
+  npcRole?: string;
+  npcAvatar?: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
+  objectives?: string[];
+  tier?: 'free' | 'premium';
   turns: DialogueTurn[];
 }

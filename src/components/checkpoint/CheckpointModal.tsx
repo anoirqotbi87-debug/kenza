@@ -38,6 +38,17 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
       })).sort(() => 0.5 - Math.random()).slice(0, 12);
     }
 
+    if (levelId === '4') {
+      return require('../../data/checkpoints/checkpointB1').checkpointB1.questions.map((q: any) => ({
+        id: q.id,
+        prompt: q.prompt,
+        answerId: q.answerId,
+        arabizi: q.arabizi,
+        arabic: q.arabic,
+        options: q.options
+      })).sort(() => 0.5 - Math.random()).slice(0, 12);
+    }
+
     // Shuffle all words
     const shuffled = [...srsVocabulary].sort(() => 0.5 - Math.random());
     const selected = shuffled.slice(0, 12);

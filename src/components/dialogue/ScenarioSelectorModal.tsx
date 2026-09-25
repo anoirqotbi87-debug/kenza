@@ -51,7 +51,7 @@ export default function ScenarioSelectorModal({ onClose, onSelect, onRequirePrem
         <div className="p-6 overflow-y-auto flex-1 bg-slate-50">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {ALL_SCENARIOS.map((scenario, index) => {
-              const isLocked = subscriptionTier === 'free' && index > 0; // Only first scenario is free
+              const isLocked = subscriptionTier === 'free' && (scenario.tier === 'premium' || index > 0);
               return (
               <div 
                 key={scenario.id} 
@@ -61,8 +61,8 @@ export default function ScenarioSelectorModal({ onClose, onSelect, onRequirePrem
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-slate-50 to-transparent opacity-50 pointer-events-none rounded-tr-2xl" />
                 
                 <div className="flex justify-between items-start mb-4 relative z-10">
-                  <div className={`text-3xl w-12 h-12 rounded-xl flex items-center justify-center ${getCategoryColor(scenario.category)}`}>
-                    {getCategoryIcon(scenario.category)}
+                  <div className={`text-3xl w-12 h-12 rounded-xl flex items-center justify-center ${getCategoryColor(scenario.category || 'daily')}`}>
+                    {getCategoryIcon(scenario.category || 'daily')}
                   </div>
                   <div className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
                     {scenario.level}
