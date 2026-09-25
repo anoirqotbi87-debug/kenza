@@ -4,6 +4,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Mic, Volume2, Trophy, AlertCircle, RefreshCw, MessageSquare, CarFront, Coffee, ShoppingBag, Globe } from 'lucide-react';
 import { useTranslation, useAppStore } from '../../store/useAppStore';
 import { playAudio } from '../../lib/audio';
+import { useVoiceRecognition } from '../../hooks/useVoiceRecognition';
+import { calculateSimilarity } from '../../utils/phonemeMatcher';
+import VoiceFeedbackCard from '../voice/VoiceFeedbackCard';
 
 // ---------------------------
 // DONNÉES : MODE ÉLOCUTION
@@ -71,9 +74,6 @@ export default function SpeechTrainer() {
 
   // ELOCUTION STATE
   const [currentExercise, setCurrentExercise] = useState(speechExercises[0]);
-  const [isListening, setIsListening] = useState(false);
-  const [transcript, setTranscript] = useState('');
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error' | 'warning', message: string } | null>(null);
   
   // ROLEPLAY STATE
   const [activeScenarioId, setActiveScenarioId] = useState<string>('taxi');
@@ -82,7 +82,16 @@ export default function SpeechTrainer() {
   const [showTranslations, setShowTranslations] = useState<Record<number, boolean>>({});
   const [roleplayComplete, setRoleplayComplete] = useState(false);
 
-  const recognitionRef = useRef<any>(null);
+  const { 
+    isSupported, 
+    isListening, 
+    transcript, 
+    error: voiceError, 
+    startListening, 
+    stopListening 
+  } = useVoiceRecognition('ar-MA', 5000);
+
+  const [evaluation, setEvaluation] = useState<any>(null);
 
   useEffect(() => {
     // Initialiser le chat Roleplay avec la première phrase du NPC
@@ -94,74 +103,26 @@ export default function SpeechTrainer() {
   }, [activeScenarioId, activeTab]);
 
   useEffect(() => {
-    if ('webkitSpeechRecognition' in window) {
-      const SpeechRecognition = (window as any).webkitSpeechRecognition;
-      recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.continuous = false;
-      recognitionRef.current.interimResults = false;
-      recognitionRef.current.lang = 'ar-MA';
-
-      recognitionRef.current.onstart = () => {
-        setIsListening(true);
-        setFeedback(null);
-        setTranscript('');
-      };
-
-      recognitionRef.current.onresult = (event: any) => {
-        const text = event.results[0][0].transcript;
-        setTranscript(text);
-        evaluatePronunciation(text);
-      };
-
-      recognitionRef.current.onerror = (event: any) => {
-        setIsListening(false);
-        if (event.error === 'not-allowed') {
-          setFeedback({ type: 'error', message: 'Accès au microphone refusé.' });
-        } else if (event.error === 'no-speech') {
-          setFeedback({ type: 'warning', message: 'Aucune voix détectée, réessayez.' });
-        } else {
-          setFeedback({ type: 'error', message: `Erreur: ${event.error}` });
-        }
-      };
-
-      recognitionRef.current.onend = () => {
-        setIsListening(false);
-      };
-    } else {
-      if (activeTab === 'elocution') {
-        setFeedback({ type: 'error', message: 'Microphone non supporté sur ce navigateur (utilisez Chrome/Edge).' });
-      }
+    if (!isListening && transcript && activeTab === 'elocution') {
+      const result = calculateSimilarity(transcript, currentExercise.arabizi, currentExercise.arabic);
+      setEvaluation(result);
     }
-
-    return () => {
-      if (recognitionRef.current) recognitionRef.current.abort();
-    };
-  }, [currentExercise, activeTab]);
-
-  // ELOCUTION METHODS
-  const evaluatePronunciation = (spokenText: string) => {
-    const normalizedSpoken = spokenText.trim().replace(/[.,!?؟]/g, '');
-    const normalizedTarget = currentExercise.arabic.trim().replace(/[.,!?؟]/g, '');
-    
-    if (normalizedSpoken === normalizedTarget || normalizedSpoken.includes(normalizedTarget) || normalizedTarget.includes(normalizedSpoken)) {
-      setFeedback({ type: 'success', message: 'Excellente prononciation !' });
-    } else {
-      setFeedback({ type: 'warning', message: 'Presque ! Essayez d\'articuler un peu plus.' });
-    }
-  };
+  }, [isListening, transcript, activeTab, currentExercise]);
 
   const toggleListening = () => {
-    if (!recognitionRef.current) return;
-    if (isListening) recognitionRef.current.stop();
-    else recognitionRef.current.start();
+    if (isListening) stopListening();
+    else {
+      setEvaluation(null);
+      startListening();
+    }
   };
 
   const nextExercise = () => {
     const currentIndex = speechExercises.findIndex(e => e.id === currentExercise.id);
     const nextIndex = (currentIndex + 1) % speechExercises.length;
     setCurrentExercise(speechExercises[nextIndex]);
-    setTranscript('');
-    setFeedback(null);
+    setEvaluation(null);
+    if (isListening) stopListening();
   };
 
   // ROLEPLAY METHODS
@@ -252,16 +213,19 @@ export default function SpeechTrainer() {
                 </div>
               )}
 
-              {feedback && (
-                <div className={`mt-2 p-4 rounded-xl flex items-center gap-3 max-w-md w-full
-                  ${feedback.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : ''}
-                  ${feedback.type === 'error' ? 'bg-red-50 text-red-700 border border-red-200' : ''}
-                  ${feedback.type === 'warning' ? 'bg-amber-50 text-amber-700 border border-amber-200' : ''}
-                `}>
-                  {feedback.type === 'success' && <Trophy className="w-5 h-5 shrink-0" />}
-                  {feedback.type !== 'success' && <AlertCircle className="w-5 h-5 shrink-0" />}
-                  <span className="font-medium">{feedback.message}</span>
+              {voiceError && (
+                <div className="mt-2 p-4 rounded-xl flex items-center gap-3 max-w-md w-full bg-red-50 text-red-700 border border-red-200">
+                  <AlertCircle className="w-5 h-5 shrink-0" />
+                  <span className="font-medium">{voiceError}</span>
                 </div>
+              )}
+
+              {evaluation && !isListening && (
+                <VoiceFeedbackCard
+                  evaluation={evaluation}
+                  onRetry={() => { setEvaluation(null); startListening(); }}
+                  onListenModel={() => playAudio(currentExercise.arabizi, currentExercise.arabic, soundEnabled)}
+                />
               )}
             </div>
 
