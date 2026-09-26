@@ -11,6 +11,7 @@
   "dependencies": {
     "@ai-sdk/google": "^0.0.52",
     "@ai-sdk/react": "^4.0.119",
+    "@serwist/next": "^9.0.8",
     "@supabase/supabase-js": "^2.116.0",
     "@types/canvas-confetti": "^1.9.0",
     "ai": "^3.4.30",
@@ -18,16 +19,16 @@
     "clsx": "^2.1.1",
     "edge-paths": "^3.0.5",
     "framer-motion": "^13.4.0",
+    "html-to-image": "^1.11.13",
     "lucide-react": "^1.47.0",
     "msedge-tts": "^2.0.7",
     "next": "16.3.5",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "serwist": "^9.0.8",
     "tailwind-merge": "^3.7.0",
     "uuid": "^14.0.2",
-    "zustand": "^5.0.15",
-    "@serwist/next": "^9.0.8",
-    "serwist": "^9.0.8"
+    "zustand": "^5.0.15"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
