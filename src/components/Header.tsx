@@ -61,7 +61,7 @@ export default function Header({ currentTab, onTabChange }: HeaderProps) {
         onClose={() => setIsAuthModalOpen(false)} 
         onSuccess={() => setIsAuthModalOpen(false)} 
       />
-      <header className="flex flex-col xl:flex-row justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-blue-100 gap-4 max-w-7xl mx-auto mt-6 overflow-visible">
+      <header className="relative z-40 flex flex-col xl:flex-row justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-blue-100 gap-4 max-w-7xl mx-auto mt-6 overflow-visible">
         <h1 className="text-2xl font-bold text-blue-600 flex items-center gap-2 w-full xl:w-auto shrink-0">
           <span className="text-3xl">🐪</span> KENZA <span className="text-sm font-medium text-slate-400 font-arabic ml-1 hidden xl:inline">كنزة</span>
         </h1>

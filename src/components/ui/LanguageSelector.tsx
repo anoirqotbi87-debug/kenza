@@ -13,12 +13,15 @@ export default function LanguageSelector() {
   };
 
   return (
-    <div className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 transition-colors px-2 py-1.5 rounded-lg border border-transparent hover:border-slate-300">
-      <Globe className="w-4 h-4 text-slate-500" />
+    <div className="relative inline-flex items-center z-50 bg-slate-100 hover:bg-slate-200 transition-colors rounded-lg px-2 py-1.5 border border-transparent hover:border-slate-300">
+      <span className="pointer-events-none absolute left-2 flex items-center justify-center">
+        <Globe className="w-4 h-4 text-slate-500" />
+      </span>
       <select 
         value={uiLanguage} 
         onChange={handleLanguageChange}
-        className="bg-transparent text-slate-700 font-bold text-sm outline-none cursor-pointer"
+        className="bg-transparent font-bold text-slate-700 cursor-pointer text-sm outline-none pl-6 pr-1 w-full h-full"
+        style={{ WebkitAppearance: 'none', appearance: 'none' }}
       >
         <option value="fr">FR</option>
         <option value="en">EN</option>

@@ -32,7 +32,7 @@ export default function Home() {
   const [currentTab, setCurrentTab] = useState<'learn' | 'phrasebook' | 'speech' | 'profile'>('learn');
   const [activeTab, setActiveTab] = useState<'grammar' | 'conversation'>('grammar');
   const rawLang = useAppStore((state) => state.uiLanguage || 'fr');
-  const lang = String(rawLang).toLowerCase();
+  const lang = String(rawLang).toLowerCase() as 'fr' | 'en' | 'es' | 'ar';
   const isArabic = lang === 'ar' || lang.startsWith('ar');
   const { t } = useTranslation();
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
