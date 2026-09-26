@@ -181,7 +181,7 @@ export const useAppStore = create<AppState>()(
 
       setAudioSpeed: (speed) => set({ audioSpeed: speed }),
       
-      setLanguage: (lang) => set({ uiLanguage: lang }),
+      setLanguage: (lang) => set({ uiLanguage: (lang || 'fr').toLowerCase() as any }),
       
       addCardsToSRS: (wordIds) => set((state) => {
         const newDeck = { ...state.srsDeck };
@@ -249,6 +249,7 @@ export const useAppStore = create<AppState>()(
 );
 
 export function useTranslation() {
-  const uiLanguage = useAppStore((state) => state.uiLanguage);
-  return { t: translations[uiLanguage], lang: uiLanguage };
+  const uiLanguage = useAppStore((state) => state.uiLanguage || 'fr');
+  const lang = String(uiLanguage).toLowerCase() as UILanguage;
+  return { t: translations[lang] || translations['fr'], lang };
 }

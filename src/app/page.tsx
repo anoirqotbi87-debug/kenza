@@ -31,7 +31,9 @@ import PricingModal from '@/components/monetization/PricingModal';
 export default function Home() {
   const [currentTab, setCurrentTab] = useState<'learn' | 'phrasebook' | 'speech' | 'profile'>('learn');
   const [activeTab, setActiveTab] = useState<'grammar' | 'conversation'>('grammar');
-  const lang = useAppStore((state) => state.uiLanguage);
+  const rawLang = useAppStore((state) => state.uiLanguage || 'fr');
+  const lang = String(rawLang).toLowerCase();
+  const isArabic = lang === 'ar' || lang.startsWith('ar');
   const { t } = useTranslation();
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
   const { completeLesson, completedLessons, devUnlockAll, setUser, resetData, hasCompletedOnboarding, subscriptionTier } = useAppStore();
@@ -277,13 +279,13 @@ export default function Home() {
                 <div 
                   className="bg-gradient-to-r from-amber-400 to-rose-400 rounded-3xl p-6 md:p-8 flex items-center justify-between shadow-lg cursor-pointer transform hover:scale-[1.02] transition-transform text-white" 
                   onClick={() => setShowScenarioSelector(true)}
-                  dir={lang === 'ar' ? 'rtl' : 'ltr'}
+                  dir={isArabic ? 'rtl' : 'ltr'}
                 >
                   <div>
-                    <h2 className="text-2xl font-black mb-2">💬 {lang === 'ar' ? 'المواقف والمحادثات' : lang === 'en' ? 'Roleplay Situations' : 'Mises en situation'}</h2>
-                    <p className="font-medium text-amber-50">{lang === 'ar' ? 'تدرّب على الدارجة في المقهى، الطاكسي أو السوق!' : lang === 'en' ? 'Practice Darija at the café, taxi, or souk!' : 'Pratiquez la Darija au café, au taxi ou au souk !'}</p>
+                    <h2 className="text-2xl font-black mb-2">💬 {isArabic ? 'المواقف والمحادثات' : lang === 'en' ? 'Roleplay Situations' : 'Mises en situation'}</h2>
+                    <p className="font-medium text-amber-50">{isArabic ? 'تدرّب على الدارجة في المقهى، الطاكسي أو السوق!' : lang === 'en' ? 'Practice Darija at the café, taxi, or souk!' : 'Pratiquez la Darija au café, au taxi ou au souk !'}</p>
                   </div>
-                  <div className={`bg-white/20 p-3 rounded-full backdrop-blur-sm shrink-0 ${lang === 'ar' ? 'mr-4' : 'ml-4'}`}>
+                  <div className={`bg-white/20 p-3 rounded-full backdrop-blur-sm shrink-0 ${isArabic ? 'mr-4' : 'ml-4'}`}>
                     <Play className="w-8 h-8 fill-white" />
                   </div>
                 </div>

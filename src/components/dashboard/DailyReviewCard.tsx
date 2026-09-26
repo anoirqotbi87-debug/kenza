@@ -10,11 +10,13 @@ interface DailyReviewCardProps {
 
 export default function DailyReviewCard({ onStartReview }: DailyReviewCardProps) {
   const srsDeck = useAppStore((state) => state.srsDeck);
-  const lang = useAppStore((state) => state.uiLanguage);
+  const rawLang = useAppStore((state) => state.uiLanguage || 'fr');
+  const lang = String(rawLang).toLowerCase();
+  
   const dueCards = srsService.getDueCards(srsDeck);
   const count = dueCards.length;
   
-  const isAr = lang === 'ar';
+  const isAr = lang === 'ar' || lang.startsWith('ar');
   
   const titleText = isAr ? 'المراجعة اليومية' : lang === 'en' ? 'Spaced Repetition' : 'Répétition Espacée';
   
