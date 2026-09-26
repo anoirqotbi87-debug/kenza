@@ -3,11 +3,18 @@
 import React from 'react';
 import { useAppStore } from '../../store/useAppStore';
 import { useCheckpointProgress } from '../../hooks/useCheckpointProgress';
-import { Flame, BrainCircuit, Star, MessageCircle, Lock, BookOpen } from 'lucide-react';
+import { Flame, BrainCircuit, Star, MessageCircle, Lock, BookOpen, Share2 } from 'lucide-react';
+import { usePassportShare } from '../../hooks/usePassportShare';
+import PassportShareCard from './PassportShareCard';
+import { useRef } from 'react';
 
 export default function ProfilePassportView() {
-  const { xp, streakDays, srsDeck, customVocabulary, uiLanguage } = useAppStore();
+  const { xp, streakDays, srsDeck, customVocabulary, uiLanguage, user } = useAppStore();
   const { hasPassedLevel } = useCheckpointProgress();
+
+  const { sharePassport, isSharing, shareSuccess } = usePassportShare();
+  const shareCardRef = useRef<HTMLDivElement>(null);
+  const username = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Apprenti';
 
   const rawLang = uiLanguage || 'fr';
   const lang = String(rawLang).toLowerCase();
@@ -188,6 +195,36 @@ export default function ProfilePassportView() {
               </div>
             );
           })}
+        </div>
+        
+        {/* Share Button */}
+        {stamps.some(s => s.passed) && (
+          <div className="mt-10 flex justify-center">
+            <button
+              onClick={() => sharePassport(shareCardRef)}
+              disabled={isSharing}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 px-8 rounded-2xl flex items-center gap-3 transition-all transform hover:scale-105 active:scale-95 shadow-xl disabled:opacity-50 disabled:transform-none"
+            >
+              <Share2 className="w-6 h-6" />
+              {isSharing 
+                ? (isAr ? 'جاري الإنشاء...' : 'Génération en cours...') 
+                : shareSuccess 
+                  ? (isAr ? 'تم النسخ/الحفظ!' : 'Partage prêt !')
+                  : (isAr ? 'مشاركة جواز السفر' : 'Partager mon Passeport')}
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Hidden Share Card */}
+      <div className="fixed left-[-9999px] top-[-9999px] pointer-events-none">
+        <div ref={shareCardRef}>
+          <PassportShareCard 
+            username={username}
+            stamps={stamps}
+            isAr={isAr}
+            lang={lang}
+          />
         </div>
       </div>
     </div>
