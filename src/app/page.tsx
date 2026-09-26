@@ -31,7 +31,8 @@ import PricingModal from '@/components/monetization/PricingModal';
 export default function Home() {
   const [currentTab, setCurrentTab] = useState<'learn' | 'phrasebook' | 'speech' | 'profile'>('learn');
   const [activeTab, setActiveTab] = useState<'grammar' | 'conversation'>('grammar');
-  const { t, lang } = useTranslation();
+  const lang = useAppStore((state) => state.uiLanguage);
+  const { t } = useTranslation();
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
   const { completeLesson, completedLessons, devUnlockAll, setUser, resetData, hasCompletedOnboarding, subscriptionTier } = useAppStore();
   const [checkpointOpen, setCheckpointOpen] = useState<{ id: string, name: string } | null>(null);

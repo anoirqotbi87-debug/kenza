@@ -10,8 +10,6 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ onStartLesson }: DashboardProps) {
-  const { xp, streakDays, completedLessons, preferredNotation, setNotation, toggleSound, soundEnabled, devUnlockAll } = useAppStore();
-  const { t, lang } = useTranslation();
   const [isReviewSessionOpen, setIsReviewSessionOpen] = useState(false);
 
   return (

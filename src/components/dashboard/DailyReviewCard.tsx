@@ -9,8 +9,8 @@ interface DailyReviewCardProps {
 }
 
 export default function DailyReviewCard({ onStartReview }: DailyReviewCardProps) {
-  const { srsDeck } = useAppStore();
-  const { lang } = useTranslation();
+  const srsDeck = useAppStore((state) => state.srsDeck);
+  const lang = useAppStore((state) => state.uiLanguage);
   const dueCards = srsService.getDueCards(srsDeck);
   const count = dueCards.length;
   
