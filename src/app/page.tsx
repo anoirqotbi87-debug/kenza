@@ -383,7 +383,7 @@ export default function Home() {
           onRequirePremium={() => setPricingSource('roleplay_locked')}
           onStartSrs={() => {
             setShowScenarioSelector(false);
-            setSrsSessionActive(true);
+            setCurrentTab('profile');
           }}
         />
       )}
