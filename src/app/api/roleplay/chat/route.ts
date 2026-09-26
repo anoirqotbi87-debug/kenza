@@ -21,11 +21,11 @@ export async function POST(req: NextRequest) {
       system: systemPrompt,
       messages,
       temperature: 0.7,
-      maxTokens: 300, // Short responses
+      maxOutputTokens: 300, // Short responses
     });
 
     // Return the streaming response
-    return result.toDataStreamResponse();
+    return result.toTextStreamResponse();
   } catch (error) {
     console.error('API Roleplay Chat Error:', error);
     return new Response('Internal Server Error', { status: 500 });
