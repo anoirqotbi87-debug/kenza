@@ -20,6 +20,7 @@ interface AppState {
   
   // SRS State
   srsDeck: Record<string, SRSCard>; // Map of wordId to SRSCard
+  customVocabulary: Record<string, any>;
   
   // Settings
   preferredNotation: Notation;
@@ -42,6 +43,7 @@ interface AppState {
   
   // SRS Actions
   addCardsToSRS: (wordIds: string[]) => void;
+  addCustomWordToSRS: (word: any) => void;
   reviewCard: (wordId: string, grade: ReviewGrade) => void;
   getDueCards: () => SRSCard[];
   
@@ -72,6 +74,7 @@ export const useAppStore = create<AppState>()(
       currentLevel: 1,
       completedLessons: [],
       srsDeck: {},
+      customVocabulary: {},
       preferredNotation: 'arabizi',
       soundEnabled: true,
       audioSpeed: 1.0,
@@ -202,6 +205,24 @@ export const useAppStore = create<AppState>()(
         });
         
         return { srsDeck: newDeck };
+      }),
+      
+      addCustomWordToSRS: (word: any) => set((state) => {
+        const newVocab = { ...state.customVocabulary, [word.id]: word };
+        const newDeck = { ...state.srsDeck };
+        const now = new Date().toISOString();
+        if (!newDeck[word.id]) {
+          newDeck[word.id] = {
+            id: `card_${word.id}`,
+            wordId: word.id,
+            interval: 0,
+            repetition: 0,
+            easeFactor: 2.5,
+            dueDate: now,
+            state: 'new' as const
+          };
+        }
+        return { customVocabulary: newVocab, srsDeck: newDeck };
       }),
       
       reviewCard: (wordId, grade) => set((state) => {

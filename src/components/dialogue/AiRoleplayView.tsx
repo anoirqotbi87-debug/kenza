@@ -46,7 +46,7 @@ const parseAiMessage = (content: string) => {
 
 export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewProps) {
   const persona = personas[personaId];
-  const { addCardsToSRS } = useAppStore();
+  const { addCustomWordToSRS } = useAppStore();
   const [showImmersion, setShowImmersion] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -57,6 +57,8 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
   });
 
   const { isSupported, isListening, transcript, startListening, stopListening } = useVoiceRecognition('ar-MA', 10000);
+
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Sync voice transcript to chat input
   useEffect(() => {
@@ -77,8 +79,19 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
 
   const handleSaveToSRS = (ar: string, arz: string, fr: string) => {
     if (!ar && !arz && !fr) return;
-    const newWordId = `srs_${uuidv4().substring(0, 8)}`;
-    alert('Mot/Expression ajouté(e) à votre carnet SRS ! (Simulé)');
+    const wordId = `srs_ai_${uuidv4().substring(0, 8)}`;
+    
+    addCustomWordToSRS({
+      id: wordId,
+      arabic: ar || '',
+      arabizi: arz || '',
+      translation: { fr: fr || '', en: fr || '', ar: ar || '' },
+      category: `roleplay_${personaId}`,
+      illustration: { iconName: personaId === 'taxi' ? 'Car' : personaId === 'cafe' ? 'Coffee' : 'ShoppingBag' }
+    });
+    
+    setToastMessage("Expression ajoutée au carnet SRS !");
+    setTimeout(() => setToastMessage(null), 3000);
   };
 
   const onSubmitForm = (e: React.FormEvent<HTMLFormElement>) => {
@@ -89,6 +102,13 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
   return (
     <div className="flex flex-col h-full bg-slate-50 relative animate-in fade-in zoom-in-95 duration-200">
       
+      {toastMessage && (
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-50 bg-slate-800 text-white px-4 py-2 rounded-full shadow-lg text-sm flex items-center gap-2 animate-in slide-in-from-top-4">
+          <Save className="w-4 h-4 text-emerald-400" />
+          {toastMessage}
+        </div>
+      )}
+
       {/* HEADER */}
       <div className="bg-white px-4 py-3 flex items-center justify-between shadow-sm z-10 sticky top-0">
         <div className="flex items-center gap-3">
@@ -160,7 +180,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
                     {/* Action Rapide : Sauvegarder dans SRS */}
                     <button 
                       onClick={() => handleSaveToSRS(ar, arz, fr)}
-                      className="absolute -right-3 -top-3 bg-white border border-slate-200 text-indigo-500 rounded-full p-1.5 shadow-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-indigo-50 hover:scale-110"
+                      className="absolute -right-3 -top-3 bg-white border border-slate-200 text-indigo-500 rounded-full p-1.5 shadow-md opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity hover:bg-indigo-50 hover:scale-110"
                       title="Sauvegarder dans mon carnet (SRS)"
                     >
                       <Save className="w-4 h-4" />
@@ -181,40 +201,56 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
         <div ref={messagesEndRef} />
       </div>
 
-      {/* INPUT AREA */}
+      {/* INPUT AREA OR COMPLETION */}
       <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 pb-safe z-20">
-        <form onSubmit={onSubmitForm} className="flex items-center gap-2 max-w-4xl mx-auto relative">
-          
-          {isSupported && (
+        
+        {messages.length >= 8 ? (
+          <div className="flex flex-col items-center gap-3">
+            <p className="text-sm font-bold text-emerald-600">Mission accomplie ! Vous avez tenu la conversation.</p>
             <button
-              type="button"
-              onClick={handleVoiceToggle}
-              className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all ${
-                isListening 
-                  ? 'bg-red-50 text-red-500 animate-pulse ring-4 ring-red-100' 
-                  : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-              }`}
+              onClick={() => {
+                useAppStore.getState().addXp(25);
+                onClose();
+              }}
+              className="w-full max-w-sm py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold transition-colors shadow-sm"
             >
-              {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+              Récupérer mes +25 XP et Quitter
             </button>
-          )}
+          </div>
+        ) : (
+          <form onSubmit={onSubmitForm} className="flex items-center gap-2 max-w-4xl mx-auto relative">
+            
+            {isSupported && (
+              <button
+                type="button"
+                onClick={handleVoiceToggle}
+                className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all ${
+                  isListening 
+                    ? 'bg-red-50 text-red-500 animate-pulse ring-4 ring-red-100' 
+                    : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                }`}
+              >
+                {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+              </button>
+            )}
 
-          <input
-            className="flex-1 bg-slate-50 border border-slate-200 rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
-            value={input}
-            onChange={handleInputChange}
-            placeholder={isListening ? "Écoute en cours (parlez)..." : "Votre message en Darija ou Français..."}
-            disabled={isLoading && !isListening}
-          />
-          
-          <button
-            type="submit"
-            disabled={isLoading || !input.trim()}
-            className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors shadow-md"
-          >
-            {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5 ml-0.5" />}
-          </button>
-        </form>
+            <input
+              className="flex-1 bg-slate-50 border border-slate-200 rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
+              value={input}
+              onChange={handleInputChange}
+              placeholder={isListening ? "Écoute en cours (parlez)..." : "Votre message en Darija ou Français..."}
+              disabled={isLoading && !isListening}
+            />
+            
+            <button
+              type="submit"
+              disabled={isLoading || !input.trim()}
+              className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors shadow-md"
+            >
+              {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5 ml-0.5" />}
+            </button>
+          </form>
+        )}
       </div>
       
     </div>

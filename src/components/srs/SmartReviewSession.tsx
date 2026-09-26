@@ -11,7 +11,7 @@ interface SmartReviewSessionProps {
 }
 
 export default function SmartReviewSession({ onClose }: SmartReviewSessionProps) {
-  const { getDueCards, reviewCard, preferredNotation } = useAppStore();
+  const { getDueCards, reviewCard, preferredNotation, customVocabulary } = useAppStore();
   const { lang, t } = useTranslation();
   
   const [sessionCards, setSessionCards] = useState<SRSCard[] | null>(null);
@@ -106,7 +106,7 @@ export default function SmartReviewSession({ onClose }: SmartReviewSessionProps)
           style={{ transformStyle: 'preserve-3d' }}
         >
           {(() => {
-            const dictWord = getWordFromDictionary(currentCard.wordId);
+            const dictWord = getWordFromDictionary(currentCard.wordId) || customVocabulary?.[currentCard.wordId];
             const translationText = dictWord ? getLocalizedText(dictWord.translation, lang) : currentCard.wordId;
             const fallbackDarija = `Darija_${currentCard.wordId}`;
             
