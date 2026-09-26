@@ -10,24 +10,27 @@ const cairo = Cairo({
 });
 
 export const metadata: Metadata = {
-  title: "KENZA — Apprendre la Darija Marocaine de A à Z",
+  title: "KENZA - Apprendre la Darija Marocaine de A à Z",
   applicationName: "KENZA",
   description: "Maîtrisez la Darija marocaine de A à Z avec KENZA : cours interactifs, grammaire et situations réelles.",
-  manifest: "/manifest.json",
+  manifest: "/manifest.webmanifest",
   openGraph: {
-    title: "KENZA — Apprendre la Darija Marocaine de A à Z",
+    title: "KENZA - Apprendre la Darija Marocaine de A à Z",
     description: "Maîtrisez la Darija marocaine de A à Z avec KENZA.",
     type: "website",
   }
 };
+
 import "./globals.css";
 import I18nProvider from '../components/I18nProvider';
+import NetworkStatus from '../components/NetworkStatus';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr" dir="ltr" className={`${inter.variable} ${cairo.variable}`}>
       <body className="font-sans antialiased bg-slate-50 text-slate-900 min-h-screen">
         <I18nProvider>
+          <NetworkStatus />
           {children}
         </I18nProvider>
       </body>
