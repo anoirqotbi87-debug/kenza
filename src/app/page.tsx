@@ -22,8 +22,8 @@ import { syncService } from '@/lib/syncService';
 import { useEffect } from 'react';
 
 import ScenarioSelectorModal from '@/components/dialogue/ScenarioSelectorModal';
-import DialogueView from '@/components/dialogue/DialogueView';
-import { DialogueScenario } from '@/types/dialogue';
+import AiRoleplayView from '@/components/dialogue/AiRoleplayView';
+import { PersonaId } from '@/lib/ai/prompts';
 import OnboardingModal from '@/components/onboarding/OnboardingModal';
 import InstallPwaBanner from '@/components/pwa/InstallPwaBanner';
 import PricingModal from '@/components/monetization/PricingModal';
@@ -41,7 +41,7 @@ export default function Home() {
   const { hasPassedLevel } = useCheckpointProgress();
 
   const [showScenarioSelector, setShowScenarioSelector] = useState(false);
-  const [activeScenario, setActiveScenario] = useState<DialogueScenario | null>(null);
+  const [activePersonaId, setActivePersonaId] = useState<PersonaId | null>(null);
   const [pricingSource, setPricingSource] = useState<string | null>(null);
 
   useEffect(() => {
@@ -376,19 +376,21 @@ export default function Home() {
       {showScenarioSelector && (
         <ScenarioSelectorModal 
           onClose={() => setShowScenarioSelector(false)}
-          onSelect={(scenario) => {
-            setActiveScenario(scenario);
+          onSelectAi={(personaId) => {
+            setActivePersonaId(personaId);
             setShowScenarioSelector(false);
           }}
           onRequirePremium={() => setPricingSource('roleplay_locked')}
         />
       )}
 
-      {activeScenario && (
-        <DialogueView 
-          scenario={activeScenario}
-          onExit={() => setActiveScenario(null)}
-        />
+      {activePersonaId && (
+        <div className="fixed inset-0 z-50 bg-white flex flex-col">
+          <AiRoleplayView 
+            personaId={activePersonaId}
+            onClose={() => setActivePersonaId(null)}
+          />
+        </div>
       )}
 
       {!hasCompletedOnboarding && (
