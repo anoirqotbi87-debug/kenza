@@ -4,33 +4,33 @@ export const module4Lessons: Lesson[] = [
   {
     id: 'm4_l1_passe',
     title: {
-      fr: 'Le Passé Régulier',
-      en: 'Regular Past Tense',
-      es: 'El Pasado Regular',
-      ar: 'الماضي المنتظم'
+      fr: 'Le Passé (L-Madi)',
+      en: 'Past Tense (L-Madi)',
+      es: 'El Pasado (L-Madi)',
+      ar: 'الماضي'
     },
     level: 4,
     description: {
-      fr: 'Conjuguer au passé (-t, -ti, -na).',
-      en: 'Conjugate in the past (-t, -ti, -na).',
-      es: 'Conjugar en pasado (-t, -ti, -na).',
-      ar: 'التصريف في الماضي (-t, -ti, -na).'
+      fr: 'Raconter des événements passés et utiliser les connecteurs temporels.',
+      en: 'Tell past events and use time connectors.',
+      es: 'Contar eventos pasados y usar conectores temporales.',
+      ar: 'سرد أحداث الماضي واستخدام الروابط الزمنية.'
     },
     steps: [
       {
         id: 'm4_l1_s1',
         type: 'learning',
         content: {
-          title: { fr: 'Le Passé : Je, Tu, Nous', en: 'Past: I, You, We', es: 'Pasado: Yo, Tú, Nosotros', ar: 'الماضي: أنا، أنت، نحن' },
+          title: { fr: 'Les suffixes du passé', en: 'Past suffixes', es: 'Sufijos del pasado', ar: 'لواحق الماضي' },
           description: { 
-            fr: 'En Darija, le passé utilise des suffixes : Je = -t, Tu = -ti, Nous = -na. Ex: Mcha (Aller) -> Mchit, Mchiti, Mchina.',
-            en: 'In Darija, the past uses suffixes: I = -t, You = -ti, We = -na.',
-            es: 'En Darija, el pasado usa sufijos: Yo = -t, Tú = -ti, Nosotros = -na.',
-            ar: 'في الدارجة، يستخدم الماضي لواحق: أنا = -t، أنت = -ti، نحن = -na.'
+            fr: 'Au passé, les verbes prennent des suffixes : Je = -t, Tu = -ti, Elle = -at, Nous = -na, Ils = -ou. Ex: Kteb ➔ Ktebt, Ktebti, Ketbat, Ktebna, Ketbou.',
+            en: 'In the past, verbs take suffixes: I = -t, You = -ti, She = -at, We = -na, They = -ou.',
+            es: 'En el pasado, los verbos toman sufijos: Yo = -t, Tú = -ti, Ella = -at, Nosotros = -na, Ellos = -ou.',
+            ar: 'في الماضي، تأخذ الأفعال لواحق: أنا = -t، أنت = -ti، هي = -at، نحن = -na، هم = -ou.'
           },
-          arabizi: 'Mchit, mchiti, mchina.',
-          arabic: 'مشيت، مشيتي، مشينا.',
-          translation: { fr: 'Je suis allé, tu es allé, nous sommes allés.', en: 'I went, you went, we went.', es: 'Fui, fuiste, fuimos.', ar: 'ذهبت، ذهبت، ذهبنا.' }
+          arabizi: 'Ktebt, ketbat, ktebna, ketbou.',
+          arabic: 'كتبت، كتبات، كتبنا، كتبوا.',
+          translation: { fr: 'J\'ai écrit, elle a écrit, nous avons écrit, ils ont écrit.', en: 'I wrote, she wrote, we wrote, they wrote.', es: 'Escribí, ella escribió, escribimos, escribieron.', ar: 'كتبت، كتبت، كتبنا، كتبوا.' }
         }
       },
       {
@@ -39,171 +39,175 @@ export const module4Lessons: Lesson[] = [
         exercise: {
           id: 'ex_m4_l1_1',
           type: 'mcq',
-          prompt: { fr: 'Comment dire "Tu es allé" ?', en: 'How to say "You went"?', es: '¿Cómo decir "Fuiste"?', ar: 'كيف تقول "ذهبت"؟' },
+          prompt: { fr: 'Comment dire "Elle a écrit" ?', en: 'How to say "She wrote"?', es: '¿Cómo decir "Ella escribió"?', ar: 'كيف تقول "كتبت"؟' },
           options: [
-            { id: 'o1', text: 'Mchit', isCorrect: false },
-            { id: 'o2', text: 'Mchiti', isCorrect: true },
-            { id: 'o3', text: 'Mchina', isCorrect: false }
+            { id: 'o1', text: 'Ktebti', isCorrect: false },
+            { id: 'o2', text: 'Ketbat', isCorrect: true },
+            { id: 'o3', text: 'Ketbou', isCorrect: false }
           ],
           answer: 'o2',
-          explanation: { fr: 'Le suffixe pour "Tu" est "-ti" (Mchiti).', en: 'The suffix for "You" is "-ti".', es: 'El sufijo para "Tú" es "-ti".', ar: 'اللاحقة لـ "أنت" هي "-ti".' }
+          explanation: { fr: 'Le suffixe pour "Elle" est "-at" (Ketbat).', en: 'The suffix for "She" is "-at".', es: 'El sufijo para "Ella" es "-at".', ar: 'اللاحقة لـ "هي" هي "-at".' }
         }
       },
       {
         id: 'm4_l1_s3',
-        type: 'exercise',
-        exercise: {
-          id: 'ex_m4_l1_2',
-          type: 'mcq',
-          prompt: { fr: 'Quel est le verbe "Manger" (Kla) au passé avec "Nous" ?', en: 'What is the verb "To eat" (Kla) in the past with "We"?', es: '¿Cuál es el verbo "Comer" (Kla) en pasado con "Nosotros"?', ar: 'ما هو الفعل "يأكل" (كلا) في الماضي مع "نحن"؟' },
-          options: [
-            { id: 'o1', text: 'Klit', isCorrect: false },
-            { id: 'o2', text: 'Klina', isCorrect: true }
-          ],
-          answer: 'o2',
-          explanation: { fr: 'Le suffixe pour "Nous" est "-na" (Klina).', en: 'The suffix for "We" is "-na".', es: 'El sufijo para "Nosotros" es "-na".', ar: 'اللاحقة لـ "نحن" هي "-na".' }
+        type: 'learning',
+        content: {
+          title: { fr: 'Verbes irréguliers (Mcha)', en: 'Irregular verbs (Mcha)', es: 'Verbos irregulares (Mcha)', ar: 'الأفعال غير المنتظمة (مشى)' },
+          description: { fr: 'Les verbes se terminant par une voyelle perdent souvent cette voyelle. Mcha (Aller) ➔ Mchit (Je suis allé). Pour "Ils", on ajoute -w : Mchaw.', en: 'Verbs ending in a vowel often lose it. Mcha (Go) ➔ Mchit (I went). They went = Mchaw.', es: 'Los verbos que terminan en vocal a menudo la pierden. Mcha (Ir) ➔ Mchit (Fui). Ellos fueron = Mchaw.', ar: 'الأفعال المنتهية بحرف علة غالبا ما تفقده. مشى ➔ مشيت. هم ذهبوا ➔ مشاو.' },
+          arabizi: 'Mchaw l-bar7 l-mdina.',
+          arabic: 'مشاو لبارح لمدينة.',
+          translation: { fr: "Ils sont allés hier à la médina.", en: "They went to the medina yesterday.", es: "Fueron a la medina ayer.", ar: "ذهبوا البارحة إلى المدينة." }
         }
       },
       {
         id: 'm4_l1_s4',
-        type: 'learning',
-        content: {
-          title: { fr: 'Voir (Chaf)', en: 'See (Chaf)', es: 'Ver (Chaf)', ar: 'يرى (شاف)' },
-          description: { fr: 'Chaf (Il a vu) -> Cheft (J\'ai vu), Chefti (Tu as vu).', en: 'Chaf (He saw) -> Cheft (I saw), Chefti (You saw).', es: 'Chaf (Él vio) -> Cheft (Yo vi), Chefti (Tú viste).', ar: 'شاف (هو رأى) -> شفت (أنا رأيت).' },
-          arabizi: 'Cheft wa7ed l-kett.',
-          arabic: 'شفت واحد القط.',
-          translation: { fr: "J'ai vu un chat.", en: "I saw a cat.", es: "Vi un gato.", ar: "رأيت قطة." }
+        type: 'exercise',
+        exercise: {
+          id: 'ex_m4_l1_2',
+          type: 'mcq',
+          prompt: { fr: 'Traduisez : "Nous sommes allés"', en: 'Translate: "We went"', es: 'Traduce: "Fuimos"', ar: 'ترجم: "مشينا"' },
+          options: [
+            { id: 'o1', text: 'Mchit', isCorrect: false },
+            { id: 'o2', text: 'Mchaw', isCorrect: false },
+            { id: 'o3', text: 'Mchina', isCorrect: true }
+          ],
+          answer: 'o3',
+          explanation: { fr: 'Le suffixe pour "Nous" est "-na", donc Mcha ➔ Mchina.', en: 'Suffix for "We" is "-na".', es: 'Sufijo para "Nosotros" es "-na".', ar: 'اللاحقة لـ "نحن" هي "-na".' }
         }
       },
       {
         id: 'm4_l1_s5',
-        type: 'exercise',
-        exercise: {
-          id: 'ex_m4_l1_3',
-          type: 'mcq',
-          prompt: { fr: 'Traduisez : "J\'ai vu"', en: 'Translate: "I saw"', es: 'Traduce: "Yo vi"', ar: 'ترجم: "رأيت"' },
-          options: [
-            { id: 'o1', text: 'Cheft', isCorrect: true },
-            { id: 'o2', text: 'Chaf', isCorrect: false },
-            { id: 'o3', text: 'Chefti', isCorrect: false }
-          ],
-          answer: 'o1',
-          explanation: { fr: 'Cheft = J\'ai vu. Chaf = Il a vu. Chefti = Tu as vu.', en: 'Cheft = I saw.', es: 'Cheft = Yo vi.', ar: 'شفت = رأيت.' }
+        type: 'learning',
+        content: {
+          title: { fr: 'Connecteurs Temporels', en: 'Time Connectors', es: 'Conectores de Tiempo', ar: 'الروابط الزمنية' },
+          description: { fr: 'L-bareh (Hier), L-3am l-fayet (L\'année dernière), Men be3d (Après).', en: 'L-bareh (Yesterday), L-3am l-fayet (Last year), Men be3d (After).', es: 'L-bareh (Ayer), L-3am l-fayet (El año pasado), Men be3d (Después).', ar: 'البارح، العام الفايت، من بعد.' },
+          arabizi: 'L-bareh, mchit l-sbitar, men be3d rje3t l-dar.',
+          arabic: 'البارح، مشيت لسبيطار، من بعد رجعت لدار.',
+          translation: { fr: "Hier, je suis allé à l'hôpital, après je suis rentré à la maison.", en: "Yesterday, I went to the hospital, then I returned home.", es: "Ayer fui al hospital, luego volví a casa.", ar: "البارحة، ذهبت إلى المستشفى، ثم عدت إلى المنزل." }
         }
       }
     ]
   },
   {
-    id: 'm4_l2_futur',
+    id: 'm4_l2_present',
     title: {
-      fr: 'Le Futur (Ghadi)',
-      en: 'The Future (Ghadi)',
-      es: 'El Futuro (Ghadi)',
-      ar: 'المستقبل (غادي)'
+      fr: 'Le Présent (Ka- / Ta-)',
+      en: 'The Present (Ka- / Ta-)',
+      es: 'El Presente (Ka- / Ta-)',
+      ar: 'المضارع (كا- / تا-)'
     },
     level: 4,
     description: {
-      fr: 'Exprimer des actions futures avec Ghadi.',
-      en: 'Express future actions with Ghadi.',
-      es: 'Expresar acciones futuras con Ghadi.',
-      ar: 'التعبير عن أفعال مستقبلية باستخدام "غادي".'
+      fr: 'Exprimer des habitudes et l\'état continu.',
+      en: 'Express habits and continuous state.',
+      es: 'Expresar hábitos y estado continuo.',
+      ar: 'التعبير عن العادات والحالة المستمرة.'
     },
     steps: [
       {
         id: 'm4_l2_s1',
         type: 'learning',
         content: {
-          title: { fr: 'Le Futur avec Ghadi', en: 'Future with Ghadi', es: 'Futuro con Ghadi', ar: 'المستقبل مع غادي' },
-          description: { fr: 'On place "Ghadi" devant le verbe au présent sans le "ka-". Ex: Ghadi nsafer (Je vais voyager).', en: 'Place "Ghadi" before the present verb without "ka-".', es: 'Coloca "Ghadi" antes del verbo en presente sin "ka-".', ar: 'نضع "غادي" قبل الفعل المضارع بدون "ka-".' },
-          arabizi: 'Ghadi nsafer ghedda.',
-          arabic: 'غادي نسافر غدا.',
-          translation: { fr: "Je vais voyager demain.", en: "I will travel tomorrow.", es: "Voy a viajar mañana.", ar: "سأسافر غداً." }
+          title: { fr: 'Le présent : Je, Il, Elle', en: 'Present: I, He, She', es: 'Presente: Yo, Él, Ella', ar: 'المضارع: أنا، هو، هي' },
+          description: { fr: 'Le présent habituel s\'utilise avec le préfixe "ka-" + préfixe personnel. Ana ➔ ka-n... (ka-nkteb). Houwa ➔ ka-y... (ka-ykteb). Hiya ➔ ka-t... (ka-tkteb).', en: 'Habitual present uses "ka-" + personal prefix. Ana ➔ ka-n... Houwa ➔ ka-y... Hiya ➔ ka-t...', es: 'El presente habitual usa "ka-" + prefijo personal.', ar: 'المضارع المعتاد يستخدم "كا-" + سابقة شخصية.' },
+          arabizi: 'Ana ka-nkteb, houwa ka-ykteb.',
+          arabic: 'أنا كنكتب، هو كيكتب.',
+          translation: { fr: "J'écris, il écrit.", en: "I write, he writes.", es: "Escribo, él escribe.", ar: "أنا أكتب، هو يكتب." }
         }
       },
       {
         id: 'm4_l2_s2',
-        type: 'exercise',
-        exercise: {
-          id: 'ex_m4_l2_1',
-          type: 'mcq',
-          prompt: { fr: 'Comment dit-on "Je vais voyager" ?', en: 'How to say "I will travel"?', es: '¿Cómo se dice "Voy a viajar"?', ar: 'كيف تقول "سأسافر"؟' },
-          options: [
-            { id: 'o1', text: 'Ka-nsafer', isCorrect: false },
-            { id: 'o2', text: 'Ghadi nsafer', isCorrect: true },
-            { id: 'o3', text: 'Safert', isCorrect: false }
-          ],
-          answer: 'o2',
-          explanation: { fr: 'Ghadi + nsafer (verbe sans ka-). Ka-nsafer = je voyage (présent).', en: 'Ghadi + nsafer.', es: 'Ghadi + nsafer.', ar: 'غادي + نسافر.' }
+        type: 'learning',
+        content: {
+          title: { fr: 'Le présent : Pluriel & Féminin', en: 'Present: Plural & Feminine', es: 'Presente: Plural y Femenino', ar: 'المضارع: الجمع والمؤنث' },
+          description: { fr: 'Tu (f) ➔ ka-t...i (ka-tketbi). Nous ➔ ka-n...ou (ka-nketbou). Vous ➔ ka-t...ou (ka-tketbou). Ils/Elles ➔ ka-y...ou (ka-yketbou).', en: 'You (f) ➔ ka-t...i. We ➔ ka-n...ou. You (pl) ➔ ka-t...ou. They ➔ ka-y...ou.', es: 'Tú (f) ➔ ka-t...i. Nosotros ➔ ka-n...ou. Ustedes ➔ ka-t...ou. Ellos ➔ ka-y...ou.', ar: 'أنتِ ➔ كتكتبي. نحن ➔ كنكتبو. أنتم ➔ كتكتبو. هم ➔ كيكتبو.' },
+          arabizi: 'Nti ka-tketbi. Hna ka-nketbou.',
+          arabic: 'نتي كتكتبي. حنا كنكتبو.',
+          translation: { fr: "Tu (f) écris. Nous écrivons.", en: "You (f) write. We write.", es: "Tú (f) escribes. Nosotros escribimos.", ar: "أنتِ تكتبين. نحن نكتب." }
         }
       },
       {
         id: 'm4_l2_s3',
         type: 'exercise',
         exercise: {
-          id: 'ex_m4_l2_2',
+          id: 'ex_m4_l2_1',
           type: 'mcq',
-          prompt: { fr: 'Traduisez : "Tu vas voir"', en: 'Translate: "You will see"', es: 'Traduce: "Vas a ver"', ar: 'ترجم: "سوف ترى"' },
+          prompt: { fr: 'Traduisez "Ils écrivent"', en: 'Translate "They write"', es: 'Traduce "Ellos escriben"', ar: 'ترجم "هم يكتبون"' },
           options: [
-            { id: 'o1', text: 'Ghadi tchouf', isCorrect: true },
-            { id: 'o2', text: 'Ghadi nchouf', isCorrect: false }
+            { id: 'o1', text: 'Ka-tketbou', isCorrect: false },
+            { id: 'o2', text: 'Ka-yketbou', isCorrect: true },
+            { id: 'o3', text: 'Ka-ykteb', isCorrect: false }
           ],
-          answer: 'o1',
-          explanation: { fr: 'tchouf = tu vois. Ghadi tchouf = tu vas voir.', en: 'tchouf = you see.', es: 'tchouf = tú ves.', ar: 'تشوف = أنت ترى.' }
+          answer: 'o2',
+          explanation: { fr: 'Ils = Houma ➔ ka-y...ou (Ka-yketbou).', en: 'They = Houma ➔ ka-y...ou.', es: 'Ellos = Houma ➔ ka-y...ou.', ar: 'هم = هما ➔ كيكتبو.' }
         }
       },
       {
         id: 'm4_l2_s4',
         type: 'learning',
         content: {
-          title: { fr: 'Futur : Elle va', en: 'Future: She will', es: 'Futuro: Ella va', ar: 'المستقبل: هي سوف' },
-          description: { fr: 'On utilise souvent "Ghadya" au féminin, mais "Ghadi" est accepté partout.', en: 'Use "Ghadya" for feminine, but "Ghadi" is widely accepted.', es: 'Se usa "Ghadya" para femenino, pero "Ghadi" se acepta.', ar: 'نستخدم "غاديا" للمؤنث، ولكن "غادي" مقبولة أيضاً.' },
-          arabizi: 'Ghadi tmshi.',
-          arabic: 'غادي تمشي.',
-          translation: { fr: "Elle va partir.", en: "She will go.", es: "Ella se irá.", ar: "هي سوف تذهب." }
+          title: { fr: 'Bonus Culturel : Ta- vs Ka-', en: 'Cultural Bonus: Ta- vs Ka-', es: 'Bono Cultural: Ta- vs Ka-', ar: 'ملاحظة ثقافية: تا- ضد كا-' },
+          description: { fr: 'Dans beaucoup de régions (Fès, Meknès, centre), la particule "ta-" remplace "ka-". C\'est 100% équivalent ! Ta-nkteb = Ka-nkteb.', en: 'In many regions, "ta-" replaces "ka-". They are 100% identical! Ta-nkteb = Ka-nkteb.', es: 'En muchas regiones, "ta-" reemplaza a "ka-". ¡Son 100% idénticos!', ar: 'في العديد من المناطق، تحل "تا-" محل "كا-". إنها متطابقة بنسبة 100٪!' },
+          arabizi: 'Ta-nmchi l-souk.',
+          arabic: 'تنمشي لسوق.',
+          translation: { fr: "Je vais au marché (habitude).", en: "I go to the market (habit).", es: "Voy al mercado (hábito).", ar: "أذهب إلى السوق." }
         }
       },
       {
         id: 'm4_l2_s5',
+        type: 'learning',
+        content: {
+          title: { fr: 'Verbes d\'action réguliers', en: 'Regular action verbs', es: 'Verbos de acción regulares', ar: 'أفعال الحركة' },
+          description: { fr: 'Attention aux irréguliers très fréquents : Manger (Kla) ➔ ka-nakol. Boire (Chreb) ➔ ka-nchreb. Aller (Mcha) ➔ ka-nmchi.', en: 'Watch out for common irregulars: Eat (Kla) ➔ ka-nakol. Drink (Chreb) ➔ ka-nchreb. Go (Mcha) ➔ ka-nmchi.', es: 'Cuidado con los irregulares comunes: Comer ➔ ka-nakol. Beber ➔ ka-nchreb. Ir ➔ ka-nmchi.', ar: 'احذر الأفعال الشائعة: أكل ➔ كناكل. شرب ➔ كنشرب. مشى ➔ كنمشي.' },
+          arabizi: 'Koll sbah, ka-nchreb atay ou ka-nakol l-khobz.',
+          arabic: 'كل صباح، كنشرب أتاي وكناكل الخبز.',
+          translation: { fr: "Chaque matin, je bois du thé et je mange du pain.", en: "Every morning, I drink tea and eat bread.", es: "Cada mañana bebo té y como pan.", ar: "كل صباح، أشرب الشاي وآكل الخبز." }
+        }
+      },
+      {
+        id: 'm4_l2_s6',
         type: 'exercise',
         exercise: {
-          id: 'ex_m4_l2_3',
+          id: 'ex_m4_l2_2',
           type: 'mcq',
-          prompt: { fr: 'Que signifie "Ghadi tmshi" ?', en: 'What does "Ghadi tmshi" mean?', es: '¿Qué significa "Ghadi tmshi"?', ar: 'ماذا تعني "غادي تمشي"؟' },
+          prompt: { fr: 'Comment dire "Elle boit" ?', en: 'How to say "She drinks"?', es: '¿Cómo decir "Ella bebe"?', ar: 'كيف تقول "هي تشرب"؟' },
           options: [
-            { id: 'o1', text: 'Je vais partir', isCorrect: false },
-            { id: 'o2', text: 'Elle va partir (ou Tu vas partir)', isCorrect: true }
+            { id: 'o1', text: 'Ka-tchreb', isCorrect: true },
+            { id: 'o2', text: 'Ka-ychreb', isCorrect: false },
+            { id: 'o3', text: 'Ka-nchreb', isCorrect: false }
           ],
-          answer: 'o2',
-          explanation: { fr: '"tmshi" peut vouloir dire "tu pars" ou "elle part" selon le contexte.', en: 'tmshi = you go or she goes.', es: 'tmshi = tú vas o ella va.', ar: 'تمشي = أنت تذهب أو هي تذهب.' }
+          answer: 'o1',
+          explanation: { fr: 'Elle (Hiya) ➔ ka-t... (Ka-tchreb).', en: 'She (Hiya) ➔ ka-t... (Ka-tchreb).', es: 'Ella (Hiya) ➔ ka-t... (Ka-tchreb).', ar: 'هي ➔ كتشرب.' }
         }
       }
     ]
   },
   {
-    id: 'm4_l3_modaux',
+    id: 'm4_l3_futur_negation',
     title: {
-      fr: 'Souhait & Obligation',
-      en: 'Wish & Obligation',
-      es: 'Deseo y Obligación',
-      ar: 'التمني والالتزام'
+      fr: 'Futur & Négation',
+      en: 'Future & Negation',
+      es: 'Futuro y Negación',
+      ar: 'المستقبل والنفي'
     },
     level: 4,
     description: {
-      fr: 'Exprimer ce qu\'on veut (bghit) ou doit faire (khassni).',
-      en: 'Express what you want or must do.',
-      es: 'Expresar lo que quieres o debes hacer.',
-      ar: 'التعبير عما تريده أو ما يجب عليك فعله.'
+      fr: 'Ghadi, gha- et l\'encadrement négatif (ma...ch).',
+      en: 'Ghadi, gha- and negative framing (ma...ch).',
+      es: 'Ghadi, gha- y el marco negativo (ma...ch).',
+      ar: 'غادي، غا- والنفي (ما...ش).'
     },
     steps: [
       {
         id: 'm4_l3_s1',
         type: 'learning',
         content: {
-          title: { fr: 'Obligation (Khass)', en: 'Obligation (Khass)', es: 'Obligación (Khass)', ar: 'الالتزام (خاص)' },
-          description: { fr: 'Khassni (Je dois), Khass-k (Tu dois). Suivi du verbe au présent sans ka-.', en: 'Khassni (I must), followed by present verb without ka-.', es: 'Khassni (Debo), seguido de verbo presente sin ka-.', ar: 'خصني (يجب علي)، يليه الفعل المضارع بدون ka-.' },
-          arabizi: 'Khassni nmshi daba.',
-          arabic: 'خصني نمشي دابا.',
-          translation: { fr: "Je dois partir maintenant.", en: "I must go now.", es: "Debo irme ahora.", ar: "يجب أن أذهب الآن." }
+          title: { fr: 'La règle d\'or du Futur', en: 'Golden rule of Future', es: 'Regla de oro del Futuro', ar: 'القاعدة الذهبية للمستقبل' },
+          description: { fr: 'La particule "ghadi" (ou "gha-") s\'accole au verbe conjugué au présent SANS le "ka-". Gha-nmchi (J\'irai). On ne dit jamais "gha-ka-nmchi".', en: 'The particle "ghadi" attaches to the present verb WITHOUT "ka-". Gha-nmchi (I will go). Never "gha-ka-nmchi".', es: 'La partícula "ghadi" se une al verbo en presente SIN "ka-".', ar: 'ترتبط "غادي" بالفعل المضارع بدون "كا-".' },
+          arabizi: 'Gha-nmchi. Ghadi nchoufou.',
+          arabic: 'غانمشي. غادي نشوفو.',
+          translation: { fr: "J'irai. Nous verrons.", en: "I will go. We will see.", es: "Iré. Veremos.", ar: "سأذهب. سنرى." }
         }
       },
       {
@@ -212,25 +216,25 @@ export const module4Lessons: Lesson[] = [
         exercise: {
           id: 'ex_m4_l3_1',
           type: 'mcq',
-          prompt: { fr: 'Comment dire "Tu dois" ?', en: 'How to say "You must"?', es: '¿Cómo decir "Debes"?', ar: 'كيف تقول "يجب عليك"؟' },
+          prompt: { fr: 'Comment dire "Tu vas écrire" (à un homme) ?', en: 'How to say "You will write" (to a man)?', es: '¿Cómo decir "Escribirás" (a un hombre)?', ar: 'كيف تقول "ستكتب"؟' },
           options: [
-            { id: 'o1', text: 'Khassni', isCorrect: false },
-            { id: 'o2', text: 'Khass-k', isCorrect: true },
-            { id: 'o3', text: 'Bghiti', isCorrect: false }
+            { id: 'o1', text: 'Gha-tkteb', isCorrect: true },
+            { id: 'o2', text: 'Gha-ka-tkteb', isCorrect: false },
+            { id: 'o3', text: 'Ghadi ktebti', isCorrect: false }
           ],
-          answer: 'o2',
-          explanation: { fr: 'Le suffixe "-k" indique "Toi" (Tu dois).', en: 'Suffix "-k" means "You".', es: 'Sufijo "-k" significa "Tú".', ar: 'اللاحقة "-k" تعني "أنت".' }
+          answer: 'o1',
+          explanation: { fr: 'Gha- (futur) + tkteb (présent sans ka-).', en: 'Gha- + tkteb.', es: 'Gha- + tkteb.', ar: 'غا- + تكتب.' }
         }
       },
       {
         id: 'm4_l3_s3',
         type: 'learning',
         content: {
-          title: { fr: 'Pouvoir (9der)', en: 'Can (9der)', es: 'Poder (9der)', ar: 'القدرة (قدر)' },
-          description: { fr: 'Ne9der (Je peux), Te9der (Tu peux).', en: 'Ne9der (I can).', es: 'Ne9der (Puedo).', ar: 'نقدر (أستطيع).' },
-          arabizi: 'Ne9der n3awnek ?',
-          arabic: 'نقدر نعاونك؟',
-          translation: { fr: "Est-ce que je peux t'aider ?", en: "Can I help you?", es: "¿Puedo ayudarte?", ar: "هل يمكنني مساعدتك؟" }
+          title: { fr: 'La Négation : Le Sandwich (Ma...ch)', en: 'Negation: The Sandwich (Ma...ch)', es: 'Negación: El Sándwich (Ma...ch)', ar: 'النفي (ما...ش)' },
+          description: { fr: 'Pour nier un verbe, encadrez-le avec Ma ... ch. Au passé : Ma-mchit-ch (Je ne suis pas allé). Au présent, le "ka-" reste encadré : Ma-ka-nchreb-ch (Je ne bois pas).', en: 'To negate a verb, wrap it with Ma ... ch. Past: Ma-mchit-ch. Present: Ma-ka-nchreb-ch.', es: 'Para negar un verbo, envuélvelo con Ma ... ch.', ar: 'لنفي فعل، استخدم ما ... ش. الماضي: مامشيتش. المضارع: ماكنشربش.' },
+          arabizi: 'Ma-kla-ch l-ftour.',
+          arabic: 'ماكلاش الفطور.',
+          translation: { fr: "Il n'a pas mangé le petit-déjeuner.", en: "He didn't eat breakfast.", es: "Él no comió el desayuno.", ar: "لم يأكل الفطور." }
         }
       },
       {
@@ -239,118 +243,76 @@ export const module4Lessons: Lesson[] = [
         exercise: {
           id: 'ex_m4_l3_2',
           type: 'mcq',
-          prompt: { fr: 'Traduisez : "Je peux t\'aider"', en: 'Translate: "I can help you"', es: 'Traduce: "Puedo ayudarte"', ar: 'ترجم: "أستطيع مساعدتك"' },
+          prompt: { fr: 'Comment dire "Je ne mange pas" ?', en: 'How to say "I don\'t eat"?', es: '¿Cómo decir "No como"?', ar: 'كيف تقول "لا آكل"؟' },
           options: [
-            { id: 'o1', text: 'Ne9der n3awnek', isCorrect: true },
-            { id: 'o2', text: 'Khassni n3awnek', isCorrect: false }
+            { id: 'o1', text: 'Ma-nakol-ch', isCorrect: false },
+            { id: 'o2', text: 'Ma-ka-nakol-ch', isCorrect: true },
+            { id: 'o3', text: 'Ka-ma-nakol', isCorrect: false }
           ],
-          answer: 'o1',
-          explanation: { fr: 'Ne9der = je peux. Khassni = je dois.', en: 'Ne9der = I can. Khassni = I must.', es: 'Ne9der = Puedo. Khassni = Debo.', ar: 'نقدر = أستطيع.' }
+          answer: 'o2',
+          explanation: { fr: 'Au présent, "ka-" est inclus dans la négation : Ma + ka-nakol + ch.', en: 'In the present, "ka-" is included: Ma + ka-nakol + ch.', es: 'En presente, "ka-" está incluido.', ar: 'في المضارع، "كا-" مشمولة.' }
         }
       },
       {
         id: 'm4_l3_s5',
+        type: 'learning',
+        content: {
+          title: { fr: 'Négation au Futur & "Machi"', en: 'Future Negation & "Machi"', es: 'Negación Futura y "Machi"', ar: 'نفي المستقبل و "ماشي"' },
+          description: { fr: 'Au futur : Ma-ghadi-ch nmchi (ou Ma-gha-nmchi-ch). Pour nier un adjectif ou un adverbe (pas un verbe), on utilise "Machi". Machi daba (Pas maintenant), Machi mochkil (Pas de problème).', en: 'Future: Ma-ghadi-ch nmchi. For adjectives/adverbs, use "Machi". Machi daba (Not now).', es: 'Futuro: Ma-ghadi-ch nmchi. Para adjetivos, usa "Machi".', ar: 'في المستقبل: ماغاديش نمشي. لنفي صفة أو ظرف، استخدم "ماشي".' },
+          arabizi: 'Machi mochkil, ma-ghadi-ch nqle9.',
+          arabic: 'ماشي مشكل، ماغاديش نقلق.',
+          translation: { fr: "Pas de problème, je ne vais pas m'inquiéter.", en: "No problem, I won't worry.", es: "No hay problema, no me preocuparé.", ar: "لا مشكلة، لن أقلق." }
+        }
+      },
+      {
+        id: 'm4_l3_s6',
         type: 'exercise',
         exercise: {
           id: 'ex_m4_l3_3',
           type: 'mcq',
-          prompt: { fr: 'Que signifie "Bghit nmshi" ?', en: 'What does "Bghit nmshi" mean?', es: '¿Qué significa "Bghit nmshi"?', ar: 'ماذا تعني "بغيت نمشي"؟' },
+          prompt: { fr: 'Complétez : "... mochkil" (Pas de problème)', en: 'Fill in: "... mochkil" (No problem)', es: 'Completa: "... mochkil" (No hay problema)', ar: 'أكمل: "... مشكل"' },
           options: [
-            { id: 'o1', text: 'Je veux y aller', isCorrect: true },
-            { id: 'o2', text: 'Je dois y aller', isCorrect: false },
-            { id: 'o3', text: 'Je peux y aller', isCorrect: false }
+            { id: 'o1', text: 'Ma-mochkil-ch', isCorrect: false },
+            { id: 'o2', text: 'Machi', isCorrect: true }
           ],
-          answer: 'o1',
-          explanation: { fr: 'Bghit = Je veux (le verbe s\'utilise au passé pour un souhait présent).', en: 'Bghit = I want.', es: 'Bghit = Quiero.', ar: 'بغيت = أريد.' }
+          answer: 'o2',
+          explanation: { fr: 'Pour un nom/adjectif, on utilise "Machi".', en: 'For nouns/adjectives, use "Machi".', es: 'Para sustantivos/adjetivos, usa "Machi".', ar: 'للأسماء والصفات، استخدم "ماشي".' }
         }
       }
     ]
   },
   {
-    id: 'm4_l4_connecteurs',
+    id: 'm4_l4_modaux',
     title: {
-      fr: 'Récit & Connecteurs',
-      en: 'Story & Connectors',
-      es: 'Relato y Conectores',
-      ar: 'السرد والروابط'
+      fr: 'Les Modaux (Khas, Qedd, Bgha)',
+      en: 'Modals (Khas, Qedd, Bgha)',
+      es: 'Modales (Khas, Qedd, Bgha)',
+      ar: 'الأفعال الناقصة'
     },
     level: 4,
     description: {
-      fr: 'Articuler ses phrases (parce que, mais, ensuite).',
-      en: 'Articulate sentences (because, but, then).',
-      es: 'Articular oraciones (porque, pero, luego).',
-      ar: 'ربط الجمل (لأن، لكن، ثم).'
+      fr: 'Obligation (Khasni), Capacité (Qedd), Volonté (Bgha).',
+      en: 'Obligation, Ability, Will.',
+      es: 'Obligación, Capacidad, Voluntad.',
+      ar: 'الالتزام، القدرة، الإرادة.'
     },
-    steps: [
-      {
-        id: 'm4_l4_s1',
-        type: 'learning',
-        content: {
-          title: { fr: 'Mais & Parce que', en: 'But & Because', es: 'Pero y Porque', ar: 'لكن ولأن' },
-          description: { fr: 'Walakin (Mais), 7it (Parce que).', en: 'Walakin (But), 7it (Because).', es: 'Walakin (Pero), 7it (Porque).', ar: 'ولكن (لكن)، حيت (لأن).' },
-          arabizi: 'Bghit nmshi walakin khassni nkhdem 7it 3endi bezzaf d-shghol.',
-          arabic: 'بغيت نمشي ولكن خصني نخدم حيت عندي بزاف دشغل.',
-          translation: { fr: "Je veux y aller mais je dois travailler parce que j'ai beaucoup de travail.", en: "I want to go but I must work because I have a lot of work.", es: "Quiero ir pero debo trabajar porque tengo mucho trabajo.", ar: "أريد الذهاب لكن يجب أن أعمل لأن لدي الكثير من العمل." }
-        }
-      },
-      {
-        id: 'm4_l4_s2',
-        type: 'exercise',
-        exercise: {
-          id: 'ex_m4_l4_1',
-          type: 'mcq',
-          prompt: { fr: 'Comment dire "Parce que" ?', en: 'How to say "Because"?', es: '¿Cómo decir "Porque"?', ar: 'كيف تقول "لأن"؟' },
-          options: [
-            { id: 'o1', text: 'Walakin', isCorrect: false },
-            { id: 'o2', text: '7it', isCorrect: true },
-            { id: 'o3', text: 'Men be3d', isCorrect: false }
-          ],
-          answer: 'o2',
-          explanation: { fr: '7it = Parce que. Walakin = Mais.', en: '7it = Because.', es: '7it = Porque.', ar: 'حيت = لأن.' }
-        }
-      },
-      {
-        id: 'm4_l4_s3',
-        type: 'learning',
-        content: {
-          title: { fr: 'Ensuite / Après', en: 'Then / After', es: 'Luego / Después', ar: 'ثم / بعد ذلك' },
-          description: { fr: 'Men be3d (Après / Ensuite).', en: 'Men be3d (After / Then).', es: 'Men be3d (Después / Luego).', ar: 'من بعد (بعد / ثم).' },
-          arabizi: 'Nfeter, u men be3d nmshi.',
-          arabic: 'نفطر، و من بعد نمشي.',
-          translation: { fr: "Je prends mon petit-déjeuner, et ensuite j'y vais.", en: "I eat breakfast, and then I go.", es: "Desayuno, y luego me voy.", ar: "أفطر، ومن بعد أذهب." }
-        }
-      },
-      {
-        id: 'm4_l4_s4',
-        type: 'exercise',
-        exercise: {
-          id: 'ex_m4_l4_2',
-          type: 'mcq',
-          prompt: { fr: 'Traduisez : "Mais je suis malade"', en: 'Translate: "But I am sick"', es: 'Traduce: "Pero estoy enfermo"', ar: 'ترجم: "لكنني مريض"' },
-          options: [
-            { id: 'o1', text: 'Walakin ana mrid', isCorrect: true },
-            { id: 'o2', text: '7it ana mrid', isCorrect: false }
-          ],
-          answer: 'o1',
-          explanation: { fr: 'Walakin = Mais. 7it = Parce que.', en: 'Walakin = But.', es: 'Walakin = Pero.', ar: 'ولكن = لكن.' }
-        }
-      },
-      {
-        id: 'm4_l4_s5',
-        type: 'exercise',
-        exercise: {
-          id: 'ex_m4_l4_3',
-          type: 'mcq',
-          prompt: { fr: 'Que veut dire "Men be3d" ?', en: 'What does "Men be3d" mean?', es: '¿Qué significa "Men be3d"?', ar: 'ماذا تعني "من بعد"؟' },
-          options: [
-            { id: 'o1', text: 'Avant', isCorrect: false },
-            { id: 'o2', text: 'Après / Ensuite', isCorrect: true },
-            { id: 'o3', text: 'Aujourd\'hui', isCorrect: false }
-          ],
-          answer: 'o2',
-          explanation: { fr: 'Men be3d = Après ou Ensuite. 9bel = Avant.', en: 'Men be3d = After/Then.', es: 'Men be3d = Después/Luego.', ar: 'من بعد = بعد أو ثم.' }
-        }
-      }
-    ]
+    steps: [] // Skeleton to fill later
+  },
+  {
+    id: 'm4_checkpoint_b1',
+    title: {
+      fr: 'Checkpoint B1',
+      en: 'Checkpoint B1',
+      es: 'Checkpoint B1',
+      ar: 'نقطة تفتيش B1'
+    },
+    level: 4,
+    description: {
+      fr: 'Validation du niveau B1 (Temps, Négation, Modaux).',
+      en: 'Validation of B1 level.',
+      es: 'Validación del nivel B1.',
+      ar: 'تقييم مستوى B1.'
+    },
+    steps: [] // Skeleton for Checkpoint to fill later
   }
 ];
