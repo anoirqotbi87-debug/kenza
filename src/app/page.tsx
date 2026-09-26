@@ -276,12 +276,13 @@ export default function Home() {
                 <div 
                   className="bg-gradient-to-r from-amber-400 to-rose-400 rounded-3xl p-6 md:p-8 flex items-center justify-between shadow-lg cursor-pointer transform hover:scale-[1.02] transition-transform text-white" 
                   onClick={() => setShowScenarioSelector(true)}
+                  dir={lang === 'ar' ? 'rtl' : 'ltr'}
                 >
                   <div>
-                    <h2 className="text-2xl font-black mb-2">💬 Mises en situation</h2>
-                    <p className="font-medium text-amber-50">Pratiquez la Darija au café, au taxi ou au souk !</p>
+                    <h2 className="text-2xl font-black mb-2">💬 {lang === 'ar' ? 'المواقف والمحادثات' : lang === 'en' ? 'Roleplay Situations' : 'Mises en situation'}</h2>
+                    <p className="font-medium text-amber-50">{lang === 'ar' ? 'تدرّب على الدارجة في المقهى، الطاكسي أو السوق!' : lang === 'en' ? 'Practice Darija at the café, taxi, or souk!' : 'Pratiquez la Darija au café, au taxi ou au souk !'}</p>
                   </div>
-                  <div className="bg-white/20 p-3 rounded-full backdrop-blur-sm shrink-0 ml-4">
+                  <div className={`bg-white/20 p-3 rounded-full backdrop-blur-sm shrink-0 ${lang === 'ar' ? 'mr-4' : 'ml-4'}`}>
                     <Play className="w-8 h-8 fill-white" />
                   </div>
                 </div>

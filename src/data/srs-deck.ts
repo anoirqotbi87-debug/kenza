@@ -2305,4 +2305,10 @@ export const srsVocabulary: VocabularySRSData[] = [
 ];
 
 
-export const getWordFromDictionary = (id: string): VocabularySRSData | undefined => { return srsVocabulary.find(w => w.id === id); };
+export const getWordFromDictionary = (id: string): VocabularySRSData | undefined => { 
+  const cleanId = id.replace(/^(word_srs_|Word_srs_|word_|srs_)/i, '');
+  return srsVocabulary.find(w => {
+    const wCleanId = w.id.replace(/^(word_srs_|Word_srs_|word_|srs_)/i, '');
+    return wCleanId === cleanId || w.id === id;
+  }); 
+};

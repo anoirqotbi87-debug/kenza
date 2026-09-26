@@ -105,34 +105,49 @@ export default function SmartReviewSession({ onClose }: SmartReviewSessionProps)
           onClick={() => setIsFlipped(true)}
           style={{ transformStyle: 'preserve-3d' }}
         >
-          {!isFlipped ? (
-            <div className="flex flex-col items-center justify-center w-full h-full" style={{ backfaceVisibility: 'hidden' }}>
-              <div className="flex justify-center mb-3">
-                <CardIllustration illustration={getWordFromDictionary(currentCard.wordId)?.illustration} />
+          {(() => {
+            const dictWord = getWordFromDictionary(currentCard.wordId);
+            const translationText = dictWord ? getLocalizedText(dictWord.translation, lang) : currentCard.wordId;
+            const fallbackDarija = `Darija_${currentCard.wordId}`;
+            
+            return !isFlipped ? (
+              <div className="flex flex-col items-center justify-center w-full h-full" style={{ backfaceVisibility: 'hidden' }}>
+                <div className="flex justify-center mb-3">
+                  <CardIllustration illustration={dictWord?.illustration} />
+                </div>
+                <div className="text-sm font-bold text-slate-400 mb-4">
+                  {preferredNotation === 'arabizi' ? t.srs.translateArabizi : preferredNotation === 'arabic' ? t.srs.translateArabic : t.srs.translateDuo}
+                </div>
+                <div className="text-3xl font-bold text-slate-800" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+                  {translationText}
+                </div>
+                <div className="mt-8 text-slate-400 animate-pulse flex items-center gap-2">
+                  {t.srs.tapToFlip} <ArrowRight className="w-4 h-4" />
+                </div>
               </div>
-              <div className="text-sm font-bold text-slate-400 mb-4">
-                {preferredNotation === 'arabizi' ? t.srs.translateArabizi : preferredNotation === 'arabic' ? t.srs.translateArabic : t.srs.translateDuo}
+            ) : (
+              <div className="flex flex-col items-center justify-center w-full h-full" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
+                 <div className="flex justify-center mb-3">
+                   <CardIllustration illustration={dictWord?.illustration} />
+                 </div>
+                 <div className="text-sm font-bold text-green-500 mb-4">{t.srs.answer}</div>
+                 <div className="text-4xl font-extrabold text-slate-800 mb-2 flex flex-col items-center gap-2">
+                   {preferredNotation === 'arabic' && (
+                     <span className="font-arabic" dir="rtl">{dictWord?.arabic || fallbackDarija}</span>
+                   )}
+                   {preferredNotation === 'arabizi' && (
+                     <span>{dictWord?.arabizi || fallbackDarija}</span>
+                   )}
+                   {preferredNotation === 'duo' && (
+                     <>
+                       <span className="text-2xl text-amber-600">{dictWord?.arabizi || fallbackDarija}</span>
+                       <span className="font-arabic" dir="rtl">{dictWord?.arabic || fallbackDarija}</span>
+                     </>
+                   )}
+                 </div>
               </div>
-              <div className="text-3xl font-bold text-slate-800">
-                {getLocalizedText(getWordFromDictionary(currentCard.wordId)?.translation, lang) || `Word_${currentCard.wordId}`}
-              </div>
-              <div className="mt-8 text-slate-400 animate-pulse flex items-center gap-2">
-                {t.srs.tapToFlip} <ArrowRight className="w-4 h-4" />
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center w-full h-full" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
-               <div className="flex justify-center mb-3">
-                 <CardIllustration illustration={getWordFromDictionary(currentCard.wordId)?.illustration} />
-               </div>
-               <div className="text-sm font-bold text-green-500 mb-4">{t.srs.answer}</div>
-               <div className="text-4xl font-extrabold text-slate-800 mb-2">
-                 {preferredNotation === 'arabic' 
-                   ? getWordFromDictionary(currentCard.wordId)?.arabic 
-                   : getWordFromDictionary(currentCard.wordId)?.arabizi || `Translation_${currentCard.wordId}`}
-               </div>
-            </div>
-          )}
+            );
+          })()}
         </div>
 
         {isFlipped && (

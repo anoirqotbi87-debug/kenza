@@ -2,7 +2,7 @@ import React from 'react';
 import { ALL_SCENARIOS } from '../../data/scenarios';
 import { DialogueScenario } from '../../types/dialogue';
 import { X, Play, MapPin, Tag, Lock } from 'lucide-react';
-import { useAppStore } from '../../store/useAppStore';
+import { useAppStore, useTranslation } from '../../store/useAppStore';
 
 interface ScenarioSelectorModalProps {
   onClose: () => void;
@@ -12,6 +12,8 @@ interface ScenarioSelectorModalProps {
 
 export default function ScenarioSelectorModal({ onClose, onSelect, onRequirePremium }: ScenarioSelectorModalProps) {
   const { subscriptionTier } = useAppStore();
+  const { lang, t } = useTranslation();
+  const isAr = lang === 'ar';
   
   const getCategoryIcon = (cat: string) => {
     switch(cat) {
@@ -31,14 +33,17 @@ export default function ScenarioSelectorModal({ onClose, onSelect, onRequirePrem
     }
   };
 
+  const modalTitle = isAr ? 'المواقف والمحادثات' : lang === 'en' ? 'Roleplay Situations' : 'Mises en situation (Roleplay)';
+  const modalDesc = isAr ? 'تدرّب على الدارجة عبر مواقف تفاعلية' : lang === 'en' ? 'Practice Darija with interactive scenarios' : 'Pratiquez la Darija avec des scénarios interactifs';
+
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4" dir={isAr ? 'rtl' : 'ltr'}>
       <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-xl animate-in zoom-in-95 duration-200">
         
         <div className="flex items-center justify-between p-6 border-b border-slate-100">
           <div>
-            <h2 className="text-2xl font-bold text-slate-800">Mises en situation (Roleplay)</h2>
-            <p className="text-slate-500 text-sm mt-1">Pratiquez la Darija avec des scénarios interactifs</p>
+            <h2 className="text-2xl font-bold text-slate-800">{modalTitle}</h2>
+            <p className="text-slate-500 text-sm mt-1">{modalDesc}</p>
           </div>
           <button 
             onClick={onClose}
@@ -58,7 +63,7 @@ export default function ScenarioSelectorModal({ onClose, onSelect, onRequirePrem
                 onClick={() => isLocked ? onRequirePremium() : onSelect(scenario)}
                 className={`bg-white rounded-2xl border border-slate-200 p-5 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group flex flex-col h-full relative overflow-hidden ${isLocked ? 'opacity-80' : ''}`}
               >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-slate-50 to-transparent opacity-50 pointer-events-none rounded-tr-2xl" />
+                <div className={`absolute top-0 ${isAr ? 'left-0 rounded-tl-2xl' : 'right-0 rounded-tr-2xl'} w-32 h-32 bg-gradient-to-bl from-slate-50 to-transparent opacity-50 pointer-events-none`} />
                 
                 <div className="flex justify-between items-start mb-4 relative z-10">
                   <div className={`text-3xl w-12 h-12 rounded-xl flex items-center justify-center ${getCategoryColor(scenario.category || 'daily')}`}>
@@ -71,14 +76,25 @@ export default function ScenarioSelectorModal({ onClose, onSelect, onRequirePrem
 
                 <h3 className="text-lg font-bold text-slate-800 mb-2 leading-tight">
                   {scenario.title}
+                  {scenario.titleFr && (
+                    <span className="block text-sm font-normal text-slate-500 mt-0.5">
+                      {isAr ? scenario.title : (lang === 'en' ? scenario.titleFr : scenario.titleFr)}
+                    </span>
+                  )}
                 </h3>
+                
+                {scenario.description && (
+                  <p className="text-slate-500 text-xs mb-3 line-clamp-2">
+                    {scenario.description}
+                  </p>
+                )}
 
-                <div className="flex items-center gap-2 text-slate-500 text-sm mb-4">
+                <div className="flex items-center gap-2 text-slate-500 text-sm mb-4 mt-auto">
                   <MapPin className="w-4 h-4 shrink-0" />
                   <span className="truncate">{scenario.location}</span>
                 </div>
 
-                <div className="mt-auto pt-4 border-t border-slate-100 flex justify-between items-center relative z-10">
+                <div className="pt-4 border-t border-slate-100 flex justify-between items-center relative z-10">
                   <div className="flex items-center gap-1 text-xs font-medium text-amber-500 bg-amber-50 px-2 py-1 rounded-md">
                     <Tag className="w-3 h-3" />
                     +25 XP
@@ -89,7 +105,7 @@ export default function ScenarioSelectorModal({ onClose, onSelect, onRequirePrem
                       : 'bg-slate-100 group-hover:bg-blue-600 group-hover:text-white text-slate-400'
                     }`}
                   >
-                    {isLocked ? <Lock className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+                    {isLocked ? <Lock className="w-4 h-4" /> : <Play className={`w-4 h-4 ${isAr ? 'mr-0.5 transform rotate-180' : 'ml-0.5'}`} />}
                   </div>
                 </div>
               </div>
