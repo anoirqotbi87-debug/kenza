@@ -10,6 +10,7 @@ import { Session } from '@supabase/supabase-js';
 import { User, Trophy, Flame, Star, Crown, Headphones, Clock, BookOpen, Lock } from 'lucide-react';
 import { useCheckpointProgress } from '../../hooks/useCheckpointProgress';
 import DarijaPassportCard from '../certificate/DarijaPassportCard';
+import ProfilePassportView from './ProfilePassportView';
 
 export default function ProfileView() {
   const { xp, streakDays, srsDeck } = useAppStore();
@@ -85,73 +86,8 @@ export default function ProfileView() {
         </div>
       </div>
 
-      {/* Statistiques d'Engagement */}
-      <h3 className="text-xl font-bold text-slate-800 px-2 mt-8 mb-4">Statistiques d'Engagement</h3>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100 flex flex-col items-center justify-center text-center">
-          <Flame className="w-8 h-8 fill-amber-500 text-amber-500 mb-2" />
-          <div className="text-2xl font-black text-slate-800">{streakDays}</div>
-          <div className="text-sm font-medium text-amber-700">Jours de suite</div>
-        </div>
-        <div className="bg-blue-50 rounded-2xl p-5 border border-blue-100 flex flex-col items-center justify-center text-center">
-          <Star className="w-8 h-8 fill-blue-500 text-blue-500 mb-2" />
-          <div className="text-2xl font-black text-slate-800">{xp}</div>
-          <div className="text-sm font-medium text-blue-700">Total XP</div>
-        </div>
-        <div className="bg-emerald-50 rounded-2xl p-5 border border-emerald-100 flex flex-col items-center justify-center text-center">
-          <BookOpen className="w-8 h-8 fill-emerald-500 text-emerald-500 mb-2" />
-          <div className="text-2xl font-black text-slate-800">{learnedCards} / {totalSrsCards}</div>
-          <div className="text-sm font-medium text-emerald-700">Mots appris</div>
-        </div>
-        <div className="bg-purple-50 rounded-2xl p-5 border border-purple-100 flex flex-col items-center justify-center text-center">
-          <Headphones className="w-8 h-8 fill-purple-500 text-purple-500 mb-2" />
-          <div className="text-2xl font-black text-slate-800">--</div>
-          <div className="text-sm font-medium text-purple-700">Minutes Audio</div>
-        </div>
-      </div>
-
-      <StreakHeatmap />
-
-      {/* Galerie des Passeports */}
-      <h3 className="text-xl font-bold text-slate-800 px-2 mt-12 mb-4">Galerie des Passeports</h3>
-      <div className="grid grid-cols-1 gap-8">
-        {passports.map(p => {
-          const isUnlocked = hasPassedLevel(p.id);
-          const result = results[p.id];
-          
-          if (isUnlocked && result) {
-            return (
-              <div key={p.id} className="bg-white rounded-3xl p-6 shadow-sm border-2 border-amber-200">
-                <div className="mb-4">
-                  <h4 className="text-lg font-bold text-slate-800">{p.name}</h4>
-                  <p className="text-slate-500 text-sm">Obtenu le {result.date}</p>
-                </div>
-                <DarijaPassportCard 
-                  data={{
-                    userName: username,
-                    levelName: result.levelName,
-                    score: result.score,
-                    date: result.date,
-                    passportId: result.passportId
-                  }}
-                />
-              </div>
-            );
-          }
-
-          return (
-            <div key={p.id} className="bg-slate-50 rounded-3xl p-8 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-center opacity-70">
-              <div className="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center mb-4">
-                <Lock className="w-8 h-8 text-slate-400" />
-              </div>
-              <h4 className="text-lg font-bold text-slate-600 mb-1">{p.name}</h4>
-              <p className="text-slate-500 text-sm max-w-sm">
-                Terminez le {p.title} pour débloquer ce passeport et certifier votre niveau.
-              </p>
-            </div>
-          );
-        })}
-      </div>
+      {/* Nouvelle UI : Grille Stats & Passeport Culturel */}
+      <ProfilePassportView />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
         <Leaderboard />
