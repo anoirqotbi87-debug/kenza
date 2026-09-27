@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useAppStore } from '../../store/useAppStore';
 import { getWordFromDictionary } from '../../data/srs-deck';
 import { getLocalizedText } from '../../lib/i18n/utils';
@@ -19,6 +19,19 @@ export default function DeckManagerView() {
   
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [cardToEdit, setCardToEdit] = useState<any | null>(null);
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   // Combine and format deck cards with their vocabulary data
   const processedCards = useMemo(() => {
@@ -81,6 +94,28 @@ export default function DeckManagerView() {
   const handleDelete = (wordId: string) => {
     if (confirm(isAr ? 'هل أنت متأكد أنك تريد حذف هذه البطاقة؟' : 'Voulez-vous vraiment supprimer cette carte ?')) {
       deleteCustomWord(wordId);
+    }
+  };
+
+  const handlePlayTTS = async (card: any) => {
+    if (playingId) return;
+    
+    // Check if offline and attempt to verify if cached (we'll just try to play it, but we can pre-warn if needed)
+    // For now we just let fetch fail gracefully if not cached.
+    
+    try {
+      setPlayingId(card.id);
+      // Priority: 1. dictWord.audioUrl (for official modules), 2. Arabic, 3. Arabizi
+      if (card.dictWord?.audioUrl) {
+        await playAudio('', card.dictWord.audioUrl);
+      } else {
+        const textToSpeak = card.arabic || card.arabizi;
+        await playAudio(card.arabizi, card.arabic); // playAudio handles (text, arabicText as audioUrl if not ending with .mp3)
+      }
+    } catch (e) {
+      console.error("Failed to play TTS:", e);
+    } finally {
+      setPlayingId(null);
     }
   };
 
@@ -201,6 +236,20 @@ export default function DeckManagerView() {
                   
                   {/* Actions - visible on hover/focus */}
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button 
+                      onClick={() => handlePlayTTS(card)}
+                      disabled={playingId === card.id || (isOffline && !card.dictWord?.audioUrl)} // In a real app we'd check if TTS is specifically cached, but for now we disable if offline and no static audioUrl
+                      className={`p-1.5 rounded-lg transition-colors ${
+                        playingId === card.id 
+                          ? 'text-blue-600 bg-blue-50 animate-pulse' 
+                          : isOffline && !card.dictWord?.audioUrl
+                            ? 'text-slate-300 cursor-not-allowed'
+                            : 'text-slate-400 hover:text-blue-600 hover:bg-blue-50'
+                      }`}
+                      title={isOffline && !card.dictWord?.audioUrl ? (isAr ? 'الصوت غير متوفر بدون إنترنت' : 'Audio non disponible hors-ligne') : ''}
+                    >
+                      <Play className="w-4 h-4" />
+                    </button>
                     <button 
                       onClick={() => {
                         setCardToEdit(card.dictWord || { 

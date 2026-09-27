@@ -110,12 +110,12 @@ export const playAudio = async (text: string, audioUrl?: string, soundEnabled: b
         if (offlineBlob) {
           arrayBuffer = await offlineBlob.arrayBuffer();
         } else {
-          // 2. Fetch from network
-          const response = await fetch('/api/tts', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ arabicText: textToSpeak, text: text })
-          });
+          // 2. Fetch from network (using GET for ServiceWorker CacheFirst compat)
+          const params = new URLSearchParams();
+          params.append('text', text);
+          if (arabicText) params.append('arabicText', arabicText);
+          
+          const response = await fetch(`/api/tts?${params.toString()}`);
           if (!response.ok) throw new Error('TTS API failed');
           arrayBuffer = await response.arrayBuffer();
         }

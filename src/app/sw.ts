@@ -22,6 +22,17 @@ const serwist = new Serwist({
       handler: "NetworkOnly",
     },
     {
+      matcher: ({ url }) => url.pathname.startsWith('/api/tts'),
+      handler: "CacheFirst",
+      options: {
+        cacheName: "kenza-tts-cache",
+        expiration: {
+          maxEntries: 200,
+          maxAgeSeconds: 30 * 24 * 60 * 60, // 30 jours
+        },
+      },
+    },
+    {
       matcher: /\.(?:mp3|wav|ogg|m4a)$/i,
       handler: "CacheFirst",
       options: {
