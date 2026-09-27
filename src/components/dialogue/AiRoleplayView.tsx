@@ -7,6 +7,8 @@ import { useVoiceRecognition } from '@/hooks/useVoiceRecognition';
 import { Send, Mic, MicOff, Save, Loader2, RefreshCw } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { v4 as uuidv4 } from 'uuid';
+import { supabase } from '@/lib/supabase';
+import PaywallModal from '@/components/monetization/PaywallModal';
 
 interface AiRoleplayViewProps {
   personaId: PersonaId;
@@ -45,6 +47,17 @@ const parseAiMessage = (content: string) => {
 };
 
 export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewProps) {
+
+  const [token, setToken] = useState<string>('');
+  const [showPaywall, setShowPaywall] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        setToken(data.session.access_token);
+      }
+    });
+  }, []);
   const persona = personas[personaId];
   const { addCustomWordToSRS } = useAppStore();
   const [showImmersion, setShowImmersion] = useState(false);
@@ -253,6 +266,9 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
         )}
       </div>
       
+
+      {showPaywall && <PaywallModal source="ai_roleplay_quota" onClose={() => setShowPaywall(false)} />}
     </div>
   );
 }
+

@@ -8,7 +8,7 @@ const withSerwist = withSerwistInit({
 });
 
 const nextConfig: NextConfig = {
-  // Vos configurations Next.js existantes
+  turbopack: {},
 };
 
 export default withSerwist(nextConfig);

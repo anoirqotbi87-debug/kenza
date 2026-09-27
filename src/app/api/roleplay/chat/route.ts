@@ -2,6 +2,7 @@ import { streamText } from 'ai';
 import { google } from '@ai-sdk/google';
 import { getSystemPrompt, PersonaId } from '@/lib/ai/prompts';
 import { NextRequest } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
 export const maxDuration = 30; // Allow max 30 seconds for streaming
 
@@ -36,7 +37,34 @@ export async function POST(req: NextRequest) {
       return new Response('Too Many Requests', { status: 429 });
     }
 
+
+    // 3. Auth & Quota Check
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'UNAUTHORIZED', message: 'Veuillez vous connecter pour utiliser l\'IA.' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+    }
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+    const supabase = createClient(supabaseUrl, supabaseKey, {
+      global: { headers: { Authorization: authHeader } }
+    });
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: 'UNAUTHORIZED', message: 'Session invalide' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+    }
+
+    const { data: quotaOk, error: quotaError } = await supabase.rpc('consume_ai_quota');
+    if (quotaError) {
+      console.error('Erreur quota:', quotaError);
+    }
+    if (!quotaOk) {
+      return new Response(JSON.stringify({ error: 'QUOTA_EXCEEDED', message: 'Quota quotidien atteint' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
+    }
+
     const { messages, personaId } = await req.json();
+
 
     // 3. Payload Validation
     if (!messages || !Array.isArray(messages)) {

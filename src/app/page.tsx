@@ -26,7 +26,7 @@ import AiRoleplayView from '@/components/dialogue/AiRoleplayView';
 import { PersonaId } from '@/lib/ai/prompts';
 import OnboardingModal from '@/components/onboarding/OnboardingModal';
 import InstallPwaBanner from '@/components/pwa/InstallPwaBanner';
-import PricingModal from '@/components/monetization/PricingModal';
+import PaywallModal from '@/components/monetization/PaywallModal';
 
 export default function Home() {
   const [currentTab, setCurrentTab] = useState<'learn' | 'phrasebook' | 'speech' | 'profile'>('learn');
@@ -42,7 +42,7 @@ export default function Home() {
 
   const [showScenarioSelector, setShowScenarioSelector] = useState(false);
   const [activePersonaId, setActivePersonaId] = useState<PersonaId | null>(null);
-  const [pricingSource, setPricingSource] = useState<string | null>(null);
+  const [paywallSource, setPaywallSource] = useState<string | null>(null);
 
   useEffect(() => {
     const handleAuthSync = async (user: any) => {

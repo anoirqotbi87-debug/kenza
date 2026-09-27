@@ -57,10 +57,10 @@ interface AppState {
   hasCompletedOnboarding: boolean;
   userGoal: string | null;
   dailyTargetMinutes: number | null;
-  subscriptionTier: 'free' | 'premium';
+  isPremium: boolean;
   
   completeOnboarding: (goal: string, minutes: number) => void;
-  setSubscriptionTier: (tier: 'free' | 'premium') => void;
+  setIsPremium: (isPremium: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -87,14 +87,14 @@ export const useAppStore = create<AppState>()(
       hasCompletedOnboarding: false,
       userGoal: null,
       dailyTargetMinutes: null,
-      subscriptionTier: 'free',
+      isPremium: false,
       
       completeOnboarding: (goal, minutes) => set({
         hasCompletedOnboarding: true,
         userGoal: goal,
         dailyTargetMinutes: minutes
       }),
-      setSubscriptionTier: (tier) => set({ subscriptionTier: tier }),
+      setIsPremium: (isPremium) => set({ isPremium }),
       
       toggleDevUnlockAll: () => set((state) => ({ devUnlockAll: !state.devUnlockAll })),
       setRegionalVariant: (variant) => set({ regionalVariant: variant }),
