@@ -124,8 +124,8 @@ export default function SpeechTrainer() {
   };
 
   const evaluateSpeech = (spokenText: string) => {
-    const similarity = calculateSimilarity(spokenText, currentExercise.arabic);
-    const score = Math.round(similarity * 100);
+    const evalResult = calculateSimilarity(spokenText, currentExercise.text, currentExercise.arabic);
+    const score = evalResult.score;
     
     let feedback = 'Continuez à vous entraîner !';
     if (score > 80) feedback = 'Excellente prononciation !';

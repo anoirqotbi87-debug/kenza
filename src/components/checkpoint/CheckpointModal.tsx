@@ -112,7 +112,7 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
         levelId={levelId}
         levelName={levelName}
         score={score}
-        total={questions.length}
+        totalQuestions={questions.length}
         onClose={onClose}
         onRetry={() => {
           setCurrentIndex(0);

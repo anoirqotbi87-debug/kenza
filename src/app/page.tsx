@@ -40,7 +40,7 @@ export default function Home() {
   const isArabic = lang === 'ar' || lang.startsWith('ar');
   const { t } = useTranslation();
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
-  const { completeLesson, completedLessons, devUnlockAll, setUser, resetData, hasCompletedOnboarding, subscriptionTier } = useAppStore();
+  const { completeLesson, completedLessons, devUnlockAll, setUser, resetData, hasCompletedOnboarding, isPremium } = useAppStore();
   const [checkpointOpen, setCheckpointOpen] = useState<{ id: string, name: string } | null>(null);
   const { hasPassedLevel } = useCheckpointProgress();
 
@@ -297,7 +297,7 @@ export default function Home() {
                 <button
                   disabled={!isCheckpointUnlocked}
                   onClick={() => {
-                    if (subscriptionTier === 'free') {
+                    if (isPremium === 'free') {
                       setPricingSource('checkpoint_locked');
                     } else {
                       setCheckpointOpen({ id: moduleId, name: titleStr });

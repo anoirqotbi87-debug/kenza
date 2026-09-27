@@ -38,7 +38,7 @@ export default function PricingModal({ onClose, source }: PricingModalProps) {
     // In real app, redirect to Stripe
     alert("Redirection vers le paiement en cours...");
     // Here we just unlock for demo
-    setIsPremium('premium');
+    setIsPremium(true);
     onClose();
   };
 

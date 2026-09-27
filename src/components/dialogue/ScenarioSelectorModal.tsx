@@ -12,7 +12,7 @@ interface ScenarioSelectorModalProps {
 }
 
 export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePremium, onStartSrs }: ScenarioSelectorModalProps) {
-  const { subscriptionTier } = useAppStore();
+  const { isPremium } = useAppStore();
   const rawLang = useAppStore((state) => state.uiLanguage || 'fr');
   const lang = String(rawLang).toLowerCase();
   const isAr = lang === 'ar' || lang.startsWith('ar');
@@ -104,7 +104,7 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {aiPersonasList.map((persona, index) => {
-              const isLocked = subscriptionTier === 'free' && index > 0;
+              const isLocked = isPremium === 'free' && index > 0;
               
               const handleCardClick = () => {
                 if (!isOnline) {
