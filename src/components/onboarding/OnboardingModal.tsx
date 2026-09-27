@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAppStore } from '../../store/useAppStore';
+import PlacementTestModal from './PlacementTestModal';
 import { Compass, Briefcase, Heart, Clock, Zap, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 const GOALS = [
@@ -13,16 +14,15 @@ const TEMPOS = [
   { id: 10, title: 'Régulier', desc: '10 min / jour', icon: CheckCircle2 },
   { id: 15, title: 'Intensif', desc: '15 min / jour', icon: Zap },
 ];
-
 export default function OnboardingModal() {
   const { completeOnboarding, completeLesson } = useAppStore();
   const [step, setStep] = useState(1);
   const [goal, setGoal] = useState<string | null>(null);
   const [tempo, setTempo] = useState<number | null>(null);
 
-  // Mini quiz state
   const [quizScore, setQuizScore] = useState(0);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [isPlacementTestOpen, setIsPlacementTestOpen] = useState(false);
+  
 
   const questions = [
     { q: 'Comment dit-on "Bonjour" ?', options: ['Salam', 'Bslama', 'Chokran'], correct: 0 },
@@ -133,29 +133,47 @@ export default function OnboardingModal() {
               </div>
             </div>
           )}
-
           {step === 3 && (
             <div className="space-y-6 animate-in slide-in-from-right">
               <div className="text-center">
-                <h2 className="text-2xl font-black text-slate-800 mb-2">Test de niveau rapide 🧠</h2>
-                <p className="text-slate-500">Voyons ce que vous savez déjà...</p>
+                <h2 className="text-2xl font-black text-slate-800 mb-2">Quel est votre niveau ? 🇲🇦</h2>
+                <p className="text-slate-500">Pour vous proposer le meilleur point de départ.</p>
               </div>
               
-              <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 text-center">
-                <h3 className="text-lg font-bold text-slate-800 mb-6">{questions[currentQuestion].q}</h3>
-                <div className="space-y-3">
-                  {questions[currentQuestion].options.map((opt, i) => (
-                    <button
-                      key={i}
-                      onClick={() => handleAnswer(i)}
-                      className="w-full py-3 px-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-700 hover:border-blue-600 hover:text-blue-600 transition-colors"
-                    >
-                      {opt}
-                    </button>
-                  ))}
-                </div>
+              <div className="space-y-4">
+                <button
+                  onClick={() => {
+                    setQuizScore(0);
+                    setStep(4);
+                  }}
+                  className="w-full p-4 bg-white border-2 border-slate-200 rounded-2xl font-bold text-slate-700 hover:border-emerald-500 hover:bg-emerald-50 transition-all flex items-center justify-between"
+                >
+                  <div className="text-left">
+                    <div className="text-emerald-600 mb-1 flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                      Je débute complètement
+                    </div>
+                    <div className="text-sm font-normal text-slate-500">Commencer depuis le Module 1</div>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-slate-400" />
+                </button>
+
+                <button
+                  onClick={() => setIsPlacementTestOpen(true)}
+                  className="w-full p-4 bg-white border-2 border-slate-200 rounded-2xl font-bold text-slate-700 hover:border-blue-500 hover:bg-blue-50 transition-all flex items-center justify-between"
+                >
+                  <div className="text-left">
+                    <div className="text-blue-600 mb-1 flex items-center gap-2">
+                      <Zap className="w-4 h-4" />
+                      J'ai déjà des notions
+                    </div>
+                    <div className="text-sm font-normal text-slate-500">Test rapide de 2 min pour sauter des niveaux</div>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-slate-400" />
+                </button>
               </div>
             </div>
+          )}
           )}
 
           {step === 4 && (
@@ -183,6 +201,16 @@ export default function OnboardingModal() {
 
         </div>
       </div>
+
+      <PlacementTestModal 
+        isOpen={isPlacementTestOpen} 
+        onClose={() => setIsPlacementTestOpen(false)} 
+        onComplete={(lvl) => {
+          setIsPlacementTestOpen(false);
+          setQuizScore(lvl === 'B1' ? 3 : lvl === 'A2' ? 2 : 0);
+          setStep(4);
+        }} 
+      />
     </div>
   );
 }

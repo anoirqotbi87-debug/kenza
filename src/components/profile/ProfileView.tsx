@@ -12,9 +12,12 @@ import { useCheckpointProgress } from '../../hooks/useCheckpointProgress';
 import DarijaPassportCard from '../certificate/DarijaPassportCard';
 import ProfilePassportView from './ProfilePassportView';
 import NotificationSettings from './NotificationSettings';
+import PlacementTestModal from '../onboarding/PlacementTestModal';
+import { Zap } from 'lucide-react';
 
 export default function ProfileView() {
   const { xp, streakDays, srsDeck } = useAppStore();
+  const [isPlacementTestOpen, setIsPlacementTestOpen] = useState(false);
   const { t } = useTranslation();
   const [session, setSession] = useState<Session | null>(null);
   
@@ -99,6 +102,33 @@ export default function ProfileView() {
       <div className="mt-8">
         <NotificationSettings />
       </div>
+
+      <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 mt-8">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
+            <Zap className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="font-bold text-slate-800">Test de Positionnement</h3>
+            <p className="text-sm text-slate-500">Réévaluez votre niveau pour débloquer du contenu.</p>
+          </div>
+        </div>
+        <button 
+          onClick={() => setIsPlacementTestOpen(true)}
+          className="w-full py-3 px-4 bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 border border-slate-200 hover:border-blue-200 rounded-xl font-bold transition-colors"
+        >
+          Re-passer le test
+        </button>
+      </div>
+
+      <PlacementTestModal 
+        isOpen={isPlacementTestOpen} 
+        onClose={() => setIsPlacementTestOpen(false)} 
+        onComplete={(lvl) => {
+          setIsPlacementTestOpen(false);
+          // Optional: trigger a toast or reload here
+        }} 
+      />
 
       {/* Mode Hors-Ligne */}
       <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 mt-8">
