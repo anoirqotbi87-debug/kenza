@@ -48,7 +48,8 @@ export function useNotifications() {
           icon: '/icons/icon-192x192.png',
           badge: '/icons/icon-192x192.png',
           data: { url: '/?tab=srs' },
-          vibrate: [200, 100, 200],
+          // @ts-ignore
+            vibrate: [200, 100, 200],
         });
       } catch (e) {
         console.error('Failed to send test notification:', e);
