@@ -39,7 +39,7 @@ export default function CustomCardEditor({ isOpen, onClose, cardToEdit }: Custom
           transText = cardToEdit.translation.fr;
         }
         setTranslation(transText);
-        setNotes(cardToEdit.notes || '');
+        setNotes((cardToEdit as any).notes || '');
       } else {
         setArabizi('');
         setTranslation('');

@@ -8,7 +8,7 @@ declare global {
   }
 }
 
-declare const self: ServiceWorkerGlobalScope;
+declare const self: any;
 
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
@@ -19,11 +19,11 @@ const serwist = new Serwist({
   runtimeCaching: [
     {
       matcher: /^\/api\/roleplay\//i,
-      handler: "NetworkOnly",
+      handler: "NetworkOnly" as any,
     },
     {
       matcher: ({ url }) => url.pathname.startsWith('/api/tts'),
-      handler: "CacheFirst",
+      handler: "CacheFirst" as any,
       options: {
         cacheName: "kenza-tts-cache",
         expiration: {
@@ -34,7 +34,7 @@ const serwist = new Serwist({
     },
     {
       matcher: /\.(?:mp3|wav|ogg|m4a)$/i,
-      handler: "CacheFirst",
+      handler: "CacheFirst" as any,
       options: {
         cacheName: "kenza-audio-cache",
         expiration: {
@@ -45,7 +45,7 @@ const serwist = new Serwist({
     },
     {
       matcher: /\.(?:woff|woff2|eot|ttf|otf)$/i,
-      handler: "CacheFirst",
+      handler: "CacheFirst" as any,
       options: {
         cacheName: "kenza-fonts-cache",
         expiration: {

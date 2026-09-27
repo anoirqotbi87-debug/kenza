@@ -24,11 +24,7 @@ export default function OnboardingModal() {
   const [isPlacementTestOpen, setIsPlacementTestOpen] = useState(false);
   
 
-  const questions = [
-    { q: 'Comment dit-on "Bonjour" ?', options: ['Salam', 'Bslama', 'Chokran'], correct: 0 },
-    { q: 'Comment dit-on "Non" ?', options: ['Wakha', 'Iyeh', 'La'], correct: 2 },
-    { q: 'Combien font Wahd + Jouj ?', options: ['Tleta', 'Rba3a', 'Khamsa'], correct: 0 },
-  ];
+  
 
   const handleGoalSelect = (gId: string) => {
     setGoal(gId);
@@ -40,18 +36,7 @@ export default function OnboardingModal() {
     setTimeout(() => setStep(3), 300);
   };
 
-  const handleAnswer = (index: number) => {
-    if (index === questions[currentQuestion].correct) {
-      setQuizScore(s => s + 1);
-    }
-    
-    if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(c => c + 1);
-    } else {
-      // Finished
-      setStep(4);
-    }
-  };
+  
 
   const handleFinish = () => {
     if (goal && tempo) {
@@ -173,7 +158,6 @@ export default function OnboardingModal() {
                 </button>
               </div>
             </div>
-          )}
           )}
 
           {step === 4 && (

@@ -11,7 +11,7 @@ import CustomCardEditor from './CustomCardEditor';
 export default function DeckManagerView() {
   const { srsDeck, customVocabulary, deleteCustomWord, uiLanguage } = useAppStore();
   const rawLang = uiLanguage || 'fr';
-  const lang = String(rawLang).toLowerCase();
+  const lang = String(rawLang).toLowerCase() as any;
   const isAr = lang === 'ar' || lang.startsWith('ar');
 
   const [searchQuery, setSearchQuery] = useState('');
