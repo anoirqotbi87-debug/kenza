@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'Plateforme interactive d\'apprentissage de la Darija',
     start_url: '/',
     display: 'standalone',
-    background_color: '#0F172A',
-    theme_color: '#F97316',
+    background_color: '#F7F3EA',
+    theme_color: '#1B2A4A',
     dir: 'auto',
     icons: [
       {

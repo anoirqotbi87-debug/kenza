@@ -1,7 +1,18 @@
 import type { Metadata } from "next";
-import { Cairo, Inter } from 'next/font/google';
+import { Cairo, Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const playfair = Playfair_Display({ 
+  subsets: ['latin'], 
+  variable: '--font-serif',
+  display: 'swap',
+});
+
+const plusJakarta = Plus_Jakarta_Sans({ 
+  subsets: ['latin'], 
+  variable: '--font-sans',
+  display: 'swap',
+});
+
 const cairo = Cairo({ 
   subsets: ['arabic', 'latin'], 
   weight: ['400', '600', '700', '800'],
@@ -27,8 +38,8 @@ import NetworkStatus from '../components/NetworkStatus';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" dir="ltr" className={`${inter.variable} ${cairo.variable}`}>
-      <body className="font-sans antialiased bg-slate-50 text-slate-900 min-h-screen">
+    <html lang="fr" dir="ltr" className={`${playfair.variable} ${plusJakarta.variable} ${cairo.variable}`}>
+      <body className="font-sans antialiased bg-[#F7F3EA] text-[#1B2A4A] min-h-screen selection:bg-[#C9A05C]/20 selection:text-[#1B2A4A]">
         <I18nProvider>
           <NetworkStatus />
           {children}

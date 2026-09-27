@@ -59,60 +59,48 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
         .filter(w => w.id !== word.id)
         .sort(() => 0.5 - Math.random())
         .slice(0, 3);
-        
-      const options = [word, ...distractors]
-        .sort(() => 0.5 - Math.random())
-        .map((opt: any) => {
-          const variant = getVariantForWord(opt.arabizi, regionalVariant);
-          const tMap: any = (opt as any).translations || (opt as any).translation || { fr: '' };
-          const translated = typeof tMap === 'string' ? tMap : tMap[lang] || tMap.fr;
-          return {
-            id: opt.id,
-            arabizi: variant ? variant.variant : opt.arabizi,
-            arabic: variant ? variant.variantArabic : opt.arabic,
-            translation: translated
-          };
-        });
+      
+      const options = [
+        { id: word.id, arabizi: word.arabizi, arabic: word.arabic },
+        ...distractors.map(d => ({ id: d.id, arabizi: d.arabizi, arabic: d.arabic }))
+      ].sort(() => 0.5 - Math.random());
 
-      const variant = getVariantForWord(word.arabizi, regionalVariant);
       const tMap: any = (word as any).translations || (word as any).translation || { fr: '' };
-      const translated = typeof tMap === 'string' ? tMap : tMap[lang] || tMap.fr;
+      const prompt = typeof tMap === 'string' ? tMap : tMap[lang] || tMap.fr;
 
       return {
         id: word.id,
-        prompt: translated,
+        prompt,
         answerId: word.id,
-        arabizi: variant ? variant.variant : word.arabizi,
-        arabic: variant ? variant.variantArabic : word.arabic,
+        arabizi: word.arabizi,
+        arabic: word.arabic,
         options
       };
     });
-  }, [lang, regionalVariant, levelId]);
+  }, [levelId, lang]);
 
   const currentQ = questions[currentIndex];
-  const progress = ((currentIndex) / questions.length) * 100;
+  const progress = Math.round(((currentIndex) / questions.length) * 100);
 
   const handleCheck = () => {
     if (!selectedOption) return;
-    
     const correct = selectedOption === currentQ.answerId;
     setIsCorrect(correct);
-    setIsAnswerChecked(true);
-    
     if (correct) {
-      setScore(prev => prev + 1);
-      playAudio('correct', undefined, soundEnabled);
-    } else {
-      playAudio('error', undefined, soundEnabled);
+      setScore(s => s + 1);
+    }
+    setIsAnswerChecked(true);
+
+    if (soundEnabled) {
+      playAudio(currentQ.arabizi, currentQ.arabic, true);
     }
   };
 
   const handleNext = () => {
     if (currentIndex < questions.length - 1) {
-      setCurrentIndex(prev => prev + 1);
+      setCurrentIndex(c => c + 1);
       setSelectedOption(null);
       setIsAnswerChecked(false);
-      setIsCorrect(false);
     } else {
       setShowResult(true);
     }
@@ -124,7 +112,7 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
         levelId={levelId}
         levelName={levelName}
         score={score}
-        totalQuestions={questions.length}
+        total={questions.length}
         onClose={onClose}
         onRetry={() => {
           setCurrentIndex(0);
@@ -138,24 +126,24 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-100 flex flex-col">
+    <div className="fixed inset-0 z-50 bg-[#F7F3EA] flex flex-col">
       {/* Header Progress */}
-      <div className="bg-white px-4 py-4 flex items-center gap-4 shadow-sm relative z-10">
+      <div className="bg-[#FDFCF8] px-4 py-4 flex items-center gap-4 shadow-xs border-b border-[#E8E2D5] relative z-10">
         <button 
           onClick={onClose} 
-          className="p-2 text-slate-400 hover:bg-slate-100 rounded-full transition-colors"
+          className="p-2 text-[#7A7670] hover:text-[#1B2A4A] hover:bg-[#E8E2D5]/50 rounded-full transition-colors"
         >
-          <X className="w-6 h-6" />
+          <X className="w-5 h-5" />
         </button>
-        <div className="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+        <div className="flex-1 h-2.5 bg-[#E8E2D5] rounded-full overflow-hidden">
           <div 
-            className="h-full bg-blue-500 transition-all duration-500 ease-out"
+            className="h-full bg-[#7A9174] transition-all duration-500 ease-out rounded-full"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <div className="w-8 flex items-center justify-center">
-          <div className="font-bold text-amber-500 bg-amber-50 px-3 py-1 rounded-full text-sm">
-            {currentIndex + 1}/{questions.length}
+        <div className="w-auto flex items-center justify-center">
+          <div className="font-bold text-[#1B2A4A] bg-[#C9A05C]/20 border border-[#C9A05C]/40 px-3 py-1 rounded-full text-xs">
+            {currentIndex + 1} / {questions.length}
           </div>
         </div>
       </div>
@@ -163,14 +151,15 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-8 flex flex-col max-w-3xl mx-auto w-full">
         <div className="text-center mb-8 pt-4">
-          <div className="inline-block bg-blue-50 text-blue-600 font-bold px-4 py-1.5 rounded-full text-sm mb-4">
-            Examen {levelId.toUpperCase()}
+          <div className="inline-flex items-center gap-2 text-[#C9A05C] text-xs font-bold tracking-[0.22em] uppercase mb-2">
+            <span>—</span>
+            <span>Examen {levelId.toUpperCase()}</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-800">
-            Comment dit-on :
+          <h2 className="font-serif text-xl sm:text-2xl text-[#7A7670] font-normal">
+            Comment dit-on en Darija :
           </h2>
-          <div className="text-3xl sm:text-4xl font-bold text-blue-600 mt-4">
-            "{currentQ.prompt}"
+          <div className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#1B2A4A] mt-2">
+            « {currentQ.prompt} »
           </div>
         </div>
 
@@ -186,18 +175,18 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
                 onClick={() => !isAnswerChecked && setSelectedOption(opt.id)}
                 disabled={isAnswerChecked}
                 className={`
-                  p-6 rounded-2xl border-2 text-center transition-all min-h-[100px] flex flex-col items-center justify-center gap-2
-                  ${isSelected && !isAnswerChecked ? 'border-blue-500 bg-blue-50 shadow-md transform -translate-y-1' : 'border-slate-200 bg-white hover:border-blue-200 hover:bg-slate-50'}
-                  ${isCorrectOption ? 'border-green-500 bg-green-50 text-green-800 shadow-md' : ''}
-                  ${isWrongSelection ? 'border-red-500 bg-red-50 text-red-800 shadow-inner' : ''}
+                  p-6 rounded-3xl border text-center transition-all min-h-[100px] flex flex-col items-center justify-center gap-1 shadow-xs
+                  ${isSelected && !isAnswerChecked ? 'border-2 border-[#C9A05C] bg-[#C9A05C]/10 text-[#1B2A4A] shadow-md -translate-y-0.5' : 'border-[#E8E2D5] bg-[#FDFCF8] hover:border-[#C9A05C]/60'}
+                  ${isCorrectOption ? 'border-2 border-[#7A9174] bg-[#7A9174]/15 text-[#1B2A4A] shadow-sm' : ''}
+                  ${isWrongSelection ? 'border-2 border-red-400 bg-red-50 text-red-800' : ''}
                   ${isAnswerChecked && !isCorrectOption && !isWrongSelection ? 'opacity-40 grayscale' : ''}
                 `}
               >
                 {(preferredNotation === 'arabizi' || preferredNotation === 'duo') && (
-                  <span className="font-bold text-lg">{opt.arabizi}</span>
+                  <span className="font-serif font-bold text-lg text-[#1B2A4A]">{opt.arabizi}</span>
                 )}
                 {(preferredNotation === 'arabic' || preferredNotation === 'duo') && (
-                  <span className="font-arabic text-xl text-slate-500">{opt.arabic}</span>
+                  <span className="font-arabic text-xl text-[#7A7670]">{opt.arabic}</span>
                 )}
               </button>
             );
@@ -206,47 +195,47 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
       </div>
 
       {/* Footer Controls */}
-      <div className={`p-4 sm:p-6 border-t-2 bg-white transition-colors duration-300 ${
-        isAnswerChecked ? (isCorrect ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50') : 'border-slate-100'
+      <div className={`p-4 sm:p-6 border-t bg-[#FDFCF8] transition-colors duration-300 ${
+        isAnswerChecked ? (isCorrect ? 'border-[#7A9174]/40 bg-[#7A9174]/10' : 'border-red-200 bg-red-50') : 'border-[#E8E2D5]'
       }`}>
         <div className="max-w-3xl mx-auto flex justify-between items-center">
           
           {isAnswerChecked ? (
-            <div className={`flex items-center gap-3 font-bold text-lg ${isCorrect ? 'text-green-600' : 'text-red-600'}`}>
-              <div className={`p-2 rounded-full ${isCorrect ? 'bg-green-100' : 'bg-red-100'}`}>
-                {isCorrect ? <Check className="w-6 h-6" /> : <X className="w-6 h-6" />}
+            <div className={`flex items-center gap-3 font-bold text-base ${isCorrect ? 'text-[#7A9174]' : 'text-red-700'}`}>
+              <div className={`p-2 rounded-full ${isCorrect ? 'bg-[#7A9174]/20 text-[#7A9174]' : 'bg-red-100 text-red-600'}`}>
+                {isCorrect ? <Check className="w-5 h-5 stroke-[2.5]" /> : <X className="w-5 h-5" />}
               </div>
               <div>
-                {isCorrect ? 'Excellent !' : 'Incorrect'}
+                <span className="font-serif text-lg">{isCorrect ? 'Excellente réponse !' : 'Incorrect'}</span>
                 {!isCorrect && (
-                  <div className="text-sm font-medium mt-1 opacity-80 flex items-center gap-2">
-                    Réponse : {currentQ.arabizi}
+                  <div className="text-xs font-medium mt-0.5 opacity-80 flex items-center gap-2">
+                    Réponse correcte : {currentQ.arabizi}
                     <button 
                       onClick={(e) => { e.stopPropagation(); playAudio(currentQ.arabizi, currentQ.arabic, soundEnabled); }}
                       className="p-1 bg-red-100 hover:bg-red-200 rounded-full"
                     >
-                      <Volume2 className="w-4 h-4" />
+                      <Volume2 className="w-3.5 h-3.5 text-red-700" />
                     </button>
                   </div>
                 )}
               </div>
             </div>
           ) : (
-            <div /> // Empty placeholder for spacing
+            <div />
           )}
 
           <button
             onClick={isAnswerChecked ? handleNext : handleCheck}
             disabled={!selectedOption && !isAnswerChecked}
             className={`
-              px-8 py-4 rounded-2xl font-bold text-lg flex items-center gap-2 transition-all shadow-md active:scale-95
-              ${(!selectedOption && !isAnswerChecked) ? 'bg-slate-200 text-slate-400 shadow-none cursor-not-allowed' : 
-                isAnswerChecked ? (isCorrect ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-red-600 hover:bg-red-700 text-white') : 
-                'bg-blue-600 hover:bg-blue-700 text-white hover:-translate-y-1 hover:shadow-lg'}
+              px-8 py-3.5 rounded-full font-bold text-sm sm:text-base flex items-center gap-2 transition-all shadow-md active:scale-95
+              ${(!selectedOption && !isAnswerChecked) ? 'bg-[#E8E2D5] text-[#7A7670] shadow-none cursor-not-allowed' : 
+                isAnswerChecked ? (isCorrect ? 'bg-[#7A9174] hover:bg-[#687e63] text-white' : 'bg-red-600 hover:bg-red-700 text-white') : 
+                'bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] shadow-lg'}
             `}
           >
-            {isAnswerChecked ? 'Continuer' : 'Vérifier'}
-            {isAnswerChecked && <ArrowRight className="w-5 h-5" />}
+            <span>{isAnswerChecked ? 'Continuer' : 'Vérifier'}</span>
+            {isAnswerChecked && <ArrowRight className="w-4 h-4" />}
           </button>
         </div>
       </div>

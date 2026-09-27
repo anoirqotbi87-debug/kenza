@@ -7,7 +7,7 @@ import BadgesList from '../gamification/BadgesList';
 import StreakHeatmap from '../gamification/StreakHeatmap';
 import { supabase } from '../../lib/supabase';
 import { Session } from '@supabase/supabase-js';
-import { User, Trophy, Flame, Star, Crown, Headphones, Clock, BookOpen, Lock } from 'lucide-react';
+import { User, Trophy, Flame, Star, Crown, Headphones, Clock, BookOpen, Lock, Sparkles, Smartphone } from 'lucide-react';
 import { useCheckpointProgress } from '../../hooks/useCheckpointProgress';
 import DarijaPassportCard from '../certificate/DarijaPassportCard';
 import ProfilePassportView from './ProfilePassportView';
@@ -63,34 +63,28 @@ export default function ProfileView() {
 
   const username = session?.user?.user_metadata?.full_name || session?.user?.email?.split('@')[0] || "Invité";
 
-  const totalSrsCards = Object.keys(srsDeck).length;
-  const learnedCards = Object.values(srsDeck).filter(c => c.repetition > 0).length;
-
-  // Passeports (A1 = level 2, A2 = level 3, B1 = level 4)
-  const passports = [
-    { id: '2', name: 'A1 - Survie & Souk', title: 'Palier A1' },
-    { id: '3', name: 'A2 - Autonomie & Riad', title: 'Palier A2' },
-    { id: '4', name: 'B1 - Maîtrise Verbale', title: 'Palier B1' }
-  ];
-
   return (
-    <div className="max-w-4xl mx-auto p-4 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="max-w-4xl mx-auto p-4 space-y-8 animate-in fade-in duration-300">
       
       {/* Profil Header */}
-      <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 flex flex-col md:flex-row items-center md:items-start gap-8">
-        <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg border-4 border-white shrink-0">
-          <User className="w-12 h-12 text-white" />
+      <div className="bg-[#FDFCF8] rounded-3xl p-8 shadow-xs border border-[#E8E2D5] flex flex-col md:flex-row items-center md:items-start gap-6">
+        <div className="w-20 h-20 bg-[#1B2A4A] rounded-full flex items-center justify-center shadow-md border-2 border-[#C9A05C] shrink-0 text-[#C9A05C]">
+          <User className="w-10 h-10" />
         </div>
-        <div className="flex-1 text-center md:text-left space-y-3">
-          <h2 className="text-3xl font-bold text-slate-800">{username}</h2>
-          <div className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 px-4 py-1.5 rounded-full font-bold text-sm">
-            <Crown className="w-4 h-4" />
-            {getLevelName(xp)}
+        <div className="flex-1 text-center md:text-left space-y-2">
+          <div className="flex items-center justify-center md:justify-start gap-2 text-[#C9A05C] text-xs font-bold tracking-[0.2em] uppercase">
+            <span>—</span>
+            <span>Profil Apprenant</span>
+          </div>
+          <h2 className="font-serif text-3xl font-bold text-[#1B2A4A]">{username}</h2>
+          <div className="inline-flex items-center gap-2 bg-[#C9A05C]/15 border border-[#C9A05C]/30 text-[#1B2A4A] px-4 py-1.5 rounded-full font-bold text-xs">
+            <Crown className="w-3.5 h-3.5 text-[#C9A05C]" />
+            <span>{getLevelName(xp)}</span>
           </div>
         </div>
       </div>
 
-      {/* Nouvelle UI : Grille Stats & Passeport Culturel */}
+      {/* Grille Stats & Passeport Culturel */}
       <ProfilePassportView />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
@@ -103,19 +97,20 @@ export default function ProfileView() {
         <NotificationSettings />
       </div>
 
-      <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 mt-8">
+      {/* Test de positionnement */}
+      <div className="bg-[#FDFCF8] rounded-3xl p-8 shadow-xs border border-[#E8E2D5] mt-8">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
+          <div className="w-10 h-10 bg-[#C9A05C]/15 text-[#C9A05C] rounded-2xl flex items-center justify-center">
             <Zap className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-bold text-slate-800">Test de Positionnement</h3>
-            <p className="text-sm text-slate-500">Réévaluez votre niveau pour débloquer du contenu.</p>
+            <h3 className="font-serif font-bold text-lg text-[#1B2A4A]">Test de Positionnement</h3>
+            <p className="text-xs text-[#7A7670]">Réévaluez votre niveau pour ajuster votre parcours.</p>
           </div>
         </div>
         <button 
           onClick={() => setIsPlacementTestOpen(true)}
-          className="w-full py-3 px-4 bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 border border-slate-200 hover:border-blue-200 rounded-xl font-bold transition-colors"
+          className="w-full py-3 px-4 bg-[#F7F3EA] hover:bg-[#E8E2D5]/60 text-[#1B2A4A] border border-[#E8E2D5] rounded-full font-bold text-xs transition-colors"
         >
           Re-passer le test
         </button>
@@ -124,34 +119,33 @@ export default function ProfileView() {
       <PlacementTestModal 
         isOpen={isPlacementTestOpen} 
         onClose={() => setIsPlacementTestOpen(false)} 
-        onComplete={(lvl) => {
+        onComplete={() => {
           setIsPlacementTestOpen(false);
-          // Optional: trigger a toast or reload here
         }} 
       />
 
       {/* Mode Hors-Ligne */}
-      <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 mt-8">
+      <div className="bg-[#FDFCF8] rounded-3xl p-8 shadow-xs border border-[#E8E2D5] mt-8">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
-            <span className="text-xl">📱</span>
+          <div className="w-10 h-10 rounded-2xl bg-[#7A9174]/15 text-[#7A9174] flex items-center justify-center">
+            <Smartphone className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-bold text-slate-800">Mode Hors-Ligne</h3>
-            <p className="text-sm text-slate-500">Téléchargez le contenu pour réviser sans internet</p>
+            <h3 className="font-serif font-bold text-lg text-[#1B2A4A]">Mode Hors-Ligne PWA</h3>
+            <p className="text-xs text-[#7A7670]">Téléchargez les audios et fiches pour pratiquer sans connexion internet.</p>
           </div>
         </div>
         
-        <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-          <div className="flex justify-between text-sm font-medium mb-2">
-            <span className="text-slate-600">Stockage local</span>
-            <span className={downloadProgress === 100 ? "text-green-600 font-bold" : "text-blue-600"}>
+        <div className="bg-[#F7F3EA] rounded-2xl p-5 border border-[#E8E2D5]">
+          <div className="flex justify-between text-xs font-semibold mb-2">
+            <span className="text-[#7A7670]">Données préchargées</span>
+            <span className={downloadProgress === 100 ? "text-[#7A9174] font-bold" : "text-[#1B2A4A]"}>
               {downloadProgress}%
             </span>
           </div>
-          <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+          <div className="h-2 bg-[#E8E2D5] rounded-full overflow-hidden">
             <div 
-              className="h-full bg-blue-500 transition-all duration-300" 
+              className="h-full bg-[#7A9174] rounded-full transition-all duration-300" 
               style={{ width: `${downloadProgress}%` }}
             />
           </div>
@@ -159,9 +153,9 @@ export default function ProfileView() {
           <button 
             onClick={handleDownloadOfflinePack}
             disabled={isDownloading || downloadProgress === 100}
-            className="w-full mt-4 bg-white border border-slate-200 hover:border-blue-300 hover:bg-blue-50 text-slate-700 font-bold py-2 px-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            className="w-full mt-4 bg-[#FDFCF8] border border-[#E8E2D5] hover:border-[#C9A05C] text-[#1B2A4A] font-bold py-2.5 px-4 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs shadow-xs"
           >
-            {isDownloading ? 'Téléchargement...' : downloadProgress === 100 ? 'Pack Complet Prêt' : 'Télécharger le pack complet'}
+            {isDownloading ? 'Téléchargement en cours...' : downloadProgress === 100 ? '✓ Pack Complet Prêt' : 'Télécharger le pack complet'}
           </button>
         </div>
       </div>

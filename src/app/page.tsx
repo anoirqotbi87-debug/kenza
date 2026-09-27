@@ -1,16 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Dashboard from '@/components/Dashboard';
 import ExerciseRunner from '@/components/ExerciseRunner';
 import SRSDashboard from '@/components/srs/SRSDashboard';
 import { allLessonsList, fullCurriculum } from '@/data/curriculum';
 import { useAppStore, useTranslation } from '@/store/useAppStore';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { CheckCircle2, Play } from 'lucide-react';
+import { Check, CheckCircle2, Play, Lock, ArrowRight, Sparkles, BookOpen, Compass, RotateCcw } from 'lucide-react';
 import { getLocalizedText } from '@/lib/i18n/utils';
 import { Navigation } from '@/components/Navigation';
 import Header from '@/components/Header';
+import HeroBanner from '@/components/dashboard/HeroBanner';
+import DailyReviewCard from '@/components/dashboard/DailyReviewCard';
+import SmartReviewSession from '@/components/srs/SmartReviewSession';
 import PhrasebookView from '@/components/tools/PhrasebookView';
 import SpeechTrainer from '@/components/audio/SpeechTrainer';
 import ProfileView from '@/components/profile/ProfileView';
@@ -19,18 +22,19 @@ import { useCheckpointProgress } from '@/hooks/useCheckpointProgress';
 
 import { supabase } from '@/lib/supabase';
 import { syncService } from '@/lib/syncService';
-import { useEffect } from 'react';
 
 import ScenarioSelectorModal from '@/components/dialogue/ScenarioSelectorModal';
 import AiRoleplayView from '@/components/dialogue/AiRoleplayView';
 import { PersonaId } from '@/lib/ai/prompts';
 import OnboardingModal from '@/components/onboarding/OnboardingModal';
 import InstallPwaBanner from '@/components/pwa/InstallPwaBanner';
-import PaywallModal from '@/components/monetization/PaywallModal';
+import PricingModal from '@/components/monetization/PricingModal';
 
 export default function Home() {
-  const [currentTab, setCurrentTab] = useState<'learn' | 'phrasebook' | 'speech' | 'profile'>('learn');
-  const [activeTab, setActiveTab] = useState<'grammar' | 'conversation'>('grammar');
+  const [currentTab, setCurrentTab] = useState<'home' | 'parcours' | 'phrasebook' | 'review' | 'learn' | 'speech' | 'profile'>('home');
+  const [activeTrack, setActiveTrack] = useState<'grammar' | 'conversation'>('grammar');
+  const [isReviewSessionOpen, setIsReviewSessionOpen] = useState(false);
+  
   const rawLang = useAppStore((state) => state.uiLanguage || 'fr');
   const lang = String(rawLang).toLowerCase() as 'fr' | 'en' | 'es' | 'ar';
   const isArabic = lang === 'ar' || lang.startsWith('ar');
@@ -42,7 +46,7 @@ export default function Home() {
 
   const [showScenarioSelector, setShowScenarioSelector] = useState(false);
   const [activePersonaId, setActivePersonaId] = useState<PersonaId | null>(null);
-  const [paywallSource, setPaywallSource] = useState<string | null>(null);
+  const [pricingSource, setPricingSource] = useState<string | null>(null);
 
   useEffect(() => {
     const handleAuthSync = async (user: any) => {
@@ -67,13 +71,11 @@ export default function Home() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         console.log("[Auth] Session active détectée :", session.user.email);
-        // On init, we just ensure the store knows the user. If they were already logged in,
-        // their local storage is already their cloud storage. We can do a pull to be safe.
         handleAuthSync(session.user);
       }
     });
 
-    // 2. Écouter les changements d'état (CRUCIAL pour le retour de Google OAuth !)
+    // 2. Écouter les changements d'état
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("[Auth Event]:", event, session?.user?.email);
       if (event === 'SIGNED_IN' && session?.user) {
@@ -109,7 +111,6 @@ export default function Home() {
         alert(`Erreur d'authentification : ${errorDesc || error}`);
       }
 
-      // Nettoyer l'URL proprement sans recharger la page
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
@@ -129,26 +130,43 @@ export default function Home() {
     setActiveLessonId(null);
   };
 
+  // Find next uncompleted lesson
+  const nextLesson = allLessonsList.find((l) => !completedLessons.includes(l.id)) || allLessonsList[0];
+
   const renderModule = (moduleId: string, moduleData: any, track: 'grammar' | 'conversation') => {
-    const headerBg = track === 'grammar' 
-      ? "bg-gradient-to-r from-blue-600 to-indigo-500" 
-      : "bg-gradient-to-r from-amber-500 to-orange-500";
-    
-    const lineColor = track === 'grammar' ? "bg-blue-100" : "bg-amber-100";
+    const isGrammar = track === 'grammar';
     
     return (
       <div key={moduleId} className="space-y-6">
-        <div className={`${headerBg} p-6 rounded-3xl text-white shadow-lg flex items-center justify-between`}>
-          <h2 className="text-2xl font-bold mb-2">{t.dashboard.module} {moduleId} : {getLocalizedText(moduleData.title, lang)}</h2>
+        
+        {/* Module Header Card */}
+        <div className={`p-6 sm:p-7 rounded-[26px] shadow-sm border transition-all ${
+          isGrammar 
+            ? 'bg-[#1B2A4A] text-[#FDFCF8] border-[#1B2A4A]' 
+            : 'bg-[#FDFCF8] text-[#1B2A4A] border-[#E8E2D5]'
+        }`}>
+          <div className="flex items-center gap-2 text-[#C9A05C] text-xs font-bold tracking-[0.22em] uppercase mb-1">
+            <span>—</span>
+            <span>Module {moduleId}</span>
+          </div>
+          <h2 className={`font-serif text-2xl sm:text-3xl font-normal ${isGrammar ? 'text-[#FDFCF8]' : 'text-[#1B2A4A]'}`}>
+            {getLocalizedText(moduleData.title, lang)}
+          </h2>
+          <p className={`text-xs mt-1 ${isGrammar ? 'text-[#E8E2D5]/80' : 'text-[#7A7670]'}`}>
+            {moduleData.lessons.length} étapes structurées
+          </p>
         </div>
 
-        <div className="relative pt-8 pb-12 flex flex-col items-center gap-12">
-          <div className={`absolute top-0 bottom-0 left-1/2 w-4 ${lineColor} -translate-x-1/2 z-0 rounded-full`}></div>
+        {/* Timeline of step circles */}
+        <div className="relative pt-4 pb-10 flex flex-col items-center gap-8">
           
-          {moduleData.lessons.map((lesson: any) => {
-            const globalIndex = allLessonsList.findIndex(l => l.id === lesson.id);
+          {/* Ligne verticale en pointillés reliant les cercles */}
+          <div className="absolute top-6 bottom-16 left-1/2 w-0 border-l-2 border-dashed border-[#E8E2D5] -translate-x-1/2 z-0" />
+
+          {moduleData.lessons.map((lesson: any, idx: number) => {
+            const globalIndex = allLessonsList.findIndex((l) => l.id === lesson.id);
             const isCompleted = completedLessons.includes(lesson.id);
-            let isNext = !isCompleted && (globalIndex === 0 || completedLessons.includes(allLessonsList[globalIndex - 1].id));
+            let isNext = !isCompleted && (globalIndex === 0 || completedLessons.includes(allLessonsList[globalIndex - 1]?.id));
             let isLocked = !isCompleted && !isNext;
 
             // Enforce Checkpoint prerequisites
@@ -165,38 +183,90 @@ export default function Home() {
               isLocked = false;
               isNext = !isCompleted;
             }
-            
+
             return (
               <div key={lesson.id} className="relative z-10 w-full max-w-md">
-                <div className={`
-                  relative p-6 rounded-3xl border-4 transition-all duration-300
-                  ${isCompleted ? 'bg-white border-green-400 shadow-md' : ''}
-                  ${isNext ? 'bg-blue-50 border-blue-600 shadow-xl scale-105 transform cursor-pointer hover:bg-blue-100' : ''}
-                  ${isLocked ? 'bg-slate-50 border-slate-200 opacity-70' : ''}
-                `}
-                onClick={() => isNext && handleStartLesson(lesson.id)}
+                
+                {/* Center Circle Node */}
+                <div className="flex flex-col items-center mb-3">
+                  {isCompleted ? (
+                    /* Validé : Cercle vert sauge (#7A9174) avec coche blanche */
+                    <div className="w-11 h-11 rounded-full bg-[#7A9174] text-white flex items-center justify-center shadow-xs border-2 border-[#FDFCF8] ring-4 ring-[#7A9174]/20 transition-transform">
+                      <Check className="w-5 h-5 text-white stroke-[2.5]" />
+                    </div>
+                  ) : isNext ? (
+                    /* En cours / À suivre : Cercle contour doré avec badge pill "À SUIVRE" plein */
+                    <div className="flex flex-col items-center gap-1.5">
+                      <div className="w-12 h-12 rounded-full border-2 border-[#C9A05C] bg-[#FDFCF8] text-[#C9A05C] flex items-center justify-center shadow-md ring-4 ring-[#C9A05C]/25 animate-pulse">
+                        <Play className="w-5 h-5 fill-[#C9A05C] text-[#C9A05C] ml-0.5" />
+                      </div>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#C9A05C] text-[#1B2A4A] text-[10px] font-bold tracking-wider uppercase shadow-xs">
+                        À SUIVRE
+                      </span>
+                    </div>
+                  ) : (
+                    /* Verrouillé : Cercle discret contour #E8E2D5 */
+                    <div className="w-10 h-10 rounded-full border border-[#E8E2D5] bg-[#F7F3EA] text-[#7A7670]/50 flex items-center justify-center">
+                      <Lock className="w-4 h-4 text-[#7A7670]/50" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Lesson Card */}
+                <div
+                  onClick={() => isNext && handleStartLesson(lesson.id)}
+                  className={`relative p-6 sm:p-7 rounded-[26px] border transition-all duration-300 text-left ${
+                    isCompleted
+                      ? 'bg-[#FDFCF8] border-[#7A9174]/40 shadow-xs hover:border-[#7A9174] cursor-pointer'
+                      : isNext
+                        ? 'bg-[#FDFCF8] border-2 border-[#C9A05C] shadow-lg scale-[1.02] transform cursor-pointer ring-4 ring-[#C9A05C]/10'
+                        : 'bg-[#FDFCF8]/60 border-[#E8E2D5]/70 opacity-60 cursor-not-allowed'
+                  }`}
                 >
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className={`font-bold text-lg ${isLocked ? 'text-slate-400' : 'text-slate-800'}`}>
-                      {getLocalizedText(lesson.title, lang)}
-                    </h3>
-                    {isCompleted && <CheckCircle2 className="text-green-500 w-6 h-6" />}
-                    {isNext && <div className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full animate-pulse">{t.dashboard.current}</div>}
+                  <div className="flex justify-between items-start gap-3 mb-2">
+                    <div>
+                      <div className="text-[11px] font-bold tracking-[0.2em] uppercase text-[#C9A05C] mb-1">
+                        — Étape {idx + 1}
+                      </div>
+                      <h3 className={`font-serif text-xl font-bold leading-snug ${isLocked ? 'text-[#7A7670]' : 'text-[#1B2A4A]'}`}>
+                        {getLocalizedText(lesson.title, lang)}
+                      </h3>
+                    </div>
+
+                    {isCompleted && (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#7A9174] bg-[#7A9174]/15 px-2.5 py-0.5 rounded-full shrink-0">
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Validé</span>
+                      </span>
+                    )}
                   </div>
-                  <p className={`text-sm mb-4 ${isLocked ? 'text-slate-400' : 'text-slate-600'}`}>
+
+                  <p className={`text-xs sm:text-sm mt-1 mb-4 leading-relaxed ${isLocked ? 'text-[#7A7670]/70' : 'text-[#7A7670]'}`}>
                     {getLocalizedText(lesson.description, lang)}
                   </p>
-                  
+
                   {isNext && (
-                    <button 
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleStartLesson(lesson.id);
                       }}
-                      className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold flex justify-center items-center gap-2 transition-colors shadow-md"
+                      className="w-full py-3 px-6 bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] rounded-full font-bold text-sm flex justify-center items-center gap-2 shadow-xs transition-all active:scale-95 group"
                     >
-                      <Play className="w-5 h-5 fill-white" />
-                      {t.dashboard.start}
+                      <span>Commencer la leçon</span>
+                      <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                    </button>
+                  )}
+
+                  {isCompleted && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStartLesson(lesson.id);
+                      }}
+                      className="text-xs font-semibold text-[#7A7670] hover:text-[#1B2A4A] hover:underline transition-colors mt-2"
+                    >
+                      Revoir cette étape
                     </button>
                   )}
                 </div>
@@ -224,7 +294,7 @@ export default function Home() {
 
             return (
               <div className="relative z-10 w-full max-w-md mt-4">
-                <button 
+                <button
                   disabled={!isCheckpointUnlocked}
                   onClick={() => {
                     if (subscriptionTier === 'free') {
@@ -233,22 +303,41 @@ export default function Home() {
                       setCheckpointOpen({ id: moduleId, name: titleStr });
                     }
                   }}
-                  className={`
-                    w-full relative p-6 rounded-3xl border-4 transition-all duration-300 flex flex-col items-center text-center
-                    ${passed 
-                      ? 'bg-amber-50 border-amber-500 shadow-lg cursor-pointer' 
-                      : isCheckpointUnlocked 
-                        ? 'bg-blue-600 border-blue-700 text-white shadow-xl hover:scale-105 cursor-pointer' 
-                        : 'bg-slate-100 border-slate-300 opacity-60 cursor-not-allowed'}
-                  `}
+                  className={`w-full relative p-6 sm:p-7 rounded-[28px] border transition-all duration-300 flex flex-col items-center text-center shadow-md ${
+                    passed
+                      ? 'bg-[#FDFCF8] border-2 border-[#7A9174] shadow-sm cursor-pointer'
+                      : isCheckpointUnlocked
+                        ? 'bg-[#1B2A4A] border-2 border-[#C9A05C] text-[#FDFCF8] shadow-xl hover:scale-[1.02] cursor-pointer'
+                        : 'bg-[#FDFCF8]/40 border-[#E8E2D5] opacity-50 cursor-not-allowed'
+                  }`}
                 >
-                  <div className="text-4xl mb-3">{passed ? '🏆' : '🔒'}</div>
-                  <h3 className={`font-bold text-xl mb-1 ${passed ? 'text-amber-600' : isCheckpointUnlocked ? 'text-white' : 'text-slate-500'}`}>
+                  <div 
+                    className="w-14 h-14 rounded-full flex items-center justify-center text-2xl mb-3 border shadow-xs"
+                    style={{
+                      backgroundColor: passed ? 'rgba(122,145,116,0.15)' : isCheckpointUnlocked ? 'rgba(201,160,92,0.2)' : '#F7F3EA',
+                      borderColor: passed ? '#7A9174' : isCheckpointUnlocked ? '#C9A05C' : '#E8E2D5',
+                    }}
+                  >
+                    {passed ? '🏆' : isCheckpointUnlocked ? '⭐' : '🔒'}
+                  </div>
+
+                  <div className="text-[11px] font-bold tracking-[0.2em] uppercase text-[#C9A05C] mb-1">
+                    — Examen de niveau
+                  </div>
+
+                  <h3 className={`font-serif text-2xl font-bold mb-1 ${passed ? 'text-[#7A9174]' : isCheckpointUnlocked ? 'text-[#FDFCF8]' : 'text-[#7A7670]'}`}>
                     Checkpoint {levelLabel}
                   </h3>
-                  <p className={`text-sm ${passed ? 'text-amber-700/80' : isCheckpointUnlocked ? 'text-blue-100' : 'text-slate-400'}`}>
-                    {passed ? 'Passeport obtenu !' : 'Examen de niveau'}
+
+                  <p className={`text-xs ${passed ? 'text-[#7A9174]' : isCheckpointUnlocked ? 'text-[#E8E2D5]/80' : 'text-[#7A7670]/70'}`}>
+                    {passed ? 'Passeport de niveau validé avec succès' : isCheckpointUnlocked ? 'Évaluez vos compétences pour obtenir le certificat' : 'Complétez les leçons pour déverrouiller'}
                   </p>
+
+                  {isCheckpointUnlocked && !passed && (
+                    <div className="mt-4 px-6 py-2.5 rounded-full bg-[#C9A05C] text-[#1B2A4A] text-xs font-bold shadow-xs">
+                      Passer le test de niveau →
+                    </div>
+                  )}
                 </button>
               </div>
             );
@@ -259,99 +348,210 @@ export default function Home() {
   };
 
   const activeLesson = activeLessonId 
-    ? allLessonsList.find(l => l.id === activeLessonId) 
+    ? allLessonsList.find((l) => l.id === activeLessonId) 
     : null;
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-20">
+    <main className="min-h-screen bg-[#F7F3EA] text-[#1B2A4A] font-sans pb-28 selection:bg-[#C9A05C]/20 selection:text-[#1B2A4A]">
+      
       {!activeLessonId && (
         <Header currentTab={currentTab} onTabChange={setCurrentTab} />
       )}
 
+      {isReviewSessionOpen && (
+        <SmartReviewSession onClose={() => setIsReviewSessionOpen(false)} />
+      )}
+
       {!activeLessonId ? (
-        <div className="pt-6">
-          {currentTab === 'learn' && (
-            <div className="space-y-12">
-              <Dashboard onStartLesson={handleStartLesson} />
+        <div className="pt-6 px-4 max-w-6xl mx-auto">
+          
+          {/* ONGLET 1 : ACCUEIL */}
+          {(currentTab === 'home' || currentTab === 'learn') && (
+            <div className="space-y-8 animate-in fade-in duration-300">
               
-              <div className="max-w-6xl mx-auto p-4 space-y-8">
-                {/* Roleplay Banner */}
-                <div 
-                  className="bg-gradient-to-r from-amber-400 to-rose-400 rounded-3xl p-6 md:p-8 flex items-center justify-between shadow-lg cursor-pointer transform hover:scale-[1.02] transition-transform text-white" 
-                  onClick={() => setShowScenarioSelector(true)}
-                  dir={isArabic ? 'rtl' : 'ltr'}
-                >
-                  <div>
-                    <h2 className="text-2xl font-black mb-2">💬 {isArabic ? 'المواقف والمحادثات' : lang === 'en' ? 'Roleplay Situations' : 'Mises en situation'}</h2>
-                    <p className="font-medium text-amber-50">{isArabic ? 'تدرّب على الدارجة في المقهى، الطاكسي أو السوق!' : lang === 'en' ? 'Practice Darija at the café, taxi, or souk!' : 'Pratiquez la Darija au café, au taxi ou au souk !'}</p>
+              {/* Hero Bannière */}
+              <HeroBanner
+                onPrimaryAction={() => handleStartLesson(nextLesson.id)}
+                primaryActionLabel={`Reprendre : ${getLocalizedText(nextLesson.title, lang)}`}
+                onSecondaryAction={() => setCurrentTab('parcours')}
+                secondaryActionLabel="Voir tout le parcours"
+              />
+
+              {/* Rappel Répétition Espacée */}
+              <DailyReviewCard onStartReview={() => setIsReviewSessionOpen(true)} />
+
+              {/* Mises en situation au Maroc */}
+              <div 
+                className="bg-[#FDFCF8] rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-xs border border-[#E8E2D5] hover:border-[#C9A05C]/60 hover:shadow-md transition-all duration-200 cursor-pointer group"
+                onClick={() => setShowScenarioSelector(true)}
+                dir={isArabic ? 'rtl' : 'ltr'}
+              >
+                <div className="space-y-2 max-w-xl">
+                  <div className="flex items-center gap-2 text-[#C9A05C] text-xs font-bold tracking-[0.22em] uppercase">
+                    <span>—</span>
+                    <span>Mises en situation réelles</span>
                   </div>
-                  <div className={`bg-white/20 p-3 rounded-full backdrop-blur-sm shrink-0 ${isArabic ? 'mr-4' : 'ml-4'}`}>
-                    <Play className="w-8 h-8 fill-white" />
-                  </div>
+                  <h2 className="font-serif text-2xl sm:text-3xl font-normal text-[#1B2A4A]">
+                    💬 {isArabic ? 'المواقف والمحادثات' : lang === 'en' ? 'Roleplay Situations' : 'Pratiquez au café, en taxi et au souk'}
+                  </h2>
+                  <p className="text-sm text-[#7A7670] leading-relaxed">
+                    {isArabic ? 'تدرّب على الدارجة في المقهى، الطاكسي أو السوق!' : lang === 'en' ? 'Interactive roleplay with native Darija dialogue scenarios.' : 'Simulateur de conversations authentiques avec assistance phonétique et variantes régionales.'}
+                  </p>
                 </div>
 
-                {/* Sélecteur d'onglets pour Mobile */}
-                <div className="flex lg:hidden justify-center gap-2 mb-6">
+                <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#1B2A4A] text-[#FDFCF8] text-xs font-bold shadow-xs group-hover:bg-[#1B2A4A]/90 transition-colors shrink-0">
+                  <span>Lancer un dialogue</span>
+                  <ArrowRight className="w-4 h-4 text-[#C9A05C]" />
+                </div>
+              </div>
+
+              {/* Raccourcis éditoriaux vers les sections */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                <div 
+                  onClick={() => setCurrentTab('parcours')}
+                  className="bg-[#FDFCF8] rounded-2xl p-5 border border-[#E8E2D5] hover:border-[#C9A05C] cursor-pointer transition-all shadow-xs space-y-2"
+                >
+                  <div className="w-9 h-9 rounded-full bg-[#1B2A4A]/10 text-[#1B2A4A] flex items-center justify-center">
+                    <Compass className="w-4 h-4" />
+                  </div>
+                  <h3 className="font-serif font-bold text-lg text-[#1B2A4A]">Parcours complet</h3>
+                  <p className="text-xs text-[#7A7670]">7 modules du niveau débutant aux conversations avancées.</p>
+                </div>
+
+                <div 
+                  onClick={() => setCurrentTab('phrasebook')}
+                  className="bg-[#FDFCF8] rounded-2xl p-5 border border-[#E8E2D5] hover:border-[#C9A05C] cursor-pointer transition-all shadow-xs space-y-2"
+                >
+                  <div className="w-9 h-9 rounded-full bg-[#C9A05C]/15 text-[#C9A05C] flex items-center justify-center">
+                    <BookOpen className="w-4 h-4" />
+                  </div>
+                  <h3 className="font-serif font-bold text-lg text-[#1B2A4A]">Dictionnaire & Fiches</h3>
+                  <p className="text-xs text-[#7A7670]">Lexique thématique, mode mains-libres et règles clés.</p>
+                </div>
+
+                <div 
+                  onClick={() => setCurrentTab('review')}
+                  className="bg-[#FDFCF8] rounded-2xl p-5 border border-[#E8E2D5] hover:border-[#C9A05C] cursor-pointer transition-all shadow-xs space-y-2"
+                >
+                  <div className="w-9 h-9 rounded-full bg-[#7A9174]/15 text-[#7A9174] flex items-center justify-center">
+                    <RotateCcw className="w-4 h-4" />
+                  </div>
+                  <h3 className="font-serif font-bold text-lg text-[#1B2A4A]">Révision SRS</h3>
+                  <p className="text-xs text-[#7A7670]">Flashcards et mémorisation longue durée avec gain d'XP.</p>
+                </div>
+              </div>
+
+            </div>
+          )}
+
+          {/* ONGLET 2 : PARCOURS */}
+          {currentTab === 'parcours' && (
+            <div className="space-y-8 animate-in fade-in duration-300">
+              
+              {/* Parcours Header */}
+              <div className="space-y-2 text-center max-w-2xl mx-auto mb-6">
+                <div className="flex items-center justify-center gap-2 text-[#C9A05C] text-xs font-bold tracking-[0.25em] uppercase">
+                  <span>—</span>
+                  <span>Votre Itinéraire</span>
+                </div>
+                <h1 className="font-serif text-3xl sm:text-4xl text-[#1B2A4A] font-normal">
+                  Le Parcours d'apprentissage
+                </h1>
+                <p className="text-sm text-[#7A7670]">
+                  Validez les étapes successives pour déverrouiller vos checkpoints et obtenir votre passeport Darija.
+                </p>
+              </div>
+
+              {/* Sélecteur de piste pour Mobile & Desktop */}
+              <div className="flex justify-center mb-8">
+                <div className="inline-flex bg-[#FDFCF8] p-1.5 rounded-full border border-[#E8E2D5] shadow-xs gap-1">
                   <button 
-                    onClick={() => setActiveTab('grammar')}
-                    className={`px-4 py-2 rounded-xl font-bold text-sm transition ${activeTab === 'grammar' ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-100 text-slate-600'}`}
+                    onClick={() => setActiveTrack('grammar')}
+                    className={`px-5 py-2.5 rounded-full font-bold text-xs transition-all ${
+                      activeTrack === 'grammar' 
+                        ? 'bg-[#1B2A4A] text-[#FDFCF8] shadow-xs' 
+                        : 'text-[#7A7670] hover:text-[#1B2A4A]'
+                    }`}
                   >
                     📚 {t.dashboard.trackA || "Grammaire & Fondations"}
                   </button>
                   <button 
-                    onClick={() => setActiveTab('conversation')}
-                    className={`px-4 py-2 rounded-xl font-bold text-sm transition ${activeTab === 'conversation' ? 'bg-amber-500 text-white shadow-md' : 'bg-slate-100 text-slate-600'}`}
+                    onClick={() => setActiveTrack('conversation')}
+                    className={`px-5 py-2.5 rounded-full font-bold text-xs transition-all ${
+                      activeTrack === 'conversation' 
+                        ? 'bg-[#1B2A4A] text-[#FDFCF8] shadow-xs' 
+                        : 'text-[#7A7670] hover:text-[#1B2A4A]'
+                    }`}
                   >
                     💬 {t.dashboard.trackB || "Situations & Immersion"}
                   </button>
                 </div>
-
-                {/* Grille Desktop 2 Colonnes & Affichage Mobile */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-                  {/* Colonne 1 : Grammaire */}
-                  <div className={`${activeTab === 'grammar' ? 'block' : 'hidden'} lg:block`}>
-                    <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-6 text-center">
-                      <span className="text-blue-700 font-extrabold text-lg flex items-center justify-center gap-2">
-                        📚 {t.dashboard.trackA || "Grammaire & Fondations"}
-                      </span>
-                    </div>
-                    <div className="space-y-6">
-                      {Object.entries(fullCurriculum)
-                        .filter(([mId]) => ['1', '3', '4', '6'].includes(mId))
-                        .map(([moduleId, moduleData]) => renderModule(moduleId, moduleData, 'grammar'))}
-                    </div>
-                  </div>
-
-                  {/* Colonne 2 : Conversation */}
-                  <div className={`${activeTab === 'conversation' ? 'block' : 'hidden'} lg:block`}>
-                    <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6 text-center">
-                      <span className="text-amber-700 font-extrabold text-lg flex items-center justify-center gap-2">
-                        💬 {t.dashboard.trackB || "Situations & Immersion"}
-                      </span>
-                    </div>
-                    <div className="space-y-6">
-                      {Object.entries(fullCurriculum)
-                        .filter(([mId]) => ['2', '5', '7'].includes(mId))
-                        .map(([moduleId, moduleData]) => renderModule(moduleId, moduleData, 'conversation'))}
-                    </div>
-                  </div>
-                </div>
               </div>
+
+              {/* Modules Columns */}
+              <div className="max-w-3xl mx-auto">
+                {activeTrack === 'grammar' ? (
+                  <div className="space-y-12">
+                    {Object.entries(fullCurriculum)
+                      .filter(([mId]) => ['1', '3', '4', '6'].includes(mId))
+                      .map(([moduleId, moduleData]) => renderModule(moduleId, moduleData, 'grammar'))}
+                  </div>
+                ) : (
+                  <div className="space-y-12">
+                    {Object.entries(fullCurriculum)
+                      .filter(([mId]) => ['2', '5', '7'].includes(mId))
+                      .map(([moduleId, moduleData]) => renderModule(moduleId, moduleData, 'conversation'))}
+                  </div>
+                )}
+              </div>
+
             </div>
           )}
 
-          {currentTab === 'phrasebook' && <PhrasebookView />}
-          
-          {currentTab === 'speech' && <SpeechTrainer />}
+          {/* ONGLET 3 : PHRASES / DICTIONNAIRE */}
+          {currentTab === 'phrasebook' && (
+            <div className="animate-in fade-in duration-300">
+              <PhrasebookView />
+            </div>
+          )}
 
+          {/* ONGLET 4 : RÉVISER (SRS & FLASHCARDS) */}
+          {currentTab === 'review' && (
+            <div className="animate-in fade-in duration-300 space-y-6">
+              <div className="space-y-2 text-center max-w-2xl mx-auto mb-6">
+                <div className="flex items-center justify-center gap-2 text-[#C9A05C] text-xs font-bold tracking-[0.25em] uppercase">
+                  <span>—</span>
+                  <span>Mémorisation Continue</span>
+                </div>
+                <h1 className="font-serif text-3xl sm:text-4xl text-[#1B2A4A] font-normal">
+                  Session de Révision
+                </h1>
+                <p className="text-sm text-[#7A7670]">
+                  Répétez vos flashcards pour accumuler de l'XP et consolider vos acquis sur le long terme.
+                </p>
+              </div>
+
+              <SRSDashboard />
+            </div>
+          )}
+
+          {/* PRATIQUE ORALE */}
+          {currentTab === 'speech' && (
+            <div className="animate-in fade-in duration-300 max-w-4xl mx-auto space-y-6">
+              <SpeechTrainer />
+            </div>
+          )}
+
+          {/* PROFIL & PASSEPORT */}
           {currentTab === 'profile' && (
-            <div className="space-y-8">
+            <div className="animate-in fade-in duration-300 space-y-8 max-w-5xl mx-auto">
               <ProfileView />
               <div className="max-w-4xl mx-auto p-4">
                 <SRSDashboard />
               </div>
             </div>
           )}
+
         </div>
       ) : (
         activeLesson && (
@@ -363,6 +563,11 @@ export default function Home() {
             />
           </ErrorBoundary>
         )
+      )}
+
+      {/* Navigation Mobile en bas (fixe) */}
+      {!activeLessonId && (
+        <Navigation currentTab={currentTab} onTabChange={setCurrentTab} />
       )}
 
       {checkpointOpen && (
@@ -383,13 +588,13 @@ export default function Home() {
           onRequirePremium={() => setPricingSource('roleplay_locked')}
           onStartSrs={() => {
             setShowScenarioSelector(false);
-            setCurrentTab('profile');
+            setCurrentTab('review');
           }}
         />
       )}
 
       {activePersonaId && (
-        <div className="fixed inset-0 z-50 bg-white flex flex-col">
+        <div className="fixed inset-0 z-50 bg-[#FDFCF8] flex flex-col">
           <AiRoleplayView 
             personaId={activePersonaId}
             onClose={() => setActivePersonaId(null)}

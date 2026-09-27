@@ -4,8 +4,8 @@
   "description": "Maîtrisez la Darija marocaine de A à Z avec KENZA : cours interactifs, grammaire et situations réelles.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f8fafc",
-  "theme_color": "#1D4ED8",
+  "background_color": "#F7F3EA",
+  "theme_color": "#1B2A4A",
   "icons": [
     {
       "src": "/icon-192x192.png",

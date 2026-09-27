@@ -17,7 +17,7 @@ interface AudioWalkModalProps {
 }
 
 export default function AudioWalkModal({ isOpen, onClose, items, moduleName, onRequirePremium }: AudioWalkModalProps) {
-  const { subscriptionTier } = useAppStore();
+  const { isPremium } = useAppStore();
   const [playTime, setPlayTime] = React.useState(0);
 
   const {
@@ -41,7 +41,7 @@ export default function AudioWalkModal({ isOpen, onClose, items, moduleName, onR
 
   React.useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (isPlaying && subscriptionTier === 'free') {
+    if (isPlaying && isPremium === 'free') {
       interval = setInterval(() => {
         setPlayTime(t => {
           const next = t + 1;
@@ -59,7 +59,7 @@ export default function AudioWalkModal({ isOpen, onClose, items, moduleName, onR
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [isPlaying, subscriptionTier, onRequirePremium, pause]);
+  }, [isPlaying, isPremium, onRequirePremium, pause]);
 
   useMediaSession({
     title: currentItem?.phraseDarijaArabizi || 'Kenza Audio Walk',

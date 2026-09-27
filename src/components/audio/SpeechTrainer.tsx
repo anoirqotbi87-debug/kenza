@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, Volume2, Trophy, AlertCircle, RefreshCw, MessageSquare, CarFront, Coffee, ShoppingBag, Globe } from 'lucide-react';
+import { Mic, Volume2, Trophy, AlertCircle, RefreshCw, MessageSquare, CarFront, Coffee, ShoppingBag, Globe, ArrowRight } from 'lucide-react';
 import { useTranslation, useAppStore } from '../../store/useAppStore';
 import { playAudio } from '../../lib/audio';
 import { useVoiceRecognition } from '../../hooks/useVoiceRecognition';
@@ -58,75 +58,94 @@ const rpScenarios: RPScenario[] = [
     id: 'souk',
     name: 'Hassan (Marchand du Souk)',
     icon: ShoppingBag,
-    context: 'Vous regardez des tapis dans la médina.',
-    npcFirstLine: { arabizi: 'Tfeddel a sidi, chouf had z-zrabi zwinin ! Sh7al bghiti ?', arabic: 'تفضل ا سيدي، شوف هاد الزرابي زوينين! شحال بغيتي؟', translation: 'Entrez monsieur, regardez ces beaux tapis ! Combien en voulez-vous ?' },
+    context: 'Vous négociez au souk.',
+    npcFirstLine: { arabizi: 'Salam ! Kif dayr ? Chof had zrabi zwinin !', arabic: 'سلام! كيف داير؟ شوف هاد الزرابي زوينين!', translation: 'Bonjour ! Comment ça va ? Regarde ces beaux tapis !' },
     userChoices: [
-      { id: 'c1', arabizi: 'Ghali bzzaf, nqess shwiya', arabic: 'غالي بزاف، نقص شوية', translation: 'C\'est très cher, baissez un peu le prix', nextNpcLine: { arabizi: 'Gha nsayb m3ak', arabic: 'غا نصايب معاك', translation: 'Je vais te faire un bon prix' } },
-      { id: 'c2', arabizi: 'Wakhan nchouf hadak l-zreq ?', arabic: 'واخا نشوف هاداك لزرق؟', translation: 'Puis-je voir le bleu ?', nextNpcLine: { arabizi: 'Hada d-zreq sghir awla l-kbir ?', arabic: 'هادا دزرق صغير اولا لكبير؟', translation: 'Le petit bleu ou le grand ?' } }
+      { id: 'c1', arabizi: 'Bch7al hadi a sidi ?', arabic: 'بشحال هادي ا سيدي؟', translation: 'Combien pour celui-ci monsieur ?', nextNpcLine: { arabizi: 'Hadi b myatayn derham', arabic: 'هادي ب مياتين درهم', translation: 'Celui-ci est à deux cents dirhams' } },
+      { id: 'c2', arabizi: 'Ghalia chwiya, nqess lia', arabic: 'غالية شوية، نقص ليا', translation: 'C\'est un peu cher, baissez le prix', nextNpcLine: { arabizi: 'Wakha, 3tini mya w khamsin', arabic: 'واخا، عطيني مية و خمسين', translation: 'D\'accord, donnez-moi cent cinquante' } }
     ]
   }
 ];
 
 export default function SpeechTrainer() {
-  const { lang } = useTranslation();
-  const { soundEnabled } = useAppStore();
-  
+  const { lang, t } = useTranslation();
+  const { soundEnabled, addXp } = useAppStore();
+
   const [activeTab, setActiveTab] = useState<'elocution' | 'roleplay'>('elocution');
 
-  // ELOCUTION STATE
-  const [currentExercise, setCurrentExercise] = useState(speechExercises[0]);
-  
-  // ROLEPLAY STATE
-  const [activeScenarioId, setActiveScenarioId] = useState<string>('taxi');
-  const activeScenario = rpScenarios.find(s => s.id === activeScenarioId)!;
-  const [chatHistory, setChatHistory] = useState<{ sender: 'npc' | 'user', textArabizi: string, textArabic: string, translation: string }[]>([]);
-  const [showTranslations, setShowTranslations] = useState<Record<number, boolean>>({});
-  const [roleplayComplete, setRoleplayComplete] = useState(false);
+  // STATE ÉLOCUTION
+  const [exerciseIndex, setExerciseIndex] = useState(0);
+  const [evaluation, setEvaluation] = useState<any>(null);
+  const currentExercise = speechExercises[exerciseIndex];
 
+  // Voice recognition
   const { 
-    isSupported, 
     isListening, 
     transcript, 
     error: voiceError, 
     startListening, 
     stopListening 
-  } = useVoiceRecognition('ar-MA', 5000);
-
-  const [evaluation, setEvaluation] = useState<any>(null);
-
-  useEffect(() => {
-    // Initialiser le chat Roleplay avec la première phrase du NPC
-    if (activeTab === 'roleplay') {
-      setChatHistory([{ sender: 'npc', textArabizi: activeScenario.npcFirstLine.arabizi, textArabic: activeScenario.npcFirstLine.arabic, translation: activeScenario.npcFirstLine.translation }]);
-      setRoleplayComplete(false);
-      setShowTranslations({});
+  } = useVoiceRecognition({
+    lang: 'ar-MA',
+    onResult: (text) => {
+      evaluateSpeech(text);
     }
-  }, [activeScenarioId, activeTab]);
+  });
 
+  // STATE ROLEPLAY
+  const [activeScenarioId, setActiveScenarioId] = useState<string>('taxi');
+  const activeScenario = rpScenarios.find(s => s.id === activeScenarioId) || rpScenarios[0];
+  const [chatHistory, setChatHistory] = useState<{ sender: 'npc' | 'user'; textArabizi: string; textArabic: string; translation: string }[]>([]);
+  const [showTranslations, setShowTranslations] = useState<Record<number, boolean>>({});
+  const [roleplayComplete, setRoleplayComplete] = useState(false);
+
+  // Init Roleplay
   useEffect(() => {
-    if (!isListening && transcript && activeTab === 'elocution') {
-      const result = calculateSimilarity(transcript, currentExercise.arabizi, currentExercise.arabic);
-      setEvaluation(result);
-      trackEvent('voice_evaluation_completed', { 
-        score: result.score, 
-        passedPhonemes: result.targetPhonemes.filter((p: any) => p.detected).length,
-        totalPhonemes: result.targetPhonemes.length
-      });
-    }
-  }, [isListening, transcript, activeTab, currentExercise]);
+    setChatHistory([
+      {
+        sender: 'npc',
+        textArabizi: activeScenario.npcFirstLine.arabizi,
+        textArabic: activeScenario.npcFirstLine.arabic,
+        translation: activeScenario.npcFirstLine.translation
+      }
+    ]);
+    setShowTranslations({});
+    setRoleplayComplete(false);
+  }, [activeScenarioId]);
 
+  // ÉLOCUTION METHODS
   const toggleListening = () => {
-    if (isListening) stopListening();
-    else {
+    if (isListening) {
+      stopListening();
+    } else {
       setEvaluation(null);
       startListening();
     }
   };
 
+  const evaluateSpeech = (spokenText: string) => {
+    const similarity = calculateSimilarity(spokenText, currentExercise.arabic);
+    const score = Math.round(similarity * 100);
+    
+    let feedback = 'Continuez à vous entraîner !';
+    if (score > 80) feedback = 'Excellente prononciation !';
+    else if (score > 50) feedback = 'Très compréhensible, bien joué !';
+
+    setEvaluation({
+      score,
+      feedback,
+      recognizedText: spokenText,
+      targetText: currentExercise.arabic
+    });
+
+    if (score >= 60) {
+      addXp(10);
+      trackEvent('speech_practice_success', { score });
+    }
+  };
+
   const nextExercise = () => {
-    const currentIndex = speechExercises.findIndex(e => e.id === currentExercise.id);
-    const nextIndex = (currentIndex + 1) % speechExercises.length;
-    setCurrentExercise(speechExercises[nextIndex]);
+    setExerciseIndex((prev) => (prev + 1) % speechExercises.length);
     setEvaluation(null);
     if (isListening) stopListening();
   };
@@ -135,12 +154,8 @@ export default function SpeechTrainer() {
   const handleUserRPChoice = (choice: typeof rpScenarios[0]['userChoices'][0]) => {
     if (roleplayComplete) return;
     
-    // Ajouter réponse utilisateur
     setChatHistory(prev => [...prev, { sender: 'user', textArabizi: choice.arabizi, textArabic: choice.arabic, translation: choice.translation }]);
     
-    // Jouer audio user (optionnel, on peut le lire si on veut)
-    
-    // Réponse NPC
     setTimeout(() => {
       if (choice.nextNpcLine) {
         setChatHistory(prev => [...prev, { sender: 'npc', textArabizi: choice.nextNpcLine!.arabizi, textArabic: choice.nextNpcLine!.arabic, translation: choice.nextNpcLine!.translation }]);
@@ -158,70 +173,87 @@ export default function SpeechTrainer() {
 
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
-      {/* Tabs */}
-      <div className="flex bg-white rounded-2xl p-1 shadow-sm border border-slate-100 max-w-sm mx-auto">
+      
+      {/* Header section with Editorial Serif title */}
+      <div className="space-y-2 text-center max-w-xl mx-auto">
+        <div className="flex items-center justify-center gap-2 text-[#C9A05C] text-xs font-bold tracking-[0.25em] uppercase">
+          <span>—</span>
+          <span>Pratique Orale</span>
+        </div>
+        <h1 className="font-serif text-3xl sm:text-4xl text-[#1B2A4A] font-normal">
+          Perfectionnez votre accent
+        </h1>
+        <p className="text-xs sm:text-sm text-[#7A7670]">
+          Entraînez-vous avec la reconnaissance vocale ou simulez un échange quotidien.
+        </p>
+      </div>
+
+      {/* Tabs Switcher */}
+      <div className="flex bg-[#FDFCF8] rounded-full p-1.5 shadow-xs border border-[#E8E2D5] max-w-xs mx-auto">
         <button 
           onClick={() => setActiveTab('elocution')}
-          className={`flex-1 py-2 px-4 rounded-xl font-bold text-sm transition-colors ${activeTab === 'elocution' ? 'bg-blue-600 text-white shadow' : 'text-slate-500 hover:bg-slate-50'}`}
+          className={`flex-1 py-2 px-4 rounded-full font-bold text-xs transition-all flex items-center justify-center gap-2 ${activeTab === 'elocution' ? 'bg-[#1B2A4A] text-[#FDFCF8] shadow-xs' : 'text-[#7A7670] hover:text-[#1B2A4A]'}`}
         >
-          <Mic className="w-4 h-4 inline-block mr-2" />
-          Élocution
+          <Mic className="w-3.5 h-3.5" />
+          <span>Élocution</span>
         </button>
         <button 
           onClick={() => setActiveTab('roleplay')}
-          className={`flex-1 py-2 px-4 rounded-xl font-bold text-sm transition-colors ${activeTab === 'roleplay' ? 'bg-blue-600 text-white shadow' : 'text-slate-500 hover:bg-slate-50'}`}
+          className={`flex-1 py-2 px-4 rounded-full font-bold text-xs transition-all flex items-center justify-center gap-2 ${activeTab === 'roleplay' ? 'bg-[#1B2A4A] text-[#FDFCF8] shadow-xs' : 'text-[#7A7670] hover:text-[#1B2A4A]'}`}
         >
-          <MessageSquare className="w-4 h-4 inline-block mr-2" />
-          Roleplay IA
+          <MessageSquare className="w-3.5 h-3.5" />
+          <span>Dialogue</span>
         </button>
       </div>
 
       {activeTab === 'elocution' && (
-        <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
-          <div className="text-center space-y-8">
-            <h2 className="text-2xl font-bold text-slate-800">Entraînement de la Voix</h2>
+        <div className="bg-[#FDFCF8] rounded-3xl p-6 sm:p-10 shadow-xs border border-[#E8E2D5]">
+          <div className="text-center space-y-8 max-w-lg mx-auto">
             
-            <div className="bg-slate-50 rounded-3xl p-8 border border-slate-200">
-              <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Lisez à voix haute</p>
-              <div className="text-4xl font-arabic text-blue-900 mb-4">{currentExercise.arabic}</div>
-              <div className="text-2xl font-bold text-slate-700">{currentExercise.arabizi}</div>
-              <div className="text-slate-500 mt-2">{currentExercise.translation[lang as keyof typeof currentExercise.translation] || currentExercise.translation.fr}</div>
+            <div className="bg-[#F7F3EA] rounded-3xl p-8 border border-[#E8E2D5] shadow-inner relative">
+              <div className="flex items-center justify-center gap-2 text-[#C9A05C] text-[11px] font-bold tracking-[0.2em] uppercase mb-3">
+                <span>—</span>
+                <span>Lisez à voix haute</span>
+              </div>
+              <div className="text-4xl sm:text-5xl font-arabic text-[#1B2A4A] mb-3 leading-tight">{currentExercise.arabic}</div>
+              <div className="font-serif text-2xl font-bold text-[#1B2A4A]">{currentExercise.arabizi}</div>
+              <div className="text-[#7A7670] text-sm mt-1">{currentExercise.translation[lang as keyof typeof currentExercise.translation] || currentExercise.translation.fr}</div>
               
               <button 
                 onClick={() => playAudio(currentExercise.arabizi, currentExercise.arabic, soundEnabled)}
-                className="mt-6 mx-auto w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-500 shadow-md hover:bg-blue-50 hover:scale-105 transition-all"
+                className="mt-6 mx-auto w-11 h-11 bg-[#1B2A4A] text-[#FDFCF8] rounded-full flex items-center justify-center shadow-md hover:bg-[#1B2A4A]/90 hover:scale-105 transition-all"
                 title="Écouter le modèle"
               >
-                <Volume2 className="w-6 h-6" />
+                <Volume2 className="w-5 h-5 text-[#C9A05C]" />
               </button>
             </div>
 
             {/* Zone d'enregistrement */}
-            <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-col items-center gap-3">
               <button
                 onClick={toggleListening}
                 className={`
-                  w-24 h-24 rounded-full flex items-center justify-center shadow-lg transition-all duration-300
-                  ${isListening ? 'bg-red-500 text-white animate-pulse scale-110' : 'bg-blue-600 text-white hover:bg-blue-700 hover:scale-105'}
+                  w-20 h-20 rounded-full flex items-center justify-center shadow-lg transition-all duration-300
+                  ${isListening ? 'bg-red-500 text-white animate-pulse scale-110' : 'bg-[#1B2A4A] text-[#FDFCF8] hover:bg-[#1B2A4A]/90 hover:scale-105'}
                 `}
               >
-                <Mic className={`w-10 h-10 ${isListening ? 'animate-bounce' : ''}`} />
+                <Mic className={`w-8 h-8 ${isListening ? 'animate-bounce' : 'text-[#C9A05C]'}`} />
               </button>
               
-              <div className="text-sm font-bold text-slate-500">
-                {isListening ? 'Écoute en cours...' : 'Appuyez pour parler'}
+              <div className="text-xs font-bold text-[#7A7670]">
+                {isListening ? 'Écoute en cours...' : 'Appuyez sur le micro pour parler'}
               </div>
 
               {transcript && (
-                <div className="mt-4 p-4 bg-slate-50 rounded-xl max-w-md w-full text-center">
-                  <div className="text-xs text-slate-400 mb-1">J'ai entendu :</div>
-                  <div className="font-arabic text-xl">{transcript}</div>
+                <div className="mt-3 p-4 bg-[#F7F3EA] rounded-2xl max-w-md w-full text-center border border-[#E8E2D5]">
+                  <div className="text-xs text-[#7A7670] mb-1">Reconnaissance vocale :</div>
+                  <div className="font-arabic text-xl text-[#1B2A4A]">{transcript}</div>
                 </div>
               )}
 
               {voiceError && (
-                <div className="mt-2 p-4 rounded-xl flex items-center gap-3 max-w-md w-full bg-red-50 text-red-700 border border-red-200">
-                  <AlertCircle className="w-5 h-5 shrink-0" />
+                <div className="mt-2 p-3.5 rounded-2xl flex items-center gap-3 max-w-md w-full bg-red-50 text-red-700 border border-red-200 text-xs">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
                   <span className="font-medium">{voiceError}</span>
                 </div>
               )}
@@ -237,59 +269,59 @@ export default function SpeechTrainer() {
 
             <button 
               onClick={nextExercise}
-              className="mx-auto flex items-center gap-2 px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors"
+              className="mx-auto inline-flex items-center gap-2 px-6 py-3 bg-[#F7F3EA] hover:bg-[#E8E2D5]/70 text-[#1B2A4A] font-bold rounded-full text-xs transition-colors border border-[#E8E2D5]"
             >
-              <RefreshCw className="w-4 h-4" />
-              Phrase Suivante
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Phrase suivante</span>
             </button>
           </div>
         </div>
       )}
 
       {activeTab === 'roleplay' && (
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col h-[600px]">
-          <div className="flex gap-2 overflow-x-auto pb-4 mb-2 hide-scrollbar">
+        <div className="bg-[#FDFCF8] rounded-3xl p-6 sm:p-8 shadow-xs border border-[#E8E2D5] flex flex-col h-[600px]">
+          <div className="flex gap-2 overflow-x-auto pb-3 mb-2 hide-scrollbar">
             {rpScenarios.map(sc => {
               const Icon = sc.icon;
               return (
                 <button
                   key={sc.id}
                   onClick={() => setActiveScenarioId(sc.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm whitespace-nowrap transition-colors flex-shrink-0 ${activeScenarioId === sc.id ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-xs whitespace-nowrap transition-colors shrink-0 ${activeScenarioId === sc.id ? 'bg-[#1B2A4A] text-[#FDFCF8]' : 'bg-[#F7F3EA] text-[#7A7670] border border-[#E8E2D5] hover:text-[#1B2A4A]'}`}
                 >
-                  <Icon className="w-4 h-4" />
-                  {sc.name}
+                  <Icon className="w-3.5 h-3.5" />
+                  <span>{sc.name}</span>
                 </button>
               );
             })}
           </div>
           
-          <div className="bg-orange-50 text-orange-800 text-sm font-bold p-3 rounded-xl text-center mb-4">
-            Context: {activeScenario.context}
+          <div className="bg-[#C9A05C]/15 border border-[#C9A05C]/30 text-[#1B2A4A] text-xs font-semibold p-3 rounded-2xl text-center mb-4">
+            Contexte : {activeScenario.context}
           </div>
 
-          <div className="flex-1 overflow-y-auto space-y-4 p-2 bg-slate-50 rounded-2xl border border-slate-100">
+          <div className="flex-1 overflow-y-auto space-y-4 p-4 bg-[#F7F3EA] rounded-2xl border border-[#E8E2D5]">
             {chatHistory.map((msg, idx) => (
               <div key={idx} className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
-                <div className={`p-4 rounded-2xl max-w-[85%] ${msg.sender === 'user' ? 'bg-blue-600 text-white rounded-br-none' : 'bg-white border border-slate-200 shadow-sm text-slate-800 rounded-bl-none'}`}>
+                <div className={`p-4 rounded-2xl max-w-[85%] ${msg.sender === 'user' ? 'bg-[#1B2A4A] text-[#FDFCF8] rounded-br-none' : 'bg-[#FDFCF8] border border-[#E8E2D5] shadow-xs text-[#1B2A4A] rounded-bl-none'}`}>
                   <div className="flex items-start gap-3">
                     {msg.sender === 'npc' && (
-                      <button onClick={() => playAudio(msg.textArabizi, msg.textArabic, soundEnabled)} className="text-blue-500 hover:text-blue-700 shrink-0 mt-1">
-                        <Volume2 className="w-5 h-5" />
+                      <button onClick={() => playAudio(msg.textArabizi, msg.textArabic, soundEnabled)} className="text-[#C9A05C] hover:text-[#b88f4b] shrink-0 mt-1">
+                        <Volume2 className="w-4 h-4" />
                       </button>
                     )}
                     <div>
-                      <p className="font-bold text-lg">{msg.textArabizi}</p>
-                      <p className={`font-arabic text-xl mt-1 ${msg.sender === 'user' ? 'text-blue-100' : 'text-slate-500'}`}>{msg.textArabic}</p>
+                      <p className="font-serif font-bold text-base">{msg.textArabizi}</p>
+                      <p className={`font-arabic text-lg mt-0.5 ${msg.sender === 'user' ? 'text-[#E8E2D5]' : 'text-[#7A7670]'}`}>{msg.textArabic}</p>
                     </div>
                   </div>
                   {showTranslations[idx] && (
-                    <div className={`mt-3 pt-3 border-t text-sm ${msg.sender === 'user' ? 'border-blue-500 text-blue-100' : 'border-slate-100 text-slate-500'}`}>
+                    <div className={`mt-2 pt-2 border-t text-xs ${msg.sender === 'user' ? 'border-white/10 text-[#E8E2D5]' : 'border-[#E8E2D5] text-[#7A7670]'}`}>
                       {msg.translation}
                     </div>
                   )}
                 </div>
-                <button onClick={() => toggleTranslation(idx)} className="text-xs text-slate-400 mt-1 flex items-center gap-1 hover:text-blue-500 mx-2">
+                <button onClick={() => toggleTranslation(idx)} className="text-[11px] text-[#7A7670] mt-1 flex items-center gap-1 hover:text-[#1B2A4A] mx-2">
                   <Globe className="w-3 h-3" /> Traduire
                 </button>
               </div>
@@ -297,26 +329,29 @@ export default function SpeechTrainer() {
           </div>
 
           {!roleplayComplete ? (
-            <div className="mt-4 pt-4 border-t border-slate-100 space-y-3">
-              <p className="text-sm font-bold text-slate-400 uppercase text-center mb-2">Choisissez votre réponse :</p>
+            <div className="mt-4 pt-4 border-t border-[#E8E2D5] space-y-3">
+              <p className="text-xs font-bold text-[#7A7670] uppercase tracking-wider text-center mb-1">Choisissez votre réponse :</p>
               <div className="grid gap-2">
                 {activeScenario.userChoices.map(choice => (
                   <button 
                     key={choice.id}
                     onClick={() => handleUserRPChoice(choice)}
-                    className="p-3 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 rounded-xl text-left transition-colors group"
+                    className="p-3 bg-[#F7F3EA] hover:bg-[#E8E2D5]/70 border border-[#E8E2D5] rounded-2xl text-left transition-colors group flex items-center justify-between"
                   >
-                    <div className="font-bold text-slate-800 group-hover:text-blue-700">{choice.arabizi}</div>
-                    <div className="text-sm text-slate-500">{choice.translation}</div>
+                    <div>
+                      <div className="font-serif font-bold text-sm text-[#1B2A4A]">{choice.arabizi}</div>
+                      <div className="text-xs text-[#7A7670]">{choice.translation}</div>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-[#C9A05C] opacity-0 group-hover:opacity-100 transition-opacity" />
                   </button>
                 ))}
               </div>
             </div>
           ) : (
-            <div className="mt-4 p-4 bg-green-50 text-green-700 border border-green-200 rounded-xl text-center font-bold">
-              <Trophy className="w-6 h-6 inline-block mb-1 mr-2" />
+            <div className="mt-4 p-4 bg-[#7A9174]/15 text-[#1B2A4A] border border-[#7A9174]/40 rounded-2xl text-center font-bold text-xs">
+              <Trophy className="w-5 h-5 inline-block mb-1 mr-2 text-[#7A9174]" />
               Conversation terminée avec succès !
-              <button onClick={() => { setChatHistory([{ sender: 'npc', textArabizi: activeScenario.npcFirstLine.arabizi, textArabic: activeScenario.npcFirstLine.arabic, translation: activeScenario.npcFirstLine.translation }]); setRoleplayComplete(false); }} className="block mx-auto mt-3 px-4 py-2 bg-green-600 text-white rounded-lg text-sm">
+              <button onClick={() => { setChatHistory([{ sender: 'npc', textArabizi: activeScenario.npcFirstLine.arabizi, textArabic: activeScenario.npcFirstLine.arabic, translation: activeScenario.npcFirstLine.translation }]); setRoleplayComplete(false); }} className="block mx-auto mt-2 px-5 py-2 bg-[#1B2A4A] text-[#FDFCF8] rounded-full text-xs font-bold">
                 Recommencer
               </button>
             </div>

@@ -10,7 +10,7 @@ interface PricingModalProps {
 }
 
 export default function PricingModal({ onClose, source }: PricingModalProps) {
-  const { setSubscriptionTier } = useAppStore();
+  const { setIsPremium } = useAppStore();
   const [currency, setCurrency] = React.useState<'EUR' | 'MAD'>('EUR');
 
   React.useEffect(() => {
@@ -38,7 +38,7 @@ export default function PricingModal({ onClose, source }: PricingModalProps) {
     // In real app, redirect to Stripe
     alert("Redirection vers le paiement en cours...");
     // Here we just unlock for demo
-    setSubscriptionTier('premium');
+    setIsPremium('premium');
     onClose();
   };
 
