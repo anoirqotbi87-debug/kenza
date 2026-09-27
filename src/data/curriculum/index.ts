@@ -40,7 +40,7 @@ export const fullCurriculum: Record<string, { title: MultiLangText, lessons: Les
     lessons: module4Lessons 
   },
   5: { 
-    title: { fr: "Immersion Culturelle", en: "Cultural Immersion", es: "Inmersión Cultural", ar: "الانغماس الثقافي" }, 
+    title: { fr: "Niveau B2 - Tanger (Le Grand Socco)", en: "Level B2 - Tangier (Le Grand Socco)", es: "Nivel B2 - Tánger (Le Grand Socco)", ar: "المستوى B2 - طنجة (السوق الكبير)" }, 
     lessons: module5Lessons 
   },
   6: {

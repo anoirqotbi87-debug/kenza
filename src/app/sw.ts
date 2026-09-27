@@ -16,7 +16,7 @@ const serwist = new Serwist({
   clientsClaim: true,
   navigationPreload: true,
   disableDevLogs: true,
-  runtimeCaching: [
+  runtimeCaching: (
     {
       matcher: /^\/api\/roleplay\//i,
       handler: "NetworkOnly" as any,
@@ -55,7 +55,7 @@ const serwist = new Serwist({
       },
     },
     ...defaultCache,
-  ],
+  ] as any,
 });
 
 serwist.addEventListeners();
