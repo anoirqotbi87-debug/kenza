@@ -297,7 +297,7 @@ export default function Home() {
                 <button
                   disabled={!isCheckpointUnlocked}
                   onClick={() => {
-                    if (isPremium === 'free') {
+                    if (!isPremium) {
                       setPricingSource('checkpoint_locked');
                     } else {
                       setCheckpointOpen({ id: moduleId, name: titleStr });

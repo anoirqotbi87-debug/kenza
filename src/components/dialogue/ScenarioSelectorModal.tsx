@@ -104,7 +104,7 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {aiPersonasList.map((persona, index) => {
-              const isLocked = isPremium === 'free' && index > 0;
+              const isLocked = !isPremium && index > 0;
               
               const handleCardClick = () => {
                 if (!isOnline) {

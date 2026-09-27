@@ -41,7 +41,7 @@ export default function AudioWalkModal({ isOpen, onClose, items, moduleName, onR
 
   React.useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (isPlaying && isPremium === 'free') {
+    if (isPlaying && !isPremium) {
       interval = setInterval(() => {
         setPlayTime(t => {
           const next = t + 1;

@@ -85,12 +85,13 @@ export default function SpeechTrainer() {
     error: voiceError, 
     startListening, 
     stopListening 
-  } = useVoiceRecognition({
-    lang: 'ar-MA',
-    onResult: (text) => {
-      evaluateSpeech(text);
+  } = useVoiceRecognition('ar-MA');
+
+  useEffect(() => {
+    if (transcript && !isListening) {
+      evaluateSpeech(transcript);
     }
-  });
+  }, [transcript, isListening]);
 
   // STATE ROLEPLAY
   const [activeScenarioId, setActiveScenarioId] = useState<string>('taxi');
