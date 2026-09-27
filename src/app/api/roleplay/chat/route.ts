@@ -20,7 +20,8 @@ export async function POST(req: NextRequest) {
     }
     
     // 2. Rate Limiting (per IP, max 10 req/min)
-    const ip = req.headers.get('x-forwarded-for') || 'anonymous';
+    // In serverless, memory state is ephemeral per instance. Kept in memory as requested if no external Redis is available.
+    const ip = req.headers.get('x-real-ip') ?? req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? '127.0.0.1';
     const now = Date.now();
     const windowMs = 60 * 1000;
     
@@ -51,7 +52,13 @@ export async function POST(req: NextRequest) {
       return new Response('Message exceeds maximum length of 500 characters', { status: 400 });
     }
 
+    const totalChars = messages.reduce((sum: number, m: any) => sum + (m.content?.length || 0), 0);
+    if (totalChars > 4000) return new Response('Payload too large', { status: 400 });
+
     const systemPrompt = getSystemPrompt(personaId as PersonaId);
+    if (!systemPrompt) {
+      return new Response('Invalid personaId', { status: 400 });
+    }
 
     // Call the Gemini model using Vercel AI SDK
     const result = await streamText({

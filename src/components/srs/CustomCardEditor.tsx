@@ -2,10 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 
+import { VocabularySRSData } from '../../types/srs';
+
 interface CustomCardEditorProps {
   isOpen: boolean;
   onClose: () => void;
-  cardToEdit?: any | null; // The VocabularySRSData or null
+  cardToEdit?: VocabularySRSData | null;
 }
 
 export default function CustomCardEditor({ isOpen, onClose, cardToEdit }: CustomCardEditorProps) {

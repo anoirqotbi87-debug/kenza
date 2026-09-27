@@ -51,6 +51,6 @@ export const personas: Record<PersonaId, PersonaConfig> = {
   }
 };
 
-export const getSystemPrompt = (personaId: PersonaId): string => {
-  return personas[personaId]?.systemPrompt || personas['cafe'].systemPrompt;
+export const getSystemPrompt = (personaId: PersonaId): string | undefined => {
+  return personas[personaId]?.systemPrompt;
 };
