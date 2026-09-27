@@ -22,7 +22,7 @@ const serwist = new Serwist({
       handler: "NetworkOnly" as any,
     },
     {
-      matcher: ({ url }) => url.pathname.startsWith('/api/tts'),
+      matcher: ({ url }: { url: URL }) => url.pathname.startsWith('/api/tts'),
       handler: "CacheFirst" as any,
       options: {
         cacheName: "kenza-tts-cache",
