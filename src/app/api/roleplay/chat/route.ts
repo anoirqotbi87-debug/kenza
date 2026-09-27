@@ -5,12 +5,50 @@ import { NextRequest } from 'next/server';
 
 export const maxDuration = 30; // Allow max 30 seconds for streaming
 
+// Simple in-memory rate limiter (Note: Instance-scoped in serverless environments)
+const rateLimit = new Map<string, { count: number, resetAt: number }>();
+
 export async function POST(req: NextRequest) {
   try {
+    // 1. Origin Check
+    const fetchSite = req.headers.get('sec-fetch-site');
+    const origin = req.headers.get('origin') || req.headers.get('referer');
+    
+    // Allow same-origin or localhost for dev, but block external cross-site
+    if (fetchSite && fetchSite !== 'same-origin' && fetchSite !== 'same-site') {
+      return new Response('Forbidden: Cross-site request blocked', { status: 403 });
+    }
+    
+    // 2. Rate Limiting (per IP, max 10 req/min)
+    const ip = req.headers.get('x-forwarded-for') || 'anonymous';
+    const now = Date.now();
+    const windowMs = 60 * 1000;
+    
+    let record = rateLimit.get(ip);
+    if (!record || now > record.resetAt) {
+      record = { count: 0, resetAt: now + windowMs };
+    }
+    record.count++;
+    rateLimit.set(ip, record);
+    
+    if (record.count > 10) {
+      return new Response('Too Many Requests', { status: 429 });
+    }
+
     const { messages, personaId } = await req.json();
 
-    if (!messages) {
+    // 3. Payload Validation
+    if (!messages || !Array.isArray(messages)) {
       return new Response('Messages array is required', { status: 400 });
+    }
+    
+    if (messages.length > 15) {
+      return new Response('Maximum context length exceeded', { status: 400 });
+    }
+    
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage?.content && lastMessage.content.length > 500) {
+      return new Response('Message exceeds maximum length of 500 characters', { status: 400 });
     }
 
     const systemPrompt = getSystemPrompt(personaId as PersonaId);

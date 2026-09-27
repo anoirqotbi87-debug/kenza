@@ -48,3 +48,38 @@ const serwist = new Serwist({
 });
 
 serwist.addEventListeners();
+
+
+self.addEventListener('notificationclick', (event: any) => {
+  // 1. Fermer immédiatement la notification du volet système
+  event.notification.close();
+
+  // 2. Extraire l'URL cible (avec fallback)
+  const targetUrl = new URL(
+    event.notification.data?.url || '/?tab=srs',
+    self.location.origin
+  ).href;
+
+  // 3. Encadrer l'opération dans waitUntil
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: 'window', includeUncontrolled: true })
+      .then(async (windowClients: any[]) => {
+        // Rechercher si un onglet/fenêtre de l'application est déjà ouvert
+        for (const client of windowClients) {
+          if (new URL(client.url).origin === self.location.origin) {
+            // Si la fenêtre est déjà sur la bonne URL, simplement lui donner le focus
+            if (client.url !== targetUrl && 'navigate' in client) {
+              await client.navigate(targetUrl);
+            }
+            return client.focus();
+          }
+        }
+
+        // Si aucune fenêtre n'est ouverte, lancer l'application en standalone
+        if (self.clients.openWindow) {
+          return self.clients.openWindow(targetUrl);
+        }
+      })
+  );
+});

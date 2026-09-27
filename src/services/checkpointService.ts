@@ -12,17 +12,11 @@ export const checkpointService = {
   async syncResultToCloud(userId: string, result: CheckpointResultData): Promise<void> {
     try {
       await withSessionRefresh(async () => {
-        const { error } = await supabase
-          .from('user_checkpoints')
-          .upsert({
-            user_id: userId,
-            checkpoint_id: result.levelId,
-            score: result.score,
-            certificate_code: result.passportId,
-            passed_at: new Date().toISOString()
-          }, {
-            onConflict: 'user_id,checkpoint_id'
-          });
+        const { error } = await supabase.rpc('claim_checkpoint_reward', {
+          checkpoint_id: result.levelId,
+          score: result.score,
+          certificate_code: result.passportId
+        });
 
         if (error) {
           console.warn("[Sync Checkpoint] Failed to sync to cloud:", error.message);

@@ -12,14 +12,19 @@ export const syncService = {
     const store = useAppStore.getState();
     
     await withSessionRefresh(async () => {
-      // 1. Update Profile (XP, streak, notation)
+      // Call RPC for sensitive data
+      const { error: rpcError } = await supabase.rpc('sync_user_progress', {
+        new_xp: store.xp,
+        new_streak_days: store.streakDays,
+        new_streak_freezes: store.streakFreezes,
+        new_badges: store.unlockedBadges
+      });
+      if (rpcError) console.error("Error migrating profile progress:", rpcError);
+
+      // Call normal update for non-sensitive data
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
-          xp: store.xp,
-          streak_days: store.streakDays,
-          streak_freezes: store.streakFreezes,
-          unlocked_badges: store.unlockedBadges,
           script_preference: store.preferredNotation,
         })
         .eq('id', userId);
@@ -141,9 +146,11 @@ export const syncService = {
     
     if (!userId) return;
     
-    await supabase
-      .from('profiles')
-      .update({ xp: newXp })
-      .eq('id', userId);
+    await supabase.rpc('sync_user_progress', {
+      new_xp: newXp,
+      new_streak_days: useAppStore.getState().streakDays,
+      new_streak_freezes: useAppStore.getState().streakFreezes,
+      new_badges: useAppStore.getState().unlockedBadges
+    });
   }
 };
