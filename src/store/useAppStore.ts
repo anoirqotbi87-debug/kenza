@@ -44,6 +44,8 @@ interface AppState {
   // SRS Actions
   addCardsToSRS: (wordIds: string[]) => void;
   addCustomWordToSRS: (word: any) => void;
+  updateCustomWord: (wordId: string, updates: any) => void;
+  deleteCustomWord: (wordId: string) => void;
   reviewCard: (wordId: string, grade: ReviewGrade) => void;
   getDueCards: () => SRSCard[];
   
@@ -222,6 +224,23 @@ export const useAppStore = create<AppState>()(
             state: 'new' as const
           };
         }
+        return { customVocabulary: newVocab, srsDeck: newDeck };
+      }),
+
+      updateCustomWord: (wordId: string, updates: any) => set((state) => {
+        if (!state.customVocabulary[wordId]) return state;
+        const newVocab = { 
+          ...state.customVocabulary, 
+          [wordId]: { ...state.customVocabulary[wordId], ...updates } 
+        };
+        return { customVocabulary: newVocab };
+      }),
+
+      deleteCustomWord: (wordId: string) => set((state) => {
+        const newVocab = { ...state.customVocabulary };
+        delete newVocab[wordId];
+        const newDeck = { ...state.srsDeck };
+        delete newDeck[wordId];
         return { customVocabulary: newVocab, srsDeck: newDeck };
       }),
       
