@@ -6,6 +6,7 @@ import { getWordFromDictionary } from '../../data/srs-deck';
 import { getLocalizedText } from '../../lib/i18n/utils';
 import { Search, Plus, BookOpen, BrainCircuit, CheckCircle, Trash2, Edit2, Play, Mic, MessageCircle, Book } from 'lucide-react';
 import { playAudio } from '../../lib/audio';
+import CustomCardEditor from './CustomCardEditor';
 
 export default function DeckManagerView() {
   const { srsDeck, customVocabulary, deleteCustomWord, uiLanguage } = useAppStore();
@@ -15,6 +16,9 @@ export default function DeckManagerView() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<'all' | 'due' | 'learning' | 'mastered'>('all');
+  
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [cardToEdit, setCardToEdit] = useState<any | null>(null);
 
   // Combine and format deck cards with their vocabulary data
   const processedCards = useMemo(() => {
@@ -111,7 +115,13 @@ export default function DeckManagerView() {
                 {processedCards.length} {isAr ? 'بطاقة في مجموعتك' : 'cartes dans votre collection'}
               </p>
             </div>
-            <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-xl shadow-md transition-all flex items-center gap-2">
+            <button 
+              onClick={() => {
+                setCardToEdit(null);
+                setIsEditorOpen(true);
+              }}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-xl shadow-md transition-all flex items-center gap-2"
+            >
               <Plus className="w-5 h-5" />
               {isAr ? 'كلمة جديدة' : 'Nouveau mot'}
             </button>
@@ -191,7 +201,19 @@ export default function DeckManagerView() {
                   
                   {/* Actions - visible on hover/focus */}
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                    <button 
+                      onClick={() => {
+                        setCardToEdit(card.dictWord || { 
+                          id: card.wordId, 
+                          arabizi: card.arabizi, 
+                          arabic: card.arabic, 
+                          translation: card.translation,
+                          source: card.source
+                        });
+                        setIsEditorOpen(true);
+                      }}
+                      className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     {/* Only allow deleting custom vocabulary */}
@@ -225,6 +247,12 @@ export default function DeckManagerView() {
         )}
 
       </div>
+      
+      <CustomCardEditor 
+        isOpen={isEditorOpen} 
+        onClose={() => setIsEditorOpen(false)} 
+        cardToEdit={cardToEdit} 
+      />
     </div>
   );
 }
