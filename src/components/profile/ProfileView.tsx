@@ -11,6 +11,7 @@ import { User, Trophy, Flame, Star, Crown, Headphones, Clock, BookOpen, Lock } f
 import { useCheckpointProgress } from '../../hooks/useCheckpointProgress';
 import DarijaPassportCard from '../certificate/DarijaPassportCard';
 import ProfilePassportView from './ProfilePassportView';
+import NotificationSettings from './NotificationSettings';
 
 export default function ProfileView() {
   const { xp, streakDays, srsDeck } = useAppStore();
@@ -92,6 +93,11 @@ export default function ProfileView() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
         <Leaderboard />
         <BadgesList />
+      </div>
+
+      {/* Notifications & Reminders */}
+      <div className="mt-8">
+        <NotificationSettings />
       </div>
 
       {/* Mode Hors-Ligne */}
