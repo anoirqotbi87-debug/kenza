@@ -5,6 +5,13 @@ import { useAppStore } from '../../store/useAppStore';
 import { UILanguage } from '../../lib/i18n/translations';
 import { Globe } from 'lucide-react';
 
+const LANGUAGES: { value: UILanguage; label: string; flag: string }[] = [
+  { value: 'fr', label: 'Français', flag: '🇫🇷' },
+  { value: 'en', label: 'English', flag: '🇬🇧' },
+  { value: 'es', label: 'Español', flag: '🇪🇸' },
+  { value: 'ar', label: 'العربية', flag: '🇲🇦' },
+];
+
 export default function LanguageSelector() {
   const { uiLanguage, setLanguage } = useAppStore();
 
@@ -13,21 +20,26 @@ export default function LanguageSelector() {
   };
 
   return (
-    <div className="relative inline-flex items-center z-50 bg-slate-100 hover:bg-slate-200 transition-colors rounded-lg px-2 py-1.5 border border-transparent hover:border-slate-300">
-      <span className="pointer-events-none absolute left-2 flex items-center justify-center">
+    <label
+      aria-label="Langue de l'interface"
+      className="relative flex items-center bg-slate-100 hover:bg-slate-200 active:bg-slate-200 transition-colors rounded-lg px-2 py-1 border border-transparent hover:border-slate-300 cursor-pointer select-none"
+      style={{ touchAction: 'manipulation' }}
+    >
+      <span className="pointer-events-none flex items-center justify-center mr-1.5">
         <Globe className="w-4 h-4 text-slate-500" />
       </span>
-      <select 
-        value={uiLanguage} 
+      <select
+        aria-label="Langue de l'interface"
+        value={uiLanguage}
         onChange={handleLanguageChange}
-        className="bg-transparent font-bold text-slate-700 cursor-pointer text-sm outline-none pl-6 pr-1 w-full h-full"
-        style={{ WebkitAppearance: 'none', appearance: 'none' }}
+        className="bg-transparent font-bold text-slate-700 cursor-pointer text-sm outline-none border-0 p-0 m-0 h-8 min-w-[5rem]"
       >
-        <option value="fr">FR</option>
-        <option value="en">EN</option>
-        <option value="es">ES</option>
-        <option value="ar">AR</option>
+        {LANGUAGES.map((lang) => (
+          <option key={lang.value} value={lang.value}>
+            {lang.flag} {lang.label}
+          </option>
+        ))}
       </select>
-    </div>
+    </label>
   );
 }
