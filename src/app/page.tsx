@@ -35,6 +35,11 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAppStore, useTranslation } from "@/store/useAppStore";
+
+const tr = (fr: string, en: string, es: string, ar: string) => {
+  const lang = useAppStore.getState().uiLanguage;
+  return lang === "en" ? en : lang === "es" ? es : lang === "ar" ? ar : fr;
+};
 import { playAudio } from "@/lib/audio";
 import { supabase } from "@/lib/supabase";
 import { syncService } from "@/lib/syncService";
@@ -249,8 +254,6 @@ export default function Home() {
   } = useAppStore();
 
   const { t } = useTranslation();
-  const tr = (fr: string, en: string, es: string, ar: string) =>
-    uiLanguage === "en" ? en : uiLanguage === "es" ? es : uiLanguage === "ar" ? ar : fr;
   const navLabel = (id: string) => {
     const key =
       id === "today" ? "home"
