@@ -10,25 +10,34 @@ export async function POST(req: NextRequest) {
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
     if (!stripe) {
+      console.error('[Stripe Webhook] STRIPE_SECRET_KEY non configurée.');
       return NextResponse.json({ error: 'Stripe not initialized' }, { status: 500 });
     }
 
-    let event: Stripe.Event;
-
-    if (webhookSecret && signature) {
-      try {
-        event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
-      } catch (err: any) {
-        console.error('[Stripe Webhook Signature Error]:', err.message);
-        return NextResponse.json({ error: `Webhook Signature Error: ${err.message}` }, { status: 400 });
-      }
-    } else {
-      // Pour les environnements de test / prévisualisation sans secret webhook
-      event = JSON.parse(rawBody) as Stripe.Event;
+    // Sécurité : la signature est OBLIGATOIRE. Aucun fallback JSON brut.
+    if (!webhookSecret) {
+      console.error('[Stripe Webhook] STRIPE_WEBHOOK_SECRET manquant — requête rejetée.');
+      return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 });
+    }
+    if (!signature) {
+      return NextResponse.json({ error: 'Missing stripe-signature header' }, { status: 400 });
     }
 
+    let event: Stripe.Event;
+    try {
+      event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
+    } catch (err: any) {
+      console.error('[Stripe Webhook Signature Error]:', err.message);
+      return NextResponse.json({ error: 'Webhook Signature Error' }, { status: 400 });
+    }
+
+    // Sécurité : la clé service-role est OBLIGATOIRE (jamais de fallback vers la clé anon).
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error('[Stripe Webhook] NEXT_PUBLIC_SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY manquant.');
+      return NextResponse.json({ error: 'Supabase service configuration missing' }, { status: 500 });
+    }
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     switch (event.type) {
@@ -49,6 +58,7 @@ export async function POST(req: NextRequest) {
 
           if (error) {
             console.error('[Stripe Webhook Error set_user_subscription]:', error);
+            return NextResponse.json({ error: 'Failed to update subscription' }, { status: 500 });
           }
         }
         break;
@@ -57,8 +67,7 @@ export async function POST(req: NextRequest) {
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription;
         console.log(`[Stripe Webhook] Résiliation abonnement ${subscription.id}`);
-        
-        // Trouver et désactiver l'abonnement dans profiles
+
         const { error } = await supabase
           .from('profiles')
           .update({ is_premium: false })
@@ -66,6 +75,7 @@ export async function POST(req: NextRequest) {
 
         if (error) {
           console.error('[Stripe Webhook Error subscription.deleted]:', error);
+          return NextResponse.json({ error: 'Failed to process deletion' }, { status: 500 });
         }
         break;
       }
@@ -73,11 +83,16 @@ export async function POST(req: NextRequest) {
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription;
         const isActive = subscription.status === 'active' || subscription.status === 'trialing';
-        
-        await supabase
+
+        const { error } = await supabase
           .from('profiles')
           .update({ is_premium: isActive })
           .eq('stripe_subscription_id', subscription.id);
+
+        if (error) {
+          console.error('[Stripe Webhook Error subscription.updated]:', error);
+          return NextResponse.json({ error: 'Failed to update subscription' }, { status: 500 });
+        }
         break;
       }
 
