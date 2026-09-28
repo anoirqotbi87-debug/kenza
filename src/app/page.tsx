@@ -217,7 +217,7 @@ const navItems: { id: View; label: string; icon: LucideIcon }[] = [
   { id: "today", label: "Aujourd’hui", icon: HomeIcon },
   { id: "path", label: "Mon parcours", icon: Compass },
   { id: "phrases", label: "Carnet de phrases", icon: Bookmark },
-  { id: "review", label: "Révision du jour", icon: Sparkles },
+  { id: "review", label: tr("Révision du jour", "Today’s review", "Revisión del día", "مراجعة اليوم"), icon: Sparkles },
 ];
 
 export default function Home() {
@@ -553,23 +553,23 @@ export default function Home() {
 
   const headerTitle: Record<View, { eyebrow: string; title: string; description: string }> = {
     today: {
-      eyebrow: "TON ESPACE D’APPRENTISSAGE",
-      title: "Salam, on s’y remet ?",
-      description: "Un petit pas en darija aujourd’hui, une grande porte ouverte demain.",
+      eyebrow: tr("TON ESPACE D’APPRENTISSAGE", "YOUR LEARNING SPACE", "TU ESPACIO DE APRENDIZAJE", "فضاء تعلمك"),
+      title: tr("Salam, on s’y remet ?", "Salam, shall we get going?", "Salam, ¿retomamos?", "سلام، نكمل؟"),
+      description: tr("Un petit pas en darija aujourd’hui, une grande porte ouverte demain.", "A small step in darija today, a big door open tomorrow.", "Un pequeño paso en darija hoy, una gran puerta abierta mañana.", "خطوة صغيرة في الدارجة اليوم، وباب كبير مفتوح غداً."),
     },
     path: {
-      eyebrow: "LE CHEMIN SE FAIT EN PARLANT",
-      title: "Ton parcours",
-      description: "Des premiers mots aux conversations qui te ressemblent.",
+      eyebrow: tr("LE CHEMIN SE FAIT EN PARLANT", "THE PATH IS MADE BY SPEAKING", "EL CAMINO SE HACE HABLANDO", "الطريق يُصنع بالكلام"),
+      title: tr("Ton parcours", "Your journey", "Tu recorrido", "مسارك"),
+      description: tr("Des premiers mots aux conversations qui te ressemblent.", "From first words to conversations that feel like you.", "De las primeras palabras a conversaciones que te representen.", "من الكلمات الأولى إلى أحاديث تشبهك."),
     },
     phrases: {
-      eyebrow: "LES MOTS QUI RAPPROCHENT",
-      title: "Ton carnet de phrases",
-      description: "Des expressions utiles, vivantes, prêtes à t’accompagner.",
+      eyebrow: tr("LES MOTS QUI RAPPROCHENT", "WORDS THAT BRING US CLOSER", "PALABRAS QUE ACERCAN", "كلمات تُقرّب"),
+      title: tr("Ton carnet de phrases", "Your phrase book", "Tu cuaderno de frases", "دفتر عباراتك"),
+      description: tr("Des expressions utiles, vivantes, prêtes à t’accompagner.", "Useful, lively expressions, ready to go with you.", "Expresiones útiles y vivas, listas para acompañarte.", "عبارات مفيدة حيّة، جاهزة لمرافقتك."),
     },
     review: {
-      eyebrow: "ANCRER, SANS SE PRESSER",
-      title: "Révision du jour",
+      eyebrow: tr("ANCRER, SANS SE PRESSER", "ANCHOR IN, NO RUSH", "ANCLAR, SIN PRISA", "ترسيخ، بلا استعجال"),
+      title: tr("Révision du jour", "Today’s review", "Revisión del día", "مراجعة اليوم"),
       description: "Quelques cartes bien choisies pour laisser les mots s’installer.",
     },
     space: {
