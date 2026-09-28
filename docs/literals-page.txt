@@ -1,61 +1,68 @@
-5|ArrowDownRight,
-6|ArrowLeft,
-7|ArrowRight,
-8|Award,
-9|Bookmark,
-10|BookOpen,
-11|Check,
-12|CheckCircle2,
-13|ChevronRight,
-14|CircleHelp,
-15|Compass,
-16|Flame,
-17|Globe,
-18|Headphones,
-19|Heart,
-20|Home as HomeIcon,
-21|Languages,
-22|Leaf,
-23|LockKeyhole,
-24|Menu,
-25|MessageCircle,
-26|RotateCcw,
-27|Search,
-28|Sparkles,
-29|Star,
-30|Target,
-31|Volume2,
-33|Crown,
-34|Lock,
-672|Ajuster l’objectif <ArrowRight size={14} />
-721|FR
-730|EN
-739|ES
-748|AR
-782|"K"
-900|Passeport Culturel & Données <ArrowRight size={13} />
-1113|La darija
-1119|Continuer à apprendre <ArrowRight size={16} />
-1176|C’est parti <ArrowRight size={15} />
-1221|Voir mon espace <ArrowRight size={14} />
-1229|POUR AUJOURD’HUI
-1234|Voir le parcours <ArrowRight size={15} />
-1245|Ton carnet
-1250|Vocabulaire essentiel <ArrowRight size={14} />
-1260|Faire une
-1265|Cartes du jour <ArrowRight size={14} />
-1275|Mises en
-1280|Au café, en taxi <ArrowRight size={14} />
-1297|Pas besoin d’être parfait·e.
-1338|Les premiers pas
-1435|PRO
-1447|Débloquer avec Pro <ArrowRight size={14} />
-1485|Passer le Checkpoint A1 <ArrowRight size={14} />
-1492|Le mot <strong>darija</strong> vient de l’arabe <span dir="rtl">الدارجة</span> — la
-1649|Effacer les filtres <ArrowRight size={14} />
-1781|L'algorithme de répétition espacée (SRS) consolide ta mémoire à long terme. Chaque point
-1790|Dis la phrase à voix haute. La mémoire aime les histoires qu’on raconte.
-1904|La progression est sécurisée. Si tu te connectes, tes leçons, favoris et points se
-1913|Passer à Kenza Pro <ArrowRight size={14} />
-1929|Valide les examens de palier pour obtenir tes visas officiels du Passeport Darija et les
-1945|Effacer ma progression locale
+589|KENZA
+590|la darija, en chemin
+619|EXPLORER
+625|Grammaire active
+628|Pratique orale
+631|Révisions SRS
+641|Roleplay IA
+651|Mon Passeport
+661|TON RYTHME
+664|10 minutes par jour
+707|KENZA
+799|Se connecter
+898|Apprendre une langue, c’est rencontrer des gens.
+1117|Une phrase, une rencontre, une autre façon de voir le Maroc.
+1134|darija, la langue du lien
+1139|marhba
+1145|TA PROCHAINE ÉTAPE
+1191|leçons terminées
+1202|XP
+1204|points de pratique
+1217|rythme régulier
+1231|À toi de choisir ton pas.
+1243|UN MOT À EMPORTER
+1258|5 MINUTES, PAS PLUS
+1273|IMMERSION IA
+1295|UNE LANGUE, DES RENCONTRES
+1299|Il suffit de commencer.
+1301|Chaque expression est une petite invitation à aller vers l’autre.
+1342|Trois escales pour oser dire les premiers mots.
+1346|Maroc
+1353|TON AVANCÉE
+1431|À SUIVRE
+1472|PETIT CONSEIL
+1473|La régularité avant la perfection.
+1479|Palier A1 (Fondations)
+1492|darija
+1492|vient de l’arabe
+1575|À PORTÉE DE MAIN
+1639|Aucune phrase trouvée
+1640|Essaie un autre mot ou change de catégorie.
+1750|Réponds dans ta tête, puis retourne la carte pour vérifier.
+1755|Encore
+1756|+1 XP
+1759|Difficile
+1760|+2 XP
+1763|Bien
+1764|+3 XP
+1767|Facile
+1768|+5 XP
+1778|SANS PRESSION
+1779|Le bon rythme, c’est le tien.
+1788|Petit conseil
+1843|MON COIN KENZA
+1861|LEÇONS
+1866|Chaque pas compte.
+1872|POINTS
+1875|XP
+1877|Gagnés en pratiquant.
+1883|RYTHME
+1888|La régularité avant tout.
+1899|TES DONNÉES
+1900|Progression & Confidentialité
+1924|CERTIFICATS
+1925|Passeport Culturel
+1940|GESTION DU COMPTE
+1941|Repartir de zéro
+1942|Réinitialise les leçons, points et favoris sur cet appareil.
+1954|Kenza Pro :
