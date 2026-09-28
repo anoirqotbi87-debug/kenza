@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Check, Crown, Sparkles, BookOpen, Headphones, Award, ArrowRight, ShieldCheck } from 'lucide-react';
+import { X, Check, Crown, Sparkles, BookOpen, Headphones, Award, ArrowRight, ShieldCheck, Loader2 } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 import { trackEvent } from '../../utils/analytics';
+import { supabase } from '../../lib/supabase';
 
 interface PaywallModalProps {
   onClose: () => void;
@@ -14,6 +15,8 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
   const { setIsPremium } = useAppStore();
   const [billingCycle, setBillingCycle] = useState<'yearly' | 'monthly'>('yearly');
   const [currency, setCurrency] = useState<'EUR' | 'MAD'>('EUR');
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   React.useEffect(() => {
     trackEvent('paywall_modal_opened', { source });
@@ -36,12 +39,53 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
 
   const currentPricing = prices[currency];
 
-  const handleSubscribe = () => {
+  const handleSubscribe = async () => {
     trackEvent('plan_subscribed', { billingCycle, currency, source });
-    // Simulation / Redirection de paiement (ex: Stripe Checkout)
-    alert(`Redirection vers le paiement sécurisé (${billingCycle === 'yearly' ? 'Plan Annuel' : 'Plan Mensuel'} - ${currency})...`);
-    setIsPremium(true);
-    onClose();
+    setLoading(true);
+    setErrorMessage(null);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          billingCycle,
+          currency,
+          source,
+          email: session?.user?.email,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Erreur lors de l’initialisation du paiement');
+      }
+
+      if (data.url) {
+        // Redirection sécurisée vers la page Stripe Checkout
+        window.location.href = data.url;
+        return;
+      }
+
+      if (data.simulated) {
+        // Simulation en local ou sans clé secrète Stripe renseignée
+        setIsPremium(true);
+        alert('Compte mis à niveau avec succès vers Kenza Pro (Mode Démo) !');
+        onClose();
+      }
+    } catch (err: any) {
+      console.error('[Paywall Checkout Error]:', err);
+      setErrorMessage(err.message || 'Impossible d’initialiser le paiement. Veuillez réessayer.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Titres et accroches contextuelles selon la provenance (source)
@@ -258,11 +302,27 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
           <div className="space-y-3 pt-1">
             <button
               onClick={handleSubscribe}
-              className="w-full py-3.5 sm:py-4 px-6 rounded-full bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] font-bold text-sm sm:text-base shadow-md hover:shadow-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-3 group"
+              disabled={loading}
+              className="w-full py-3.5 sm:py-4 px-6 rounded-full bg-[#C9A05C] hover:bg-[#b88f4b] disabled:opacity-60 disabled:cursor-not-allowed text-[#1B2A4A] font-bold text-sm sm:text-base shadow-md hover:shadow-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-3 group"
             >
-              <span>Débloquer Kenza Pro</span>
-              <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
+              {loading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Préparation du paiement...</span>
+                </>
+              ) : (
+                <>
+                  <span>Débloquer Kenza Pro</span>
+                  <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
+                </>
+              )}
             </button>
+
+            {errorMessage && (
+              <p className="text-xs text-red-600 font-medium text-center bg-red-50 p-2 rounded-lg border border-red-200">
+                {errorMessage}
+              </p>
+            )}
 
             <p className="text-[11px] text-center text-[#7A7670] leading-snug">
               Paiement chiffré et sécurisé · Annulation en 1 clic à tout moment.

@@ -40,7 +40,7 @@ export default function Home() {
   const isArabic = lang === 'ar' || lang.startsWith('ar');
   const { t } = useTranslation();
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
-  const { completeLesson, completedLessons, devUnlockAll, setUser, resetData, hasCompletedOnboarding, isPremium } = useAppStore();
+  const { completeLesson, completedLessons, devUnlockAll, setUser, resetData, hasCompletedOnboarding, isPremium, setIsPremium } = useAppStore();
   const [checkpointOpen, setCheckpointOpen] = useState<{ id: string, name: string } | null>(null);
   const { hasPassedLevel } = useCheckpointProgress();
 
@@ -113,7 +113,16 @@ export default function Home() {
 
       window.history.replaceState({}, document.title, window.location.pathname);
     }
-  }, []);
+
+    const upgradeStatus = searchParams.get('upgrade');
+    if (upgradeStatus === 'success') {
+      setIsPremium(true);
+      alert('🎉 Félicitations ! Votre abonnement Kenza Pro est activé. Bienvenue dans l’expérience complète !');
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (upgradeStatus === 'cancel') {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [setIsPremium]);
 
   const handleStartLesson = (lessonId: string) => {
     // Vérification du gating Premium sur les modules 3, 4 et 5
