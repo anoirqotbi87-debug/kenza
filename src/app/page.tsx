@@ -598,7 +598,7 @@ export default function Home() {
           </button>
         </div>
 
-        <div className="sidebar-label">APPRENDRE</div>
+        <div className="sidebar-label">{(t as any).side?.learn || "APPRENDRE"}</div>
         <nav className="side-nav" aria-label="Navigation principale">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -632,7 +632,7 @@ export default function Home() {
           </a>
         </nav>
 
-        <div className="sidebar-label sidebar-label-spaced">PRATIQUE ORALE & IA</div>
+        <div className="sidebar-label sidebar-label-spaced">{(t as any).side?.oral || "PRATIQUE ORALE & IA"}</div>
         <button
           onClick={() => setShowScenarioSelector(true)}
           className="nav-item"
@@ -641,7 +641,7 @@ export default function Home() {
           <span>Roleplay IA</span>
         </button>
 
-        <div className="sidebar-label sidebar-label-spaced">TON ESPACE</div>
+        <div className="sidebar-label sidebar-label-spaced">{(t as any).side?.space || "TON ESPACE"}</div>
         <button
           onClick={() => switchView("space")}
           className={`nav-item ${view === "space" ? "nav-item-active" : ""}`}
