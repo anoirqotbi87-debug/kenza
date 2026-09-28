@@ -1,0 +1,61 @@
+5|ArrowDownRight,
+6|ArrowLeft,
+7|ArrowRight,
+8|Award,
+9|Bookmark,
+10|BookOpen,
+11|Check,
+12|CheckCircle2,
+13|ChevronRight,
+14|CircleHelp,
+15|Compass,
+16|Flame,
+17|Globe,
+18|Headphones,
+19|Heart,
+20|Home as HomeIcon,
+21|Languages,
+22|Leaf,
+23|LockKeyhole,
+24|Menu,
+25|MessageCircle,
+26|RotateCcw,
+27|Search,
+28|Sparkles,
+29|Star,
+30|Target,
+31|Volume2,
+33|Crown,
+34|Lock,
+672|Ajuster l’objectif <ArrowRight size={14} />
+721|FR
+730|EN
+739|ES
+748|AR
+782|"K"
+900|Passeport Culturel & Données <ArrowRight size={13} />
+1113|La darija
+1119|Continuer à apprendre <ArrowRight size={16} />
+1176|C’est parti <ArrowRight size={15} />
+1221|Voir mon espace <ArrowRight size={14} />
+1229|POUR AUJOURD’HUI
+1234|Voir le parcours <ArrowRight size={15} />
+1245|Ton carnet
+1250|Vocabulaire essentiel <ArrowRight size={14} />
+1260|Faire une
+1265|Cartes du jour <ArrowRight size={14} />
+1275|Mises en
+1280|Au café, en taxi <ArrowRight size={14} />
+1297|Pas besoin d’être parfait·e.
+1338|Les premiers pas
+1435|PRO
+1447|Débloquer avec Pro <ArrowRight size={14} />
+1485|Passer le Checkpoint A1 <ArrowRight size={14} />
+1492|Le mot <strong>darija</strong> vient de l’arabe <span dir="rtl">الدارجة</span> — la
+1649|Effacer les filtres <ArrowRight size={14} />
+1781|L'algorithme de répétition espacée (SRS) consolide ta mémoire à long terme. Chaque point
+1790|Dis la phrase à voix haute. La mémoire aime les histoires qu’on raconte.
+1904|La progression est sécurisée. Si tu te connectes, tes leçons, favoris et points se
+1913|Passer à Kenza Pro <ArrowRight size={14} />
+1929|Valide les examens de palier pour obtenir tes visas officiels du Passeport Darija et les
+1945|Effacer ma progression locale

@@ -738,3 +738,11 @@ button:focus-visible, input:focus-visible { outline: 3px solid rgba(214, 155, 71
   .phrase-search { flex-basis: 100%; }
   .favorites-filter { margin-left: auto; }
 }
+/* kenza-ui-responsive-patch */
+@media (max-width: 720px) {
+  .topbar { flex-wrap: wrap; height: auto; min-height: 52px; padding: 6px 12px; gap: 4px 8px; }
+  .topbar-actions { flex-wrap: wrap; justify-content: flex-end; gap: 4px; }
+  .lang-switcher { gap: 1px; padding: 0 5px; font-size: 10px; height: 26px; overflow-x: auto; max-width: 46vw; scrollbar-width: none; }
+  .lang-btn { padding: 2px 3px; white-space: nowrap; }
+  .lang-sep { display: none; }
+}
