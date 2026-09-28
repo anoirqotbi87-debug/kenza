@@ -250,20 +250,32 @@ export default function Home() {
   const [activePersonaId, setActivePersonaId] = useState<PersonaId | null>(null);
   const [pricingSource, setPricingSource] = useState<string | null>(null);
 
-  // Sync favorites with localStorage
+  // 1. Sécurisation absolue de favorites (Null-Safety)
   useEffect(() => {
     try {
       const stored = localStorage.getItem("kenza_favorites");
-      if (stored) setFavorites(JSON.parse(stored));
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          setFavorites(parsed);
+          return;
+        }
+      }
     } catch {}
+    setFavorites([]);
   }, []);
 
   const saveFavorites = (next: string[]) => {
-    setFavorites(next);
+    const safeNext = Array.isArray(next) ? next : [];
+    setFavorites(safeNext);
     try {
-      localStorage.setItem("kenza_favorites", JSON.stringify(next));
+      localStorage.setItem("kenza_favorites", JSON.stringify(safeNext));
     } catch {}
   };
+
+  const safeFavorites = useMemo(() => {
+    return Array.isArray(favorites) ? favorites : [];
+  }, [favorites]);
 
   // Auth sync
   useEffect(() => {
@@ -321,24 +333,66 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [view]);
 
-  // Combined phrases (Manus default + rich srsVocabulary)
-  const allPhrases = useMemo(() => {
-    const vocabularyList: Phrase[] = srsVocabulary.slice(0, 40).map((w, idx) => ({
-      id: w.id || `vocab_${idx}`,
-      category: w.category || "Essentiels",
-      darija: w.arabizi,
-      arabic: w.arabic,
-      meaning: (w as any).translations?.fr || (w as any).translation || "Expression en darija",
-      note: "Vocabulaire du quotidien avec audio naturel.",
-    }));
+  // 2. Adaptateur universel pour les phrases (Format Manus ↔ Format KENZA)
+  const allPhrases: Phrase[] = useMemo(() => {
+    const rawVocabulary = (srsVocabulary || []).slice(0, 40).map((w, idx) => {
+      let meaningText = "Expression en darija";
+      if (typeof (w as any).translation === "string") {
+        meaningText = (w as any).translation;
+      } else if ((w as any).translation && typeof (w as any).translation === "object") {
+        meaningText = (w as any).translation.fr || (w as any).translation.en || "Expression en darija";
+      } else if ((w as any).translations?.fr) {
+        meaningText = (w as any).translations.fr;
+      } else if (typeof (w as any).back === "string") {
+        meaningText = (w as any).back;
+      }
 
-    const combined = [...defaultPhrases];
-    for (const v of vocabularyList) {
-      if (!combined.some((p) => p.darija.toLowerCase() === v.darija.toLowerCase())) {
+      let cat = "Les essentiels";
+      if (w.category === "polite_social") cat = "Saluer";
+      else if (w.category === "food_drink") cat = "Au café";
+      else if (w.category === "directions") cat = "Se déplacer";
+      else if (w.category) cat = w.category;
+
+      return {
+        id: w.id || `vocab_${idx}`,
+        category: cat,
+        darija: w.arabizi || (w as any).front || "",
+        arabic: w.arabic || "",
+        meaning: meaningText,
+        note: (w.example?.arabizi ? `Ex: ${w.example.arabizi}` : "") || "Vocabulaire du quotidien avec audio naturel.",
+      };
+    });
+
+    const combined: any[] = [...defaultPhrases];
+    for (const v of rawVocabulary) {
+      if (v.darija && !combined.some((p) => (p.darija || p.front || "").toLowerCase() === (v.darija || "").toLowerCase())) {
         combined.push(v);
       }
     }
-    return combined;
+
+    return combined.map((p) => {
+      let meaningStr = "Expression en darija";
+      if (typeof p.meaning === "string") {
+        meaningStr = p.meaning;
+      } else if (p.meaning && typeof p.meaning === "object") {
+        meaningStr = p.meaning.fr || p.meaning.en || "";
+      } else if (typeof p.back === "string") {
+        meaningStr = p.back;
+      } else if (p.back && typeof p.back === "object") {
+        meaningStr = p.back.fr || p.back.en || "";
+      } else if (p.translation) {
+        meaningStr = typeof p.translation === "string" ? p.translation : p.translation.fr || p.translation.en || "";
+      }
+
+      return {
+        id: String(p.id || Math.random()),
+        category: String(p.category || "Les essentiels"),
+        darija: String(p.darija || p.front || p.arabizi || ""),
+        arabic: String(p.arabic || ""),
+        meaning: String(meaningStr || "Expression en darija"),
+        note: String(p.note || p.notes || ""),
+      };
+    });
   }, []);
 
   const completedCount = completedLessons.length;
@@ -348,17 +402,22 @@ export default function Home() {
   const activeLesson = baseLessons.find((lesson) => lesson.id === lessonId) ?? null;
   const activeQuestion = activeLesson?.questions[questionIndex] ?? null;
 
-  const categories = ["Tout voir", ...Array.from(new Set(allPhrases.map((phrase) => phrase.category)))];
+  // 4. Sécurisation de la liste des catégories
+  const categories = useMemo(() => {
+    return ["Tout voir", ...Array.from(new Set(allPhrases.map((phrase) => phrase.category).filter(Boolean)))];
+  }, [allPhrases]);
+
+  // 3. Sécurisation de la recherche textuelle
   const filteredPhrases = useMemo(() => {
+    const searchLower = (search || "").toLowerCase().trim();
     return allPhrases.filter((phrase) => {
       const matchesCategory = category === "Tout voir" || phrase.category === category;
-      const matchesSearch = `${phrase.darija} ${phrase.arabic} ${phrase.meaning} ${phrase.category}`
-        .toLocaleLowerCase("fr")
-        .includes(search.toLocaleLowerCase("fr"));
-      const matchesFavorite = !favoritesOnly || favorites.includes(phrase.id);
+      const searchTarget = `${phrase.darija || ""} ${phrase.arabic || ""} ${phrase.meaning || ""} ${phrase.category || ""}`.toLowerCase();
+      const matchesSearch = !searchLower || searchTarget.includes(searchLower);
+      const matchesFavorite = !favoritesOnly || safeFavorites.includes(phrase.id);
       return matchesCategory && matchesSearch && matchesFavorite;
     });
-  }, [category, search, favoritesOnly, favorites, allPhrases]);
+  }, [category, search, favoritesOnly, safeFavorites, allPhrases]);
 
   const showToast = (message: string) => setToast(message);
 
@@ -412,20 +471,23 @@ export default function Home() {
   };
 
   const toggleFavorite = (id: string) => {
-    const updated = favorites.includes(id)
-      ? favorites.filter((item) => item !== id)
-      : [...favorites, id];
+    const current = Array.isArray(favorites) ? favorites : [];
+    const updated = current.includes(id)
+      ? current.filter((item) => item !== id)
+      : [...current, id];
     saveFavorites(updated);
   };
 
   const playPhrase = (darija: string, arabic: string) => {
-    playAudio(darija, arabic, true);
+    if (!darija && !arabic) return;
+    playAudio(darija || "", arabic || "", true);
     showToast("Prononciation audio de la phrase.");
   };
 
   const copyPhrase = async (phrase: Phrase) => {
     try {
-      await navigator.clipboard.writeText(`${phrase.darija} (${phrase.arabic}) — ${phrase.meaning}`);
+      const text = `${phrase.darija || ""} ${phrase.arabic ? `(${phrase.arabic})` : ""} — ${phrase.meaning || ""}`.trim();
+      await navigator.clipboard.writeText(text);
       showToast("Phrase copiée dans le presse-papiers.");
     } catch {
       showToast("Copie indisponible.");
@@ -677,7 +739,7 @@ export default function Home() {
               setCategory={setCategory}
               categories={categories}
               phrases={filteredPhrases}
-              favorites={favorites}
+              favorites={safeFavorites}
               favoritesOnly={favoritesOnly}
               setFavoritesOnly={setFavoritesOnly}
               onFavorite={toggleFavorite}
@@ -1328,7 +1390,7 @@ function PhrasesView({
   setCategory,
   categories,
   phrases: visiblePhrases,
-  favorites,
+  favorites = [],
   favoritesOnly,
   setFavoritesOnly,
   onFavorite,
@@ -1342,13 +1404,16 @@ function PhrasesView({
   setCategory: (value: string) => void;
   categories: string[];
   phrases: Phrase[];
-  favorites: string[];
+  favorites?: string[];
   favoritesOnly: boolean;
   setFavoritesOnly: (value: boolean) => void;
   onFavorite: (id: string) => void;
   onPlay: (darija: string, arabic: string) => void;
   onCopy: (phrase: Phrase) => void;
 }) {
+  const safeFavorites = Array.isArray(favorites) ? favorites : [];
+  const safePhrases = Array.isArray(visiblePhrases) ? visiblePhrases : [];
+
   return (
     <>
       <section className="phrase-toolbar">
@@ -1368,12 +1433,12 @@ function PhrasesView({
           onClick={() => setFavoritesOnly(!favoritesOnly)}
         >
           <Heart size={15} fill={favoritesOnly ? "currentColor" : "none"} /> Mes favoris{" "}
-          <span>{favorites.length}</span>
+          <span>{safeFavorites.length}</span>
         </button>
       </section>
 
       <div className="category-tabs" role="tablist" aria-label="Catégories de phrases">
-        {categories.map((item) => (
+        {(categories || []).map((item) => (
           <button
             role="tab"
             aria-selected={category === item}
@@ -1398,44 +1463,54 @@ function PhrasesView({
           </h2>
         </div>
         <span className="phrase-count">
-          {visiblePhrases.length} expression{visiblePhrases.length === 1 ? "" : "s"}
+          {safePhrases.length} expression{safePhrases.length === 1 ? "" : "s"}
         </span>
       </div>
 
-      {visiblePhrases.length > 0 ? (
+      {safePhrases.length > 0 ? (
         <div className="phrase-grid">
-          {visiblePhrases.map((phrase, index) => (
-            <article className="phrase-card" key={phrase.id}>
-              <div className="phrase-card-top">
-                <span className="phrase-category">{phrase.category}</span>
-                <button
-                  className={`heart-button ${favorites.includes(phrase.id) ? "heart-active" : ""}`}
-                  onClick={() => onFavorite(phrase.id)}
-                  aria-label={
-                    favorites.includes(phrase.id) ? "Retirer des favoris" : "Ajouter aux favoris"
-                  }
-                >
-                  <Heart size={17} fill={favorites.includes(phrase.id) ? "currentColor" : "none"} />
-                </button>
-              </div>
-              <span className="phrase-index">0{index + 1}</span>
-              <h3>{phrase.darija}</h3>
-              <span className="phrase-arabic" dir="rtl">
-                {phrase.arabic}
-              </span>
-              <div className="phrase-divider" />
-              <p className="phrase-meaning">{phrase.meaning}</p>
-              <p className="phrase-note">{phrase.note}</p>
-              <div className="phrase-actions">
-                <button onClick={() => onPlay(phrase.darija, phrase.arabic)}>
-                  <Volume2 size={15} /> Écouter
-                </button>
-                <button onClick={() => onCopy(phrase)}>
-                  <Bookmark size={14} /> Copier
-                </button>
-              </div>
-            </article>
-          ))}
+          {safePhrases.map((phrase, index) => {
+            const isFav = safeFavorites.includes(phrase.id);
+            const darijaText = phrase.darija || "";
+            const arabicText = phrase.arabic || "";
+            const meaningText = phrase.meaning || "";
+            const categoryText = phrase.category || "Les essentiels";
+
+            return (
+              <article className="phrase-card" key={phrase.id}>
+                <div className="phrase-card-top">
+                  <span className="phrase-category">{categoryText}</span>
+                  <button
+                    className={`heart-button ${isFav ? "heart-active" : ""}`}
+                    onClick={() => onFavorite(phrase.id)}
+                    aria-label={
+                      isFav ? "Retirer des favoris" : "Ajouter aux favoris"
+                    }
+                  >
+                    <Heart size={17} fill={isFav ? "currentColor" : "none"} />
+                  </button>
+                </div>
+                <span className="phrase-index">0{index + 1}</span>
+                <h3>{darijaText}</h3>
+                {arabicText ? (
+                  <span className="phrase-arabic" dir="rtl">
+                    {arabicText}
+                  </span>
+                ) : null}
+                <div className="phrase-divider" />
+                <p className="phrase-meaning">{meaningText}</p>
+                {phrase.note ? <p className="phrase-note">{phrase.note}</p> : null}
+                <div className="phrase-actions">
+                  <button onClick={() => onPlay(darijaText, arabicText)}>
+                    <Volume2 size={15} /> Écouter
+                  </button>
+                  <button onClick={() => onCopy(phrase)}>
+                    <Bookmark size={14} /> Copier
+                  </button>
+                </div>
+              </article>
+            );
+          })}
         </div>
       ) : (
         <div className="empty-state">
