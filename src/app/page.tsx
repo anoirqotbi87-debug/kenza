@@ -256,7 +256,7 @@ export default function Home() {
       : id === "phrases" ? "phrasebook"
       : id === "review" ? "review"
       : null;
-    return key ? ((t as any).nav?.[key] as string | undefined) : undefined;
+    return key ? ((t as any).side?.[key] as string | undefined) : undefined;
   };
 
   const handleGoogleLogin = async () => {
