@@ -249,6 +249,8 @@ export default function Home() {
   } = useAppStore();
 
   const { t } = useTranslation();
+  const tr = (fr: string, en: string, es: string, ar: string) =>
+    uiLanguage === "en" ? en : uiLanguage === "es" ? es : uiLanguage === "ar" ? ar : fr;
   const navLabel = (id: string) => {
     const key =
       id === "today" ? "home"
@@ -587,7 +589,7 @@ export default function Home() {
           </div>
           <div>
             <span className="brand-name">KENZA</span>
-            <span className="brand-tagline">la darija, en chemin</span>
+            <span className="brand-tagline">{tr("la darija, en chemin", "darija, one step at a time", "la darija, paso a paso", "الدارجة، على الطريق")}</span>
           </div>
           <button
             className="icon-button mobile-close"
@@ -616,19 +618,19 @@ export default function Home() {
           })}
         </nav>
 
-        <div className="sidebar-label">EXPLORER</div>
+        <div className="sidebar-label">{tr("EXPLORER", "EXPLORE", "EXPLORAR", "استكشف")}</div>
         <nav className="side-nav" aria-label="Ressources d'étude">
           <a href="/etudier" className="nav-item">
             <span>Étudier — Modules complets</span>
           </a>
           <a href="/grammaire" className="nav-item">
-            <span>Grammaire active</span>
+            <span>{tr("Grammaire active", "Active grammar", "Gramática activa", "القواعد النشطة")}</span>
           </a>
           <a href="/parler" className="nav-item">
-            <span>Pratique orale</span>
+            <span>{tr("Pratique orale", "Speaking practice", "Práctica oral", "تدريب النطق")}</span>
           </a>
           <a href="/revisions" className="nav-item">
-            <span>Révisions SRS</span>
+            <span>{tr("Révisions SRS", "SRS review", "Repaso SRS", "مراجعة SRS")}</span>
           </a>
         </nav>
 
@@ -638,7 +640,7 @@ export default function Home() {
           className="nav-item"
         >
           <MessageCircle size={19} strokeWidth={1.8} />
-          <span>Roleplay IA</span>
+          <span>{tr("Roleplay IA", "AI roleplay", "Roleplay IA", "حوار مع الذكاء الاصطناعي")}</span>
         </button>
 
         <div className="sidebar-label sidebar-label-spaced">{(t as any).side?.space || "TON ESPACE"}</div>
@@ -648,7 +650,7 @@ export default function Home() {
           aria-current={view === "space" ? "page" : undefined}
         >
           <Award size={19} strokeWidth={1.8} />
-          <span>Mon Passeport</span>
+          <span>{tr("Mon Passeport", "My passport", "Mi pasaporte", "جوازي")}</span>
         </button>
 
         <div className="sidebar-spacer" />
@@ -658,10 +660,10 @@ export default function Home() {
             <Target size={17} />
           </div>
           <div className="goal-topline">
-            <span>TON RYTHME</span>
+            <span>{tr("TON RYTHME", "YOUR PACE", "TU RITMO", "إيقاعك")}</span>
             <span>{Math.min(100, Math.round(((completedCount * 3) / 10) * 100))}%</span>
           </div>
-          <strong>10 minutes par jour</strong>
+          <strong>{tr("10 minutes par jour", "10 minutes a day", "10 minutos al día", "10 دقائق يومياً")}</strong>
           <div className="goal-track">
             <span style={{ width: `${Math.min(100, ((completedCount * 3) / 10) * 100)}%` }} />
           </div>
@@ -796,7 +798,7 @@ export default function Home() {
                   <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.16 0 10.02 0 12s.45 3.84 1.25 5.42l4.03-3.15z"/>
                   <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
                 </svg>
-                <span>Se connecter</span>
+                <span>{tr("Se connecter", "Sign in", "Iniciar sesión", "تسجيل الدخول")}</span>
               </button>
             )}
           </div>
@@ -895,7 +897,7 @@ export default function Home() {
             <span>
               KENZA <span className="footer-arabic">كنزة</span>
             </span>
-            <span>Apprendre une langue, c’est rencontrer des gens.</span>
+            <span>{tr("Apprendre une langue, c’est rencontrer des gens.", "Learning a language is meeting people.", "Aprender un idioma es conocer gente.", "تعلم اللغة لقاءٌ بالناس.")}</span>
             <button onClick={() => switchView("space")}>
               Passeport Culturel & Données <ArrowRight size={13} />
             </button>
@@ -1114,7 +1116,7 @@ function TodayView({
               <br />
               s’ouvre à toi.
             </h2>
-            <p>Une phrase, une rencontre, une autre façon de voir le Maroc.</p>
+            <p>{tr("Une phrase, une rencontre, une autre façon de voir le Maroc.", "A phrase, an encounter, another way to see Morocco.", "Una frase, un encuentro, otra forma de ver Marruecos.", "عبارة، لقاء، وطريقة أخرى لرؤية المغرب.")}</p>
             <button className="hero-button" onClick={() => onStart(nextLesson.id)}>
               Continuer à apprendre <ArrowRight size={16} />
             </button>
@@ -1142,7 +1144,7 @@ function TodayView({
 
         <article className="next-card">
           <div className="next-card-head">
-            <span className="mini-kicker">TA PROCHAINE ÉTAPE</span>
+            <span className="mini-kicker">{tr("TA PROCHAINE ÉTAPE", "YOUR NEXT STEP", "TU PRÓXIMO PASO", "خطوتك التالية")}</span>
             <span className="next-icon">
               <ArrowDownRight size={17} />
             </span>
@@ -1188,7 +1190,7 @@ function TodayView({
               {completedCount}
               <small>/{totalLessons}</small>
             </strong>
-            <span>leçons terminées</span>
+            <span>{tr("leçons terminées", "lessons completed", "lecciones completadas", "دروس مكتملة")}</span>
           </div>
         </div>
         <div className="stat-divider" />
@@ -1201,7 +1203,7 @@ function TodayView({
               {xp}
               <small> XP</small>
             </strong>
-            <span>points de pratique</span>
+            <span>{tr("points de pratique", "practice points", "puntos de práctica", "نقاط التدريب")}</span>
           </div>
         </div>
         <div className="stat-divider" />
@@ -1228,7 +1230,7 @@ function TodayView({
             <span className="eyebrow-line" />
             POUR AUJOURD’HUI
           </span>
-          <h2>À toi de choisir ton pas.</h2>
+          <h2>{tr("À toi de choisir ton pas.", "Your pace, your choice.", "Tú eliges tu paso.", "اختر خطوتك.")}</h2>
         </div>
         <button className="plain-link" onClick={() => onNavigate("path")}>
           Voir le parcours <ArrowRight size={15} />
@@ -1240,7 +1242,7 @@ function TodayView({
           <span className="quick-icon">
             <Bookmark size={18} />
           </span>
-          <span className="quick-label">UN MOT À EMPORTER</span>
+          <span className="quick-label">{tr("UN MOT À EMPORTER", "A WORD TO GO", "UNA PALABRA PARA LLEVAR", "كلمة معك")}</span>
           <strong>
             Ton carnet
             <br />
@@ -1255,7 +1257,7 @@ function TodayView({
           <span className="quick-icon">
             <Sparkles size={18} />
           </span>
-          <span className="quick-label">5 MINUTES, PAS PLUS</span>
+          <span className="quick-label">{tr("5 MINUTES, PAS PLUS", "5 MINUTES, NO MORE", "5 MINUTOS, NO MÁS", "5 دقائق فقط")}</span>
           <strong>
             Faire une
             <br />
@@ -1270,7 +1272,7 @@ function TodayView({
           <span className="quick-icon">
             <MessageCircle size={18} />
           </span>
-          <span className="quick-label">IMMERSION IA</span>
+          <span className="quick-label">{tr("IMMERSION IA", "AI IMMERSION", "INMERSIÓN IA", "انغماس مع الذكاء")}</span>
           <strong>
             Mises en
             <br />
@@ -1292,11 +1294,11 @@ function TodayView({
           <span className="callout-spark spark-b">✳</span>
         </div>
         <div className="callout-copy">
-          <span className="mini-kicker">UNE LANGUE, DES RENCONTRES</span>
+          <span className="mini-kicker">{tr("UNE LANGUE, DES RENCONTRES", "A LANGUAGE, ENCOUNTERS", "UN IDIOMA, ENCUENTROS", "لغةٌ ولقاءات")}</span>
           <h3>
             Pas besoin d’être parfait·e.
             <br />
-            <em>Il suffit de commencer.</em>
+            <em>{tr("Il suffit de commencer.", "Just start.", "Solo empieza.", "ابدأ فقط.")}</em>
           </h3>
           <p>Chaque expression est une petite invitation à aller vers l’autre.</p>
         </div>
@@ -1339,7 +1341,7 @@ function PathView({
               <br />
               en darija.
             </h2>
-            <p>Trois escales pour oser dire les premiers mots.</p>
+            <p>{tr("Trois escales pour oser dire les premiers mots.", "Three stops to dare your first words.", "Tres paradas para atreverte a hablar.", "ثلاث محطات لتبدأ كلماتك الأولى.")}</p>
           </div>
           <div className="path-stamp">
             <span>المغرب</span>
@@ -1350,7 +1352,7 @@ function PathView({
 
         <div className="path-progress-row">
           <div>
-            <span className="mini-kicker">TON AVANCÉE</span>
+            <span className="mini-kicker">{tr("TON AVANCÉE", "YOUR PROGRESS", "TU AVANCE", "تقدّمك")}</span>
             <strong>
               {completedLessons.length}{" "}
               <small>
@@ -1428,7 +1430,7 @@ function PathView({
                       </span>
                     )}
                     {!done && !locked && !isGated && (
-                      <span className="current-tag">À SUIVRE</span>
+                      <span className="current-tag">{tr("À SUIVRE", "TO CONTINUE", "A CONTINUAR", "للمتابعة")}</span>
                     )}
                     {isGated && (
                       <span className="current-tag" style={{ background: "#fef3c7", color: "#b45309" }}>
@@ -1469,14 +1471,14 @@ function PathView({
           <span className="aside-icon">
             <Leaf size={18} />
           </span>
-          <span className="mini-kicker">PETIT CONSEIL</span>
-          <h3>La régularité avant la perfection.</h3>
+          <span className="mini-kicker">{tr("PETIT CONSEIL", "QUICK TIP", "PEQUEÑO CONSEJO", "نصيحة صغيرة")}</span>
+          <h3>{tr("La régularité avant la perfection.", "Consistency beats perfection.", "La constancia antes que la perfección.", "الاستمرارية قبل الإتقان.")}</h3>
           <p>
             5 minutes par jour font plus qu’une heure de temps en temps. Reviens quand tu veux.
           </p>
           <div className="aside-divider" />
           <div className="aside-stat">
-            <span>Palier A1 (Fondations)</span>
+            <span>{tr("Palier A1 (Fondations)", "Level A1 (Foundations)", "Nivel A1 (Fundamentos)", "المستوى A1 (الأساسيات)")}</span>
             <strong>{hasPassedLevel("1") ? "Validé ✓" : "En cours"}</strong>
           </div>
           <button
@@ -1572,7 +1574,7 @@ function PhrasesView({
 
       <div className="phrase-section-top">
         <div>
-          <span className="mini-kicker">À PORTÉE DE MAIN</span>
+          <span className="mini-kicker">{tr("À PORTÉE DE MAIN", "AT HAND", "A MANO", "في متناول اليد")}</span>
           <h2>
             {favoritesOnly
               ? "Tes phrases favorites"
@@ -1636,8 +1638,8 @@ function PhrasesView({
           <span className="empty-symbol">
             <Search size={22} />
           </span>
-          <h3>Aucune phrase trouvée</h3>
-          <p>Essaie un autre mot ou change de catégorie.</p>
+          <h3>{tr("Aucune phrase trouvée", "No phrase found", "Ninguna frase encontrada", "لا توجد عبارات")}</h3>
+          <p>{tr("Essaie un autre mot ou change de catégorie.", "Try another word or category.", "Prueba otra palabra o categoría.", "جرّب كلمة أو فئة أخرى.")}</p>
           <button
             className="plain-link"
             onClick={() => {
@@ -1747,24 +1749,24 @@ function ReviewView({
 
         <div className="review-hint">
           <CircleHelp size={15} />
-          <span>Réponds dans ta tête, puis retourne la carte pour vérifier.</span>
+          <span>{tr("Réponds dans ta tête, puis retourne la carte pour vérifier.", "Answer in your head, then flip the card.", "Responde en tu mente y gira la tarjeta.", "أجب في ذهنك ثم اقلب البطاقة.")}</span>
         </div>
 
         <div className="review-ratings">
           <button className="rate-again" onClick={() => onGrade("again")}>
-            <span>Encore</span>
+            <span>{tr("Encore", "Again", "Otra vez", "مرة أخرى")}</span>
             <small>+1 XP</small>
           </button>
           <button className="rate-hard" onClick={() => onGrade("hard")}>
-            <span>Difficile</span>
+            <span>{tr("Difficile", "Hard", "Difícil", "صعب")}</span>
             <small>+2 XP</small>
           </button>
           <button className="rate-good" onClick={() => onGrade("good")}>
-            <span>Bien</span>
+            <span>{tr("Bien", "Good", "Bien", "جيد")}</span>
             <small>+3 XP</small>
           </button>
           <button className="rate-easy" onClick={() => onGrade("easy")}>
-            <span>Facile</span>
+            <span>{tr("Facile", "Easy", "Fácil", "سهل")}</span>
             <small>+5 XP</small>
           </button>
         </div>
@@ -1775,8 +1777,8 @@ function ReviewView({
           <span className="aside-icon">
             <Sparkles size={18} />
           </span>
-          <span className="mini-kicker">SANS PRESSION</span>
-          <h3>Le bon rythme, c’est le tien.</h3>
+          <span className="mini-kicker">{tr("SANS PRESSION", "NO PRESSURE", "SIN PRESIÓN", "بدون ضغط")}</span>
+          <h3>{tr("Le bon rythme, c’est le tien.", "The right pace is yours.", "El buen ritmo es el tuyo.", "الإيقاع المناسب هو إيقاعك.")}</h3>
           <p>
             L'algorithme de répétition espacée (SRS) consolide ta mémoire à long terme. Chaque point
             d'XP nourrit ton passeport.
@@ -1785,7 +1787,7 @@ function ReviewView({
           <div className="review-method">
             <span className="method-dot" />
             <p>
-              <strong>Petit conseil</strong>
+              <strong>{tr("Petit conseil", "Quick tip", "Pequeño consejo", "نصيحة")}</strong>
               <br />
               Dis la phrase à voix haute. La mémoire aime les histoires qu’on raconte.
             </p>
@@ -1840,7 +1842,7 @@ function SpaceView({
           {username[0]?.toUpperCase() || "ك"}
         </div>
         <div className="profile-intro">
-          <span className="mini-kicker">MON COIN KENZA</span>
+          <span className="mini-kicker">{tr("MON COIN KENZA", "MY KENZA CORNER", "MI RINCÓN KENZA", "ركني في كنزة")}</span>
           <h2>Salam, {username} !</h2>
           <p>
             {user
@@ -1858,34 +1860,34 @@ function SpaceView({
           <span className="space-stat-icon stat-blue">
             <BookOpen size={18} />
           </span>
-          <span className="mini-kicker">LEÇONS</span>
+          <span className="mini-kicker">{tr("LEÇONS", "LESSONS", "LECCIONES", "الدروس")}</span>
           <strong>
             {completedCount}
             <small> / {baseLessons.length}</small>
           </strong>
-          <p>Chaque pas compte.</p>
+          <p>{tr("Chaque pas compte.", "Every step counts.", "Cada paso cuenta.", "كل خطوة تُحسب.")}</p>
         </article>
         <article>
           <span className="space-stat-icon stat-gold">
             <Star size={18} />
           </span>
-          <span className="mini-kicker">POINTS</span>
+          <span className="mini-kicker">{tr("POINTS", "POINTS", "PUNTOS", "النقاط")}</span>
           <strong>
             {xp}
             <small> XP</small>
           </strong>
-          <p>Gagnés en pratiquant.</p>
+          <p>{tr("Gagnés en pratiquant.", "Earned by practicing.", "Ganados practicando.", "تُكتسب بالتدريب.")}</p>
         </article>
         <article>
           <span className="space-stat-icon stat-orange">
             <Flame size={18} />
           </span>
-          <span className="mini-kicker">RYTHME</span>
+          <span className="mini-kicker">{tr("RYTHME", "PACE", "RITMO", "الإيقاع")}</span>
           <strong>
             {streak}
             <small> jour{streak > 1 ? "s" : ""}</small>
           </strong>
-          <p>La régularité avant tout.</p>
+          <p>{tr("La régularité avant tout.", "Consistency above all.", "La constancia ante todo.", "الاستمرارية أولاً.")}</p>
         </article>
       </div>
 
@@ -1896,8 +1898,8 @@ function SpaceView({
               <LockKeyhole size={18} />
             </span>
             <div>
-              <span className="mini-kicker">TES DONNÉES</span>
-              <h3>Progression & Confidentialité</h3>
+              <span className="mini-kicker">{tr("TES DONNÉES", "YOUR DATA", "TUS DATOS", "بياناتك")}</span>
+              <h3>{tr("Progression & Confidentialité", "Progress & Privacy", "Progreso y privacidad", "التقدم والخصوصية")}</h3>
             </div>
           </div>
           <p>
@@ -1921,8 +1923,8 @@ function SpaceView({
               <Award size={18} />
             </span>
             <div>
-              <span className="mini-kicker">CERTIFICATS</span>
-              <h3>Passeport Culturel</h3>
+              <span className="mini-kicker">{tr("CERTIFICATS", "CERTIFICATES", "CERTIFICADOS", "الشهادات")}</span>
+              <h3>{tr("Passeport Culturel", "Cultural passport", "Pasaporte cultural", "الجواز الثقافي")}</h3>
             </div>
           </div>
           <p>
@@ -1937,9 +1939,9 @@ function SpaceView({
 
       <div className="space-settings">
         <div>
-          <span className="mini-kicker">GESTION DU COMPTE</span>
-          <h3>Repartir de zéro</h3>
-          <p>Réinitialise les leçons, points et favoris sur cet appareil.</p>
+          <span className="mini-kicker">{tr("GESTION DU COMPTE", "ACCOUNT", "GESTIÓN DE CUENTA", "إدارة الحساب")}</span>
+          <h3>{tr("Repartir de zéro", "Start over", "Empezar de cero", "البدء من جديد")}</h3>
+          <p>{tr("Réinitialise les leçons, points et favoris sur cet appareil.", "Reset lessons, points and favorites on this device.", "Reinicia lecciones, puntos y favoritos en este dispositivo.", "صفّر الدروس والنقاط والمفضلة على هذا الجهاز.")}</p>
         </div>
         <button className="outline-button danger-outline" onClick={onReset}>
           Effacer ma progression locale
