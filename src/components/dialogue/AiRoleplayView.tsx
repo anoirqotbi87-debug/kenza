@@ -65,9 +65,34 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
 
   const { messages, input, handleInputChange, handleSubmit, isLoading, setInput, reload, error } = useChat({
     api: '/api/roleplay/chat',
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     body: { personaId },
     initialMessages: [],
+    onError: (err) => {
+      console.error('[AI Chat Error]:', err);
+      if (
+        err.message?.includes('QUOTA') || 
+        err.message?.includes('403') || 
+        err.message?.includes('quota') ||
+        err.message?.includes('UNAUTHORIZED')
+      ) {
+        setShowPaywall(true);
+      }
+    }
   });
+
+  useEffect(() => {
+    if (error) {
+      if (
+        error.message?.includes('QUOTA') || 
+        error.message?.includes('403') || 
+        error.message?.includes('quota') || 
+        error.message?.includes('UNAUTHORIZED')
+      ) {
+        setShowPaywall(true);
+      }
+    }
+  }, [error]);
 
   const { isSupported, isListening, transcript, startListening, stopListening } = useVoiceRecognition('ar-MA', 10000);
 
@@ -267,7 +292,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
       </div>
       
 
-      {showPaywall && <PaywallModal source="ai_roleplay_quota" onClose={() => setShowPaywall(false)} />}
+      {showPaywall && <PaywallModal source="ai_quota_exceeded" onClose={() => setShowPaywall(false)} />}
     </div>
   );
 }

@@ -1,159 +1,274 @@
+'use client';
+
 import React, { useState } from 'react';
-import { X, CheckCircle2, Crown, Star, BookOpen, Headphones, Award } from 'lucide-react';
+import { X, Check, Crown, Sparkles, BookOpen, Headphones, Award, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
+import { trackEvent } from '../../utils/analytics';
 
 interface PaywallModalProps {
   onClose: () => void;
-  source: string;
+  source?: string;
 }
 
-export default function PaywallModal({ onClose, source }: PaywallModalProps) {
+export default function PaywallModal({ onClose, source = 'direct' }: PaywallModalProps) {
   const { setIsPremium } = useAppStore();
-  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('yearly');
-  
+  const [billingCycle, setBillingCycle] = useState<'yearly' | 'monthly'>('yearly');
+  const [currency, setCurrency] = useState<'EUR' | 'MAD'>('EUR');
+
+  React.useEffect(() => {
+    trackEvent('paywall_modal_opened', { source });
+  }, [source]);
+
+  const prices = {
+    EUR: {
+      yearlyPerMonth: '4,90 €',
+      yearlyTotal: '59 € / an',
+      monthlyPrice: '9,00 €',
+      currencySymbol: '€',
+    },
+    MAD: {
+      yearlyPerMonth: '49 DH',
+      yearlyTotal: '590 DH / an',
+      monthlyPrice: '90 DH',
+      currencySymbol: 'DH',
+    },
+  };
+
+  const currentPricing = prices[currency];
+
   const handleSubscribe = () => {
-    // Dans une vraie app, rediriger vers Stripe Checkout
-    alert(`Redirection Stripe (Cycle: ${billingCycle} - Origine: ${source})...`);
+    trackEvent('plan_subscribed', { billingCycle, currency, source });
+    // Simulation / Redirection de paiement (ex: Stripe Checkout)
+    alert(`Redirection vers le paiement sécurisé (${billingCycle === 'yearly' ? 'Plan Annuel' : 'Plan Mensuel'} - ${currency})...`);
     setIsPremium(true);
     onClose();
   };
 
+  // Titres et accroches contextuelles selon la provenance (source)
+  const getContextualContent = () => {
+    if (source.includes('module') || source === 'module_locked') {
+      return {
+        kicker: '— PARCOURS AVANCÉ',
+        title: 'Débloquez les Modules B1 & B2',
+        subtitle: 'Poursuivez votre voyage vers Tanger et approfondissez les subtilités du dialecte marocain.',
+      };
+    }
+    if (source.includes('ai') || source.includes('roleplay') || source === 'ai_quota_exceeded') {
+      return {
+        kicker: '— IMMERSION IA SANS LIMITE',
+        title: 'Conversations IA Illimitées',
+        subtitle: 'Vous avez terminé votre session IA gratuite du jour. Passez à Kenza Pro pour échanger librement avec tous les personas.',
+      };
+    }
+    return {
+      kicker: '— PASSEPORT CULTUREL',
+      title: 'Maîtrisez la Darija sans limites',
+      subtitle: 'Libérez tout le potentiel de votre apprentissage de la Darija avec l’accès complet à l’écosystème Kenza.',
+    };
+  };
+
+  const headerInfo = getContextualContent();
+
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 z-[100] bg-[#1B2A4A]/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
       <div 
-        className="bg-[#FDFCF8] rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col md:flex-row relative animate-in zoom-in-95 duration-300"
+        className="bg-[#FDFCF8] rounded-3xl w-full max-w-4xl overflow-hidden shadow-2xl border border-[#E8E2D5] flex flex-col md:flex-row relative my-auto animate-in fade-in zoom-in-95 duration-200"
+        role="dialog"
+        aria-modal="true"
       >
+        {/* Bouton Fermer */}
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 bg-white/50 backdrop-blur-md rounded-full transition-colors z-10"
+          className="absolute top-3.5 right-3.5 p-2 rounded-full bg-[#F7F3EA] hover:bg-[#E8E2D5] text-[#1B2A4A] transition-colors border border-[#E8E2D5] z-30 shadow-xs"
+          aria-label="Fermer la modale"
         >
           <X className="w-5 h-5" />
         </button>
 
-        {/* Colonne de Gauche : Visuel & Valeur (Inspiré du passeport) */}
-        <div className="bg-[#1B2A4A] p-8 md:p-12 md:w-1/2 flex flex-col justify-center relative overflow-hidden rounded-t-3xl md:rounded-l-3xl md:rounded-tr-none text-white">
-          <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-            {/* Pattern stylisé */}
-            <svg viewBox="0 0 100 100" className="w-full h-full fill-current">
-              <pattern id="motif" width="20" height="20" patternUnits="userSpaceOnUse">
-                <circle cx="10" cy="10" r="1.5" />
-                <path d="M10 0v20M0 10h20" stroke="currentColor" strokeWidth="0.5" fill="none" />
-              </pattern>
-              <rect width="100%" height="100%" fill="url(#motif)" />
-            </svg>
-          </div>
-          
-          <div className="relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#C9A05C]/20 text-[#C9A05C] rounded-full text-sm font-bold tracking-wide mb-6">
-              <Crown className="w-4 h-4" />
-              KENZA PRO
+        {/* Volet Gauche : Identité éditoriale & Valeur (Inspiré du Passeport Culturel) */}
+        <div className="bg-[#1B2A4A] text-[#FDFCF8] p-6 sm:p-8 md:p-10 md:w-1/2 flex flex-col justify-between relative overflow-hidden">
+          {/* Motif géométrique discret */}
+          <div 
+            className="absolute inset-0 opacity-10 pointer-events-none"
+            style={{
+              backgroundImage: `radial-gradient(circle at 10px 10px, #C9A05C 1px, transparent 0)`,
+              backgroundSize: '24px 24px',
+            }}
+          />
+          <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-[#C9A05C]/20 blur-2xl pointer-events-none" />
+
+          <div className="relative z-10 space-y-4">
+            {/* Badge Kicker Or */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C9A05C]/20 border border-[#C9A05C]/40 text-[#C9A05C] text-xs font-bold tracking-widest uppercase">
+              <Crown className="w-3.5 h-3.5" />
+              <span>{headerInfo.kicker}</span>
             </div>
-            
-            <h2 className="text-3xl md:text-4xl font-serif font-black mb-4 leading-tight text-white">
-              Débloquez votre<br />Passeport Culturel.
+
+            {/* Titre Serif */}
+            <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-normal text-[#FDFCF8] leading-tight">
+              {headerInfo.title}
             </h2>
-            <p className="text-blue-100 text-lg mb-8 leading-relaxed">
-              Maîtrisez la Darija sans limites avec l'immersion IA complète et les modules de conversation avancés.
+
+            {/* Accroche */}
+            <p className="text-xs sm:text-sm text-[#E8E2D5]/85 leading-relaxed">
+              {headerInfo.subtitle}
             </p>
 
-            <ul className="space-y-4">
+            {/* Avantages exclusifs */}
+            <ul className="space-y-3 pt-2 text-xs sm:text-sm">
               {[
-                { icon: BookOpen, text: 'Accès total aux Modules 3, 4 et 5 (Niveaux B1 & B2)' },
-                { icon: Star, text: 'Roleplay IA illimité (Tous les personas & scénarios)' },
-                { icon: Headphones, text: 'Synthèse Vocale (TTS) illimitée et 100% hors-ligne' },
-                { icon: Award, text: 'Certificats officiels et visas du Passeport Culturel' }
+                { icon: BookOpen, text: 'Accès intégral aux Modules 3, 4 et 5 (Niveaux B1 & B2)' },
+                { icon: Sparkles, text: 'Roleplay IA illimité (Tous les personas et scénarios sans quota)' },
+                { icon: Headphones, text: 'Synthèse vocale (TTS) naturelle & mode 100% hors-ligne' },
+                { icon: Award, text: 'Visas officiels du Passeport Culturel & suivi de maîtrise' },
               ].map((benefit, idx) => (
                 <li key={idx} className="flex items-start gap-3">
-                  <div className="mt-1 p-1 bg-[#C9A05C]/20 rounded-full flex-shrink-0">
-                    <CheckCircle2 className="w-4 h-4 text-[#C9A05C]" />
+                  <div className="mt-0.5 w-5 h-5 rounded-full bg-[#7A9174]/25 text-[#7A9174] flex items-center justify-center shrink-0">
+                    <Check className="w-3.5 h-3.5 stroke-[2.5]" />
                   </div>
-                  <span className="text-slate-200">{benefit.text}</span>
+                  <span className="text-[#E8E2D5] font-medium leading-snug">{benefit.text}</span>
                 </li>
               ))}
             </ul>
           </div>
+
+          {/* Micro-badge de confiance en bas du volet gauche (desktop uniquement) */}
+          <div className="relative z-10 hidden md:flex items-center gap-2 pt-6 text-[11px] text-[#E8E2D5]/60 border-t border-white/10 mt-6">
+            <ShieldCheck className="w-4 h-4 text-[#C9A05C]" />
+            <span>Apprentissage certifié — Garanti sans engagement</span>
+          </div>
         </div>
 
-        {/* Colonne de Droite : Tarifs & CTA */}
-        <div className="p-8 md:p-12 md:w-1/2 flex flex-col">
-          <div className="text-center mb-8">
-            <h3 className="text-2xl font-black text-slate-800 mb-2">Choisissez votre plan</h3>
-            <p className="text-slate-500">Investissez dans votre fluidité. Annulable à tout moment.</p>
-          </div>
+        {/* Volet Droit : Sélecteur d'offres & CTA */}
+        <div className="bg-[#FDFCF8] p-6 sm:p-8 md:p-10 md:w-1/2 flex flex-col justify-between space-y-6">
+          
+          {/* Header Volet Droit : Titre + Toggle EUR / MAD */}
+          <div>
+            <div className="flex items-center justify-between gap-4 mb-2">
+              <span className="text-xs font-bold tracking-[0.2em] uppercase text-[#C9A05C]">
+                — Formules Kenza Pro
+              </span>
 
-          <div className="space-y-4 mb-8 flex-grow">
-            {/* Plan Annuel */}
-            <label 
-              className={`block relative p-5 border-2 rounded-2xl cursor-pointer transition-all duration-200 ${
-                billingCycle === 'yearly' 
-                  ? 'border-[#C9A05C] bg-[#C9A05C]/5 shadow-[0_0_20px_rgba(201,160,92,0.15)]' 
-                  : 'border-slate-200 hover:border-slate-300'
-              }`}
-            >
-              <div className="absolute -top-3 right-4 bg-[#C9A05C] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
-                -40% — Le plus populaire
+              {/* Toggle de devises EUR / MAD */}
+              <div className="inline-flex items-center bg-[#F7F3EA] p-1 rounded-full border border-[#E8E2D5] text-xs font-bold">
+                <button
+                  type="button"
+                  onClick={() => setCurrency('EUR')}
+                  className={`px-2.5 py-1 rounded-full transition-all ${
+                    currency === 'EUR'
+                      ? 'bg-[#1B2A4A] text-[#FDFCF8] shadow-xs'
+                      : 'text-[#7A7670] hover:text-[#1B2A4A]'
+                  }`}
+                >
+                  EUR (€)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrency('MAD')}
+                  className={`px-2.5 py-1 rounded-full transition-all ${
+                    currency === 'MAD'
+                      ? 'bg-[#1B2A4A] text-[#FDFCF8] shadow-xs'
+                      : 'text-[#7A7670] hover:text-[#1B2A4A]'
+                  }`}
+                >
+                  MAD (DH)
+                </button>
               </div>
-              <input 
-                type="radio" 
-                name="billing" 
-                value="yearly" 
-                checked={billingCycle === 'yearly'}
-                onChange={() => setBillingCycle('yearly')}
-                className="sr-only" 
-              />
-              <div className="flex justify-between items-center">
-                <div>
-                  <div className="font-bold text-slate-800 text-lg">Annuel</div>
-                  <div className="text-sm text-slate-500">Facturé 59€ / an</div>
-                </div>
-                <div className="text-right">
-                  <div className="font-black text-2xl text-slate-800">4,90€</div>
-                  <div className="text-xs text-slate-500">/ mois</div>
-                </div>
-              </div>
-            </label>
+            </div>
 
-            {/* Plan Mensuel */}
-            <label 
-              className={`block p-5 border-2 rounded-2xl cursor-pointer transition-all duration-200 ${
-                billingCycle === 'monthly' 
-                  ? 'border-[#C9A05C] bg-[#C9A05C]/5' 
-                  : 'border-slate-200 hover:border-slate-300'
-              }`}
-            >
-              <input 
-                type="radio" 
-                name="billing" 
-                value="monthly" 
-                checked={billingCycle === 'monthly'}
-                onChange={() => setBillingCycle('monthly')}
-                className="sr-only" 
-              />
-              <div className="flex justify-between items-center">
-                <div>
-                  <div className="font-bold text-slate-800 text-lg">Mensuel</div>
-                  <div className="text-sm text-slate-500">Sans engagement</div>
-                </div>
-                <div className="text-right">
-                  <div className="font-black text-2xl text-slate-800">9,00€</div>
-                  <div className="text-xs text-slate-500">/ mois</div>
-                </div>
-              </div>
-            </label>
-          </div>
-
-          <div className="space-y-4 text-center">
-            <button 
-              onClick={handleSubscribe}
-              className="w-full bg-gradient-to-r from-[#C9A05C] to-[#B8860B] hover:from-[#B8860B] hover:to-[#996515] text-white font-bold py-4 px-6 rounded-2xl shadow-lg shadow-[#C9A05C]/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2 text-lg"
-            >
-              <Crown className="w-5 h-5" />
-              Débloquer Kenza Pro
-            </button>
-            <p className="text-xs text-slate-400">
-              Paiement sécurisé. Annulable à tout moment en 1 clic depuis vos paramètres.
+            <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#1B2A4A]">
+              Choisissez votre cadence
+            </h3>
+            <p className="text-xs text-[#7A7670] mt-0.5">
+              Investissez dans votre aisance orale. Modifiable à tout instant.
             </p>
           </div>
+
+          {/* Cartes d'abonnements */}
+          <div className="space-y-3.5">
+            {/* Offre Annuelle (-40%) */}
+            <div
+              onClick={() => setBillingCycle('yearly')}
+              className={`relative p-4 sm:p-5 rounded-2xl border cursor-pointer transition-all duration-200 ${
+                billingCycle === 'yearly'
+                  ? 'bg-[#C9A05C]/10 border-2 border-[#C9A05C] shadow-md ring-2 ring-[#C9A05C]/20'
+                  : 'bg-[#F7F3EA]/60 border-[#E8E2D5] hover:border-[#C9A05C]/50'
+              }`}
+            >
+              {/* Badge réduction dorée */}
+              <div className="absolute -top-2.5 right-4 bg-[#C9A05C] text-[#1B2A4A] text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
+                -40% · Meilleure offre
+              </div>
+
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${
+                    billingCycle === 'yearly' ? 'border-[#C9A05C] bg-[#C9A05C]' : 'border-[#E8E2D5]'
+                  }`}>
+                    {billingCycle === 'yearly' && <div className="w-2 h-2 rounded-full bg-[#1B2A4A]" />}
+                  </div>
+                  <div>
+                    <h4 className="font-serif text-base font-bold text-[#1B2A4A]">Abonnement Annuel</h4>
+                    <p className="text-xs text-[#7A7670]">Facturé {currentPricing.yearlyTotal}</p>
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <div className="font-serif text-xl sm:text-2xl font-bold text-[#1B2A4A]">
+                    {currentPricing.yearlyPerMonth}
+                  </div>
+                  <div className="text-[10px] uppercase tracking-wider text-[#7A7670] font-semibold">/ mois</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Offre Mensuelle */}
+            <div
+              onClick={() => setBillingCycle('monthly')}
+              className={`p-4 sm:p-5 rounded-2xl border cursor-pointer transition-all duration-200 ${
+                billingCycle === 'monthly'
+                  ? 'bg-[#C9A05C]/10 border-2 border-[#C9A05C] shadow-md ring-2 ring-[#C9A05C]/20'
+                  : 'bg-[#F7F3EA]/60 border-[#E8E2D5] hover:border-[#C9A05C]/50'
+              }`}
+            >
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${
+                    billingCycle === 'monthly' ? 'border-[#C9A05C] bg-[#C9A05C]' : 'border-[#E8E2D5]'
+                  }`}>
+                    {billingCycle === 'monthly' && <div className="w-2 h-2 rounded-full bg-[#1B2A4A]" />}
+                  </div>
+                  <div>
+                    <h4 className="font-serif text-base font-bold text-[#1B2A4A]">Abonnement Mensuel</h4>
+                    <p className="text-xs text-[#7A7670]">Liberté totale, sans engagement</p>
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <div className="font-serif text-xl sm:text-2xl font-bold text-[#1B2A4A]">
+                    {currentPricing.monthlyPrice}
+                  </div>
+                  <div className="text-[10px] uppercase tracking-wider text-[#7A7670] font-semibold">/ mois</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bouton d'action CTA & Réassurance */}
+          <div className="space-y-3 pt-1">
+            <button
+              onClick={handleSubscribe}
+              className="w-full py-3.5 sm:py-4 px-6 rounded-full bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] font-bold text-sm sm:text-base shadow-md hover:shadow-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-3 group"
+            >
+              <span>Débloquer Kenza Pro</span>
+              <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
+            </button>
+
+            <p className="text-[11px] text-center text-[#7A7670] leading-snug">
+              Paiement chiffré et sécurisé · Annulation en 1 clic à tout moment.
+            </p>
+          </div>
+
         </div>
       </div>
     </div>

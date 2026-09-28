@@ -7,7 +7,7 @@ import SRSDashboard from '@/components/srs/SRSDashboard';
 import { allLessonsList, fullCurriculum } from '@/data/curriculum';
 import { useAppStore, useTranslation } from '@/store/useAppStore';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { Check, CheckCircle2, Play, Lock, ArrowRight, Sparkles, BookOpen, Compass, RotateCcw } from 'lucide-react';
+import { Check, CheckCircle2, Play, Lock, ArrowRight, Sparkles, BookOpen, Compass, RotateCcw, Crown } from 'lucide-react';
 import { getLocalizedText } from '@/lib/i18n/utils';
 import { Navigation } from '@/components/Navigation';
 import Header from '@/components/Header';
@@ -28,7 +28,7 @@ import AiRoleplayView from '@/components/dialogue/AiRoleplayView';
 import { PersonaId } from '@/lib/ai/prompts';
 import OnboardingModal from '@/components/onboarding/OnboardingModal';
 import InstallPwaBanner from '@/components/pwa/InstallPwaBanner';
-import PricingModal from '@/components/monetization/PricingModal';
+import PaywallModal from '@/components/monetization/PaywallModal';
 
 export default function Home() {
   const [currentTab, setCurrentTab] = useState<'home' | 'parcours' | 'phrasebook' | 'review' | 'learn' | 'speech' | 'profile'>('home');
@@ -116,6 +116,17 @@ export default function Home() {
   }, []);
 
   const handleStartLesson = (lessonId: string) => {
+    // Vérification du gating Premium sur les modules 3, 4 et 5
+    const isGated = ['3', '4', '5'].some((modId) => {
+      const mod = (fullCurriculum as any)[modId];
+      return mod?.lessons?.some((l: any) => l.id === lessonId);
+    });
+
+    if (isGated && !isPremium && !devUnlockAll) {
+      setPricingSource('module_locked');
+      return;
+    }
+
     setActiveLessonId(lessonId);
   };
 
@@ -135,6 +146,8 @@ export default function Home() {
 
   const renderModule = (moduleId: string, moduleData: any, track: 'grammar' | 'conversation') => {
     const isGrammar = track === 'grammar';
+    const isModulePremium = ['3', '4', '5'].includes(String(moduleId));
+    const isRestrictedByPremium = isModulePremium && !isPremium && !devUnlockAll;
     
     return (
       <div key={moduleId} className="space-y-6">
@@ -145,9 +158,20 @@ export default function Home() {
             ? 'bg-[#1B2A4A] text-[#FDFCF8] border-[#1B2A4A]' 
             : 'bg-[#FDFCF8] text-[#1B2A4A] border-[#E8E2D5]'
         }`}>
-          <div className="flex items-center gap-2 text-[#C9A05C] text-xs font-bold tracking-[0.22em] uppercase mb-1">
-            <span>—</span>
-            <span>Module {moduleId}</span>
+          <div className="flex items-center justify-between gap-3 mb-1">
+            <div className="flex items-center gap-2 text-[#C9A05C] text-xs font-bold tracking-[0.22em] uppercase">
+              <span>—</span>
+              <span>Module {moduleId}</span>
+            </div>
+            {isModulePremium && !isPremium && (
+              <button
+                onClick={() => setPricingSource('module_locked')}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C9A05C]/20 hover:bg-[#C9A05C]/30 border border-[#C9A05C]/40 text-[#C9A05C] text-[11px] font-bold tracking-wider uppercase transition-colors"
+              >
+                <Crown className="w-3.5 h-3.5" />
+                <span>Kenza Pro</span>
+              </button>
+            )}
           </div>
           <h2 className={`font-serif text-2xl sm:text-3xl font-normal ${isGrammar ? 'text-[#FDFCF8]' : 'text-[#1B2A4A]'}`}>
             {getLocalizedText(moduleData.title, lang)}
@@ -184,6 +208,8 @@ export default function Home() {
               isNext = !isCompleted;
             }
 
+            const isLessonGated = isRestrictedByPremium && !isCompleted;
+
             return (
               <div key={lesson.id} className="relative z-10 w-full max-w-md">
                 
@@ -193,6 +219,15 @@ export default function Home() {
                     /* Validé : Cercle vert sauge (#7A9174) avec coche blanche */
                     <div className="w-11 h-11 rounded-full bg-[#7A9174] text-white flex items-center justify-center shadow-xs border-2 border-[#FDFCF8] ring-4 ring-[#7A9174]/20 transition-transform">
                       <Check className="w-5 h-5 text-white stroke-[2.5]" />
+                    </div>
+                  ) : isLessonGated ? (
+                    /* Verrouillé Pro : Cercle contour doré avec cadenas or */
+                    <div 
+                      onClick={() => setPricingSource('module_locked')}
+                      className="w-11 h-11 rounded-full border-2 border-[#C9A05C] bg-[#FDFCF8] text-[#C9A05C] flex items-center justify-center shadow-xs cursor-pointer hover:scale-105 transition-transform"
+                      title="Niveau réservé aux membres Kenza Pro"
+                    >
+                      <Lock className="w-4 h-4 text-[#C9A05C]" />
                     </div>
                   ) : isNext ? (
                     /* En cours / À suivre : Cercle contour doré avec badge pill "À SUIVRE" plein */
@@ -214,13 +249,21 @@ export default function Home() {
 
                 {/* Lesson Card */}
                 <div
-                  onClick={() => isNext && handleStartLesson(lesson.id)}
+                  onClick={() => {
+                    if (isLessonGated) {
+                      setPricingSource('module_locked');
+                    } else if (isNext) {
+                      handleStartLesson(lesson.id);
+                    }
+                  }}
                   className={`relative p-6 sm:p-7 rounded-[26px] border transition-all duration-300 text-left ${
                     isCompleted
                       ? 'bg-[#FDFCF8] border-[#7A9174]/40 shadow-xs hover:border-[#7A9174] cursor-pointer'
-                      : isNext
-                        ? 'bg-[#FDFCF8] border-2 border-[#C9A05C] shadow-lg scale-[1.02] transform cursor-pointer ring-4 ring-[#C9A05C]/10'
-                        : 'bg-[#FDFCF8]/60 border-[#E8E2D5]/70 opacity-60 cursor-not-allowed'
+                      : isLessonGated
+                        ? 'bg-[#FDFCF8] border border-[#C9A05C]/40 hover:border-[#C9A05C] shadow-sm hover:shadow-md cursor-pointer'
+                        : isNext
+                          ? 'bg-[#FDFCF8] border-2 border-[#C9A05C] shadow-lg scale-[1.02] transform cursor-pointer ring-4 ring-[#C9A05C]/10'
+                          : 'bg-[#FDFCF8]/60 border-[#E8E2D5]/70 opacity-60 cursor-not-allowed'
                   }`}
                 >
                   <div className="flex justify-between items-start gap-3 mb-2">
@@ -228,24 +271,46 @@ export default function Home() {
                       <div className="text-[11px] font-bold tracking-[0.2em] uppercase text-[#C9A05C] mb-1">
                         — Étape {idx + 1}
                       </div>
-                      <h3 className={`font-serif text-xl font-bold leading-snug ${isLocked ? 'text-[#7A7670]' : 'text-[#1B2A4A]'}`}>
+                      <h3 className={`font-serif text-xl font-bold leading-snug ${isLocked && !isLessonGated ? 'text-[#7A7670]' : 'text-[#1B2A4A]'}`}>
                         {getLocalizedText(lesson.title, lang)}
                       </h3>
                     </div>
 
-                    {isCompleted && (
+                    {isCompleted ? (
                       <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#7A9174] bg-[#7A9174]/15 px-2.5 py-0.5 rounded-full shrink-0">
                         <Check className="w-3.5 h-3.5" />
                         <span>Validé</span>
                       </span>
-                    )}
+                    ) : isLessonGated ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPricingSource('module_locked');
+                        }}
+                        className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#C9A05C] bg-[#C9A05C]/15 border border-[#C9A05C]/40 hover:bg-[#C9A05C]/25 px-2.5 py-1 rounded-full shrink-0 transition-colors"
+                      >
+                        <Crown className="w-3.5 h-3.5" />
+                        <span>PRO</span>
+                      </button>
+                    ) : null}
                   </div>
 
-                  <p className={`text-xs sm:text-sm mt-1 mb-4 leading-relaxed ${isLocked ? 'text-[#7A7670]/70' : 'text-[#7A7670]'}`}>
+                  <p className={`text-xs sm:text-sm mt-1 mb-4 leading-relaxed ${isLocked && !isLessonGated ? 'text-[#7A7670]/70' : 'text-[#7A7670]'}`}>
                     {getLocalizedText(lesson.description, lang)}
                   </p>
 
-                  {isNext && (
+                  {isLessonGated ? (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPricingSource('module_locked');
+                      }}
+                      className="w-full py-3 px-6 bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] rounded-full font-bold text-sm flex justify-center items-center gap-2 shadow-xs transition-all active:scale-95 group"
+                    >
+                      <Crown className="w-4 h-4 text-[#1B2A4A]" />
+                      <span>Débloquer avec Kenza Pro</span>
+                    </button>
+                  ) : isNext ? (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -256,7 +321,7 @@ export default function Home() {
                       <span>Commencer la leçon</span>
                       <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                     </button>
-                  )}
+                  ) : null}
 
                   {isCompleted && (
                     <button
@@ -607,7 +672,7 @@ export default function Home() {
       )}
 
       {pricingSource && (
-        <PricingModal 
+        <PaywallModal 
           onClose={() => setPricingSource(null)} 
           source={pricingSource} 
         />
