@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import I18nProvider from '../components/I18nProvider';
 import NetworkStatus from '../components/NetworkStatus';
+import DirSync from '../components/DirSync';
 
 export const metadata: Metadata = {
   title: "KENZA - Apprendre la Darija Marocaine de A à Z",
@@ -25,6 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="theme-color" content="#f7f5ef" />
       </head>
       <body className="antialiased">
+        <DirSync />
         <I18nProvider>
           <NetworkStatus />
           {children}
