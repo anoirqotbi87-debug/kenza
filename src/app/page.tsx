@@ -570,10 +570,10 @@ export default function Home() {
     review: {
       eyebrow: tr("ANCRER, SANS SE PRESSER", "ANCHOR IN, NO RUSH", "ANCLAR, SIN PRISA", "ترسيخ، بلا استعجال"),
       title: tr("Révision du jour", "Today’s review", "Revisión del día", "مراجعة اليوم"),
-      description: "Quelques cartes bien choisies pour laisser les mots s’installer.",
+      description: tr("Quelques cartes bien choisies pour laisser les mots s’installer.", "A few well-chosen cards to let the words settle.", "Algunas cartas bien elegidas para que las palabras se asienten.", "بعض البطاقات المنتقاة لتستقر الكلمات."),
     },
     space: {
-      eyebrow: "UN ESPACE À TOI",
+      eyebrow: tr("UN ESPACE À TOI", "A SPACE OF YOUR OWN", "UN ESPACIO PARA TI", "فضاء لك"),
       title: "Mon espace & Passeport",
       description: "Ta progression et tes visas officiels, sous ton contrôle.",
     },
@@ -674,7 +674,7 @@ export default function Home() {
             onClick={() => showToast("Objectif quotidien : 10 minutes de pratique chaque jour.")}
             className="goal-link"
           >
-            Ajuster l’objectif <ArrowRight size={14} />
+            {tr("Ajuster l’objectif", "Adjust goal", "Ajustar objetivo", "عدّل الهدف")} <ArrowRight size={14} />
           </button>
         </div>
 
@@ -1011,7 +1011,7 @@ export default function Home() {
                 onClick={advanceQuestion}
                 disabled={!selectedAnswer}
               >
-                {questionIndex === activeLesson.questions.length - 1 ? "Terminer la leçon" : "Continuer"}
+                {questionIndex === activeLesson.questions.length - 1 ? tr("Terminer la leçon", "Finish the lesson", "Terminar la lección", "أنهِ الدرس") : tr("Continuer", "Continue", "Continuar", "متابعة")}
                 <ArrowRight size={17} />
               </button>
               <div className="local-note">
@@ -1112,19 +1112,19 @@ function TodayView({
           <div className="hero-texture" />
           <div className="hero-copy">
             <span className="hero-kicker">
-              <Sparkles size={14} /> TON PETIT MOMENT DARIJA
+              <Sparkles size={14} /> {tr("TON PETIT MOMENT DARIJA", "YOUR LITTLE DARIJA MOMENT", "TU MOMENTO DARIJA", "لحظتك مع الدارجة")}
             </span>
             <h2>
-              La darija
+              {tr("La darija", "Darija", "La darija", "الدارجة")}
               <br />
-              s’ouvre à toi.
+              {tr("s’ouvre à toi.", "opens up to you.", "se abre a ti.", "تنفتح عليك.")}
             </h2>
             <p>{tr("Une phrase, une rencontre, une autre façon de voir le Maroc.", "A phrase, an encounter, another way to see Morocco.", "Una frase, un encuentro, otra forma de ver Marruecos.", "عبارة، لقاء، وطريقة أخرى لرؤية المغرب.")}</p>
             <button className="hero-button" onClick={() => onStart(nextLesson.id)}>
-              Continuer à apprendre <ArrowRight size={16} />
+              {tr("Continuer à apprendre", "Keep learning", "Seguir aprendiendo", "واصل التعلم")} <ArrowRight size={16} />
             </button>
             <div className="hero-footnote">
-              <span className="hero-foot-line" /> À ton rythme, toujours.
+              <span className="hero-foot-line" /> {tr("À ton rythme, toujours.", "At your pace, always.", "A tu ritmo, siempre.", "على إيقاعك، دائماً.")}
             </div>
           </div>
           <div className="hero-image-wrap" aria-hidden="true">
@@ -1178,7 +1178,7 @@ function TodayView({
             <p>{nextLesson.subtitle}</p>
           </div>
           <button className="text-link" onClick={() => onStart(nextLesson.id)}>
-            C’est parti <ArrowRight size={15} />
+            {tr("C’est parti", "Let’s go", "¡Vamos!", "هيا بنا")} <ArrowRight size={15} />
           </button>
         </article>
       </div>
