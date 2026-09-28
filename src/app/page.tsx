@@ -34,7 +34,7 @@ import {
   Lock,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { useAppStore } from "@/store/useAppStore";
+import { useAppStore, useTranslation } from "@/store/useAppStore";
 import { playAudio } from "@/lib/audio";
 import { supabase } from "@/lib/supabase";
 import { syncService } from "@/lib/syncService";
@@ -247,6 +247,17 @@ export default function Home() {
     uiLanguage,
     setLanguage,
   } = useAppStore();
+
+  const { t } = useTranslation();
+  const navLabel = (id: string) => {
+    const key =
+      id === "today" ? "home"
+      : id === "path" ? "parcours"
+      : id === "phrases" ? "phrasebook"
+      : id === "review" ? "review"
+      : null;
+    return key ? ((t as any).nav?.[key] as string | undefined) : undefined;
+  };
 
   const handleGoogleLogin = async () => {
     try {
@@ -598,7 +609,7 @@ export default function Home() {
                 className={`nav-item ${view === item.id ? "nav-item-active" : ""}`}
                 aria-current={view === item.id ? "page" : undefined}
               >
-                <Icon size={19} strokeWidth={1.8} /> <span>{item.label}</span>
+                <Icon size={19} strokeWidth={1.8} /> <span>{navLabel(item.id) || item.label}</span>
                 {item.id === "review" && <span className="nav-count">4</span>}
               </button>
             );
@@ -901,7 +912,7 @@ export default function Home() {
               key={item.id}
               onClick={() => switchView(item.id)}
               className={view === item.id ? "mobile-nav-active" : ""}
-              aria-label={item.label}
+              aria-label={navLabel(item.id) || item.label}
               aria-current={view === item.id ? "page" : undefined}
             >
               <Icon size={19} />
