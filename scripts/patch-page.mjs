@@ -1,12 +1,49 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 
-// ---------- Patch 8: translate main UI content (pure JS; v7 failed: TS annotations in .mjs) ----------
+// ---------- Patch 9: repair translations.ts stray-newline corruption + (idempotent) content i18n ----------
+const tp = 'src/lib/i18n/translations.ts';
+let ts = readFileSync(tp, 'utf8');
+{
+  const lines = ts.split('\n');
+  const out = [];
+  let fixed = 0;
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+    const q = (line.match(/"/g) || []).length;
+    if (q % 2 === 1 && i + 1 < lines.length) {
+      let j = line;
+      let k = i + 1;
+      while ((j.match(/"/g) || []).length % 2 === 1 && k < lines.length) {
+        j = j + lines[k].replace(/^\s+/, '');
+        k++;
+      }
+      out.push(j);
+      fixed++;
+      console.log('joined broken string around former line ' + (i + 1) + ': ' + line.slice(0, 60));
+      i = k - 1;
+    } else {
+      out.push(line);
+    }
+  }
+  const repaired = out.join('\n');
+  if (fixed > 0) {
+    // fix words broken mid-split (known artifacts)
+    let fixedWords = repaired
+      .replace('Reintent ar', 'Reintentar');
+    ts = fixedWords;
+    writeFileSync(tp, ts);
+    console.log('translations.ts: repaired ' + fixed + ' broken line(s)');
+  } else {
+    console.log('translations.ts: clean');
+  }
+}
+
+// ---------- content i18n via tr() helper (idempotent) ----------
 const p = 'src/app/page.tsx';
 let src = readFileSync(p, 'utf8');
 const count = (s, sub) => s.split(sub).length - 1;
 const HELPER_ANCHOR = '  const { t } = useTranslation();';
 const TR_HELPER = HELPER_ANCHOR + '\n  const tr = (fr: string, en: string, es: string, ar: string) =>\n    uiLanguage === "en" ? en : uiLanguage === "es" ? es : uiLanguage === "ar" ? ar : fr;';
-
 if (!src.includes('const tr = (fr: string')) {
   if (count(src, HELPER_ANCHOR) === 1) {
     src = src.replace(HELPER_ANCHOR, TR_HELPER);
