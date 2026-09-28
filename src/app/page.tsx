@@ -605,6 +605,22 @@ export default function Home() {
           })}
         </nav>
 
+        <div className="sidebar-label">EXPLORER</div>
+        <nav className="side-nav" aria-label="Ressources d'étude">
+          <a href="/etudier" className="nav-item">
+            <span>Étudier — Modules complets</span>
+          </a>
+          <a href="/grammaire" className="nav-item">
+            <span>Grammaire active</span>
+          </a>
+          <a href="/parler" className="nav-item">
+            <span>Pratique orale</span>
+          </a>
+          <a href="/revisions" className="nav-item">
+            <span>Révisions SRS</span>
+          </a>
+        </nav>
+
         <div className="sidebar-label sidebar-label-spaced">PRATIQUE ORALE & IA</div>
         <button
           onClick={() => setShowScenarioSelector(true)}
