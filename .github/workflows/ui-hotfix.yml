@@ -13,17 +13,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Apply patch to page.tsx
+      - name: Apply patch / dump literals
         run: node scripts/patch-page.mjs
 
       - name: Commit if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/app/page.tsx
+          git add -A
           if git diff --cached --quiet; then
             echo "no changes to commit"
           else
-            git commit -m "fix(ui): topbar 4-language switcher (FR/EN/ES/AR) + EXPLORER sidebar section (auto-patch)"
+            git commit -m "chore: auto-patch (responsive topbar + literals dump)"
             git push
           fi
