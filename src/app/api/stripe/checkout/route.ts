@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe, PRICING_CONFIG } from '@/lib/stripe';
 import { createClient } from '@supabase/supabase-js';
+import { safeRedirectOrigin } from '@/lib/allowedOrigins';
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,7 +12,7 @@ export async function POST(req: NextRequest) {
     const authHeader = req.headers.get('Authorization');
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-    
+
     let userId: string | null = null;
     let customerEmail: string | undefined = email;
 
@@ -40,7 +41,8 @@ export async function POST(req: NextRequest) {
     const cycleKey = (billingCycle === 'monthly' ? 'monthly' : 'yearly') as 'monthly' | 'yearly';
     const planConfig = PRICING_CONFIG[currKey][cycleKey];
 
-    const origin = req.headers.get('origin') || req.headers.get('referer') || 'https://kenza.vercel.app';
+    // Sécurité : allowlist stricte de l'origine (jamais de header brut injecté tel quel)
+    const origin = safeRedirectOrigin(req.headers.get('origin') || req.headers.get('referer'));
 
     // 4. Création de la session Checkout Stripe
     const session = await stripe.checkout.sessions.create({

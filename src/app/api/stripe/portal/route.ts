@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { createClient } from '@supabase/supabase-js';
+import { safeRedirectOrigin } from '@/lib/allowedOrigins';
 
 export async function POST(req: NextRequest) {
   try {
@@ -43,7 +44,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const origin = req.headers.get('origin') || req.headers.get('referer') || 'https://kenza.vercel.app';
+    // Sécurité : allowlist stricte de l'origine
+    const origin = safeRedirectOrigin(req.headers.get('origin') || req.headers.get('referer'));
 
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: customerId,
