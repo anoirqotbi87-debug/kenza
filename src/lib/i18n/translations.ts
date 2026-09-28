@@ -76,8 +76,7 @@ export const translations = {
     },
     srs: {
       flip: "Flip card", again: "Again", hard: "Hard", good: "Good", easy: "Easy",
-      dueToday: "Due cards today", tapToFlip: "Tap 
-to flip ->",
+      dueToday: "Due cards today", tapToFlip: "Tap to flip ->",
       answer: "ANSWER", translateArabizi: "Translate to Arabizi", translateArabic: "Translate to Arabic", translateDuo: "Translate to Darija (Duo)",
       allCaughtUp: "All caught up!",
       allCaughtUpDesc: "You have no cards to review today. Come back tomorrow to consolidate your memory.",
@@ -117,8 +116,7 @@ to flip ->",
       trackA: "Gramática y Fundamentos", trackB: "Situaciones y Conversaciones Reales"
     },
     lessons: {
-      check: "Comprobar", continue: "Continuar", retry: "Reintent
-ar", gameOver: "¡Sin vidas!",
+      check: "Comprobar", continue: "Continuar", retry: "Reintentar", gameOver: "¡Sin vidas!",
       congrats: "¡Lección completada!", lives: "Vidas",
       excellent: "¡Excelente!", oops: "¡Ups!", chooseAnswer: "Elige tu respuesta:",
       grammarTitle: "Gramática Activa", grammarDesc: "Explora los mecanismos del idioma."
@@ -159,8 +157,7 @@ ar", gameOver: "¡Sin vidas!",
       reviewPrompt: "راجع كلماتك الصعبة لتعزيز ذاكرتك.",
       dailyPractice: "تمرين اليوم",
       currentStreak: "السلسلة الحالية", streakDays: "أيام", streakFreeze: "تجميد", streakFreezes: "تجميد",
-      weeklyLeagues: "الدوريات الأسبوعية", yourTrophies: "جوائ
-زك", youGuest: "أنت (ضيف)",
+      weeklyLeagues: "الدوريات الأسبوعية", yourTrophies: "جوائزك", youGuest: "أنت (ضيف)",
       badgeCafeMaster: "خبير المقهى", badgeTaxiAce: "بطل التاكسي", badgeSoukNego: "مفاوض السوق", badgePolyglot: "متحدث لغات الأطلس",
       loading: "جاري التحميل...", anonymous: "مجهول", remainingCards: "البطاقات المتبقية:",
       trackA: "القواعد والأساسيات", trackB: "المواقف والمحادثات اليومية"
