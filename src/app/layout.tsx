@@ -18,6 +18,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr" dir="ltr">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <meta name="theme-color" content="#1B2A4A" />
+      </head>
       <body className="font-sans antialiased bg-[#F7F3EA] text-[#1B2A4A] min-h-screen selection:bg-[#C9A05C]/20 selection:text-[#1B2A4A]">
         <I18nProvider>
           <NetworkStatus />

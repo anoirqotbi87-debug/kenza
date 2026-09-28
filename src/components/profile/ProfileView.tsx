@@ -14,10 +14,13 @@ import ProfilePassportView from './ProfilePassportView';
 import NotificationSettings from './NotificationSettings';
 import PlacementTestModal from '../onboarding/PlacementTestModal';
 import { Zap } from 'lucide-react';
+import PaywallModal from '../monetization/PaywallModal';
 
 export default function ProfileView() {
-  const { xp, streakDays, srsDeck } = useAppStore();
+  const { xp, streakDays, srsDeck, isPremium } = useAppStore();
   const [isPlacementTestOpen, setIsPlacementTestOpen] = useState(false);
+  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [isPortalLoading, setIsPortalLoading] = useState(false);
   const { t } = useTranslation();
   const [session, setSession] = useState<Session | null>(null);
   
@@ -63,6 +66,35 @@ export default function ProfileView() {
 
   const username = session?.user?.user_metadata?.full_name || session?.user?.email?.split('@')[0] || "Invité";
 
+  const handleOpenCustomerPortal = async () => {
+    setIsPortalLoading(true);
+    try {
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      const token = currentSession?.access_token;
+      if (!token) {
+        alert("Veuillez vous connecter pour gérer votre abonnement.");
+        return;
+      }
+      const res = await fetch('/api/stripe/portal', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else if (data.simulated) {
+        alert("Portail de facturation en mode démo.");
+      } else {
+        alert(data.error || "Impossible d'accéder au portail de facturation.");
+      }
+    } catch (e: any) {
+      console.error(e);
+      alert("Erreur lors de l'accès au portail de facturation.");
+    } finally {
+      setIsPortalLoading(false);
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-8 animate-in fade-in duration-300">
       
@@ -80,6 +112,50 @@ export default function ProfileView() {
           <div className="inline-flex items-center gap-2 bg-[#C9A05C]/15 border border-[#C9A05C]/30 text-[#1B2A4A] px-4 py-1.5 rounded-full font-bold text-xs">
             <Crown className="w-3.5 h-3.5 text-[#C9A05C]" />
             <span>{getLevelName(xp)}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Carte Statut Abonnement Kenza Pro */}
+      <div className={`p-6 sm:p-8 rounded-3xl shadow-xs border transition-all ${
+        isPremium
+          ? 'bg-[#1B2A4A] text-[#FDFCF8] border-[#1B2A4A]'
+          : 'bg-[#FDFCF8] text-[#1B2A4A] border-[#E8E2D5]'
+      }`}>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2 text-[#C9A05C] text-xs font-bold tracking-[0.2em] uppercase">
+              <Crown className="w-4 h-4" />
+              <span>{isPremium ? 'Membre Kenza Pro' : 'Version Gratuite'}</span>
+            </div>
+            <h3 className={`font-serif text-2xl font-bold ${isPremium ? 'text-[#FDFCF8]' : 'text-[#1B2A4A]'}`}>
+              {isPremium ? 'Votre Passeport Culturel est actif' : 'Débloquez tout le potentiel de la Darija'}
+            </h3>
+            <p className={`text-xs sm:text-sm max-w-xl ${isPremium ? 'text-[#E8E2D5]/80' : 'text-[#7A7670]'}`}>
+              {isPremium
+                ? 'Accès illimité aux modules avancés B1/B2, roleplay IA sans quota quotidien et synthèse vocale haute fidélité.'
+                : 'Passez à Kenza Pro pour accéder aux Modules 3, 4 et 5, aux dialogues IA illimités et aux visas de certification.'}
+            </p>
+          </div>
+
+          <div className="shrink-0">
+            {isPremium ? (
+              <button
+                onClick={handleOpenCustomerPortal}
+                disabled={isPortalLoading}
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] font-bold text-xs sm:text-sm transition-all shadow-xs"
+              >
+                <span>{isPortalLoading ? 'Chargement...' : 'Gérer mon abonnement'}</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => setIsPaywallOpen(true)}
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] font-bold text-xs sm:text-sm transition-all shadow-xs"
+              >
+                <Crown className="w-4 h-4" />
+                <span>Passer à Kenza Pro</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -160,6 +236,9 @@ export default function ProfileView() {
         </div>
       </div>
 
+      {isPaywallOpen && (
+        <PaywallModal source="profile_view" onClose={() => setIsPaywallOpen(false)} />
+      )}
     </div>
   );
 }
