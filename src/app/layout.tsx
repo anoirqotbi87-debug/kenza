@@ -21,9 +21,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <meta name="theme-color" content="#1B2A4A" />
+        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&family=Noto+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet" />
+        <meta name="theme-color" content="#f7f5ef" />
       </head>
-      <body className="font-sans antialiased bg-[#F7F3EA] text-[#1B2A4A] min-h-screen selection:bg-[#C9A05C]/20 selection:text-[#1B2A4A]">
+      <body className="antialiased">
         <I18nProvider>
           <NetworkStatus />
           {children}

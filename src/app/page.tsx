@@ -1,693 +1,1766 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Dashboard from '@/components/Dashboard';
-import ExerciseRunner from '@/components/ExerciseRunner';
-import SRSDashboard from '@/components/srs/SRSDashboard';
-import { allLessonsList, fullCurriculum } from '@/data/curriculum';
-import { useAppStore, useTranslation } from '@/store/useAppStore';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { Check, CheckCircle2, Play, Lock, ArrowRight, Sparkles, BookOpen, Compass, RotateCcw, Crown } from 'lucide-react';
-import { getLocalizedText } from '@/lib/i18n/utils';
-import { Navigation } from '@/components/Navigation';
-import Header from '@/components/Header';
-import HeroBanner from '@/components/dashboard/HeroBanner';
-import DailyReviewCard from '@/components/dashboard/DailyReviewCard';
-import SmartReviewSession from '@/components/srs/SmartReviewSession';
-import PhrasebookView from '@/components/tools/PhrasebookView';
-import SpeechTrainer from '@/components/audio/SpeechTrainer';
-import ProfileView from '@/components/profile/ProfileView';
-import CheckpointModal from '@/components/checkpoint/CheckpointModal';
-import { useCheckpointProgress } from '@/hooks/useCheckpointProgress';
+import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
+import {
+  ArrowDownRight,
+  ArrowLeft,
+  ArrowRight,
+  Award,
+  Bookmark,
+  BookOpen,
+  Check,
+  CheckCircle2,
+  ChevronRight,
+  CircleHelp,
+  Compass,
+  Flame,
+  Headphones,
+  Heart,
+  Home as HomeIcon,
+  Languages,
+  Leaf,
+  LockKeyhole,
+  Menu,
+  MessageCircle,
+  RotateCcw,
+  Search,
+  Sparkles,
+  Star,
+  Target,
+  Volume2,
+  X,
+  Crown,
+  Lock,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { useAppStore } from "@/store/useAppStore";
+import { playAudio } from "@/lib/audio";
+import { supabase } from "@/lib/supabase";
+import { syncService } from "@/lib/syncService";
+import { useCheckpointProgress } from "@/hooks/useCheckpointProgress";
+import CheckpointModal from "@/components/checkpoint/CheckpointModal";
+import ScenarioSelectorModal from "@/components/dialogue/ScenarioSelectorModal";
+import AiRoleplayView from "@/components/dialogue/AiRoleplayView";
+import PaywallModal from "@/components/monetization/PaywallModal";
+import InstallPwaBanner from "@/components/pwa/InstallPwaBanner";
+import DarijaPassportCard from "@/components/certificate/DarijaPassportCard";
+import { PersonaId } from "@/lib/ai/prompts";
+import { srsVocabulary } from "@/data/srs-deck";
 
-import { supabase } from '@/lib/supabase';
-import { syncService } from '@/lib/syncService';
+export type View = "today" | "path" | "phrases" | "review" | "space";
 
-import ScenarioSelectorModal from '@/components/dialogue/ScenarioSelectorModal';
-import AiRoleplayView from '@/components/dialogue/AiRoleplayView';
-import { PersonaId } from '@/lib/ai/prompts';
-import OnboardingModal from '@/components/onboarding/OnboardingModal';
-import InstallPwaBanner from '@/components/pwa/InstallPwaBanner';
-import PaywallModal from '@/components/monetization/PaywallModal';
+export type Question = {
+  prompt: string;
+  helper: string;
+  options: string[];
+  answer: string;
+  note: string;
+};
+
+export type Lesson = {
+  id: string;
+  title: string;
+  subtitle: string;
+  length: string;
+  status: "done" | "current" | "locked";
+  isPremium?: boolean;
+  questions: Question[];
+};
+
+export type Phrase = {
+  id: string;
+  category: string;
+  darija: string;
+  arabic: string;
+  meaning: string;
+  note: string;
+};
+
+const baseLessons: Lesson[] = [
+  {
+    id: "hello",
+    title: "Les premiers bonjours",
+    subtitle: "Saluer, se présenter, créer le lien",
+    length: "6 min",
+    status: "current",
+    questions: [
+      {
+        prompt: "Comment dit-on « bonjour » en darija ?",
+        helper: "Choisis la formule la plus naturelle.",
+        options: ["Salam", "Shukran", "Bslama"],
+        answer: "Salam",
+        note: "« Salam » veut dire paix. C’est le bonjour simple, chaleureux et passe-partout.",
+      },
+      {
+        prompt: "Tu rencontres quelqu’un pour la première fois. Que dis-tu ?",
+        helper: "Pense à une formule de bienvenue.",
+        options: ["Labas?", "Tsharrafna", "Afak"],
+        answer: "Tsharrafna",
+        note: "« Tsharrafna » signifie littéralement « enchanté·e ». Une belle façon de faire connaissance.",
+      },
+      {
+        prompt: "Que signifie « labas? »",
+        helper: "Une question qu’on entend partout.",
+        options: ["Où vas-tu ?", "Ça va ?", "À demain"],
+        answer: "Ça va ?",
+        note: "« Labas? » est le petit « ça va ? » du quotidien. On répond souvent « labas, hamdullah ».",
+      },
+    ],
+  },
+  {
+    id: "cafe",
+    title: "Au café du coin",
+    subtitle: "Commander un thé à la menthe",
+    length: "8 min",
+    status: "locked",
+    questions: [
+      {
+        prompt: "Comment demander un thé, s’il vous plaît ?",
+        helper: "Une formule utile au café.",
+        options: ["Atay, afak", "Fin ghadi?", "Smah liya"],
+        answer: "Atay, afak",
+        note: "« Atay, afak » : un thé, s’il vous plaît. « Afak » ajoute la politesse.",
+      },
+      {
+        prompt: "Qu’est-ce que « bghit » veut dire ?",
+        helper: "Un mot très pratique pour commander.",
+        options: ["Je voudrais", "J’ai faim", "C’est loin"],
+        answer: "Je voudrais",
+        note: "« Bghit » veut dire « je veux » ou « je voudrais », selon le contexte.",
+      },
+    ],
+  },
+  {
+    id: "medina",
+    title: "Se repérer dans la médina",
+    subtitle: "Demander son chemin sans stress",
+    length: "7 min",
+    status: "locked",
+    questions: [
+      {
+        prompt: "Comment demander « où est… ? »",
+        helper: "La phrase qui débloque une promenade.",
+        options: ["Fin kayn…?", "Chhal hadi?", "Mumkin…?"],
+        answer: "Fin kayn…?",
+        note: "« Fin kayn…? » signifie « où se trouve… ? ». Ajoute le lieu que tu cherches.",
+      },
+      {
+        prompt: "Que signifie « yallah » ?",
+        helper: "Un mot qu’on entend souvent.",
+        options: ["Allons-y", "Peut-être", "Merci beaucoup"],
+        answer: "Allons-y",
+        note: "« Yallah » invite à partir, à avancer, ou simplement à se lancer.",
+      },
+    ],
+  },
+  {
+    id: "marrakech",
+    title: "Négocier au souk de Marrakech",
+    subtitle: "Les nombres et les prix (Niveau A2)",
+    length: "9 min",
+    status: "locked",
+    isPremium: true,
+    questions: [
+      {
+        prompt: "Comment demander « Combien coûte ceci ? »",
+        helper: "Expression clé pour entamer la discussion.",
+        options: ["Bchhal hada?", "Fin mchiti?", "Labas 3lik?"],
+        answer: "Bchhal hada?",
+        note: "« Bchhal hada? » permet de demander le prix de n'importe quel article.",
+      },
+      {
+        prompt: "Que veut dire « Naqas chwiya 3afak » ?",
+        helper: "La formule cordiale de marchandage.",
+        options: ["Baisse un peu s'il te plaît", "Donne-moi deux verres", "C'est trop beau"],
+        answer: "Baisse un peu s'il te plaît",
+        note: "« Naqas chwiya » = réduis un peu. Utilisé avec le sourire !",
+      },
+    ],
+  },
+  {
+    id: "tanger",
+    title: "Voyage à Tanger (Chamali)",
+    subtitle: "Les subtilités régionales (Niveau B2)",
+    length: "10 min",
+    status: "locked",
+    isPremium: true,
+    questions: [
+      {
+        prompt: "À Tanger, comment dit-on « Qu'est-ce que tu veux ? »",
+        helper: "Remplace le standard « Chno bghiti ».",
+        options: ["Chni katchof?", "Chni katsaksi?", "Chni khassek?"],
+        answer: "Chni khassek?",
+        note: "Dans le nord (Chamali), on utilise « Chni » au lieu de « Chno ».",
+      },
+    ],
+  },
+];
+
+const defaultPhrases: Phrase[] = [
+  { id: "salam", category: "Saluer", darija: "Salam, labas?", arabic: "سلام، لاباس؟", meaning: "Salut, ça va ?", note: "La formule la plus simple pour ouvrir une conversation." },
+  { id: "bikhir", category: "Saluer", darija: "Labas, hamdullah.", arabic: "لاباس، الحمد لله.", meaning: "Ça va, merci / Dieu merci.", note: "La réponse classique à « labas? »." },
+  { id: "afak", category: "Au café", darija: "Wahed atay, afak.", arabic: "واحد أتاي، عفاك.", meaning: "Un thé, s’il vous plaît.", note: "« Wahed » = un, « atay » = thé, « afak » = s’il te plaît." },
+  { id: "bghit", category: "Au café", darija: "Bghit lma, afak.", arabic: "بغيت الما، عفاك.", meaning: "Je voudrais de l’eau, s’il vous plaît.", note: "Remplace « lma » par ce que tu aimerais commander." },
+  { id: "fin", category: "Se déplacer", darija: "Fin kayn souk?", arabic: "فين كاين السوق؟", meaning: "Où est le souk ?", note: "Utilise cette structure pour demander un lieu." },
+  { id: "shukran", category: "Les essentiels", darija: "Shukran bzaf!", arabic: "شكرا بزاف!", meaning: "Merci beaucoup !", note: "« Bzaf » signifie beaucoup — un mot qui sert partout." },
+  { id: "smah", category: "Les essentiels", darija: "Smah liya.", arabic: "سمح ليا.", meaning: "Excuse-moi / pardon.", note: "Pour attirer l’attention ou demander pardon, avec douceur." },
+  { id: "bslama", category: "Saluer", darija: "Bslama, nshawfek.", arabic: "بسلامة، نشوفك.", meaning: "Au revoir, à bientôt.", note: "Une façon amicale de prendre congé." },
+];
+
+const navItems: { id: View; label: string; icon: LucideIcon }[] = [
+  { id: "today", label: "Aujourd’hui", icon: HomeIcon },
+  { id: "path", label: "Mon parcours", icon: Compass },
+  { id: "phrases", label: "Carnet de phrases", icon: Bookmark },
+  { id: "review", label: "Révision du jour", icon: Sparkles },
+];
 
 export default function Home() {
-  const [currentTab, setCurrentTab] = useState<'home' | 'parcours' | 'phrasebook' | 'review' | 'learn' | 'speech' | 'profile'>('home');
-  const [activeTrack, setActiveTrack] = useState<'grammar' | 'conversation'>('grammar');
-  const [isReviewSessionOpen, setIsReviewSessionOpen] = useState(false);
-  
-  const rawLang = useAppStore((state) => state.uiLanguage || 'fr');
-  const lang = String(rawLang).toLowerCase() as 'fr' | 'en' | 'es' | 'ar';
-  const isArabic = lang === 'ar' || lang.startsWith('ar');
-  const { t } = useTranslation();
-  const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
-  const { completeLesson, completedLessons, devUnlockAll, setUser, resetData, hasCompletedOnboarding, isPremium, setIsPremium } = useAppStore();
-  const [checkpointOpen, setCheckpointOpen] = useState<{ id: string, name: string } | null>(null);
-  const { hasPassedLevel } = useCheckpointProgress();
+  const [view, setView] = useState<View>("today");
+  const [lessonId, setLessonId] = useState<string | null>(null);
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("Tout voir");
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [reviewIndex, setReviewIndex] = useState(0);
+  const [cardFlipped, setCardFlipped] = useState(false);
+  const [toast, setToast] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
+  // Zustand Store Integration
+  const {
+    xp,
+    streakDays,
+    completedLessons,
+    addXp,
+    completeLesson,
+    user,
+    setUser,
+    resetData,
+    soundEnabled,
+    toggleSound,
+    isPremium,
+    setIsPremium,
+  } = useAppStore();
+
+  const [checkpointOpen, setCheckpointOpen] = useState<{ id: string; name: string } | null>(null);
   const [showScenarioSelector, setShowScenarioSelector] = useState(false);
   const [activePersonaId, setActivePersonaId] = useState<PersonaId | null>(null);
   const [pricingSource, setPricingSource] = useState<string | null>(null);
 
+  // Sync favorites with localStorage
   useEffect(() => {
-    const handleAuthSync = async (user: any) => {
-      setUser(user);
-      
-      // Check if the user has existing cloud data
-      const { data: profile } = await supabase.from('profiles').select('xp').eq('id', user.id).single();
-      const { count: lessonsCount } = await supabase.from('lesson_progress').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
-      
-      if ((profile && profile.xp > 0) || (lessonsCount && lessonsCount > 0)) {
-        // Existing user: pull their cloud data down, overwriting any local guest data
-        console.log("[Auth] Existing user detected. Restoring cloud data.");
-        await syncService.syncCloudToLocal(user.id);
-      } else {
-        // New user: push their local guest data up to the cloud
-        console.log("[Auth] New user detected. Migrating local guest data to cloud.");
-        await syncService.migrateGuestDataToCloud(user.id);
-      }
-    };
+    try {
+      const stored = localStorage.getItem("kenza_favorites");
+      if (stored) setFavorites(JSON.parse(stored));
+    } catch {}
+  }, []);
 
-    // 1. Récupérer immédiatement la session active au chargement de la page
+  const saveFavorites = (next: string[]) => {
+    setFavorites(next);
+    try {
+      localStorage.setItem("kenza_favorites", JSON.stringify(next));
+    } catch {}
+  };
+
+  // Auth sync
+  useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        console.log("[Auth] Session active détectée :", session.user.email);
-        handleAuthSync(session.user);
-      }
+      if (session?.user) setUser(session.user);
     });
 
-    // 2. Écouter les changements d'état
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("[Auth Event]:", event, session?.user?.email);
-      if (event === 'SIGNED_IN' && session?.user) {
-        handleAuthSync(session.user);
-      } else if (event === 'SIGNED_OUT') {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "SIGNED_IN" && session?.user) {
+        setUser(session.user);
+        await syncService.syncCloudToLocal(session.user.id);
+      } else if (event === "SIGNED_OUT") {
         setUser(null);
         resetData();
-        localStorage.removeItem('kenza_checkpoints');
       }
     });
 
-    return () => {
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, [setUser, resetData]);
 
+  // Check URL params (e.g. Stripe callback)
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    // Analyser les paramètres de requête et le hash de l'URL
+    if (typeof window === "undefined") return;
     const searchParams = new URLSearchParams(window.location.search);
-    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
-    
-    const error = searchParams.get('error') || hashParams.get('error');
-    const errorDesc = searchParams.get('error_description') || hashParams.get('error_description');
-
-    if (error || errorDesc) {
-      console.error("[OAuth Callback Error]:", { error, errorDesc });
-
-      if (errorDesc?.includes("Unable to exchange external code")) {
-        alert("Échec de connexion Google :\nLe Secret Client (Client Secret) configuré dans votre dashboard Supabase ne correspond pas à celui de votre console Google Cloud.\n\nVeuillez vérifier et recoller le Client Secret dans Supabase > Auth > Providers > Google.");
-      } else {
-        alert(`Erreur d'authentification : ${errorDesc || error}`);
-      }
-
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-
-    const upgradeStatus = searchParams.get('upgrade');
-    if (upgradeStatus === 'success') {
+    const upgradeStatus = searchParams.get("upgrade");
+    if (upgradeStatus === "success") {
       setIsPremium(true);
-      alert('🎉 Félicitations ! Votre abonnement Kenza Pro est activé. Bienvenue dans l’expérience complète !');
-      window.history.replaceState({}, document.title, window.location.pathname);
-    } else if (upgradeStatus === 'cancel') {
+      showToast("Félicitations ! Votre abonnement Kenza Pro est activé.");
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [setIsPremium]);
 
-  const handleStartLesson = (lessonId: string) => {
-    // Vérification du gating Premium sur les modules 3, 4 et 5
-    const isGated = ['3', '4', '5'].some((modId) => {
-      const mod = (fullCurriculum as any)[modId];
-      return mod?.lessons?.some((l: any) => l.id === lessonId);
-    });
+  useEffect(() => {
+    if (!toast) return;
+    const timer = window.setTimeout(() => setToast(""), 3500);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
 
-    if (isGated && !isPremium && !devUnlockAll) {
-      setPricingSource('module_locked');
+  useEffect(() => {
+    const handleShortcut = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setView("phrases");
+        window.setTimeout(() => searchInputRef.current?.focus(), 60);
+      }
+    };
+    window.addEventListener("keydown", handleShortcut);
+    return () => window.removeEventListener("keydown", handleShortcut);
+  }, []);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [view]);
+
+  // Combined phrases (Manus default + rich srsVocabulary)
+  const allPhrases = useMemo(() => {
+    const vocabularyList: Phrase[] = srsVocabulary.slice(0, 40).map((w, idx) => ({
+      id: w.id || `vocab_${idx}`,
+      category: w.category || "Essentiels",
+      darija: w.arabizi,
+      arabic: w.arabic,
+      meaning: (w as any).translations?.fr || (w as any).translation || "Expression en darija",
+      note: "Vocabulaire du quotidien avec audio naturel.",
+    }));
+
+    const combined = [...defaultPhrases];
+    for (const v of vocabularyList) {
+      if (!combined.some((p) => p.darija.toLowerCase() === v.darija.toLowerCase())) {
+        combined.push(v);
+      }
+    }
+    return combined;
+  }, []);
+
+  const completedCount = completedLessons.length;
+  const nextLesson =
+    baseLessons.find((lesson) => !completedLessons.includes(lesson.id)) ??
+    baseLessons[baseLessons.length - 1];
+  const activeLesson = baseLessons.find((lesson) => lesson.id === lessonId) ?? null;
+  const activeQuestion = activeLesson?.questions[questionIndex] ?? null;
+
+  const categories = ["Tout voir", ...Array.from(new Set(allPhrases.map((phrase) => phrase.category)))];
+  const filteredPhrases = useMemo(() => {
+    return allPhrases.filter((phrase) => {
+      const matchesCategory = category === "Tout voir" || phrase.category === category;
+      const matchesSearch = `${phrase.darija} ${phrase.arabic} ${phrase.meaning} ${phrase.category}`
+        .toLocaleLowerCase("fr")
+        .includes(search.toLocaleLowerCase("fr"));
+      const matchesFavorite = !favoritesOnly || favorites.includes(phrase.id);
+      return matchesCategory && matchesSearch && matchesFavorite;
+    });
+  }, [category, search, favoritesOnly, favorites, allPhrases]);
+
+  const showToast = (message: string) => setToast(message);
+
+  const startLesson = (id: string) => {
+    const lesson = baseLessons.find((item) => item.id === id);
+    if (!lesson) return;
+
+    // Premium gating check
+    if (lesson.isPremium && !isPremium) {
+      setPricingSource("module_locked");
       return;
     }
 
-    setActiveLessonId(lessonId);
-  };
+    const index = baseLessons.findIndex((item) => item.id === id);
+    const canStart =
+      index === 0 ||
+      completedLessons.includes(baseLessons[index - 1].id) ||
+      completedLessons.includes(id);
 
-  const handleCloseLesson = () => {
-    setActiveLessonId(null);
-  };
-
-  const handleCompleteLesson = () => {
-    if (activeLessonId) {
-      completeLesson(activeLessonId);
+    if (!canStart) {
+      showToast("Termine la leçon précédente pour continuer ton parcours.");
+      return;
     }
-    setActiveLessonId(null);
+
+    setLessonId(id);
+    setQuestionIndex(0);
+    setSelectedAnswer(null);
   };
 
-  // Find next uncompleted lesson
-  const nextLesson = allLessonsList.find((l) => !completedLessons.includes(l.id)) || allLessonsList[0];
+  const advanceQuestion = () => {
+    if (!activeLesson || !activeQuestion || !selectedAnswer) return;
+    if (questionIndex < activeLesson.questions.length - 1) {
+      setQuestionIndex((current) => current + 1);
+      setSelectedAnswer(null);
+      return;
+    }
 
-  const renderModule = (moduleId: string, moduleData: any, track: 'grammar' | 'conversation') => {
-    const isGrammar = track === 'grammar';
-    const isModulePremium = ['3', '4', '5'].includes(String(moduleId));
-    const isRestrictedByPremium = isModulePremium && !isPremium && !devUnlockAll;
-    
-    return (
-      <div key={moduleId} className="space-y-6">
-        
-        {/* Module Header Card */}
-        <div className={`p-6 sm:p-7 rounded-[26px] shadow-sm border transition-all ${
-          isGrammar 
-            ? 'bg-[#1B2A4A] text-[#FDFCF8] border-[#1B2A4A]' 
-            : 'bg-[#FDFCF8] text-[#1B2A4A] border-[#E8E2D5]'
-        }`}>
-          <div className="flex items-center justify-between gap-3 mb-1">
-            <div className="flex items-center gap-2 text-[#C9A05C] text-xs font-bold tracking-[0.22em] uppercase">
-              <span>—</span>
-              <span>Module {moduleId}</span>
-            </div>
-            {isModulePremium && !isPremium && (
-              <button
-                onClick={() => setPricingSource('module_locked')}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C9A05C]/20 hover:bg-[#C9A05C]/30 border border-[#C9A05C]/40 text-[#C9A05C] text-[11px] font-bold tracking-wider uppercase transition-colors"
-              >
-                <Crown className="w-3.5 h-3.5" />
-                <span>Kenza Pro</span>
-              </button>
-            )}
-          </div>
-          <h2 className={`font-serif text-2xl sm:text-3xl font-normal ${isGrammar ? 'text-[#FDFCF8]' : 'text-[#1B2A4A]'}`}>
-            {getLocalizedText(moduleData.title, lang)}
-          </h2>
-          <p className={`text-xs mt-1 ${isGrammar ? 'text-[#E8E2D5]/80' : 'text-[#7A7670]'}`}>
-            {moduleData.lessons.length} étapes structurées
-          </p>
-        </div>
+    const firstCompletion = !completedLessons.includes(activeLesson.id);
+    if (firstCompletion) {
+      completeLesson(activeLesson.id);
+      addXp(activeLesson.questions.length * 10);
+    }
 
-        {/* Timeline of step circles */}
-        <div className="relative pt-4 pb-10 flex flex-col items-center gap-8">
-          
-          {/* Ligne verticale en pointillés reliant les cercles */}
-          <div className="absolute top-6 bottom-16 left-1/2 w-0 border-l-2 border-dashed border-[#E8E2D5] -translate-x-1/2 z-0" />
-
-          {moduleData.lessons.map((lesson: any, idx: number) => {
-            const globalIndex = allLessonsList.findIndex((l) => l.id === lesson.id);
-            const isCompleted = completedLessons.includes(lesson.id);
-            let isNext = !isCompleted && (globalIndex === 0 || completedLessons.includes(allLessonsList[globalIndex - 1]?.id));
-            let isLocked = !isCompleted && !isNext;
-
-            // Enforce Checkpoint prerequisites
-            if (moduleId === '3' && !hasPassedLevel('2')) {
-              isLocked = true;
-              isNext = false;
-            }
-            if (moduleId === '4' && !hasPassedLevel('3')) {
-              isLocked = true;
-              isNext = false;
-            }
-
-            if (devUnlockAll) {
-              isLocked = false;
-              isNext = !isCompleted;
-            }
-
-            const isLessonGated = isRestrictedByPremium && !isCompleted;
-
-            return (
-              <div key={lesson.id} className="relative z-10 w-full max-w-md">
-                
-                {/* Center Circle Node */}
-                <div className="flex flex-col items-center mb-3">
-                  {isCompleted ? (
-                    /* Validé : Cercle vert sauge (#7A9174) avec coche blanche */
-                    <div className="w-11 h-11 rounded-full bg-[#7A9174] text-white flex items-center justify-center shadow-xs border-2 border-[#FDFCF8] ring-4 ring-[#7A9174]/20 transition-transform">
-                      <Check className="w-5 h-5 text-white stroke-[2.5]" />
-                    </div>
-                  ) : isLessonGated ? (
-                    /* Verrouillé Pro : Cercle contour doré avec cadenas or */
-                    <div 
-                      onClick={() => setPricingSource('module_locked')}
-                      className="w-11 h-11 rounded-full border-2 border-[#C9A05C] bg-[#FDFCF8] text-[#C9A05C] flex items-center justify-center shadow-xs cursor-pointer hover:scale-105 transition-transform"
-                      title="Niveau réservé aux membres Kenza Pro"
-                    >
-                      <Lock className="w-4 h-4 text-[#C9A05C]" />
-                    </div>
-                  ) : isNext ? (
-                    /* En cours / À suivre : Cercle contour doré avec badge pill "À SUIVRE" plein */
-                    <div className="flex flex-col items-center gap-1.5">
-                      <div className="w-12 h-12 rounded-full border-2 border-[#C9A05C] bg-[#FDFCF8] text-[#C9A05C] flex items-center justify-center shadow-md ring-4 ring-[#C9A05C]/25 animate-pulse">
-                        <Play className="w-5 h-5 fill-[#C9A05C] text-[#C9A05C] ml-0.5" />
-                      </div>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#C9A05C] text-[#1B2A4A] text-[10px] font-bold tracking-wider uppercase shadow-xs">
-                        À SUIVRE
-                      </span>
-                    </div>
-                  ) : (
-                    /* Verrouillé : Cercle discret contour #E8E2D5 */
-                    <div className="w-10 h-10 rounded-full border border-[#E8E2D5] bg-[#F7F3EA] text-[#7A7670]/50 flex items-center justify-center">
-                      <Lock className="w-4 h-4 text-[#7A7670]/50" />
-                    </div>
-                  )}
-                </div>
-
-                {/* Lesson Card */}
-                <div
-                  onClick={() => {
-                    if (isLessonGated) {
-                      setPricingSource('module_locked');
-                    } else if (isNext) {
-                      handleStartLesson(lesson.id);
-                    }
-                  }}
-                  className={`relative p-6 sm:p-7 rounded-[26px] border transition-all duration-300 text-left ${
-                    isCompleted
-                      ? 'bg-[#FDFCF8] border-[#7A9174]/40 shadow-xs hover:border-[#7A9174] cursor-pointer'
-                      : isLessonGated
-                        ? 'bg-[#FDFCF8] border border-[#C9A05C]/40 hover:border-[#C9A05C] shadow-sm hover:shadow-md cursor-pointer'
-                        : isNext
-                          ? 'bg-[#FDFCF8] border-2 border-[#C9A05C] shadow-lg scale-[1.02] transform cursor-pointer ring-4 ring-[#C9A05C]/10'
-                          : 'bg-[#FDFCF8]/60 border-[#E8E2D5]/70 opacity-60 cursor-not-allowed'
-                  }`}
-                >
-                  <div className="flex justify-between items-start gap-3 mb-2">
-                    <div>
-                      <div className="text-[11px] font-bold tracking-[0.2em] uppercase text-[#C9A05C] mb-1">
-                        — Étape {idx + 1}
-                      </div>
-                      <h3 className={`font-serif text-xl font-bold leading-snug ${isLocked && !isLessonGated ? 'text-[#7A7670]' : 'text-[#1B2A4A]'}`}>
-                        {getLocalizedText(lesson.title, lang)}
-                      </h3>
-                    </div>
-
-                    {isCompleted ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#7A9174] bg-[#7A9174]/15 px-2.5 py-0.5 rounded-full shrink-0">
-                        <Check className="w-3.5 h-3.5" />
-                        <span>Validé</span>
-                      </span>
-                    ) : isLessonGated ? (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setPricingSource('module_locked');
-                        }}
-                        className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#C9A05C] bg-[#C9A05C]/15 border border-[#C9A05C]/40 hover:bg-[#C9A05C]/25 px-2.5 py-1 rounded-full shrink-0 transition-colors"
-                      >
-                        <Crown className="w-3.5 h-3.5" />
-                        <span>PRO</span>
-                      </button>
-                    ) : null}
-                  </div>
-
-                  <p className={`text-xs sm:text-sm mt-1 mb-4 leading-relaxed ${isLocked && !isLessonGated ? 'text-[#7A7670]/70' : 'text-[#7A7670]'}`}>
-                    {getLocalizedText(lesson.description, lang)}
-                  </p>
-
-                  {isLessonGated ? (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setPricingSource('module_locked');
-                      }}
-                      className="w-full py-3 px-6 bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] rounded-full font-bold text-sm flex justify-center items-center gap-2 shadow-xs transition-all active:scale-95 group"
-                    >
-                      <Crown className="w-4 h-4 text-[#1B2A4A]" />
-                      <span>Débloquer avec Kenza Pro</span>
-                    </button>
-                  ) : isNext ? (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleStartLesson(lesson.id);
-                      }}
-                      className="w-full py-3 px-6 bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] rounded-full font-bold text-sm flex justify-center items-center gap-2 shadow-xs transition-all active:scale-95 group"
-                    >
-                      <span>Commencer la leçon</span>
-                      <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                    </button>
-                  ) : null}
-
-                  {isCompleted && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleStartLesson(lesson.id);
-                      }}
-                      className="text-xs font-semibold text-[#7A7670] hover:text-[#1B2A4A] hover:underline transition-colors mt-2"
-                    >
-                      Revoir cette étape
-                    </button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-
-          {/* CHECKPOINT NODE */}
-          {(() => {
-            const lastLessonId = moduleData.lessons[moduleData.lessons.length - 1].id;
-            const isCheckpointUnlocked = completedLessons.includes(lastLessonId) || devUnlockAll;
-            const passed = hasPassedLevel(moduleId);
-            const titleStr = getLocalizedText(moduleData.title, lang);
-
-            const checkpointTitles: Record<string, string> = {
-              '1': 'A1.1',
-              '2': 'A1.2',
-              '3': 'A2',
-              '4': 'B1.1',
-              '5': 'B1.2',
-              '6': 'B2.1',
-              '7': 'B2.2',
-            };
-            const levelLabel = checkpointTitles[moduleId] || moduleId;
-
-            return (
-              <div className="relative z-10 w-full max-w-md mt-4">
-                <button
-                  disabled={!isCheckpointUnlocked}
-                  onClick={() => {
-                    if (!isPremium) {
-                      setPricingSource('checkpoint_locked');
-                    } else {
-                      setCheckpointOpen({ id: moduleId, name: titleStr });
-                    }
-                  }}
-                  className={`w-full relative p-6 sm:p-7 rounded-[28px] border transition-all duration-300 flex flex-col items-center text-center shadow-md ${
-                    passed
-                      ? 'bg-[#FDFCF8] border-2 border-[#7A9174] shadow-sm cursor-pointer'
-                      : isCheckpointUnlocked
-                        ? 'bg-[#1B2A4A] border-2 border-[#C9A05C] text-[#FDFCF8] shadow-xl hover:scale-[1.02] cursor-pointer'
-                        : 'bg-[#FDFCF8]/40 border-[#E8E2D5] opacity-50 cursor-not-allowed'
-                  }`}
-                >
-                  <div 
-                    className="w-14 h-14 rounded-full flex items-center justify-center text-2xl mb-3 border shadow-xs"
-                    style={{
-                      backgroundColor: passed ? 'rgba(122,145,116,0.15)' : isCheckpointUnlocked ? 'rgba(201,160,92,0.2)' : '#F7F3EA',
-                      borderColor: passed ? '#7A9174' : isCheckpointUnlocked ? '#C9A05C' : '#E8E2D5',
-                    }}
-                  >
-                    {passed ? '🏆' : isCheckpointUnlocked ? '⭐' : '🔒'}
-                  </div>
-
-                  <div className="text-[11px] font-bold tracking-[0.2em] uppercase text-[#C9A05C] mb-1">
-                    — Examen de niveau
-                  </div>
-
-                  <h3 className={`font-serif text-2xl font-bold mb-1 ${passed ? 'text-[#7A9174]' : isCheckpointUnlocked ? 'text-[#FDFCF8]' : 'text-[#7A7670]'}`}>
-                    Checkpoint {levelLabel}
-                  </h3>
-
-                  <p className={`text-xs ${passed ? 'text-[#7A9174]' : isCheckpointUnlocked ? 'text-[#E8E2D5]/80' : 'text-[#7A7670]/70'}`}>
-                    {passed ? 'Passeport de niveau validé avec succès' : isCheckpointUnlocked ? 'Évaluez vos compétences pour obtenir le certificat' : 'Complétez les leçons pour déverrouiller'}
-                  </p>
-
-                  {isCheckpointUnlocked && !passed && (
-                    <div className="mt-4 px-6 py-2.5 rounded-full bg-[#C9A05C] text-[#1B2A4A] text-xs font-bold shadow-xs">
-                      Passer le test de niveau →
-                    </div>
-                  )}
-                </button>
-              </div>
-            );
-          })()}
-        </div>
-      </div>
+    setLessonId(null);
+    setSelectedAnswer(null);
+    showToast(
+      firstCompletion
+        ? `Bravo ! Leçon terminée · +${activeLesson.questions.length * 10} XP`
+        : "Leçon revue avec succès."
     );
   };
 
-  const activeLesson = activeLessonId 
-    ? allLessonsList.find((l) => l.id === activeLessonId) 
-    : null;
+  const toggleFavorite = (id: string) => {
+    const updated = favorites.includes(id)
+      ? favorites.filter((item) => item !== id)
+      : [...favorites, id];
+    saveFavorites(updated);
+  };
+
+  const playPhrase = (darija: string, arabic: string) => {
+    playAudio(darija, arabic, true);
+    showToast("Prononciation audio de la phrase.");
+  };
+
+  const copyPhrase = async (phrase: Phrase) => {
+    try {
+      await navigator.clipboard.writeText(`${phrase.darija} (${phrase.arabic}) — ${phrase.meaning}`);
+      showToast("Phrase copiée dans le presse-papiers.");
+    } catch {
+      showToast("Copie indisponible.");
+    }
+  };
+
+  const gradeReview = (grade: "again" | "hard" | "good" | "easy") => {
+    const award = grade === "easy" ? 5 : grade === "good" ? 3 : grade === "hard" ? 2 : 1;
+    addXp(award);
+    setCardFlipped(false);
+    setReviewIndex((current) => current + 1);
+    showToast(
+      `Noté : ${grade === "again" ? "à revoir" : grade === "hard" ? "difficile" : grade === "good" ? "bien" : "facile"} · +${award} XP`
+    );
+  };
+
+  const resetProgress = () => {
+    const confirmed = window.confirm("Effacer la progression locale sur cet appareil ?");
+    if (!confirmed) return;
+    resetData();
+    localStorage.removeItem("kenza_favorites");
+    setFavorites([]);
+    showToast("Progression locale réinitialisée.");
+  };
+
+  const switchView = (next: View) => {
+    setView(next);
+    setMobileMenuOpen(false);
+  };
+
+  const headerTitle: Record<View, { eyebrow: string; title: string; description: string }> = {
+    today: {
+      eyebrow: "TON ESPACE D’APPRENTISSAGE",
+      title: "Salam, on s’y remet ?",
+      description: "Un petit pas en darija aujourd’hui, une grande porte ouverte demain.",
+    },
+    path: {
+      eyebrow: "LE CHEMIN SE FAIT EN PARLANT",
+      title: "Ton parcours",
+      description: "Des premiers mots aux conversations qui te ressemblent.",
+    },
+    phrases: {
+      eyebrow: "LES MOTS QUI RAPPROCHENT",
+      title: "Ton carnet de phrases",
+      description: "Des expressions utiles, vivantes, prêtes à t’accompagner.",
+    },
+    review: {
+      eyebrow: "ANCRER, SANS SE PRESSER",
+      title: "Révision du jour",
+      description: "Quelques cartes bien choisies pour laisser les mots s’installer.",
+    },
+    space: {
+      eyebrow: "UN ESPACE À TOI",
+      title: "Mon espace & Passeport",
+      description: "Ta progression et tes visas officiels, sous ton contrôle.",
+    },
+  };
+
+  const currentHeader = headerTitle[view];
 
   return (
-    <main className="min-h-screen bg-[#F7F3EA] text-[#1B2A4A] font-sans pb-28 selection:bg-[#C9A05C]/20 selection:text-[#1B2A4A]">
-      
-      {!activeLessonId && (
-        <Header currentTab={currentTab} onTabChange={setCurrentTab} />
-      )}
-
-      {isReviewSessionOpen && (
-        <SmartReviewSession onClose={() => setIsReviewSessionOpen(false)} />
-      )}
-
-      {!activeLessonId ? (
-        <div className="pt-6 px-4 max-w-6xl mx-auto">
-          
-          {/* ONGLET 1 : ACCUEIL */}
-          {(currentTab === 'home' || currentTab === 'learn') && (
-            <div className="space-y-8 animate-in fade-in duration-300">
-              
-              {/* Hero Bannière */}
-              <HeroBanner
-                onPrimaryAction={() => handleStartLesson(nextLesson.id)}
-                primaryActionLabel={`Reprendre : ${getLocalizedText(nextLesson.title, lang)}`}
-                onSecondaryAction={() => setCurrentTab('parcours')}
-                secondaryActionLabel="Voir tout le parcours"
-              />
-
-              {/* Rappel Répétition Espacée */}
-              <DailyReviewCard onStartReview={() => setIsReviewSessionOpen(true)} />
-
-              {/* Mises en situation au Maroc */}
-              <div 
-                className="bg-[#FDFCF8] rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-xs border border-[#E8E2D5] hover:border-[#C9A05C]/60 hover:shadow-md transition-all duration-200 cursor-pointer group"
-                onClick={() => setShowScenarioSelector(true)}
-                dir={isArabic ? 'rtl' : 'ltr'}
-              >
-                <div className="space-y-2 max-w-xl">
-                  <div className="flex items-center gap-2 text-[#C9A05C] text-xs font-bold tracking-[0.22em] uppercase">
-                    <span>—</span>
-                    <span>Mises en situation réelles</span>
-                  </div>
-                  <h2 className="font-serif text-2xl sm:text-3xl font-normal text-[#1B2A4A]">
-                    💬 {isArabic ? 'المواقف والمحادثات' : lang === 'en' ? 'Roleplay Situations' : 'Pratiquez au café, en taxi et au souk'}
-                  </h2>
-                  <p className="text-sm text-[#7A7670] leading-relaxed">
-                    {isArabic ? 'تدرّب على الدارجة في المقهى، الطاكسي أو السوق!' : lang === 'en' ? 'Interactive roleplay with native Darija dialogue scenarios.' : 'Simulateur de conversations authentiques avec assistance phonétique et variantes régionales.'}
-                  </p>
-                </div>
-
-                <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#1B2A4A] text-[#FDFCF8] text-xs font-bold shadow-xs group-hover:bg-[#1B2A4A]/90 transition-colors shrink-0">
-                  <span>Lancer un dialogue</span>
-                  <ArrowRight className="w-4 h-4 text-[#C9A05C]" />
-                </div>
-              </div>
-
-              {/* Raccourcis éditoriaux vers les sections */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-                <div 
-                  onClick={() => setCurrentTab('parcours')}
-                  className="bg-[#FDFCF8] rounded-2xl p-5 border border-[#E8E2D5] hover:border-[#C9A05C] cursor-pointer transition-all shadow-xs space-y-2"
-                >
-                  <div className="w-9 h-9 rounded-full bg-[#1B2A4A]/10 text-[#1B2A4A] flex items-center justify-center">
-                    <Compass className="w-4 h-4" />
-                  </div>
-                  <h3 className="font-serif font-bold text-lg text-[#1B2A4A]">Parcours complet</h3>
-                  <p className="text-xs text-[#7A7670]">7 modules du niveau débutant aux conversations avancées.</p>
-                </div>
-
-                <div 
-                  onClick={() => setCurrentTab('phrasebook')}
-                  className="bg-[#FDFCF8] rounded-2xl p-5 border border-[#E8E2D5] hover:border-[#C9A05C] cursor-pointer transition-all shadow-xs space-y-2"
-                >
-                  <div className="w-9 h-9 rounded-full bg-[#C9A05C]/15 text-[#C9A05C] flex items-center justify-center">
-                    <BookOpen className="w-4 h-4" />
-                  </div>
-                  <h3 className="font-serif font-bold text-lg text-[#1B2A4A]">Dictionnaire & Fiches</h3>
-                  <p className="text-xs text-[#7A7670]">Lexique thématique, mode mains-libres et règles clés.</p>
-                </div>
-
-                <div 
-                  onClick={() => setCurrentTab('review')}
-                  className="bg-[#FDFCF8] rounded-2xl p-5 border border-[#E8E2D5] hover:border-[#C9A05C] cursor-pointer transition-all shadow-xs space-y-2"
-                >
-                  <div className="w-9 h-9 rounded-full bg-[#7A9174]/15 text-[#7A9174] flex items-center justify-center">
-                    <RotateCcw className="w-4 h-4" />
-                  </div>
-                  <h3 className="font-serif font-bold text-lg text-[#1B2A4A]">Révision SRS</h3>
-                  <p className="text-xs text-[#7A7670]">Flashcards et mémorisation longue durée avec gain d'XP.</p>
-                </div>
-              </div>
-
-            </div>
-          )}
-
-          {/* ONGLET 2 : PARCOURS */}
-          {currentTab === 'parcours' && (
-            <div className="space-y-8 animate-in fade-in duration-300">
-              
-              {/* Parcours Header */}
-              <div className="space-y-2 text-center max-w-2xl mx-auto mb-6">
-                <div className="flex items-center justify-center gap-2 text-[#C9A05C] text-xs font-bold tracking-[0.25em] uppercase">
-                  <span>—</span>
-                  <span>Votre Itinéraire</span>
-                </div>
-                <h1 className="font-serif text-3xl sm:text-4xl text-[#1B2A4A] font-normal">
-                  Le Parcours d'apprentissage
-                </h1>
-                <p className="text-sm text-[#7A7670]">
-                  Validez les étapes successives pour déverrouiller vos checkpoints et obtenir votre passeport Darija.
-                </p>
-              </div>
-
-              {/* Sélecteur de piste pour Mobile & Desktop */}
-              <div className="flex justify-center mb-8">
-                <div className="inline-flex bg-[#FDFCF8] p-1.5 rounded-full border border-[#E8E2D5] shadow-xs gap-1">
-                  <button 
-                    onClick={() => setActiveTrack('grammar')}
-                    className={`px-5 py-2.5 rounded-full font-bold text-xs transition-all ${
-                      activeTrack === 'grammar' 
-                        ? 'bg-[#1B2A4A] text-[#FDFCF8] shadow-xs' 
-                        : 'text-[#7A7670] hover:text-[#1B2A4A]'
-                    }`}
-                  >
-                    📚 {t.dashboard.trackA || "Grammaire & Fondations"}
-                  </button>
-                  <button 
-                    onClick={() => setActiveTrack('conversation')}
-                    className={`px-5 py-2.5 rounded-full font-bold text-xs transition-all ${
-                      activeTrack === 'conversation' 
-                        ? 'bg-[#1B2A4A] text-[#FDFCF8] shadow-xs' 
-                        : 'text-[#7A7670] hover:text-[#1B2A4A]'
-                    }`}
-                  >
-                    💬 {t.dashboard.trackB || "Situations & Immersion"}
-                  </button>
-                </div>
-              </div>
-
-              {/* Modules Columns */}
-              <div className="max-w-3xl mx-auto">
-                {activeTrack === 'grammar' ? (
-                  <div className="space-y-12">
-                    {Object.entries(fullCurriculum)
-                      .filter(([mId]) => ['1', '3', '4', '6'].includes(mId))
-                      .map(([moduleId, moduleData]) => renderModule(moduleId, moduleData, 'grammar'))}
-                  </div>
-                ) : (
-                  <div className="space-y-12">
-                    {Object.entries(fullCurriculum)
-                      .filter(([mId]) => ['2', '5', '7'].includes(mId))
-                      .map(([moduleId, moduleData]) => renderModule(moduleId, moduleData, 'conversation'))}
-                  </div>
-                )}
-              </div>
-
-            </div>
-          )}
-
-          {/* ONGLET 3 : PHRASES / DICTIONNAIRE */}
-          {currentTab === 'phrasebook' && (
-            <div className="animate-in fade-in duration-300">
-              <PhrasebookView />
-            </div>
-          )}
-
-          {/* ONGLET 4 : RÉVISER (SRS & FLASHCARDS) */}
-          {currentTab === 'review' && (
-            <div className="animate-in fade-in duration-300 space-y-6">
-              <div className="space-y-2 text-center max-w-2xl mx-auto mb-6">
-                <div className="flex items-center justify-center gap-2 text-[#C9A05C] text-xs font-bold tracking-[0.25em] uppercase">
-                  <span>—</span>
-                  <span>Mémorisation Continue</span>
-                </div>
-                <h1 className="font-serif text-3xl sm:text-4xl text-[#1B2A4A] font-normal">
-                  Session de Révision
-                </h1>
-                <p className="text-sm text-[#7A7670]">
-                  Répétez vos flashcards pour accumuler de l'XP et consolider vos acquis sur le long terme.
-                </p>
-              </div>
-
-              <SRSDashboard />
-            </div>
-          )}
-
-          {/* PRATIQUE ORALE */}
-          {currentTab === 'speech' && (
-            <div className="animate-in fade-in duration-300 max-w-4xl mx-auto space-y-6">
-              <SpeechTrainer />
-            </div>
-          )}
-
-          {/* PROFIL & PASSEPORT */}
-          {currentTab === 'profile' && (
-            <div className="animate-in fade-in duration-300 space-y-8 max-w-5xl mx-auto">
-              <ProfileView />
-              <div className="max-w-4xl mx-auto p-4">
-                <SRSDashboard />
-              </div>
-            </div>
-          )}
-
+    <div className="app-shell">
+      {/* Sidebar Desktop & Mobile Slideout */}
+      <aside className={`sidebar ${mobileMenuOpen ? "sidebar-open" : ""}`}>
+        <div className="brand-lockup">
+          <div className="brand-mark" aria-hidden="true">
+            <span>ك</span>
+            <i />
+          </div>
+          <div>
+            <span className="brand-name">KENZA</span>
+            <span className="brand-tagline">la darija, en chemin</span>
+          </div>
+          <button
+            className="icon-button mobile-close"
+            aria-label="Fermer le menu"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            <X size={19} />
+          </button>
         </div>
-      ) : (
-        activeLesson && (
-          <ErrorBoundary onClose={handleCloseLesson}>
-            <ExerciseRunner 
-              lesson={activeLesson}
-              onComplete={handleCompleteLesson}
-              onClose={handleCloseLesson}
-            />
-          </ErrorBoundary>
-        )
-      )}
 
-      {/* Navigation Mobile en bas (fixe) */}
-      {!activeLessonId && (
-        <Navigation currentTab={currentTab} onTabChange={setCurrentTab} />
-      )}
+        <div className="sidebar-label">APPRENDRE</div>
+        <nav className="side-nav" aria-label="Navigation principale">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.id}
+                onClick={() => switchView(item.id)}
+                className={`nav-item ${view === item.id ? "nav-item-active" : ""}`}
+                aria-current={view === item.id ? "page" : undefined}
+              >
+                <Icon size={19} strokeWidth={1.8} /> <span>{item.label}</span>
+                {item.id === "review" && <span className="nav-count">4</span>}
+              </button>
+            );
+          })}
+        </nav>
 
-      {checkpointOpen && (
-        <CheckpointModal 
-          levelId={checkpointOpen.id} 
-          levelName={checkpointOpen.name}
-          onClose={() => setCheckpointOpen(null)} 
+        <div className="sidebar-label sidebar-label-spaced">PRATIQUE ORALE & IA</div>
+        <button
+          onClick={() => setShowScenarioSelector(true)}
+          className="nav-item"
+        >
+          <MessageCircle size={19} strokeWidth={1.8} />
+          <span>Roleplay IA</span>
+        </button>
+
+        <div className="sidebar-label sidebar-label-spaced">TON ESPACE</div>
+        <button
+          onClick={() => switchView("space")}
+          className={`nav-item ${view === "space" ? "nav-item-active" : ""}`}
+          aria-current={view === "space" ? "page" : undefined}
+        >
+          <Award size={19} strokeWidth={1.8} />
+          <span>Mon Passeport</span>
+        </button>
+
+        <div className="sidebar-spacer" />
+
+        <div className="daily-goal-card">
+          <div className="goal-orbit">
+            <Target size={17} />
+          </div>
+          <div className="goal-topline">
+            <span>TON RYTHME</span>
+            <span>{Math.min(100, Math.round(((completedCount * 3) / 10) * 100))}%</span>
+          </div>
+          <strong>10 minutes par jour</strong>
+          <div className="goal-track">
+            <span style={{ width: `${Math.min(100, ((completedCount * 3) / 10) * 100)}%` }} />
+          </div>
+          <button
+            onClick={() => showToast("Objectif quotidien : 10 minutes de pratique chaque jour.")}
+            className="goal-link"
+          >
+            Ajuster l’objectif <ArrowRight size={14} />
+          </button>
+        </div>
+
+        <div className="sidebar-footer">
+          <span className="privacy-dot" />
+          <span>{user ? user.email?.split("@")[0] : "Mode Invité actif"}</span>
+          <button
+            aria-label="En savoir plus sur les données"
+            onClick={() => switchView("space")}
+          >
+            <CircleHelp size={14} />
+          </button>
+        </div>
+      </aside>
+
+      {mobileMenuOpen && (
+        <button
+          className="mobile-scrim"
+          aria-label="Fermer le menu"
+          onClick={() => setMobileMenuOpen(false)}
         />
       )}
 
+      {/* Main Area */}
+      <main className="main-area">
+        <header className="topbar">
+          <button
+            className="icon-button mobile-menu-trigger"
+            aria-label="Ouvrir le menu"
+            onClick={() => setMobileMenuOpen(true)}
+          >
+            <Menu size={21} />
+          </button>
+          <div className="breadcrumbs">
+            <span>KENZA</span>
+            <ChevronRight size={14} />
+            <span>{currentHeader.eyebrow.toLocaleLowerCase("fr")}</span>
+          </div>
+          <div className="topbar-actions">
+            <button
+              className="sound-toggle"
+              onClick={toggleSound}
+              title={soundEnabled ? "Audio activé" : "Audio muet"}
+            >
+              <Headphones size={16} />
+              <span>{soundEnabled ? "Son actif" : "Son coupé"}</span>
+            </button>
+            <button
+              className="top-avatar"
+              aria-label="Ouvrir mon espace"
+              onClick={() => switchView("space")}
+            >
+              {user?.user_metadata?.full_name ? user.user_metadata.full_name[0].toUpperCase() : "K"}
+            </button>
+          </div>
+        </header>
+
+        <div className="content-wrap">
+          <section className="page-heading">
+            <div>
+              <div className="eyebrow">
+                <span className="eyebrow-line" />
+                {currentHeader.eyebrow}
+              </div>
+              <h1>{currentHeader.title}</h1>
+              <p>{currentHeader.description}</p>
+            </div>
+            <div className="date-chip">
+              <span className="date-sun">☼</span>
+              <span>
+                {new Intl.DateTimeFormat("fr-FR", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                }).format(new Date())}
+              </span>
+            </div>
+          </section>
+
+          {/* VUE 1 : AUJOURD'HUI */}
+          {view === "today" && (
+            <TodayView
+              completedCount={completedCount}
+              xp={xp}
+              streak={streakDays}
+              nextLesson={nextLesson}
+              onStart={startLesson}
+              onNavigate={switchView}
+              onOpenRoleplay={() => setShowScenarioSelector(true)}
+            />
+          )}
+
+          {/* VUE 2 : MON PARCOURS */}
+          {view === "path" && (
+            <PathView
+              completedLessons={completedLessons}
+              onStart={startLesson}
+              onOpenCheckpoint={(id, name) => setCheckpointOpen({ id, name })}
+              onOpenPaywall={() => setPricingSource("module_locked")}
+              isPremium={isPremium}
+            />
+          )}
+
+          {/* VUE 3 : CARNET DE PHRASES */}
+          {view === "phrases" && (
+            <PhrasesView
+              search={search}
+              searchInputRef={searchInputRef}
+              setSearch={setSearch}
+              category={category}
+              setCategory={setCategory}
+              categories={categories}
+              phrases={filteredPhrases}
+              favorites={favorites}
+              favoritesOnly={favoritesOnly}
+              setFavoritesOnly={setFavoritesOnly}
+              onFavorite={toggleFavorite}
+              onPlay={playPhrase}
+              onCopy={copyPhrase}
+            />
+          )}
+
+          {/* VUE 4 : RÉVISION SRS */}
+          {view === "review" && (
+            <ReviewView
+              reviewIndex={reviewIndex}
+              cardFlipped={cardFlipped}
+              setCardFlipped={setCardFlipped}
+              onGrade={gradeReview}
+            />
+          )}
+
+          {/* VUE 5 : MON ESPACE / PASSEPORT */}
+          {view === "space" && (
+            <SpaceView
+              completedCount={completedCount}
+              xp={xp}
+              streak={streakDays}
+              user={user}
+              isPremium={isPremium}
+              onReset={resetProgress}
+              onOpenPaywall={() => setPricingSource("profile_upgrade")}
+              onToast={showToast}
+            />
+          )}
+
+          <footer className="page-footer">
+            <span>
+              KENZA <span className="footer-arabic">كنزة</span>
+            </span>
+            <span>Apprendre une langue, c’est rencontrer des gens.</span>
+            <button onClick={() => switchView("space")}>
+              Passeport Culturel & Données <ArrowRight size={13} />
+            </button>
+          </footer>
+        </div>
+      </main>
+
+      {/* Mobile Bottom Navigation (Visible sous 900px) */}
+      <nav className="mobile-bottom-nav" aria-label="Navigation mobile">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <button
+              key={item.id}
+              onClick={() => switchView(item.id)}
+              className={view === item.id ? "mobile-nav-active" : ""}
+              aria-label={item.label}
+              aria-current={view === item.id ? "page" : undefined}
+            >
+              <Icon size={19} />
+              <span>
+                {item.id === "today"
+                  ? "Accueil"
+                  : item.id === "path"
+                  ? "Parcours"
+                  : item.id === "phrases"
+                  ? "Phrases"
+                  : "Réviser"}
+              </span>
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* Modale d'Exercice Manus */}
+      {lessonId && activeLesson && activeQuestion && (
+        <div
+          className="modal-scrim"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setLessonId(null);
+          }}
+        >
+          <section className="lesson-modal" role="dialog" aria-modal="true" aria-labelledby="lesson-title">
+            <div className="lesson-modal-top">
+              <button onClick={() => setLessonId(null)} className="icon-button" aria-label="Fermer la leçon">
+                <ArrowLeft size={19} />
+              </button>
+              <div className="lesson-progress-label">
+                <span>LEÇON · {activeLesson.length.toUpperCase()}</span>
+                <span>
+                  {questionIndex + 1} / {activeLesson.questions.length}
+                </span>
+              </div>
+              <button onClick={() => setLessonId(null)} className="icon-button" aria-label="Quitter">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="lesson-progress-track">
+              <span style={{ width: `${((questionIndex + 1) / activeLesson.questions.length) * 100}%` }} />
+            </div>
+            <div className="lesson-modal-body">
+              <div className="lesson-kicker">
+                <span className="lesson-kicker-icon">
+                  <Languages size={16} />
+                </span>{" "}
+                {activeLesson.title}
+              </div>
+              <h2 id="lesson-title">{activeQuestion.prompt}</h2>
+              <p className="lesson-helper">{activeQuestion.helper}</p>
+              <div className="answer-list">
+                {activeQuestion.options.map((option, index) => {
+                  const isCorrect = selectedAnswer !== null && option === activeQuestion.answer;
+                  const isWrong = selectedAnswer === option && !isCorrect;
+                  const letter = String.fromCharCode(65 + index);
+                  return (
+                    <button
+                      key={option}
+                      onClick={() => {
+                        if (!selectedAnswer) setSelectedAnswer(option);
+                      }}
+                      disabled={Boolean(selectedAnswer)}
+                      className={`answer-option ${selectedAnswer === option ? "answer-selected" : ""} ${
+                        isCorrect ? "answer-correct" : ""
+                      } ${isWrong ? "answer-wrong" : ""}`}
+                    >
+                      <span className="answer-letter">{isCorrect ? <Check size={17} /> : letter}</span>
+                      <span>{option}</span>
+                      {isCorrect && <CheckCircle2 className="answer-check" size={19} />}
+                    </button>
+                  );
+                })}
+              </div>
+              {selectedAnswer && (
+                <div
+                  className={`answer-feedback ${
+                    selectedAnswer === activeQuestion.answer ? "feedback-good" : "feedback-try"
+                  }`}
+                >
+                  <strong>
+                    {selectedAnswer === activeQuestion.answer ? "Bien joué !" : "Presque — retiens ceci."}
+                  </strong>
+                  <span>{activeQuestion.note}</span>
+                </div>
+              )}
+              <button
+                className="primary-button lesson-next"
+                onClick={advanceQuestion}
+                disabled={!selectedAnswer}
+              >
+                {questionIndex === activeLesson.questions.length - 1 ? "Terminer la leçon" : "Continuer"}
+                <ArrowRight size={17} />
+              </button>
+              <div className="local-note">
+                <LockKeyhole size={13} /> Progression enregistrée en direct sur ton profil.
+              </div>
+            </div>
+          </section>
+        </div>
+      )}
+
+      {/* Roleplay Scenario Selector */}
       {showScenarioSelector && (
-        <ScenarioSelectorModal 
+        <ScenarioSelectorModal
           onClose={() => setShowScenarioSelector(false)}
           onSelectAi={(personaId) => {
             setActivePersonaId(personaId);
             setShowScenarioSelector(false);
           }}
-          onRequirePremium={() => setPricingSource('roleplay_locked')}
+          onRequirePremium={() => setPricingSource("roleplay_locked")}
           onStartSrs={() => {
             setShowScenarioSelector(false);
-            setCurrentTab('review');
+            setView("review");
           }}
         />
       )}
 
+      {/* Fullscreen Roleplay IA Persona View */}
       {activePersonaId && (
         <div className="fixed inset-0 z-50 bg-[#FDFCF8] flex flex-col">
-          <AiRoleplayView 
+          <AiRoleplayView
             personaId={activePersonaId}
             onClose={() => setActivePersonaId(null)}
           />
         </div>
       )}
 
-      {!hasCompletedOnboarding && (
-        <OnboardingModal />
-      )}
-
-      {pricingSource && (
-        <PaywallModal 
-          onClose={() => setPricingSource(null)} 
-          source={pricingSource} 
+      {/* Checkpoint Modal */}
+      {checkpointOpen && (
+        <CheckpointModal
+          levelId={checkpointOpen.id}
+          levelName={checkpointOpen.name}
+          onClose={() => setCheckpointOpen(null)}
         />
       )}
 
+      {/* Paywall Modal */}
+      {pricingSource && (
+        <PaywallModal
+          onClose={() => setPricingSource(null)}
+          source={pricingSource}
+        />
+      )}
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className="toast-message" role="status" aria-live="polite">
+          <span className="toast-check">
+            <Check size={15} />
+          </span>
+          {toast}
+          <button aria-label="Fermer" onClick={() => setToast("")}>
+            <X size={15} />
+          </button>
+        </div>
+      )}
+
       <InstallPwaBanner />
-    </main>
+    </div>
+  );
+}
+
+// -------------------------------------------------------------
+// Composant 1 : TodayView
+// -------------------------------------------------------------
+function TodayView({
+  completedCount,
+  xp,
+  streak,
+  nextLesson,
+  onStart,
+  onNavigate,
+  onOpenRoleplay,
+}: {
+  completedCount: number;
+  xp: number;
+  streak: number;
+  nextLesson: Lesson;
+  onStart: (id: string) => void;
+  onNavigate: (view: View) => void;
+  onOpenRoleplay: () => void;
+}) {
+  const totalLessons = baseLessons.length;
+
+  return (
+    <>
+      <div className="today-grid">
+        <article className="hero-panel">
+          <div className="hero-texture" />
+          <div className="hero-copy">
+            <span className="hero-kicker">
+              <Sparkles size={14} /> TON PETIT MOMENT DARIJA
+            </span>
+            <h2>
+              La darija
+              <br />
+              s’ouvre à toi.
+            </h2>
+            <p>Une phrase, une rencontre, une autre façon de voir le Maroc.</p>
+            <button className="hero-button" onClick={() => onStart(nextLesson.id)}>
+              Continuer à apprendre <ArrowRight size={16} />
+            </button>
+            <div className="hero-footnote">
+              <span className="hero-foot-line" /> À ton rythme, toujours.
+            </div>
+          </div>
+          <div className="hero-image-wrap" aria-hidden="true">
+            <img
+              className="hero-image"
+              src="/manus-storage/kenza-hero_99e35384.jpg"
+              alt="Maroc médina"
+            />
+            <div className="hero-image-wash" />
+            <div className="hero-image-caption">
+              <span>دَارِيجة</span>
+              <small>darija, la langue du lien</small>
+            </div>
+          </div>
+          <div className="hero-medallion" aria-hidden="true">
+            <span>مرحبا</span>
+            <small>marhba</small>
+          </div>
+        </article>
+
+        <article className="next-card">
+          <div className="next-card-head">
+            <span className="mini-kicker">TA PROCHAINE ÉTAPE</span>
+            <span className="next-icon">
+              <ArrowDownRight size={17} />
+            </span>
+          </div>
+          <div className="lesson-number">
+            0{Math.min(completedCount + 1, totalLessons)}{" "}
+            <span>/ 0{totalLessons}</span>
+          </div>
+          <div className="next-illustration">
+            <img
+              className="next-photo"
+              src="/manus-storage/kenza-market_a0db8277.jpg"
+              alt="Thé à la menthe"
+            />
+            <div className="cup-shadow" />
+            <div className="tea-cup">
+              <span />
+              <i />
+            </div>
+            <div className="tea-steam steam-one" />
+            <div className="tea-steam steam-two" />
+            <div className="tea-leaf leaf-one" />
+            <div className="tea-leaf leaf-two" />
+          </div>
+          <div className="next-card-copy">
+            <span className="lesson-pill">LEÇON SUIVANTE · {nextLesson.length}</span>
+            <h3>{nextLesson.title}</h3>
+            <p>{nextLesson.subtitle}</p>
+          </div>
+          <button className="text-link" onClick={() => onStart(nextLesson.id)}>
+            C’est parti <ArrowRight size={15} />
+          </button>
+        </article>
+      </div>
+
+      <div className="stat-strip">
+        <div className="stat-item">
+          <span className="stat-icon stat-blue">
+            <BookOpen size={17} />
+          </span>
+          <div>
+            <strong>
+              {completedCount}
+              <small>/{totalLessons}</small>
+            </strong>
+            <span>leçons terminées</span>
+          </div>
+        </div>
+        <div className="stat-divider" />
+        <div className="stat-item">
+          <span className="stat-icon stat-gold">
+            <Star size={17} />
+          </span>
+          <div>
+            <strong>
+              {xp}
+              <small> XP</small>
+            </strong>
+            <span>points de pratique</span>
+          </div>
+        </div>
+        <div className="stat-divider" />
+        <div className="stat-item">
+          <span className="stat-icon stat-orange">
+            <Flame size={17} />
+          </span>
+          <div>
+            <strong>
+              {streak}
+              <small> jour{streak > 1 ? "s" : ""}</small>
+            </strong>
+            <span>rythme régulier</span>
+          </div>
+        </div>
+        <button className="stat-action" onClick={() => onNavigate("space")}>
+          Voir mon espace <ArrowRight size={14} />
+        </button>
+      </div>
+
+      <div className="section-heading">
+        <div>
+          <span className="eyebrow">
+            <span className="eyebrow-line" />
+            POUR AUJOURD’HUI
+          </span>
+          <h2>À toi de choisir ton pas.</h2>
+        </div>
+        <button className="plain-link" onClick={() => onNavigate("path")}>
+          Voir le parcours <ArrowRight size={15} />
+        </button>
+      </div>
+
+      <div className="quick-grid">
+        <button className="quick-card quick-card-phrases" onClick={() => onNavigate("phrases")}>
+          <span className="quick-icon">
+            <Bookmark size={18} />
+          </span>
+          <span className="quick-label">UN MOT À EMPORTER</span>
+          <strong>
+            Ton carnet
+            <br />
+            de phrases
+          </strong>
+          <span className="quick-bottom">
+            Vocabulaire essentiel <ArrowRight size={14} />
+          </span>
+        </button>
+
+        <button className="quick-card quick-card-review" onClick={() => onNavigate("review")}>
+          <span className="quick-icon">
+            <Sparkles size={18} />
+          </span>
+          <span className="quick-label">5 MINUTES, PAS PLUS</span>
+          <strong>
+            Faire une
+            <br />
+            petite révision
+          </strong>
+          <span className="quick-bottom">
+            Cartes du jour <ArrowRight size={14} />
+          </span>
+        </button>
+
+        <button className="quick-card quick-card-listen" onClick={onOpenRoleplay}>
+          <span className="quick-icon">
+            <MessageCircle size={18} />
+          </span>
+          <span className="quick-label">IMMERSION IA</span>
+          <strong>
+            Mises en
+            <br />
+            situation
+          </strong>
+          <span className="quick-bottom">
+            Au café, en taxi <ArrowRight size={14} />
+          </span>
+        </button>
+      </div>
+
+      <div className="bottom-callout">
+        <div className="callout-art">
+          <div className="callout-sun" />
+          <div className="callout-arch">
+            <span>مرحبا</span>
+          </div>
+          <span className="callout-spark spark-a">✳</span>
+          <span className="callout-spark spark-b">✳</span>
+        </div>
+        <div className="callout-copy">
+          <span className="mini-kicker">UNE LANGUE, DES RENCONTRES</span>
+          <h3>
+            Pas besoin d’être parfait·e.
+            <br />
+            <em>Il suffit de commencer.</em>
+          </h3>
+          <p>Chaque expression est une petite invitation à aller vers l’autre.</p>
+        </div>
+        <button onClick={() => onNavigate("path")} aria-label="Explorer le parcours">
+          <ArrowRight size={20} />
+        </button>
+      </div>
+    </>
+  );
+}
+
+// -------------------------------------------------------------
+// Composant 2 : PathView
+// -------------------------------------------------------------
+function PathView({
+  completedLessons,
+  onStart,
+  onOpenCheckpoint,
+  onOpenPaywall,
+  isPremium,
+}: {
+  completedLessons: string[];
+  onStart: (id: string) => void;
+  onOpenCheckpoint: (id: string, name: string) => void;
+  onOpenPaywall: () => void;
+  isPremium: boolean;
+}) {
+  const { hasPassedLevel } = useCheckpointProgress();
+
+  return (
+    <div className="path-layout">
+      <section className="path-main-card">
+        <div className="path-banner">
+          <div>
+            <span className="hero-kicker">
+              <Compass size={14} /> PARCOURS DÉCOUVERTE
+            </span>
+            <h2>
+              Les premiers pas
+              <br />
+              en darija.
+            </h2>
+            <p>Trois escales pour oser dire les premiers mots.</p>
+          </div>
+          <div className="path-stamp">
+            <span>المغرب</span>
+            <small>Maroc</small>
+          </div>
+          <div className="path-doodle" />
+        </div>
+
+        <div className="path-progress-row">
+          <div>
+            <span className="mini-kicker">TON AVANCÉE</span>
+            <strong>
+              {completedLessons.length}{" "}
+              <small>
+                leçon{completedLessons.length > 1 ? "s" : ""} sur {baseLessons.length}
+              </small>
+            </strong>
+          </div>
+          <div className="path-overall-track">
+            <span
+              style={{
+                width: `${Math.round((completedLessons.length / baseLessons.length) * 100)}%`,
+              }}
+            />
+          </div>
+          <span className="path-percent">
+            {Math.round((completedLessons.length / baseLessons.length) * 100)}%
+          </span>
+        </div>
+
+        <div className="lesson-roadmap">
+          {baseLessons.map((lesson, index) => {
+            const done = completedLessons.includes(lesson.id);
+            const unlocked =
+              index === 0 || completedLessons.includes(baseLessons[index - 1].id) || done;
+            const isGated = lesson.isPremium && !isPremium;
+            const locked = !unlocked && !isGated;
+
+            return (
+              <div
+                className={`roadmap-row ${done ? "roadmap-done" : ""} ${locked ? "roadmap-locked" : ""}`}
+                key={lesson.id}
+              >
+                <div className="roadmap-track">
+                  <div className="roadmap-line" />
+                  <button
+                    className={`roadmap-node ${done ? "node-done" : ""} ${
+                      !locked && !done ? "node-current" : ""
+                    }`}
+                    disabled={locked}
+                    onClick={() => (isGated ? onOpenPaywall() : onStart(lesson.id))}
+                    aria-label={
+                      done
+                        ? `Revoir ${lesson.title}`
+                        : locked
+                        ? `${lesson.title}, verrouillée`
+                        : `Commencer ${lesson.title}`
+                    }
+                  >
+                    {done ? (
+                      <Check size={16} />
+                    ) : isGated ? (
+                      <Crown size={14} className="text-[#C9A05C]" />
+                    ) : locked ? (
+                      <LockKeyhole size={14} />
+                    ) : (
+                      <span>0{index + 1}</span>
+                    )}
+                  </button>
+                </div>
+                <div className="roadmap-content">
+                  <div className="roadmap-meta">
+                    <span>
+                      {lesson.length.toUpperCase()} ·{" "}
+                      {index === 0
+                        ? "LES ESSENTIELS"
+                        : index === 1
+                        ? "AU QUOTIDIEN"
+                        : index === 2
+                        ? "SE REPÉRER"
+                        : "IMMERSION AVANCÉE"}
+                    </span>
+                    {done && (
+                      <span className="done-tag">
+                        <CheckCircle2 size={13} /> TERMINÉE
+                      </span>
+                    )}
+                    {!done && !locked && !isGated && (
+                      <span className="current-tag">À SUIVRE</span>
+                    )}
+                    {isGated && (
+                      <span className="current-tag" style={{ background: "#fef3c7", color: "#b45309" }}>
+                        PRO
+                      </span>
+                    )}
+                  </div>
+                  <h3>{lesson.title}</h3>
+                  <p>{lesson.subtitle}</p>
+                  <div className="roadmap-footer">
+                    <span>
+                      <BookOpen size={14} /> {lesson.questions.length} exercices
+                    </span>
+                    {isGated ? (
+                      <button onClick={onOpenPaywall} style={{ color: "#d69b47" }}>
+                        Débloquer avec Pro <ArrowRight size={14} />
+                      </button>
+                    ) : unlocked ? (
+                      <button onClick={() => onStart(lesson.id)}>
+                        {done ? "Revoir" : "Commencer"}
+                        <ArrowRight size={14} />
+                      </button>
+                    ) : (
+                      <span className="locked-copy">
+                        <LockKeyhole size={13} /> Finis l’étape avant
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <aside className="path-aside">
+        <div className="path-aside-card">
+          <span className="aside-icon">
+            <Leaf size={18} />
+          </span>
+          <span className="mini-kicker">PETIT CONSEIL</span>
+          <h3>La régularité avant la perfection.</h3>
+          <p>
+            5 minutes par jour font plus qu’une heure de temps en temps. Reviens quand tu veux.
+          </p>
+          <div className="aside-divider" />
+          <div className="aside-stat">
+            <span>Palier A1 (Fondations)</span>
+            <strong>{hasPassedLevel("1") ? "Validé ✓" : "En cours"}</strong>
+          </div>
+          <button
+            onClick={() => onOpenCheckpoint("1", "Palier A1 — Fondations")}
+          >
+            Passer le Checkpoint A1 <ArrowRight size={14} />
+          </button>
+        </div>
+
+        <div className="path-aside-note">
+          <span className="note-symbol">✳</span>
+          <p>
+            Le mot <strong>darija</strong> vient de l’arabe <span dir="rtl">الدارجة</span> — la
+            langue courante, celle de tous les jours.
+          </p>
+        </div>
+      </aside>
+    </div>
+  );
+}
+
+// -------------------------------------------------------------
+// Composant 3 : PhrasesView
+// -------------------------------------------------------------
+function PhrasesView({
+  search,
+  searchInputRef,
+  setSearch,
+  category,
+  setCategory,
+  categories,
+  phrases: visiblePhrases,
+  favorites,
+  favoritesOnly,
+  setFavoritesOnly,
+  onFavorite,
+  onPlay,
+  onCopy,
+}: {
+  search: string;
+  searchInputRef: RefObject<HTMLInputElement | null>;
+  setSearch: (value: string) => void;
+  category: string;
+  setCategory: (value: string) => void;
+  categories: string[];
+  phrases: Phrase[];
+  favorites: string[];
+  favoritesOnly: boolean;
+  setFavoritesOnly: (value: boolean) => void;
+  onFavorite: (id: string) => void;
+  onPlay: (darija: string, arabic: string) => void;
+  onCopy: (phrase: Phrase) => void;
+}) {
+  return (
+    <>
+      <section className="phrase-toolbar">
+        <label className="phrase-search">
+          <Search size={17} />
+          <input
+            ref={searchInputRef}
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Chercher une expression…"
+            aria-label="Chercher une expression"
+          />
+          <kbd>⌘ K</kbd>
+        </label>
+        <button
+          className={`favorites-filter ${favoritesOnly ? "filter-active" : ""}`}
+          onClick={() => setFavoritesOnly(!favoritesOnly)}
+        >
+          <Heart size={15} fill={favoritesOnly ? "currentColor" : "none"} /> Mes favoris{" "}
+          <span>{favorites.length}</span>
+        </button>
+      </section>
+
+      <div className="category-tabs" role="tablist" aria-label="Catégories de phrases">
+        {categories.map((item) => (
+          <button
+            role="tab"
+            aria-selected={category === item}
+            key={item}
+            className={category === item ? "category-active" : ""}
+            onClick={() => setCategory(item)}
+          >
+            {item}
+          </button>
+        ))}
+      </div>
+
+      <div className="phrase-section-top">
+        <div>
+          <span className="mini-kicker">À PORTÉE DE MAIN</span>
+          <h2>
+            {favoritesOnly
+              ? "Tes phrases favorites"
+              : category === "Tout voir"
+              ? "Les expressions du quotidien"
+              : category}
+          </h2>
+        </div>
+        <span className="phrase-count">
+          {visiblePhrases.length} expression{visiblePhrases.length === 1 ? "" : "s"}
+        </span>
+      </div>
+
+      {visiblePhrases.length > 0 ? (
+        <div className="phrase-grid">
+          {visiblePhrases.map((phrase, index) => (
+            <article className="phrase-card" key={phrase.id}>
+              <div className="phrase-card-top">
+                <span className="phrase-category">{phrase.category}</span>
+                <button
+                  className={`heart-button ${favorites.includes(phrase.id) ? "heart-active" : ""}`}
+                  onClick={() => onFavorite(phrase.id)}
+                  aria-label={
+                    favorites.includes(phrase.id) ? "Retirer des favoris" : "Ajouter aux favoris"
+                  }
+                >
+                  <Heart size={17} fill={favorites.includes(phrase.id) ? "currentColor" : "none"} />
+                </button>
+              </div>
+              <span className="phrase-index">0{index + 1}</span>
+              <h3>{phrase.darija}</h3>
+              <span className="phrase-arabic" dir="rtl">
+                {phrase.arabic}
+              </span>
+              <div className="phrase-divider" />
+              <p className="phrase-meaning">{phrase.meaning}</p>
+              <p className="phrase-note">{phrase.note}</p>
+              <div className="phrase-actions">
+                <button onClick={() => onPlay(phrase.darija, phrase.arabic)}>
+                  <Volume2 size={15} /> Écouter
+                </button>
+                <button onClick={() => onCopy(phrase)}>
+                  <Bookmark size={14} /> Copier
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div className="empty-state">
+          <span className="empty-symbol">
+            <Search size={22} />
+          </span>
+          <h3>Aucune phrase trouvée</h3>
+          <p>Essaie un autre mot ou change de catégorie.</p>
+          <button
+            className="plain-link"
+            onClick={() => {
+              setSearch("");
+              setCategory("Tout voir");
+              setFavoritesOnly(false);
+            }}
+          >
+            Effacer les filtres <ArrowRight size={14} />
+          </button>
+        </div>
+      )}
+
+      <div className="phrase-footnote">
+        <span className="privacy-dot" /> Synthèse vocale naturelle haute fidélité (Edge TTS) avec
+        cache hors-ligne intégré.
+      </div>
+    </>
+  );
+}
+
+// -------------------------------------------------------------
+// Composant 4 : ReviewView (Flashcards SRS)
+// -------------------------------------------------------------
+function ReviewView({
+  reviewIndex,
+  cardFlipped,
+  setCardFlipped,
+  onGrade,
+}: {
+  reviewIndex: number;
+  cardFlipped: boolean;
+  setCardFlipped: (value: boolean) => void;
+  onGrade: (grade: "again" | "hard" | "good" | "easy") => void;
+}) {
+  const cards = [
+    {
+      front: "Merci beaucoup",
+      back: "Shukran bzaf",
+      arabic: "شكرا بزاف!",
+      hint: "Un petit mot chaleureux qui ouvre toutes les portes.",
+    },
+    {
+      front: "Où est le souk ?",
+      back: "Fin kayn souk?",
+      arabic: "فين كاين السوق؟",
+      hint: "Pour trouver ton chemin dans la médina.",
+    },
+    {
+      front: "S’il vous plaît",
+      back: "Afak",
+      arabic: "عفاك",
+      hint: "Un mot simple pour rendre tes demandes plus douces.",
+    },
+    {
+      front: "Au revoir, à bientôt",
+      back: "Bslama, nshawfek",
+      arabic: "بسلامة، نشوفك",
+      hint: "Une manière chaleureuse de se dire à bientôt.",
+    },
+    {
+      front: "Je voudrais un thé",
+      back: "Bghit wahed atay, afak",
+      arabic: "بغيت واحد أتاي، عفاك",
+      hint: "Pour savourer un moment au café.",
+    },
+  ];
+
+  const card = cards[reviewIndex % cards.length];
+
+  return (
+    <div className="review-layout">
+      <section className="review-main">
+        <div className="review-card-top">
+          <span className="mini-kicker">
+            CARTE {String((reviewIndex % cards.length) + 1).padStart(2, "0")} <i>/</i> 0{cards.length}
+          </span>
+          <span className="review-session">
+            <Sparkles size={14} /> Session tranquille
+          </span>
+        </div>
+        <button
+          className={`flashcard ${cardFlipped ? "flashcard-flipped" : ""}`}
+          onClick={() => setCardFlipped(!cardFlipped)}
+          aria-label={cardFlipped ? "Voir la question" : "Retourner la carte"}
+        >
+          <span className="flashcard-decoration decor-top">✳</span>
+          <span className="flashcard-label">{cardFlipped ? "EN DARIJA" : "EN FRANÇAIS"}</span>
+          {cardFlipped ? (
+            <>
+              <strong className="flashcard-answer">{card.back}</strong>
+              <span className="flashcard-arabic" dir="rtl">
+                {card.arabic}
+              </span>
+              <p>{card.hint}</p>
+            </>
+          ) : (
+            <>
+              <strong className="flashcard-question">{card.front}</strong>
+              <span className="flashcard-tap">
+                <span className="rotate-symbol">↻</span> Touche pour révéler
+              </span>
+            </>
+          )}
+          <span className="flashcard-decoration decor-bottom">✳</span>
+        </button>
+
+        <div className="review-hint">
+          <CircleHelp size={15} />
+          <span>Réponds dans ta tête, puis retourne la carte pour vérifier.</span>
+        </div>
+
+        <div className="review-ratings">
+          <button className="rate-again" onClick={() => onGrade("again")}>
+            <span>Encore</span>
+            <small>+1 XP</small>
+          </button>
+          <button className="rate-hard" onClick={() => onGrade("hard")}>
+            <span>Difficile</span>
+            <small>+2 XP</small>
+          </button>
+          <button className="rate-good" onClick={() => onGrade("good")}>
+            <span>Bien</span>
+            <small>+3 XP</small>
+          </button>
+          <button className="rate-easy" onClick={() => onGrade("easy")}>
+            <span>Facile</span>
+            <small>+5 XP</small>
+          </button>
+        </div>
+      </section>
+
+      <aside className="review-aside">
+        <div className="review-aside-card">
+          <span className="aside-icon">
+            <Sparkles size={18} />
+          </span>
+          <span className="mini-kicker">SANS PRESSION</span>
+          <h3>Le bon rythme, c’est le tien.</h3>
+          <p>
+            L'algorithme de répétition espacée (SRS) consolide ta mémoire à long terme. Chaque point
+            d'XP nourrit ton passeport.
+          </p>
+          <div className="aside-divider" />
+          <div className="review-method">
+            <span className="method-dot" />
+            <p>
+              <strong>Petit conseil</strong>
+              <br />
+              Dis la phrase à voix haute. La mémoire aime les histoires qu’on raconte.
+            </p>
+          </div>
+        </div>
+        <div className="review-alphabet">
+          <span>أ ب ت</span>
+          <p>Écoute · Répète · Reviens</p>
+        </div>
+      </aside>
+    </div>
+  );
+}
+
+// -------------------------------------------------------------
+// Composant 5 : SpaceView (Mon Espace & Passeport)
+// -------------------------------------------------------------
+function SpaceView({
+  completedCount,
+  xp,
+  streak,
+  user,
+  isPremium,
+  onReset,
+  onOpenPaywall,
+  onToast,
+}: {
+  completedCount: number;
+  xp: number;
+  streak: number;
+  user: any;
+  isPremium: boolean;
+  onReset: () => void;
+  onOpenPaywall: () => void;
+  onToast: (message: string) => void;
+}) {
+  const username =
+    user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Invité(e)";
+
+  const passportData = {
+    userName: username,
+    levelName: xp >= 300 ? "Niveau A2 — Essentiels" : "Niveau A1 — Premiers Pas",
+    score: Math.min(100, Math.round((xp / 500) * 100)),
+    date: new Date().toLocaleDateString("fr-FR"),
+    passportId: `KNZ-${user ? "PRO" : "DEMO"}-7421`,
+  };
+
+  return (
+    <div className="space-layout">
+      <section className="space-card space-profile">
+        <div className="profile-avatar">
+          {username[0]?.toUpperCase() || "ك"}
+        </div>
+        <div className="profile-intro">
+          <span className="mini-kicker">MON COIN KENZA</span>
+          <h2>Salam, {username} !</h2>
+          <p>
+            {user
+              ? `Connecté en tant que ${user.email}. Données sauvegardées dans le cloud.`
+              : "Mode Invité actif. Ta progression est préservée localement sur cet appareil."}
+          </p>
+        </div>
+        <span className="local-badge">
+          <span className="privacy-dot" /> {isPremium ? "MEMBRE KENZA PRO" : "VERSION GRATUITE"}
+        </span>
+      </section>
+
+      <div className="space-stats">
+        <article>
+          <span className="space-stat-icon stat-blue">
+            <BookOpen size={18} />
+          </span>
+          <span className="mini-kicker">LEÇONS</span>
+          <strong>
+            {completedCount}
+            <small> / {baseLessons.length}</small>
+          </strong>
+          <p>Chaque pas compte.</p>
+        </article>
+        <article>
+          <span className="space-stat-icon stat-gold">
+            <Star size={18} />
+          </span>
+          <span className="mini-kicker">POINTS</span>
+          <strong>
+            {xp}
+            <small> XP</small>
+          </strong>
+          <p>Gagnés en pratiquant.</p>
+        </article>
+        <article>
+          <span className="space-stat-icon stat-orange">
+            <Flame size={18} />
+          </span>
+          <span className="mini-kicker">RYTHME</span>
+          <strong>
+            {streak}
+            <small> jour{streak > 1 ? "s" : ""}</small>
+          </strong>
+          <p>La régularité avant tout.</p>
+        </article>
+      </div>
+
+      <div className="space-data-grid">
+        <article className="data-card">
+          <div className="data-card-heading">
+            <span className="data-icon">
+              <LockKeyhole size={18} />
+            </span>
+            <div>
+              <span className="mini-kicker">TES DONNÉES</span>
+              <h3>Progression & Confidentialité</h3>
+            </div>
+          </div>
+          <p>
+            La progression est sécurisée. Si tu te connectes, tes leçons, favoris et points se
+            synchronisent automatiquement sur tous tes appareils.
+          </p>
+          <div className="data-safe-row">
+            <CheckCircle2 size={15} />
+            <span>PWA Hors-Ligne · Sauvegarde Hybride Local & Supabase</span>
+          </div>
+          {!isPremium && (
+            <button className="outline-button" onClick={onOpenPaywall}>
+              Passer à Kenza Pro <ArrowRight size={14} />
+            </button>
+          )}
+        </article>
+
+        <article className="data-card data-card-cert">
+          <div className="data-card-heading">
+            <span className="data-icon certificate-icon">
+              <Award size={18} />
+            </span>
+            <div>
+              <span className="mini-kicker">CERTIFICATS</span>
+              <h3>Passeport Culturel</h3>
+            </div>
+          </div>
+          <p>
+            Valide les examens de palier pour obtenir tes visas officiels du Passeport Darija et les
+            télécharger en haute résolution.
+          </p>
+          <div className="py-2">
+            <DarijaPassportCard data={passportData} />
+          </div>
+        </article>
+      </div>
+
+      <div className="space-settings">
+        <div>
+          <span className="mini-kicker">GESTION DU COMPTE</span>
+          <h3>Repartir de zéro</h3>
+          <p>Réinitialise les leçons, points et favoris sur cet appareil.</p>
+        </div>
+        <button className="outline-button danger-outline" onClick={onReset}>
+          Effacer ma progression locale
+        </button>
+      </div>
+
+      <div className="future-note">
+        <span>
+          <Sparkles size={16} />
+        </span>
+        <p>
+          <strong>Kenza Pro :</strong> Accède à l'intégralité des modules B1 & B2, aux dialogues IA
+          illimités et aux visas de certification culturels.
+        </p>
+      </div>
+    </div>
   );
 }
