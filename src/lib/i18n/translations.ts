@@ -2,6 +2,10 @@ export type UILanguage = 'fr' | 'es' | 'en' | 'ar';
 
 export const translations = {
   fr: {
+    side: {
+      today: "Aujourd'hui", path: "Mon parcours", phrases: "Carnet de phrases", review: "Révision du jour",
+      learn: "APPRENDRE", oral: "PRATIQUE ORALE & IA", space: "TON ESPACE"
+    },
     header: {
       guestMode: "Mode Invité", logout: "Déconnexion", arabizi: "Arabizi (3afak)", arabic: "Arabe (عفاك)", duo: "Bilingue"
     },
@@ -30,7 +34,8 @@ export const translations = {
       allCaughtUpDesc: "Vous n'avez aucune carte à réviser aujourd'hui. Revenez demain pour consolider votre mémoire.",
       backToMenu: "Retour au Menu",
       sessionComplete: "Session Terminée",
-      sessionCompleteDesc: "Vous avez révisé {count} mots avec succès. +{xp} XP gagnés !",
+      sessionCompleteDesc: 
+"Vous avez révisé {count} mots avec succès. +{xp} XP gagnés !",
       smartReviewsTitle: "Révisions Intelligentes",
       smartReviewsDesc: "Mémorisez le vocabulaire de la Darija pour toujours grâce à notre système de répétition espacée.",
       cardsToReview: "Cartes à réviser",
@@ -45,6 +50,10 @@ export const translations = {
     }
   },
   en: {
+    side: {
+      today: "Today", path: "My journey", phrases: "Phrasebook", review: "Daily review",
+      learn: "LEARN", oral: "SPEAKING & AI", space: "YOUR SPACE"
+    },
     header: {
       guestMode: "Guest Mode", logout: "Logout", arabizi: "Arabizi (3afak)", arabic: "Arabic (عفاك)", duo: "Bilingual"
     },
@@ -67,7 +76,8 @@ export const translations = {
     },
     srs: {
       flip: "Flip card", again: "Again", hard: "Hard", good: "Good", easy: "Easy",
-      dueToday: "Due cards today", tapToFlip: "Tap to flip ->",
+      dueToday: "Due cards today", tapToFlip: "Tap 
+to flip ->",
       answer: "ANSWER", translateArabizi: "Translate to Arabizi", translateArabic: "Translate to Arabic", translateDuo: "Translate to Darija (Duo)",
       allCaughtUp: "All caught up!",
       allCaughtUpDesc: "You have no cards to review today. Come back tomorrow to consolidate your memory.",
@@ -88,6 +98,10 @@ export const translations = {
     }
   },
   es: {
+    side: {
+      today: "Hoy", path: "Mi ruta", phrases: "Mis frases", review: "Repaso del día",
+      learn: "APRENDER", oral: "PRÁCTICA ORAL & IA", space: "TU ESPACIO"
+    },
     header: {
       guestMode: "Modo Invitado", logout: "Cerrar sesión", arabizi: "Arabizi (3afak)", arabic: "Árabe (عفاك)", duo: "Bilingüe"
     },
@@ -103,7 +117,8 @@ export const translations = {
       trackA: "Gramática y Fundamentos", trackB: "Situaciones y Conversaciones Reales"
     },
     lessons: {
-      check: "Comprobar", continue: "Continuar", retry: "Reintentar", gameOver: "¡Sin vidas!",
+      check: "Comprobar", continue: "Continuar", retry: "Reintent
+ar", gameOver: "¡Sin vidas!",
       congrats: "¡Lección completada!", lives: "Vidas",
       excellent: "¡Excelente!", oops: "¡Ups!", chooseAnswer: "Elige tu respuesta:",
       grammarTitle: "Gramática Activa", grammarDesc: "Explora los mecanismos del idioma."
@@ -131,6 +146,10 @@ export const translations = {
     }
   },
   ar: {
+    side: {
+      today: "اليوم", path: "مساري", phrases: "دفتر العبارات", review: "مراجعة اليوم",
+      learn: "تعلّم", oral: "التحدث والذكاء الاصطناعي", space: "مساحتك"
+    },
     header: {
       guestMode: "وضع الضيف", logout: "تسجيل الخروج", arabizi: "عربيزي (3afak)", arabic: "عربي (عفاك)", duo: "مزدوج"
     },
@@ -140,7 +159,8 @@ export const translations = {
       reviewPrompt: "راجع كلماتك الصعبة لتعزيز ذاكرتك.",
       dailyPractice: "تمرين اليوم",
       currentStreak: "السلسلة الحالية", streakDays: "أيام", streakFreeze: "تجميد", streakFreezes: "تجميد",
-      weeklyLeagues: "الدوريات الأسبوعية", yourTrophies: "جوائزك", youGuest: "أنت (ضيف)",
+      weeklyLeagues: "الدوريات الأسبوعية", yourTrophies: "جوائ
+زك", youGuest: "أنت (ضيف)",
       badgeCafeMaster: "خبير المقهى", badgeTaxiAce: "بطل التاكسي", badgeSoukNego: "مفاوض السوق", badgePolyglot: "متحدث لغات الأطلس",
       loading: "جاري التحميل...", anonymous: "مجهول", remainingCards: "البطاقات المتبقية:",
       trackA: "القواعد والأساسيات", trackB: "المواقف والمحادثات اليومية"
