@@ -361,7 +361,7 @@ export default function Header({ currentTab, onTabChange }: HeaderProps) {
             {/* Drawer Footer with Network Status */}
             <div className="pt-6 border-t border-[#E8E2D5] flex items-center justify-between">
               <NetworkStatusIndicator />
-              <span className="text-[10px] text-[#7A7670]/60">v0.1.0 • Kenza</span>
+              <span className="text-[10px] text-[#7A7670]/60">v0.2.0 • Kenza — UI étendue</span>
             </div>
 
           </div>
