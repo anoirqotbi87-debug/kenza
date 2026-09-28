@@ -135,45 +135,51 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1B2A4A]/60 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="bg-[#FDFCF8] rounded-3xl w-full max-w-md overflow-hidden shadow-2xl border border-[#E8E2D5] relative animate-in zoom-in-95 duration-200">
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors z-10"
+          className="absolute top-4 right-4 p-2 text-[#7A7670] hover:text-[#1B2A4A] bg-[#F7F3EA] hover:bg-[#E8E2D5] border border-[#E8E2D5] rounded-full transition-colors z-10 shadow-xs"
         >
           <X className="w-5 h-5" />
         </button>
 
         <div className="p-8">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-black text-slate-800 flex justify-center items-center gap-2">
-              <span className="text-3xl">🐪</span> KENZA <span className="text-lg font-medium text-slate-400 font-arabic ml-1">كنزة</span>
+          <div className="text-center mb-6">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#C9A05C]/20 border border-[#C9A05C]/40 text-[#C9A05C] text-2xl mb-3 shadow-xs">
+              🐪
+            </div>
+            <h2 className="font-serif tracking-[0.2em] text-2xl font-extrabold text-[#1B2A4A] uppercase flex justify-center items-center gap-2">
+              KENZA <span className="font-arabic text-base font-bold text-[#C9A05C] lowercase">كنزة</span>
             </h2>
+            <p className="text-xs text-[#7A7670] mt-1 font-medium">
+              La darija, en chemin
+            </p>
           </div>
 
-          <div className="flex bg-slate-100 p-1 rounded-xl mb-6">
+          <div className="flex bg-[#F7F3EA] p-1 rounded-full border border-[#E8E2D5] mb-6 text-xs font-bold">
             <button 
               onClick={() => setIsLogin(true)}
-              className={`flex-1 py-2 font-bold text-sm rounded-lg transition-all ${isLogin ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`flex-1 py-2 rounded-full transition-all ${isLogin ? 'bg-[#1B2A4A] text-[#FDFCF8] shadow-xs' : 'text-[#7A7670] hover:text-[#1B2A4A]'}`}
             >
               {t.auth.login}
             </button>
             <button 
               onClick={() => setIsLogin(false)}
-              className={`flex-1 py-2 font-bold text-sm rounded-lg transition-all ${!isLogin ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`flex-1 py-2 rounded-full transition-all ${!isLogin ? 'bg-[#1B2A4A] text-[#FDFCF8] shadow-xs' : 'text-[#7A7670] hover:text-[#1B2A4A]'}`}
             >
               {t.auth.signup}
             </button>
           </div>
 
           {message && (
-            <div className="bg-green-50 text-green-700 p-3 rounded-xl text-sm font-medium mb-4 text-center">
+            <div className="bg-[#7A9174]/15 border border-[#7A9174]/30 text-[#7A9174] p-3 rounded-2xl text-xs font-semibold mb-4 text-center">
               {message}
             </div>
           )}
 
           {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm font-medium mb-4 text-center">
+            <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-2xl text-xs font-semibold mb-4 text-center">
               {error}
               {error.includes("Email non confirmé") && (
                 <button
@@ -183,7 +189,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                     setMessage("Un nouvel email de confirmation vient d'être envoyé.");
                     setError(null);
                   }}
-                  className="text-xs text-blue-600 underline mt-2 block w-full text-center"
+                  className="text-xs text-[#1B2A4A] underline font-bold mt-2 block w-full text-center"
                 >
                   Renvoyer le lien de confirmation
                 </button>
@@ -194,27 +200,27 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7A7670]" />
                 <input 
                   type="email" 
                   placeholder={t.auth.email} 
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl pl-10 pr-4 py-3 outline-none focus:border-blue-500 focus:bg-white transition-colors font-medium"
+                  className="w-full bg-[#F7F3EA] border border-[#E8E2D5] text-[#1B2A4A] rounded-2xl pl-10 pr-4 py-3 outline-none focus:border-[#C9A05C] focus:bg-[#FDFCF8] transition-colors text-xs sm:text-sm font-medium placeholder-[#7A7670]/60"
                 />
               </div>
             </div>
             <div>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7A7670]" />
                 <input 
                   type="password" 
                   placeholder={t.auth.password} 
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl pl-10 pr-4 py-3 outline-none focus:border-blue-500 focus:bg-white transition-colors font-medium"
+                  className="w-full bg-[#F7F3EA] border border-[#E8E2D5] text-[#1B2A4A] rounded-2xl pl-10 pr-4 py-3 outline-none focus:border-[#C9A05C] focus:bg-[#FDFCF8] transition-colors text-xs sm:text-sm font-medium placeholder-[#7A7670]/60"
                 />
               </div>
             </div>
@@ -222,22 +228,25 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             <button 
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70"
+              className="w-full bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] font-bold py-3.5 rounded-full shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 text-xs sm:text-sm disabled:opacity-60"
             >
               {loading ? '...' : (isLogin ? t.auth.login : t.auth.signup)}
-              {!loading && <LogIn className="w-5 h-5" />}
+              {!loading && <LogIn className="w-4 h-4" />}
             </button>
           </form>
 
-          <div className="mt-6 flex gap-3">
-            <button onClick={() => handleOAuth('google')} className="flex-1 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2">
-              <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
-              {t.auth.google}
+          <div className="mt-4 flex gap-3">
+            <button 
+              onClick={() => handleOAuth('google')} 
+              className="flex-1 bg-[#FDFCF8] border border-[#E8E2D5] hover:bg-[#F7F3EA] text-[#1B2A4A] font-bold py-2.5 rounded-full transition-colors flex items-center justify-center gap-2 text-xs shadow-xs"
+            >
+              <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-4 h-4" />
+              <span>{t.auth.google}</span>
             </button>
           </div>
           
-          <div className="mt-8 text-center">
-            <button onClick={onClose} className="text-slate-500 hover:text-slate-800 text-sm font-bold underline-offset-4 hover:underline">
+          <div className="mt-6 text-center">
+            <button onClick={onClose} className="text-[#7A7670] hover:text-[#1B2A4A] text-xs font-semibold underline-offset-4 hover:underline">
               {t.auth.continueGuest}
             </button>
           </div>

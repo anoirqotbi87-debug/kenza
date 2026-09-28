@@ -116,14 +116,14 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
   return (
     <div className="fixed inset-0 z-[100] bg-[#1B2A4A]/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
       <div 
-        className="bg-[#FDFCF8] rounded-3xl w-full max-w-4xl overflow-hidden shadow-2xl border border-[#E8E2D5] flex flex-col md:flex-row relative my-auto animate-in fade-in zoom-in-95 duration-200"
+        className="bg-[#FDFCF8] rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl border border-[#E8E2D5] flex flex-col md:flex-row relative my-auto animate-in fade-in zoom-in-95 duration-200"
         role="dialog"
         aria-modal="true"
       >
-        {/* Bouton Fermer */}
+        {/* Bouton Fermer - sticky sur mobile (<380px) pour rester toujours accessible */}
         <button 
           onClick={onClose}
-          className="absolute top-3.5 right-3.5 p-2 rounded-full bg-[#F7F3EA] hover:bg-[#E8E2D5] text-[#1B2A4A] transition-colors border border-[#E8E2D5] z-30 shadow-xs"
+          className="sticky top-3.5 right-3.5 z-50 self-end -mb-10 mr-3.5 p-2 rounded-full bg-[#F7F3EA] hover:bg-[#E8E2D5] text-[#1B2A4A] transition-colors border border-[#E8E2D5] shadow-md md:absolute md:top-3.5 md:right-3.5 md:m-0"
           aria-label="Fermer la modale"
         >
           <X className="w-5 h-5" />

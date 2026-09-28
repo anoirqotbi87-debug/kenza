@@ -25,7 +25,7 @@ const serwist = new Serwist({
       matcher: ({ url }: { url: URL }) => url.pathname.startsWith('/api/tts'),
       handler: "CacheFirst" as any,
       options: {
-        cacheName: "kenza-tts-cache",
+        cacheName: "kenza-v2-tts-cache",
         expiration: {
           maxEntries: 200,
           maxAgeSeconds: 30 * 24 * 60 * 60, // 30 jours
@@ -36,7 +36,7 @@ const serwist = new Serwist({
       matcher: /\.(?:mp3|wav|ogg|m4a)$/i,
       handler: "CacheFirst" as any,
       options: {
-        cacheName: "kenza-audio-cache",
+        cacheName: "kenza-v2-audio-cache",
         expiration: {
           maxEntries: 250,
           maxAgeSeconds: 30 * 24 * 60 * 60, // 30 jours
@@ -47,7 +47,7 @@ const serwist = new Serwist({
       matcher: /\.(?:woff|woff2|eot|ttf|otf)$/i,
       handler: "CacheFirst" as any,
       options: {
-        cacheName: "kenza-fonts-cache",
+        cacheName: "kenza-v2-fonts-cache",
         expiration: {
           maxEntries: 50,
           maxAgeSeconds: 365 * 24 * 60 * 60, // 1 an
@@ -59,6 +59,18 @@ const serwist = new Serwist({
 });
 
 serwist.addEventListeners();
+
+self.addEventListener('activate', (event: any) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames: string[]) => {
+      return Promise.all(
+        cacheNames
+          .filter((name) => !name.startsWith('kenza-v2-') && !name.includes('precache'))
+          .map((name) => caches.delete(name))
+      );
+    })
+  );
+});
 
 
 self.addEventListener('notificationclick', (event: any) => {

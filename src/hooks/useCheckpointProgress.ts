@@ -27,16 +27,29 @@ export function useCheckpointProgress() {
     }
 
     if (user) {
-      checkpointService.fetchCloudResults(user.id).then(cloudData => {
-        if (Object.keys(cloudData).length > 0) {
-          setResults(prev => {
-            const merged = { ...prev, ...cloudData };
-            try {
-              localStorage.setItem('kenza_checkpoints', JSON.stringify(merged));
-            } catch (e) {}
-            return merged;
-          });
+      checkpointService.fetchCloudResults(user.id).then(async (cloudData) => {
+        try {
+          const stored = localStorage.getItem('kenza_checkpoints');
+          if (stored) {
+            const localResults: Record<string, CheckpointResultData> = JSON.parse(stored);
+            for (const [lvlId, res] of Object.entries(localResults)) {
+              if (res.passed && !cloudData[lvlId]) {
+                // Synchroniser discrètement en arrière-plan sans bloquer
+                await checkpointService.syncResultToCloud(user.id, res).catch(() => {});
+              }
+            }
+          }
+        } catch (e) {
+          // Pas d'impact si le parsing échoue
         }
+
+        setResults(prev => {
+          const merged = { ...prev, ...cloudData };
+          try {
+            localStorage.setItem('kenza_checkpoints', JSON.stringify(merged));
+          } catch (e) {}
+          return merged;
+        });
       });
     }
   }, [user]);

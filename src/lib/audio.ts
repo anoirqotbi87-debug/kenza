@@ -104,16 +104,24 @@ export const playAudio = async (text: string, audioUrl?: string, soundEnabled: b
 
       if (!audioBuffer) {
         // 1. Check Offline IndexedDB First
-        const offlineBlob = await getOfflineAudio(text);
+        const cleanText = text.trim();
+        const cleanArabic = arabicText ? arabicText.trim() : undefined;
+        const offlineBlob = await getOfflineAudio(cleanText);
         let arrayBuffer: ArrayBuffer;
 
         if (offlineBlob) {
           arrayBuffer = await offlineBlob.arrayBuffer();
         } else {
+          // Si l'utilisateur est hors-ligne et que l'audio n'est pas dans le cache IndexedDB
+          if (typeof window !== 'undefined' && !window.navigator.onLine) {
+            console.warn('[Audio TTS] Mode hors-ligne : audio non préchargé localement pour ce mot.');
+            throw new Error('OFFLINE_AUDIO_UNAVAILABLE');
+          }
+
           // 2. Fetch from network (using GET for ServiceWorker CacheFirst compat)
           const params = new URLSearchParams();
-          params.append('text', text);
-          if (arabicText) params.append('arabicText', arabicText);
+          params.append('text', cleanText);
+          if (cleanArabic) params.append('arabicText', cleanArabic);
           
           const response = await fetch(`/api/tts?${params.toString()}`);
           if (!response.ok) throw new Error('TTS API failed');
@@ -133,27 +141,32 @@ export const playAudio = async (text: string, audioUrl?: string, soundEnabled: b
         source.start();
       });
     } catch (e) {
-      console.error("Error with Edge TTS, falling back to Web Speech API:", e);
+      console.warn("[Audio TTS] Erreur Edge TTS ou indisponibilité hors-ligne, bascule vers Web Speech API :", e);
     }
   }
 
   // Fallback ultime : Web Speech API du navigateur
   if ('speechSynthesis' in window && text && text !== 'correct' && text !== 'error') {
     return new Promise<void>((resolve) => {
-      const voices = window.speechSynthesis.getVoices();
-      const voice = voices.find(v => v.lang.includes('ar-MA')) || voices.find(v => v.lang.includes('ar-'));
-      
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'ar-MA';
-      utterance.rate = speed;
-      if (voice) {
-        utterance.voice = voice;
+      try {
+        const voices = window.speechSynthesis.getVoices();
+        const voice = voices.find(v => v.lang.includes('ar-MA')) || voices.find(v => v.lang.includes('ar-'));
+        
+        // Priorité au texte en alphabet arabe s'il est disponible pour une prononciation naturelle
+        const utterance = new SpeechSynthesisUtterance(arabicText?.trim() || text.trim());
+        utterance.lang = 'ar-MA';
+        utterance.rate = speed;
+        if (voice) {
+          utterance.voice = voice;
+        }
+        
+        utterance.onend = () => resolve();
+        utterance.onerror = () => resolve();
+        
+        window.speechSynthesis.speak(utterance);
+      } catch (err) {
+        resolve();
       }
-      
-      utterance.onend = () => resolve();
-      utterance.onerror = () => resolve();
-      
-      window.speechSynthesis.speak(utterance);
     });
   }
 };

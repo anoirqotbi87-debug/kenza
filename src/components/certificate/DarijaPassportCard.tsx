@@ -64,66 +64,83 @@ export default function DarijaPassportCard({ data }: DarijaPassportCardProps) {
   };
 
   return (
-    <div className="flex flex-col items-center gap-6 max-w-lg mx-auto">
+    <div className="flex flex-col items-center gap-5 max-w-lg mx-auto">
       
-      {/* Visual Preview built with Tailwind (mimicking the canvas style for UI rendering) */}
-      <div className="relative w-full aspect-[1.9/1] bg-gradient-to-br from-blue-900 to-slate-900 rounded-xl overflow-hidden shadow-2xl border-4 border-amber-500/20 transform transition-transform hover:scale-[1.02]">
+      {/* Visual Preview (Passeport Culturel Haute Fidélité) */}
+      <div className="relative w-full aspect-[1.9/1] bg-[#1B2A4A] rounded-2xl overflow-hidden shadow-2xl border-2 border-[#C9A05C] transform transition-transform hover:scale-[1.02]">
         
-        {/* Inner border */}
-        <div className="absolute inset-2 border-2 border-amber-500/40 rounded-lg pointer-events-none" />
-        <div className="absolute inset-3 border border-amber-500/20 rounded pointer-events-none" />
+        {/* Motif géométrique discret */}
+        <div 
+          className="absolute inset-0 opacity-10 pointer-events-none"
+          style={{
+            backgroundImage: `radial-gradient(circle at 10px 10px, #C9A05C 1px, transparent 0)`,
+            backgroundSize: '24px 24px',
+          }}
+        />
 
-        <div className="absolute inset-0 p-6 flex flex-col justify-between text-white">
+        {/* Double filet doré intérieur */}
+        <div className="absolute inset-2 border-2 border-[#C9A05C]/40 rounded-xl pointer-events-none" />
+        <div className="absolute inset-3 border border-[#C9A05C]/20 rounded-lg pointer-events-none" />
+
+        <div className="absolute inset-0 p-5 sm:p-6 flex flex-col justify-between text-[#FDFCF8]">
           <div className="text-center">
-            <h3 className="font-bold text-amber-500 tracking-widest text-xl drop-shadow-md">PASSEPORT DARIJA</h3>
-            <div className="text-slate-400 text-sm font-arabic">جواز سفر الدارجة</div>
+            <h3 className="font-serif font-bold text-[#C9A05C] tracking-[0.25em] text-lg sm:text-xl drop-shadow-xs uppercase">
+              PASSEPORT DARIJA
+            </h3>
+            <div className="text-[#E8E2D5]/70 text-xs sm:text-sm font-arabic mt-0.5">
+              جواز سفر الدارجة المغربية
+            </div>
           </div>
 
           <div className="flex justify-between items-end">
             <div>
-              <div className="text-slate-400 text-xs mb-1 uppercase tracking-wider">Titulaire</div>
-              <div className="font-bold text-2xl truncate max-w-[200px]">{data.userName || 'INVITÉ(E)'}</div>
+              <div className="text-[#E8E2D5]/60 text-[10px] sm:text-xs mb-0.5 uppercase tracking-widest font-semibold">Titulaire</div>
+              <div className="font-serif font-bold text-xl sm:text-2xl truncate max-w-[200px] text-[#FDFCF8]">
+                {data.userName || 'INVITÉ(E)'}
+              </div>
               
-              <div className="text-slate-400 text-xs mt-3 mb-1 uppercase tracking-wider">Niveau Validé</div>
-              <div className="font-bold text-sky-400 text-lg">{data.levelName}</div>
+              <div className="text-[#E8E2D5]/60 text-[10px] sm:text-xs mt-2.5 mb-0.5 uppercase tracking-widest font-semibold">Niveau Validé</div>
+              <div className="font-bold text-[#C9A05C] text-base sm:text-lg">{data.levelName}</div>
             </div>
 
-            <div className="flex flex-col items-center justify-center bg-slate-800/80 border-2 border-amber-500/50 rounded-full w-20 h-20 shadow-lg relative shrink-0">
-              <Award className="absolute -top-3 text-amber-500 w-6 h-6" />
-              <div className="font-bold text-amber-500 text-xl leading-none">{data.score}%</div>
-              <div className="text-[10px] text-slate-400 mt-1">SCORE</div>
+            <div className="flex flex-col items-center justify-center bg-[#1B2A4A] border-2 border-[#C9A05C] rounded-full w-18 h-18 sm:w-20 sm:h-20 shadow-lg relative shrink-0">
+              <Award className="absolute -top-3 text-[#C9A05C] w-5 h-5 sm:w-6 sm:h-6" />
+              <div className="font-serif font-bold text-[#C9A05C] text-lg sm:text-xl leading-none">{data.score}%</div>
+              <div className="text-[9px] text-[#E8E2D5]/70 mt-1 font-bold tracking-wider">SCORE</div>
             </div>
           </div>
           
-          <div className="flex justify-between items-center text-[10px] text-slate-500 font-mono mt-4 pt-2 border-t border-amber-500/20">
+          <div className="flex justify-between items-center text-[10px] text-[#E8E2D5]/60 font-mono mt-3 pt-2 border-t border-[#C9A05C]/20">
             <div>ID: {data.passportId}</div>
             <div>{data.date}</div>
           </div>
         </div>
         
-        {/* Red stamp overlay */}
-        <div className="absolute -bottom-4 right-1/4 transform -rotate-12 pointer-events-none opacity-40 mix-blend-screen">
-          <div className="border-4 border-red-500 text-red-500 font-bold text-3xl px-4 py-1 rounded-lg">VALIDÉ</div>
+        {/* Visa tamponné vert sauge */}
+        <div className="absolute -bottom-3 right-1/4 transform -rotate-12 pointer-events-none opacity-90">
+          <div className="border-3 border-[#7A9174] text-[#7A9174] font-bold text-2xl sm:text-3xl px-4 py-0.5 rounded-lg tracking-widest uppercase bg-[#1B2A4A]/60 backdrop-blur-xs">
+            VALIDÉ
+          </div>
         </div>
       </div>
 
-      <div className="flex gap-4 w-full">
+      <div className="flex gap-3 w-full">
         <button
           onClick={handleDownload}
           disabled={isExporting}
-          className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+          className="flex-1 bg-[#F7F3EA] hover:bg-[#E8E2D5] text-[#1B2A4A] border border-[#E8E2D5] font-bold py-3 px-4 rounded-full flex items-center justify-center gap-2 transition-colors disabled:opacity-50 text-xs sm:text-sm shadow-xs"
         >
-          <Download className="w-5 h-5" />
-          Enregistrer
+          <Download className="w-4 h-4" />
+          <span>Enregistrer</span>
         </button>
         
         <button
           onClick={handleShare}
           disabled={isExporting}
-          className="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-amber-500/20 disabled:opacity-50"
+          className="flex-1 bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] font-bold py-3 px-4 rounded-full flex items-center justify-center gap-2 transition-colors shadow-md disabled:opacity-50 text-xs sm:text-sm"
         >
-          {shareSuccess ? <Check className="w-5 h-5" /> : <Share2 className="w-5 h-5" />}
-          {shareSuccess ? 'Copié !' : 'Partager'}
+          {shareSuccess ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
+          <span>{shareSuccess ? 'Copié !' : 'Partager'}</span>
         </button>
       </div>
     </div>

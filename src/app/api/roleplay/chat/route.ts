@@ -40,27 +40,47 @@ export async function POST(req: NextRequest) {
 
     // 3. Auth & Quota Check
     const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'UNAUTHORIZED', message: 'Veuillez vous connecter pour utiliser l\'IA.' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
-    }
-
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-    const supabase = createClient(supabaseUrl, supabaseKey, {
-      global: { headers: { Authorization: authHeader } }
-    });
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: 'UNAUTHORIZED', message: 'Session invalide' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
-    }
+    if (authHeader && authHeader.startsWith('Bearer ') && authHeader.length > 10) {
+      // Utilisateur connecté avec session Supabase
+      const supabase = createClient(supabaseUrl, supabaseKey, {
+        global: { headers: { Authorization: authHeader } }
+      });
 
-    const { data: quotaOk, error: quotaError } = await supabase.rpc('consume_ai_quota');
-    if (quotaError) {
-      console.error('Erreur quota:', quotaError);
-    }
-    if (!quotaOk) {
-      return new Response(JSON.stringify({ error: 'QUOTA_EXCEEDED', message: 'Quota quotidien atteint' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (!authError && user) {
+        const { data: quotaOk, error: quotaError } = await supabase.rpc('consume_ai_quota');
+        if (quotaError) {
+          console.error('[Supabase Quota Error]:', quotaError);
+        }
+        if (!quotaOk) {
+          return new Response(JSON.stringify({ 
+            error: 'QUOTA_EXCEEDED', 
+            message: 'Quota quotidien de 8 messages atteint. Passez à Kenza Pro pour des conversations illimitées !' 
+          }), { status: 403, headers: { 'Content-Type': 'application/json' } });
+        }
+      }
+    } else {
+      // Mode Invité : Quota de découverte limité à 3 messages par IP et par jour
+      const guestTrialKey = `guest_${ip}`;
+      let trialRecord = rateLimit.get(guestTrialKey);
+      const guestDayMs = 24 * 60 * 60 * 1000;
+      
+      if (!trialRecord || now > trialRecord.resetAt) {
+        trialRecord = { count: 0, resetAt: now + guestDayMs };
+      }
+      trialRecord.count++;
+      rateLimit.set(guestTrialKey, trialRecord);
+
+      if (trialRecord.count > 3) {
+        return new Response(JSON.stringify({ 
+          error: 'QUOTA_EXCEEDED', 
+          guest: true,
+          message: 'Votre session d’essai gratuite de 3 messages est terminée. Connectez-vous ou débloquez Kenza Pro pour continuer !' 
+        }), { status: 403, headers: { 'Content-Type': 'application/json' } });
+      }
     }
 
     const { messages, personaId } = await req.json();

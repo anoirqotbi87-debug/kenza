@@ -166,19 +166,25 @@ export default function PlacementTestModal({ isOpen, onClose, onComplete }: Plac
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl w-full max-w-xl overflow-hidden flex flex-col shadow-2xl animate-in zoom-in-95 duration-300 relative">
+    <div className="fixed inset-0 z-50 bg-[#1B2A4A]/60 backdrop-blur-md flex items-center justify-center p-4">
+      <div className="bg-[#FDFCF8] rounded-3xl w-full max-w-xl overflow-hidden flex flex-col shadow-2xl border border-[#E8E2D5] animate-in zoom-in-95 duration-200 relative">
         
         {!showResult && (
-          <button onClick={handleClose} className="absolute top-4 right-4 p-2 text-slate-400 hover:bg-slate-100 rounded-full z-10">
+          <button 
+            onClick={handleClose} 
+            className="absolute top-4 right-4 p-2 text-[#7A7670] hover:text-[#1B2A4A] bg-[#F7F3EA] hover:bg-[#E8E2D5] border border-[#E8E2D5] rounded-full z-10 transition-colors shadow-xs"
+          >
             <X className="w-5 h-5" />
           </button>
         )}
 
         {/* Progress */}
         {!showResult && (
-          <div className="flex h-1.5 bg-slate-100">
-            <div className="bg-blue-500 transition-all duration-300" style={{ width: `${((currentQ) / PLACEMENT_QUESTIONS.length) * 100}%` }} />
+          <div className="flex h-2 bg-[#E8E2D5]">
+            <div 
+              className="bg-[#7A9174] transition-all duration-300" 
+              style={{ width: `${((currentQ) / PLACEMENT_QUESTIONS.length) * 100}%` }} 
+            />
           </div>
         )}
 
@@ -187,10 +193,10 @@ export default function PlacementTestModal({ isOpen, onClose, onComplete }: Plac
           {!showResult ? (
             <div className="space-y-6">
               <div className="mb-6">
-                <span className="inline-block px-3 py-1 bg-slate-100 text-slate-500 text-xs font-bold uppercase tracking-wider rounded-full mb-3">
+                <span className="inline-block px-3 py-1 bg-[#C9A05C]/20 border border-[#C9A05C]/40 text-[#C9A05C] text-xs font-bold uppercase tracking-wider rounded-full mb-3">
                   Question {currentQ + 1} / {PLACEMENT_QUESTIONS.length}
                 </span>
-                <h3 className="text-xl md:text-2xl font-bold text-slate-800">
+                <h3 className="font-serif text-xl md:text-2xl font-bold text-[#1B2A4A]">
                   {PLACEMENT_QUESTIONS[currentQ].q}
                 </h3>
               </div>
@@ -200,10 +206,10 @@ export default function PlacementTestModal({ isOpen, onClose, onComplete }: Plac
                   <button
                     key={i}
                     onClick={() => handleAnswer(i)}
-                    className={`w-full text-left p-4 rounded-xl border-2 font-medium transition-all ${
+                    className={`w-full text-left p-4 rounded-2xl border-2 font-medium transition-all text-xs sm:text-sm shadow-xs ${
                       selectedOption === i 
-                        ? 'border-blue-500 bg-blue-50 text-blue-700' 
-                        : 'border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50'
+                        ? 'border-[#C9A05C] bg-[#C9A05C]/15 text-[#1B2A4A] font-bold' 
+                        : 'border-[#E8E2D5] bg-[#FDFCF8] text-[#1B2A4A] hover:border-[#C9A05C]/60 hover:bg-[#F7F3EA]'
                     }`}
                   >
                     {opt}
@@ -213,40 +219,44 @@ export default function PlacementTestModal({ isOpen, onClose, onComplete }: Plac
               
               <button 
                 onClick={() => finishTest(score)}
-                className="mt-6 flex items-center justify-center gap-2 w-full py-3 text-slate-400 hover:text-slate-600 font-medium transition-colors"
+                className="mt-6 flex items-center justify-center gap-2 w-full py-3 text-[#7A7670] hover:text-[#1B2A4A] font-semibold text-xs transition-colors"
               >
                 <SkipForward className="w-4 h-4" />
-                Passer et commencer à zéro
+                <span>Passer et commencer à zéro</span>
               </button>
             </div>
           ) : (
             <div className="space-y-6 text-center animate-in fade-in slide-in-from-bottom-4">
-              <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center ${levelColor}`}>
+              <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center bg-[#C9A05C]/20 border-2 border-[#C9A05C]/40 text-[#C9A05C]">
                 <Award className="w-10 h-10" />
               </div>
               
               <div>
-                <h2 className="text-2xl font-black text-slate-800 mb-2">Test terminé !</h2>
-                <p className="text-slate-500">
-                  Vous avez obtenu un score de <strong className="text-slate-800">{score} / {PLACEMENT_QUESTIONS.length}</strong>.
+                <div className="text-[#C9A05C] text-xs font-bold tracking-[0.25em] uppercase mb-1">
+                  — Résultat
+                </div>
+                <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#1B2A4A] mb-1">Test terminé !</h2>
+                <p className="text-xs sm:text-sm text-[#7A7670]">
+                  Vous avez obtenu un score de <strong className="text-[#1B2A4A]">{score} / {PLACEMENT_QUESTIONS.length}</strong>.
                 </p>
               </div>
 
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                <p className="text-sm text-slate-500 mb-1">Niveau attribué</p>
-                <p className="text-xl font-bold text-slate-800">{levelAssigned}</p>
+              <div className="bg-[#F7F3EA] p-5 rounded-2xl border border-[#E8E2D5]">
+                <p className="text-xs text-[#7A7670] mb-1 uppercase tracking-wider font-semibold">Niveau attribué</p>
+                <p className="font-serif text-xl sm:text-2xl font-bold text-[#1B2A4A]">{levelAssigned}</p>
                 {score >= 3 && (
-                  <p className="text-sm text-emerald-600 font-medium mt-2">
-                    +{score >= 6 ? '350' : '150'} XP et visas débloqués !
+                  <p className="text-xs text-[#7A9174] font-bold mt-2">
+                    +{score >= 6 ? '350' : '150'} XP et visas officiels débloqués !
                   </p>
                 )}
               </div>
 
               <button 
                 onClick={handleClose}
-                className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-lg flex items-center justify-center gap-2 transition-colors mt-8"
+                className="w-full py-4 bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] font-bold rounded-full text-sm sm:text-base flex items-center justify-center gap-2 transition-all shadow-md active:scale-98 mt-6"
               >
-                {recommendation} <ArrowRight className="w-5 h-5" />
+                <span>{recommendation}</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           )}

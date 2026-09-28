@@ -38,9 +38,14 @@ const parseAiMessage = (content: string) => {
     fr = content.substring(frIndex + 4).trim();
   }
 
-  // Fallback (if tags missing)
-  if (arIndex === -1 && arzIndex === -1 && frIndex === -1) {
-    fr = content.trim();
+  // Repli robuste : si aucune balise reconnue ou si parsing incomplet
+  if (!ar && !arz && !fr) {
+    const hasArabicChars = /[\u0600-\u06FF]/.test(content);
+    if (hasArabicChars) {
+      ar = content.trim();
+    } else {
+      fr = content.trim();
+    }
   }
   
   return { ar, arz, fr };
@@ -138,31 +143,31 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-50 relative animate-in fade-in zoom-in-95 duration-200">
+    <div className="flex flex-col h-full bg-[#F7F3EA] relative animate-in fade-in zoom-in-95 duration-200">
       
       {toastMessage && (
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-50 bg-slate-800 text-white px-4 py-2 rounded-full shadow-lg text-sm flex items-center gap-2 animate-in slide-in-from-top-4">
-          <Save className="w-4 h-4 text-emerald-400" />
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-50 bg-[#1B2A4A] text-[#FDFCF8] border border-[#C9A05C]/40 px-4 py-2 rounded-full shadow-lg text-sm flex items-center gap-2 animate-in slide-in-from-top-4">
+          <Save className="w-4 h-4 text-[#C9A05C]" />
           {toastMessage}
         </div>
       )}
 
       {/* HEADER */}
-      <div className="bg-white px-4 py-3 flex items-center justify-between shadow-sm z-10 sticky top-0">
+      <div className="bg-[#FDFCF8] px-4 py-3.5 flex items-center justify-between shadow-xs border-b border-[#E8E2D5] z-10 sticky top-0">
         <div className="flex items-center gap-3">
-          <button onClick={onClose} className="p-2 -ml-2 rounded-full hover:bg-slate-100 text-slate-500">
+          <button onClick={onClose} className="p-2 -ml-2 rounded-full hover:bg-[#E8E2D5]/50 text-[#7A7670] hover:text-[#1B2A4A] transition-colors">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
           </button>
           <div>
-            <h2 className="font-bold text-slate-800 flex items-center gap-2">
+            <h2 className="font-serif font-bold text-[#1B2A4A] flex items-center gap-2 text-base sm:text-lg">
               {personaId === 'taxi' ? '🚕' : personaId === 'cafe' ? '☕' : '🏺'} {persona.name}
             </h2>
-            <p className="text-xs text-slate-500 line-clamp-1">{persona.context}</p>
+            <p className="text-xs text-[#7A7670] line-clamp-1">{persona.context}</p>
           </div>
         </div>
         <button 
           onClick={() => setShowImmersion(!showImmersion)}
-          className={`text-xs px-3 py-1.5 rounded-full font-bold transition-colors ${showImmersion ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-600'}`}
+          className={`text-xs px-3 py-1.5 rounded-full font-bold transition-colors border ${showImmersion ? 'bg-[#C9A05C]/20 border-[#C9A05C]/40 text-[#1B2A4A]' : 'bg-[#F7F3EA] border-[#E8E2D5] text-[#7A7670]'}`}
         >
           {showImmersion ? 'Immersion: ON' : 'Immersion: OFF'}
         </button>
@@ -171,18 +176,18 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
       {/* CHAT AREA */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-32">
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-center p-6 opacity-60">
-            <div className="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center mb-4 text-3xl">
+          <div className="flex flex-col items-center justify-center h-full text-center p-6 opacity-75">
+            <div className="w-16 h-16 rounded-full bg-[#C9A05C]/15 border border-[#C9A05C]/30 flex items-center justify-center mb-4 text-3xl">
               {personaId === 'taxi' ? '🚕' : personaId === 'cafe' ? '☕' : '🏺'}
             </div>
-            <p className="text-slate-600 font-medium">L'agent est prêt. Envoyez "Salam" pour commencer !</p>
+            <p className="text-[#1B2A4A] font-medium text-sm">L'agent est prêt. Envoyez "Salam" pour commencer !</p>
           </div>
         )}
 
         {error && (
-          <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm flex items-center justify-between">
-            <span>Erreur de connexion avec l'agent.</span>
-            <button onClick={() => reload()} className="flex items-center gap-1 hover:underline"><RefreshCw className="w-4 h-4"/> Réessayer</button>
+          <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-2xl text-sm flex items-center justify-between shadow-xs">
+            <span>Erreur de communication avec l'agent.</span>
+            <button onClick={() => reload()} className="flex items-center gap-1 font-bold hover:underline"><RefreshCw className="w-4 h-4"/> Réessayer</button>
           </div>
         )}
 
@@ -192,10 +197,10 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
 
           return (
             <div key={m.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[85%] rounded-2xl p-4 shadow-sm relative group ${
+              <div className={`max-w-[85%] rounded-2xl p-4 shadow-xs relative group ${
                 isUser 
-                  ? 'bg-blue-600 text-white rounded-br-none' 
-                  : 'bg-white border border-slate-100 rounded-bl-none text-slate-800'
+                  ? 'bg-[#1B2A4A] text-[#FDFCF8] rounded-br-none' 
+                  : 'bg-[#FDFCF8] border border-[#E8E2D5] rounded-bl-none text-[#1B2A4A]'
               }`}>
                 
                 {isUser ? (
@@ -203,22 +208,22 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
                 ) : (
                   <div className="space-y-2">
                     {ar && (
-                      <p className="text-xl font-bold font-arabic text-right leading-relaxed" dir="rtl">
+                      <p className="text-xl font-bold font-arabic text-right leading-relaxed text-[#1B2A4A]" dir="rtl">
                         {ar}
                       </p>
                     )}
                     
                     {(!showImmersion || !ar) && (
-                      <div className="pt-2 border-t border-slate-100 space-y-1 mt-2">
-                        {arz && <p className="text-sm font-bold text-slate-700">{arz}</p>}
-                        {fr && <p className="text-sm text-slate-500">{fr}</p>}
+                      <div className="pt-2 border-t border-[#E8E2D5] space-y-1 mt-2">
+                        {arz && <p className="text-sm font-bold text-[#1B2A4A]">{arz}</p>}
+                        {fr && <p className="text-xs sm:text-sm text-[#7A7670]">{fr}</p>}
                       </div>
                     )}
                     
                     {/* Action Rapide : Sauvegarder dans SRS */}
                     <button 
                       onClick={() => handleSaveToSRS(ar, arz, fr)}
-                      className="absolute -right-3 -top-3 bg-white border border-slate-200 text-indigo-500 rounded-full p-1.5 shadow-md opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity hover:bg-indigo-50 hover:scale-110"
+                      className="absolute -right-3 -top-3 bg-[#FDFCF8] border border-[#E8E2D5] text-[#C9A05C] rounded-full p-1.5 shadow-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity hover:bg-[#C9A05C]/15 hover:scale-110"
                       title="Sauvegarder dans mon carnet (SRS)"
                     >
                       <Save className="w-4 h-4" />
@@ -231,8 +236,8 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
         })}
         {isLoading && messages.length > 0 && messages[messages.length - 1].role === 'user' && (
           <div className="flex justify-start">
-            <div className="bg-white border border-slate-100 rounded-2xl rounded-bl-none p-4 shadow-sm">
-              <Loader2 className="w-5 h-5 text-slate-400 animate-spin" />
+            <div className="bg-[#FDFCF8] border border-[#E8E2D5] rounded-2xl rounded-bl-none p-4 shadow-xs">
+              <Loader2 className="w-5 h-5 text-[#C9A05C] animate-spin" />
             </div>
           </div>
         )}
@@ -240,17 +245,17 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
       </div>
 
       {/* INPUT AREA OR COMPLETION */}
-      <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 pb-safe z-20">
+      <div className="absolute bottom-0 left-0 right-0 bg-[#FDFCF8] border-t border-[#E8E2D5] p-4 pb-safe z-20">
         
         {messages.length >= 8 ? (
           <div className="flex flex-col items-center gap-3">
-            <p className="text-sm font-bold text-emerald-600">Mission accomplie ! Vous avez tenu la conversation.</p>
+            <p className="text-sm font-bold text-[#7A9174]">Mission accomplie ! Vous avez tenu la conversation.</p>
             <button
               onClick={() => {
                 useAppStore.getState().addXp(25);
                 onClose();
               }}
-              className="w-full max-w-sm py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold transition-colors shadow-sm"
+              className="w-full max-w-sm py-3.5 bg-[#7A9174] hover:bg-[#687f63] text-white rounded-full font-bold transition-colors shadow-xs"
             >
               Récupérer mes +25 XP et Quitter
             </button>
@@ -265,7 +270,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
                 className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all ${
                   isListening 
                     ? 'bg-red-50 text-red-500 animate-pulse ring-4 ring-red-100' 
-                    : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                    : 'bg-[#F7F3EA] border border-[#E8E2D5] text-[#7A7670] hover:text-[#1B2A4A]'
                 }`}
               >
                 {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
@@ -273,7 +278,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
             )}
 
             <input
-              className="flex-1 bg-slate-50 border border-slate-200 rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
+              className="flex-1 bg-[#F7F3EA] border border-[#E8E2D5] rounded-full px-5 py-3 text-sm text-[#1B2A4A] placeholder-[#7A7670]/60 focus:outline-none focus:ring-2 focus:ring-[#C9A05C] transition-colors"
               value={input}
               onChange={handleInputChange}
               placeholder={isListening ? "Écoute en cours (parlez)..." : "Votre message en Darija ou Français..."}
@@ -283,7 +288,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
             <button
               type="submit"
               disabled={isLoading || !input.trim()}
-              className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors shadow-md"
+              className="flex-shrink-0 w-12 h-12 rounded-full bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-xs active:scale-95"
             >
               {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5 ml-0.5" />}
             </button>

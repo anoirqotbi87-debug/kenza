@@ -154,16 +154,10 @@ export default function Header({ currentTab, onTabChange }: HeaderProps) {
               <Headphones className="w-4 h-4" />
             </button>
 
-            {/* Avatar Circulaire */}
+            {/* Avatar Circulaire - Always navigates to Profile tab */}
             <button
-              onClick={() => {
-                if (user) {
-                  onTabChange('profile');
-                } else {
-                  setIsAuthModalOpen(true);
-                }
-              }}
-              title={user ? (user.user_metadata?.full_name || user.email) : "Se connecter"}
+              onClick={() => onTabChange('profile')}
+              title={user ? (user.user_metadata?.full_name || user.email) : "Profil & Passeport Culturel"}
               className="w-9 h-9 rounded-full bg-[#C9A05C]/15 border border-[#C9A05C] text-[#1B2A4A] flex items-center justify-center hover:ring-2 hover:ring-[#C9A05C]/40 transition-all overflow-hidden"
             >
               {user?.user_metadata?.avatar_url ? (
