@@ -59,7 +59,7 @@ export default function RevisionsPage() {
           <div className="space-y-6">
             <section className="bg-[#FDFCF8] rounded-2xl border border-[#E8E2D5] p-6 shadow-xs">
               <h2 className="font-serif text-lg font-bold text-[#1B2A4A] mb-4 flex items-center gap-2">
-                <Flame className="w-5 h-5 text-[#C9A05C]" /> {isAr ? 'خريطة النشاط' : lang === 'en' ? 'Activity Map' : 'Carte d'activité'}
+                <Flame className="w-5 h-5 text-[#C9A05C]" /> {isAr ? 'خريطة النشاط' : lang === 'en' ? 'Activity Map' : 'Carte d’activité'}
               </h2>
               <StreakHeatmap />
             </section>

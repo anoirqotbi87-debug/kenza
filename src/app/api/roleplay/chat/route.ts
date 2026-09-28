@@ -98,7 +98,6 @@ export async function POST(req: NextRequest) {
     return result.toDataStreamResponse();
   } catch (error) {
     console.error('API Roleplay Chat Error:', error);
-    return new Response('Internal Server Error', { s
-tatus: 500 });
+    return new Response('Internal Server Error', { status: 500 });
   }
 }
