@@ -3,40 +3,35 @@ import { readFileSync, writeFileSync } from 'node:fs';
 const p = 'src/app/page.tsx';
 let src = readFileSync(p, 'utf8');
 let changed = false;
-
 const count = (s, sub) => s.split(sub).length - 1;
 
-const OLD_TOGGLE = "            <div className=\"lang-switcher\" role=\"group\" aria-label=\"Sélecteur de langue\">\n              <Globe size={13} className=\"lang-icon\" />\n              <button\n                type=\"button\"\n                onClick={() => setLanguage(\"fr\")}\n                className={`lang-btn ${uiLanguage !== \"ar\" ? \"lang-btn-active\" : \"\"}`}\n                aria-label=\"Passer en français\"\n              >\n                FR\n              </button>\n              <span className=\"lang-sep\">|</span>\n              <button\n                type=\"button\"\n                onClick={() => setLanguage(\"ar\")}\n                className={`lang-btn ${uiLanguage === \"ar\" ? \"lang-btn-active\" : \"\"}`}\n                aria-label=\"Passer en arabe\"\n              >\n                AR\n              </button>\n            </div>";
-const NEW_TOGGLE = "            <div className=\"lang-switcher\" role=\"group\" aria-label=\"Sélecteur de langue\">\n              <Globe size={13} className=\"lang-icon\" />\n              <button\n                type=\"button\"\n                onClick={() => setLanguage(\"fr\")}\n                className={`lang-btn ${uiLanguage === \"fr\" ? \"lang-btn-active\" : \"\"}`}\n                aria-label=\"Passer en français\"\n              >\n                FR\n              </button>\n              <span className=\"lang-sep\">|</span>\n              <button\n                type=\"button\"\n                onClick={() => setLanguage(\"en\")}\n                className={`lang-btn ${uiLanguage === \"en\" ? \"lang-btn-active\" : \"\"}`}\n                aria-label=\"Switch to English\"\n              >\n                EN\n              </button>\n              <span className=\"lang-sep\">|</span>\n              <button\n                type=\"button\"\n                onClick={() => setLanguage(\"es\")}\n                className={`lang-btn ${uiLanguage === \"es\" ? \"lang-btn-active\" : \"\"}`}\n                aria-label=\"Cambiar a español\"\n              >\n                ES\n              </button>\n              <span className=\"lang-sep\">|</span>\n              <button\n                type=\"button\"\n                onClick={() => setLanguage(\"ar\")}\n                className={`lang-btn ${uiLanguage === \"ar\" ? \"lang-btn-active\" : \"\"}`}\n                aria-label=\"Passer en arabe\"\n              >\n                AR\n              </button>\n            </div>";
-const NAV_ANCHOR = "{item.id === \"review\" && <span className=\"nav-count\">4</span>}\n              </button>\n            );\n          })}\n        </nav>";
-const NAV_APPEND = "\n\n        <div className=\"sidebar-label\">EXPLORER</div>\n        <nav className=\"side-nav\" aria-label=\"Ressources d'étude\">\n          <a href=\"/etudier\" className=\"nav-item\">\n            <span>Étudier — Modules complets</span>\n          </a>\n          <a href=\"/grammaire\" className=\"nav-item\">\n            <span>Grammaire active</span>\n          </a>\n          <a href=\"/parler\" className=\"nav-item\">\n            <span>Pratique orale</span>\n          </a>\n          <a href=\"/revisions\" className=\"nav-item\">\n            <span>Révisions SRS</span>\n          </a>\n        </nav>";
+// ---------- Patch 3: wire translations to nav labels (idempotent) ----------
+const IMPORT_LINE = "import { useAppStore } from \"@/store/useAppStore\";";
+const NEW_IMPORT = 'import { useAppStore, useTranslation } from "@/store/useAppStore";';
+const STORE_DESTRUCT = "  } = useAppStore();";
+const T_HOOK = STORE_DESTRUCT + '\n\n  const { t } = useTranslation();\n  const navLabel = (id: string) => {\n    const key =\n      id === "today" ? "home"\n      : id === "path" ? "parcours"\n      : id === "phrases" ? "phrasebook"\n      : id === "review" ? "review"\n      : null;\n    return key ? ((t as any).nav?.[key] as string | undefined) : undefined;\n  };';
+const OLD_LABEL = "{item.label}";
+const NEW_LABEL = '{navLabel(item.id) || item.label}';
 
-// --- Patch 1: language toggle (idempotent) ---
-if (!src.includes('Cambiar a español')) {
-  const n = count(src, OLD_TOGGLE);
-  if (n === 1) {
-    src = src.replace(OLD_TOGGLE, NEW_TOGGLE);
+if (!src.includes('navLabel(item.id)')) {
+  if (count(src, IMPORT_LINE) === 1) {
+    src = src.replace(IMPORT_LINE, NEW_IMPORT);
     changed = true;
-    console.log('patched: language toggle -> 4 languages (FR/EN/ES/AR)');
-  } else {
-    console.log('toggle pattern not unique, count:', n);
+    console.log('patched: useTranslation import');
+  }
+  if (count(src, STORE_DESTRUCT) === 1) {
+    src = src.replace(STORE_DESTRUCT, T_HOOK);
+    changed = true;
+    console.log('patched: t + navLabel hook');
+  }
+  const n = count(src, OLD_LABEL);
+  if (n >= 1) {
+    src = src.split(OLD_LABEL).join(NEW_LABEL);
+    changed = true;
+    console.log('patched: ' + n + ' nav label(s) -> translated');
   }
 } else {
-  console.log('toggle already patched');
-}
-
-// --- Patch 2: EXPLORER sidebar section (idempotent) ---
-if (!src.includes('sidebar-label">EXPLORER')) {
-  const n = count(src, NAV_ANCHOR);
-  if (n === 1) {
-    src = src.replace(NAV_ANCHOR, NAV_ANCHOR + NAV_APPEND);
-    changed = true;
-    console.log('patched: EXPLORER sidebar section added');
-  } else {
-    console.log('nav anchor not unique, count:', n);
-  }
-} else {
-  console.log('EXPLORER already present');
+  console.log('i18n nav labels already patched');
 }
 
 if (!changed) {
