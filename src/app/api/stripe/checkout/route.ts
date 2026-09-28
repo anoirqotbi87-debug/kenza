@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
             product_data: {
               name: planConfig.name,
               description: planConfig.description,
-              images: ['https://kenza.vercel.app/icons/icon-512x512.png'],
+              images: ['https://kenza-dusky.vercel.app/icons/icon-512x512.png'],
             },
             unit_amount: planConfig.unitAmount,
             recurring: {

@@ -1,7 +1,7 @@
 // Allowlist stricte des origines autorisées pour les redirections Stripe.
 // Évite la manipulation des success_url / cancel_url / return_url via des headers clients.
 
-const PRODUCTION_ORIGIN = process.env.NEXT_PUBLIC_APP_URL || 'https://kenza.vercel.app';
+const PRODUCTION_ORIGIN = process.env.NEXT_PUBLIC_APP_URL || 'https://kenza-dusky.vercel.app';
 
 const ALLOWED_ORIGIN_REGEX =
   /^https:\/\/([a-z0-9][a-z0-9-]*\.)?vercel\.app$/i;
