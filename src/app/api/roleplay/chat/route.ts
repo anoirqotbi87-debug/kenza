@@ -45,7 +45,8 @@ export async function POST(req: NextRequest) {
           return new Response(JSON.stringify({
             error: 'QUOTA_EXCEEDED',
             message: 'Quota quotidien de 8 messages atteint. Passez à Kenza Pro pour des conversations illimitées !'
-          }), { status: 403, headers: { 'Content-Type': 'application/json' } });
+          }), 
+{ status: 403, headers: { 'Content-Type': 'application/json' } });
         }
       }
     } else {
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest) {
         return new Response(JSON.stringify({
           error: 'QUOTA_EXCEEDED',
           guest: true,
-          message: 'Votre session d'essai gratuite de 3 messages est terminée. Connectez-vous ou débloquez Kenza Pro pour continuer !'
+          message: 'Votre session d\'essai gratuite de 3 messages est terminée. Connectez-vous ou débloquez Kenza Pro pour continuer !'
         }), { status: 403, headers: { 'Content-Type': 'application/json' } });
       }
     }
@@ -97,6 +98,7 @@ export async function POST(req: NextRequest) {
     return result.toDataStreamResponse();
   } catch (error) {
     console.error('API Roleplay Chat Error:', error);
-    return new Response('Internal Server Error', { status: 500 });
+    return new Response('Internal Server Error', { s
+tatus: 500 });
   }
 }

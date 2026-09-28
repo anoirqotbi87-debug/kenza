@@ -40,7 +40,8 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
   const aiPersonasList = Object.values(personas);
 
   const dialoguesTitle = isAr ? 'حوارات مُعدّة (وضعيات حقيقية)' : lang === 'en' ? 'Scripted Dialogues (Real Situations)' : 'Dialogues scénarisés (Situations réelles)';
-  const dialoguesDesc = isAr ? 'تدرّب على مواقف يومية حقيقية مع تصحيح تلقائي' : lang === 'en' ? 'Practice real everyday situations with automatic correction' : 'Entraîne-toi sur des situations réelles avec correction automatique';
+  const dialoguesDesc 
+= isAr ? 'تدرّب على مواقف يومية حقيقية مع تصحيح تلقائي' : lang === 'en' ? 'Practice real everyday situations with automatic correction' : 'Entraîne-toi sur des situations réelles avec correction automatique';
   const exploreTitle = isAr ? 'استكشف المزيد' : lang === 'en' ? 'Explore More' : 'Explorer plus';
 
   const scenarioCategoryIcon = (category: string) => {
@@ -77,7 +78,8 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
         <div className="flex items-center justify-between p-6 sm:p-7 border-b border-[#1B2A4A] bg-[#1B2A4A] text-[#FDFCF8] relative">
      
      <div>
-            <div className="flex items-center gap-2 text-[#C9A05C] text-xs font-bold tracking-[0.22em] uppercase mb-1">
+            <
+div className="flex items-center gap-2 text-[#C9A05C] text-xs font-bold tracking-[0.22em] uppercase mb-1">
               <span>—</span>
               <span>Immersion Active</span>
             </div>
@@ -114,7 +116,8 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
                   : lang === 'en'
                     ? 'Interactive AI roleplay requires an internet connection. Meanwhile, your curriculum modules and review cards work 100% offline!'
                     : 'Les
- conversations libres avec l\'IA nécessitent une connexion réseau. En attendant, vos modules de cours et vos cartes de révision espacée sont 100 % opérationnels hors-ligne !'}
+ conversations libres a
+vec l\'IA nécessitent une connexion réseau. En attendant, vos modules de cours et vos cartes de révision espacée sont 100 % opérationnels hors-ligne !'}
               </p>
               <div className="flex gap-3">
                 <button 
@@ -160,7 +163,8 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
                   key={persona.id} 
                   onClick={handleCardClick}
                   className={`bg-[#
-FDFCF8] rounded-2xl border border-[#E8E2D5] p-5 transition-all cursor-pointer group flex flex-col justify-between relative shadow-xs hover:border-[#C9A05C] hover:shadow-md ${
+FDFCF8] rounded-2xl bo
+rder border-[#E8E2D5] p-5 transition-all cursor-pointer group flex flex-col justify-between relative shadow-xs hover:border-[#C9A05C] hover:shadow-md ${
                     isLocked ? 'opacity-80' : ''
                   } ${!isOnline ? 'opacity-60' : ''}`}
                 >
@@ -195,7 +199,8 @@ FDFCF8] rounded-2xl border border-[#E8E2D5] p-5 transition-all cursor-pointer gr
                   
 </div>
 
-                  <div className="pt-4 mt-3 border-t border-[#E8E2D5]/60 flex justify-between items-center text-xs">
+             
+     <div className="pt-4 mt-3 border-t border-[#E8E2D5]/60 flex justify-between items-center text-xs">
                     <div className="flex items-center gap-1.5 text-[#7A7670]">
                       <MapPin className="w-3.5 h-3.5 text-[#C9A05C]" />
                       <span className="font-medium">{persona.id === 'taxi' ? 'Fès Médina' : persona.id === 'souk' ? 'Grand Souk' : 'Café Populaire'}</span>
@@ -228,7 +233,8 @@ FDFCF8] rounded-2xl border border-[#E8E2D5] p-5 transition-all cursor-pointer gr
                   >
                     <div>
                       <div className="flex justify-between items-start mb-3">
-                        <div className="text-3xl w-12 h-12 rounded-2xl bg-[#F7F3EA] border border-[#E8E2D5] flex items-center justify-center">
+                        <div className="text-3x
+l w-12 h-12 rounded-2xl bg-[#F7F3EA] border border-[#E8E2D5] flex items-center justify-center">
                           {scenarioCategoryIcon(s.category)}
                         </div>
                         {isLocked ? (
@@ -260,7 +266,8 @@ FDFCF8] rounded-2xl border border-[#E8E2D5] p-5 transition-all cursor-pointer gr
 
           {/* Section 3 : Explorer plus */}
           <div className="mt-8">
-            <h3 className="font-serif text-lg font-bold text-[#1B2A4A] mb-3">{exploreTitle}</h3>
+            <h3 className="font-serif text-lg font-bold text-[#1B2A4A] mb-3">{exploreTitle}</h3
+>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {explorerLinks.map(({ href, icon: Icon, label }) => (
                 <Link
