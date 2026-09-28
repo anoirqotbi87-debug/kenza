@@ -4,6 +4,7 @@ import React from 'react';
 import { ArrowRight, Sparkles, BookOpen, Compass } from 'lucide-react';
 import { useAppStore, useTranslation } from '@/store/useAppStore';
 import { allLessonsList } from '@/data/curriculum';
+import { getLocalizedText } from '@/lib/i18n/utils';
 
 interface HeroBannerProps {
   onPrimaryAction: () => void;
@@ -19,6 +20,8 @@ export default function HeroBanner({
   secondaryActionLabel,
 }: HeroBannerProps) {
   const { completedLessons, streakDays, xp } = useAppStore();
+  const rawLang = useAppStore((state) => state.uiLanguage || 'fr');
+  const lang = String(rawLang).toLowerCase() as 'fr' | 'en' | 'es' | 'ar';
   const { t } = useTranslation();
 
   // Find next uncompleted lesson
@@ -80,7 +83,7 @@ export default function HeroBanner({
               onClick={onPrimaryAction}
               className="inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-full bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] font-bold text-sm sm:text-base shadow-md hover:shadow-xl transition-all duration-200 active:scale-95 group"
             >
-              <span>{primaryActionLabel || `Continuer : ${nextLesson?.title?.fr || 'Leçon suivante'}`}</span>
+              <span>{primaryActionLabel || `Continuer : ${getLocalizedText(nextLesson?.title, lang) || 'Leçon suivante'}`}</span>
               <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
             </button>
 
