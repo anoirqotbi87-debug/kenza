@@ -1,17 +1,26 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 
-// ---------- content i18n via tr() helper (idempotent) ----------
+// ---------- Patch 11: module-level tr() helper (fixes "Cannot find name 'tr'" in other components) ----------
 const p = 'src/app/page.tsx';
 let src = readFileSync(p, 'utf8');
 const count = (s, sub) => s.split(sub).length - 1;
+
 const HELPER_ANCHOR = '  const { t } = useTranslation();';
-const TR_HELPER = HELPER_ANCHOR + '\n  const tr = (fr: string, en: string, es: string, ar: string) =>\n    uiLanguage === "en" ? en : uiLanguage === "es" ? es : uiLanguage === "ar" ? ar : fr;';
-if (!src.includes('const tr = (fr: string')) {
-  if (count(src, HELPER_ANCHOR) === 1) {
-    src = src.replace(HELPER_ANCHOR, TR_HELPER);
-    console.log('patched: tr() helper injected');
+const LOCAL_TR = HELPER_ANCHOR + '\n  const tr = (fr: string, en: string, es: string, ar: string) =>\n    uiLanguage === "en" ? en : uiLanguage === "es" ? es : uiLanguage === "ar" ? ar : fr;';
+// 1. remove the component-local helper if present
+if (src.includes(LOCAL_TR)) {
+  src = src.replace(LOCAL_TR, HELPER_ANCHOR);
+  console.log('removed local tr() helper');
+}
+// 2. insert module-level helper after the store import
+const IMPORT_ANCHOR = 'import { useAppStore, useTranslation } from "@/store/useAppStore";';
+const MODULE_TR = IMPORT_ANCHOR + '\n\nconst tr = (fr: string, en: string, es: string, ar: string) => {\n  const lang = useAppStore.getState().uiLanguage;\n  return lang === "en" ? en : lang === "es" ? es : lang === "ar" ? ar : fr;\n};';
+if (!src.includes('const lang = useAppStore.getState().uiLanguage')) {
+  if (count(src, IMPORT_ANCHOR) === 1) {
+    src = src.replace(IMPORT_ANCHOR, MODULE_TR);
+    console.log('inserted module-level tr() helper');
   } else {
-    console.log('ERROR: helper anchor not unique');
+    console.log('ERROR: import anchor not unique (' + count(src, IMPORT_ANCHOR) + ')');
   }
 }
 
@@ -36,15 +45,10 @@ for (const r of TABLE) {
 console.log('translated ' + applied + ' strings, already ' + already + ', missing ' + missing);
 if (applied > 0) writeFileSync(p, src);
 
-// ---------- Patch 10: dump out-of-scope tr() region for analysis ----------
+// dump tr() line numbers for verification
 {
   const lines = src.split('\n');
   const trLines = [];
   lines.forEach((l, i) => { if (l.includes('{tr("')) trLines.push(i + 1); });
-  const from = Math.max(0, (trLines[0] || 1100) - 80);
-  const to = Math.min(lines.length, (trLines[trLines.length - 1] || 1310) + 5);
-  const dump = lines.slice(from, to).map((l, i) => (from + i + 1) + '|' + l).join('\n');
-  writeFileSync('docs/scope-page.txt', 'trLines: ' + trLines.join(',') + '\n' + dump);
-  console.log('scope dump: ' + trLines.length + ' tr() lines, range ' + (from+1) + '-' + (to+1));
+  console.log('tr() usage lines: ' + trLines.join(','));
 }
-
