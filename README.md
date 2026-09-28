@@ -48,12 +48,16 @@ L'application est construite avec **Next.js 16**, **React 19**, **Tailwind CSS 4
 
 ## 🗄️ Base de données (Supabase)
 
-Appliquez les scripts SQL **dans l'ordre** via le **SQL Editor** de Supabase :
+Appliquez les scripts SQL **dans l'ordre** (ordre chronologique des fichiers) via le **SQL Editor** de Supabase — tout est dans `supabase/migrations/` :
 
-1. `supabase/schema.sql` — tables de base (profiles, lesson_progress, srs_items, user_checkpoints) + RLS
-2. `supabase/migrations/20260927130000_fix_qa_audit.sql`
-3. `supabase/migrations/20260927235000_monetization_quotas.sql` — quotas IA + abonnements
-4. `supabase/20260927_secure_xp_and_checkpoints.sql` — durcissement RLS (anti-triche XP, RPC)
+1. `0001_init_schema.sql` — tables de base (profiles, lesson_progress, srs_items, user_checkpoints) + RLS
+2. `20260927090000_secure_xp_and_checkpoints.sql` — durcissement RLS (anti-triche XP, RPC)
+3. `20260927130000_fix_qa_audit.sql` — durcissement des RPC (prérequis, certificats générés côté serveur)
+4. `20260927235000_monetization_quotas.sql` — quotas IA + abonnements Kenza Pro
+5. `20260928120000_rate_limiting.sql` — rate-limiting durable des API
+6. `20260928130000_rls_regression_tests.sql` — script de tests manuel (optionnel)
+
+Les scripts obsolètes sont archivés dans `supabase/archive/` (ne pas exécuter).
 
 ## 💳 Stripe (Kenza Pro)
 
