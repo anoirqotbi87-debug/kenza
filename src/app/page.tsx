@@ -704,10 +704,28 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => setLanguage("fr")}
-                className={`lang-btn ${uiLanguage !== "ar" ? "lang-btn-active" : ""}`}
+                className={`lang-btn ${uiLanguage === "fr" ? "lang-btn-active" : ""}`}
                 aria-label="Passer en français"
               >
                 FR
+              </button>
+              <span className="lang-sep">|</span>
+              <button
+                type="button"
+                onClick={() => setLanguage("en")}
+                className={`lang-btn ${uiLanguage === "en" ? "lang-btn-active" : ""}`}
+                aria-label="Switch to English"
+              >
+                EN
+              </button>
+              <span className="lang-sep">|</span>
+              <button
+                type="button"
+                onClick={() => setLanguage("es")}
+                className={`lang-btn ${uiLanguage === "es" ? "lang-btn-active" : ""}`}
+                aria-label="Cambiar a español"
+              >
+                ES
               </button>
               <span className="lang-sep">|</span>
               <button
