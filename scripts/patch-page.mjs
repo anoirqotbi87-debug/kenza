@@ -1,162 +1,59 @@
-// patch-page.mjs v33 — i18n UI: 4-lang (fr/en/es/ar) OnboardingModal, PlacementTestModal, ProfileView, NotificationSettings. Previous fixes kept idempotent.
-import fs from "node:fs";
-const report = [];
-function fix(path, name, oldS, newS) {
-  let s = fs.readFileSync(path, "utf8");
-  if (!s.includes(oldS)) {
-    report.push(s.includes(newS) ? name + ": OK (already)" : name + ": MISSING");
-    return;
-  }
-  const n = s.split(oldS).length - 1;
-  if (n !== 1) { report.push(name + ": AMBIGUOUS (" + n + ")"); return; }
-  s = s.replace(oldS, newS);
-  fs.writeFileSync(path, s);
-  report.push(name + ": OK");
+import fs from 'fs';
+const report = {};
+function apply(path, name, oldS, newS) {
+  let c;
+  try { c = fs.readFileSync(path, 'utf8'); } catch (e) { report[name] = 'NOFILE'; return; }
+  const n = c.split(oldS).length - 1;
+  if (n === 0) { report[name] = c.includes(newS) ? 'OK (already)' : 'MISSING'; return; }
+  if (n > 1) { report[name] = 'AMBIGUOUS (' + n + ')'; return; }
+  fs.writeFileSync(path, c.split(oldS).join(newS));
+  report[name] = 'OK';
 }
-function prepend(path, name, header) {
-  let s = fs.readFileSync(path, "utf8");
-  if (s.startsWith(header)) { report.push(name + ": OK (already)"); return; }
-  fs.writeFileSync(path, header + "\n" + s);
-  report.push(name + ": OK");
+function applyRx(path, name, rx, newS) {
+  let c;
+  try { c = fs.readFileSync(path, 'utf8'); } catch (e) { report[name] = 'NOFILE'; return; }
+  const m = c.match(rx);
+  if (!m) { report[name] = c.includes(newS) ? 'OK (already)' : 'MISSING'; return; }
+  if (m.length > 1) { report[name] = 'AMBIGUOUS (' + m.length + ')'; return; }
+  fs.writeFileSync(path, c.split(m[0]).join(newS));
+  report[name] = 'OK';
 }
 
-fix("src/components/onboarding/OnboardingModal.tsx", "OB-dict", "const GOALS = [", "const OB_STR = {\n  fr: { welcome: \"Bienvenue sur KENZA 👋\", goalQuestion: \"Quel est votre objectif principal avec la Darija ?\",\n    goals: { travel: { title: \"Voyage & Découverte\", desc: \"Souk, taxi, politesse\" }, expat: { title: \"Installation & Expatriation\", desc: \"Administratif, logement\" }, family: { title: \"Famille & Conjoint\", desc: \"Vocabulaire chaleureux\" } },\n    tempoTitle: \"Votre rythme idéal ⏱️\", tempoQuestion: \"Combien de temps souhaitez-vous y consacrer par jour ?\",\n    tempos: { 5: { title: \"Tranquille\", desc: \"5 min / jour\" }, 10: { title: \"Régulier\", desc: \"10 min / jour\" }, 15: { title: \"Intensif\", desc: \"15 min / jour\" } },\n    levelQuestion: \"Quel est votre niveau ? 🇲🇦\", levelHint: \"Pour vous proposer le meilleur point de départ.\",\n    beginner: \"Je débute complètement\", beginnerHint: \"Commencer depuis le Module 1\",\n    notions: \"J'ai déjà des notions\", notionsHint: \"Test rapide de 2 min pour sauter des niveaux\",\n    done: \"Profil configuré !\", youScored: \"Vous avez eu\",\n    bravo: \"Bravo ! Vous semblez avoir les bases. Vous pourrez commencer direct au Module 2.\",\n    parfait: \"Parfait ! Nous allons commencer par les fondations doucement.\", start: \"Commencer l'aventure\" },\n  en: { welcome: \"Welcome to KENZA 👋\", goalQuestion: \"What is your main goal with Darija?\",\n    goals: { travel: { title: \"Travel & Discovery\", desc: \"Souk, taxi, politeness\" }, expat: { title: \"Moving & Expat Life\", desc: \"Admin, housing\" }, family: { title: \"Family & Partner\", desc: \"Warm vocabulary\" } },\n    tempoTitle: \"Your ideal pace ⏱️\", tempoQuestion: \"How much time do you want to spend per day?\",\n    tempos: { 5: { title: \"Relaxed\", desc: \"5 min / day\" }, 10: { title: \"Regular\", desc: \"10 min / day\" }, 15: { title: \"Intensive\", desc: \"15 min / day\" } },\n    levelQuestion: \"What's your level? 🇲🇦\", levelHint: \"So we can suggest the best starting point.\",\n    beginner: \"I'm a complete beginner\", beginnerHint: \"Start from Module 1\",\n    notions: \"I already know some\", notionsHint: \"Quick 2-min test to skip levels\",\n    done: \"Profile set up!\", youScored: \"You scored\",\n    bravo: \"Great! You seem to have the basics. You can start directly at Module 2.\",\n    parfait: \"Perfect! We'll start gently with the foundations.\", start: \"Start the adventure\" },\n  es: { welcome: \"¡Bienvenido a KENZA 👋!\", goalQuestion: \"¿Cuál es tu principal objetivo con la Darija?\",\n    goals: { travel: { title: \"Viaje y Descubrimiento\", desc: \"Souk, taxi, cortesía\" }, expat: { title: \"Instalación y Expatriación\", desc: \"Trámites, vivienda\" }, family: { title: \"Familia y Pareja\", desc: \"Vocabulario cercano\" } },\n    tempoTitle: \"Tu ritmo ideal ⏱️\", tempoQuestion: \"¿Cuánto tiempo quieres dedicarle al día?\",\n    tempos: { 5: { title: \"Tranquilo\", desc: \"5 min / día\" }, 10: { title: \"Constante\", desc: \"10 min / día\" }, 15: { title: \"Intensivo\", desc: \"15 min / día\" } },\n    levelQuestion: \"¿Cuál es tu nivel? 🇲🇦\", levelHint: \"Para ofrecerte el mejor punto de partida.\",\n    beginner: \"Empiezo de cero\", beginnerHint: \"Comenzar desde el Módulo 1\",\n    notions: \"Ya tengo nociones\", notionsHint: \"Test rápido de 2 min para saltar niveles\",\n    done: \"¡Perfil configurado!\", youScored: \"Has obtenido\",\n    bravo: \"¡Bravo! Parece que tienes las bases. Podrás empezar directamente en el Módulo 2.\",\n    parfait: \"¡Perfecto! Empezaremos poco a poco por los fundamentos.\", start: \"Empezar la aventura\" },\n  ar: { welcome: \"مرحبا بك في كينزا 👋\", goalQuestion: \"ما هدفك الأساسي مع الدارجة؟\",\n    goals: { travel: { title: \"سفر واستكشاف\", desc: \"سوق، طاكسي، أدب\" }, expat: { title: \"الاستقرار والهجرة\", desc: \"إدارة، سكن\" }, family: { title: \"العائلة والشريك\", desc: \"مفردات دافئة\" } },\n    tempoTitle: \"إيقاعك المثالي ⏱️\", tempoQuestion: \"كم من الوقت تريد أن تخصص يومياً؟\",\n    tempos: { 5: { title: \"هادئ\", desc: \"5 دقائق / يوم\" }, 10: { title: \"منتظم\", desc: \"10 دقائق / يوم\" }, 15: { title: \"مكثف\", desc: \"15 دقيقة / يوم\" } },\n    levelQuestion: \"ما مستواك؟ 🇲🇦\", levelHint: \"لنقترح عليك أفضل نقطة انطلاق.\",\n    beginner: \"أبدأ من الصفر\", beginnerHint: \"ابدأ من الوحدة 1\",\n    notions: \"لدي بعض المفاهيم\", notionsHint: \"اختبار سريع لدقيقتين لتجاوز مستويات\",\n    done: \"تم إعداد حسابك!\", youScored: \"حصلت على\",\n    bravo: \"أحسنت! يبدو أنك تملك الأساسيات. يمكنك البدء مباشرة بالوحدة 2.\",\n    parfait: \"ممتاز! سنبدأ بهدوء من الأساسيات.\", start: \"ابدأ المغامرة\" }\n};\nfunction obS(lang: string) {\n  const k = (lang === 'en' || lang === 'es' || lang === 'ar') ? lang : 'fr';\n  return (OB_STR as Record<string, typeof OB_STR.fr>)[k];\n}\n\nconst GOALS = [");
-fix("src/components/onboarding/OnboardingModal.tsx", "OB-lang", "const { completeOnboarding, completeLesson } = useAppStore();", "const { completeOnboarding, completeLesson } = useAppStore();\n  const { uiLanguage } = useAppStore();\n  const S = obS(String(uiLanguage || 'fr').toLowerCase());");
-fix("src/components/onboarding/OnboardingModal.tsx", "OB-welcome", "Bienvenue sur KENZA 👋", "{S.welcome}");
-fix("src/components/onboarding/OnboardingModal.tsx", "OB-goalQ", "Quel est votre objectif principal avec la Darija ?", "{S.goalQuestion}");
-fix("src/components/onboarding/OnboardingModal.tsx", "OB-gtitle", "{g.title}", "{(S.goals as Record<string, { title: string; desc: string }>)[g.id]?.title || g.title}");
-fix("src/components/onboarding/OnboardingModal.tsx", "OB-gdesc", "{g.desc}", "{(S.goals as Record<string, { title: string; desc: string }>)[g.id]?.desc || g.desc}");
-fix("src/components/onboarding/OnboardingModal.tsx", "OB-tempoTitle", "Votre rythme idéal ⏱️", "{S.tempoTitle}");
-fix("src/components/onboarding/OnboardingModal.tsx", "OB-tempoQ", "Combien de temps souhaitez-vous y consacrer par jour ?", "{S.tempoQuestion}");
-fix("src/components/onboarding/OnboardingModal.tsx", "OB-ttitle", "{t.title}", "{(S.tempos as Record<number, { title: string; desc: string }>)[t.id]?.title || t.title}");
-fix("src/components/onboarding/OnboardingModal.tsx", "OB-tdesc", "{t.desc}", "{(S.tempos as Record<number, { title: string; desc: string }>)[t.id]?.desc || t.desc}");
-fix("src/components/onboarding/OnboardingModal.tsx", "OB-levelQ", "Quel est votre niveau ? 🇲🇦", "{S.levelQuestion}");
-fix("src/components/onboarding/OnboardingModal.tsx", "OB-levelHint", "Pour vous proposer le meilleur point de départ.", "{S.levelHint}");
-fix("src/components/onboarding/OnboardingModal.tsx", "OB-beginner", "Je débute complètement", "{S.beginner}");
-fix("src/components/onboarding/OnboardingModal.tsx", "OB-beginnerHint", "Commencer depuis le Module 1", "{S.beginnerHint}");
-fix("src/components/onboarding/OnboardingModal.tsx", "OB-notions", "J'ai déjà des notions", "{S.notions}");
-fix("src/components/onboarding/OnboardingModal.tsx", "OB-notionsHint", "Test rapide de 2 min pour sauter des niveaux", "{S.notionsHint}");
-fix("src/components/onboarding/OnboardingModal.tsx", "OB-done", "Profil configuré !", "{S.done}");
-fix("src/components/onboarding/OnboardingModal.tsx", "OB-scoreline", "Vous avez eu {quizScore} / 3 au test.<br/>", "{S.youScored} {quizScore} / 3.<br/>");
-fix("src/components/onboarding/OnboardingModal.tsx", "OB-bravo", "\"Bravo ! Vous semblez avoir les bases. Vous pourrez commencer direct au Module 2.\"", "S.bravo");
-fix("src/components/onboarding/OnboardingModal.tsx", "OB-parfait", "\"Parfait ! Nous allons commencer par les fondations doucement.\"", "S.parfait");
-fix("src/components/onboarding/OnboardingModal.tsx", "OB-start", "Commencer l'aventure <ArrowRight", "{S.start} <ArrowRight");
-fix("src/components/onboarding/PlacementTestModal.tsx", "PT-dict", "const PLACEMENT_QUESTIONS = [", "const PT_STR = {\n  fr: { question: \"Question\", skip: \"Passer et commencer à zéro\", result: \"Résultat\", testDone: \"Test terminé !\",\n    scoreLine: \"Vous avez obtenu un score de\", levelLabel: \"Niveau attribué\", xpUnlocked: \"XP et visas officiels débloqués !\",\n    lvlA1: \"Débutant (A1)\", lvlA2: \"Élémentaire (A2)\", lvlB1: \"Intermédiaire (B1)\",\n    recM1: \"Commencer au Module 1\", recM3: \"Commencer au Module 3\", recM4: \"Commencer au Module 4\" },\n  en: { question: \"Question\", skip: \"Skip and start from scratch\", result: \"Result\", testDone: \"Test complete!\",\n    scoreLine: \"You scored\", levelLabel: \"Assigned level\", xpUnlocked: \"XP and official visas unlocked!\",\n    lvlA1: \"Beginner (A1)\", lvlA2: \"Elementary (A2)\", lvlB1: \"Intermediate (B1)\",\n    recM1: \"Start at Module 1\", recM3: \"Start at Module 3\", recM4: \"Start at Module 4\" },\n  es: { question: \"Pregunta\", skip: \"Saltar y empezar de cero\", result: \"Resultado\", testDone: \"¡Test terminado!\",\n    scoreLine: \"Has obtenido una puntuación de\", levelLabel: \"Nivel asignado\", xpUnlocked: \"¡XP y visas oficiales desbloqueados!\",\n    lvlA1: \"Principiante (A1)\", lvlA2: \"Elemental (A2)\", lvlB1: \"Intermedio (B1)\",\n    recM1: \"Comenzar en el Módulo 1\", recM3: \"Comenzar en el Módulo 3\", recM4: \"Comenzar en el Módulo 4\" },\n  ar: { question: \"سؤال\", skip: \"تخطَّ وابدأ من الصفر\", result: \"النتيجة\", testDone: \"انتهى الاختبار!\",\n    scoreLine: \"حصلت على نقطة\", levelLabel: \"المستوى المُحدَّد\", xpUnlocked: \"نقاط XP وتأشيرات رسمية مفتوحة!\",\n    lvlA1: \"مبتدئ (A1)\", lvlA2: \"أساسي (A2)\", lvlB1: \"متوسط (B1)\",\n    recM1: \"ابدأ من الوحدة 1\", recM3: \"ابدأ من الوحدة 3\", recM4: \"ابدأ من الوحدة 4\" }\n};\nfunction ptS(lang: string) {\n  const k = (lang === 'en' || lang === 'es' || lang === 'ar') ? lang : 'fr';\n  return (PT_STR as Record<string, typeof PT_STR.fr>)[k];\n}\n\nconst PLACEMENT_QUESTIONS = [");
-fix("src/components/onboarding/PlacementTestModal.tsx", "PT-lang", "const { addXp, completeLesson, user } = useAppStore();", "const { addXp, completeLesson, user } = useAppStore();\n  const { uiLanguage } = useAppStore();\n  const S = ptS(String(uiLanguage || 'fr').toLowerCase());");
-fix("src/components/onboarding/PlacementTestModal.tsx", "PT-question", "Question {currentQ + 1}", "{S.question} {currentQ + 1}");
-fix("src/components/onboarding/PlacementTestModal.tsx", "PT-skip", "Passer et commencer à zéro", "{S.skip}");
-fix("src/components/onboarding/PlacementTestModal.tsx", "PT-result", "— Résultat", "— {S.result}");
-fix("src/components/onboarding/PlacementTestModal.tsx", "PT-testDone", "Test terminé !", "{S.testDone}");
-fix("src/components/onboarding/PlacementTestModal.tsx", "PT-scoreLine", "Vous avez obtenu un score de <strong", "{S.scoreLine} <strong");
-fix("src/components/onboarding/PlacementTestModal.tsx", "PT-levelLabel", "Niveau attribué</p>", "{S.levelLabel}</p>");
-fix("src/components/onboarding/PlacementTestModal.tsx", "PT-xp", "XP et visas officiels débloqués !", "{S.xpUnlocked}");
-fix("src/components/onboarding/PlacementTestModal.tsx", "PT-lvlA1", "levelAssigned = 'Débutant (A1)';", "levelAssigned = S.lvlA1;");
-fix("src/components/onboarding/PlacementTestModal.tsx", "PT-lvlB1", "levelAssigned = 'Intermédiaire (B1)';", "levelAssigned = S.lvlB1;");
-fix("src/components/onboarding/PlacementTestModal.tsx", "PT-lvlA2", "levelAssigned = 'Élémentaire (A2)';", "levelAssigned = S.lvlA2;");
-fix("src/components/onboarding/PlacementTestModal.tsx", "PT-recM1", "recommendation = 'Commencer au Module 1';", "recommendation = S.recM1;");
-fix("src/components/onboarding/PlacementTestModal.tsx", "PT-recM4", "recommendation = 'Commencer au Module 4';", "recommendation = S.recM4;");
-fix("src/components/onboarding/PlacementTestModal.tsx", "PT-recM3", "recommendation = 'Commencer au Module 3';", "recommendation = S.recM3;");
-fix("src/components/profile/ProfileView.tsx", "PV-dict", "export default function ProfileView() {", "const PV_STR = {\n  fr: { lvlA1: \"Débutant Atlas — Niveau A1\", lvlA2: \"Explorateur Saharien — Niveau A2\", lvlB1: \"Apprenti Fassi — Niveau B1\", lvlB2: \"Voyageur Marrakchi — Niveau B2\", lvlC1: \"Maître de la Medina — Niveau C1\",\n    guest: \"Invité\", alertLogin: \"Veuillez vous connecter pour gérer votre abonnement.\", alertDemo: \"Portail de facturation en mode démo.\",\n    alertPortalFail: \"Impossible d'accéder au portail de facturation.\", alertPortalError: \"Erreur lors de l'accès au portail de facturation.\",\n    profileLabel: \"Profil Apprenant\", proMember: \"Membre Kenza Pro\", freeVersion: \"Version Gratuite\",\n    passportActive: \"Votre Passeport Culturel est actif\", unlockAll: \"Débloquez tout le potentiel de la Darija\",\n    proDesc1: \"Accès illimité aux modules avancés B1/B2, roleplay IA sans quota quotidien et synthèse vocale haute fidélité.\",\n    proDesc2: \"Passez à Kenza Pro pour accéder aux Modules 3, 4 et 5, aux dialogues IA illimités et aux visas de certification.\",\n    loading: \"Chargement...\", manageSub: \"Gérer mon abonnement\", goPro: \"Passer à Kenza Pro\",\n    placementTitle: \"Test de Positionnement\", placementHint: \"Réévaluez votre niveau pour ajuster votre parcours.\", retakeTest: \"Re-passer le test\",\n    offlineTitle: \"Mode Hors-Ligne PWA\", offlineHint: \"Téléchargez les audios et fiches pour pratiquer sans connexion internet.\",\n    preloaded: \"Données préchargées\", downloading: \"Téléchargement en cours...\", packReady: \"✓ Pack Complet Prêt\", downloadPack: \"Télécharger le pack complet\" },\n  en: { lvlA1: \"Atlas Beginner — Level A1\", lvlA2: \"Sahara Explorer — Level A2\", lvlB1: \"Fassi Apprentice — Level B1\", lvlB2: \"Marrakech Traveler — Level B2\", lvlC1: \"Medina Master — Level C1\",\n    guest: \"Guest\", alertLogin: \"Please sign in to manage your subscription.\", alertDemo: \"Billing portal in demo mode.\",\n    alertPortalFail: \"Unable to access the billing portal.\", alertPortalError: \"Error accessing the billing portal.\",\n    profileLabel: \"Learner Profile\", proMember: \"Kenza Pro Member\", freeVersion: \"Free Version\",\n    passportActive: \"Your Cultural Passport is active\", unlockAll: \"Unlock the full potential of Darija\",\n    proDesc1: \"Unlimited access to advanced B1/B2 modules, AI roleplay with no daily quota and high-fidelity text-to-speech.\",\n    proDesc2: \"Upgrade to Kenza Pro for Modules 3, 4 and 5, unlimited AI dialogues and certification visas.\",\n    loading: \"Loading...\", manageSub: \"Manage my subscription\", goPro: \"Upgrade to Kenza Pro\",\n    placementTitle: \"Placement Test\", placementHint: \"Reassess your level to adjust your learning path.\", retakeTest: \"Retake the test\",\n    offlineTitle: \"PWA Offline Mode\", offlineHint: \"Download audio and sheets to practice without an internet connection.\",\n    preloaded: \"Preloaded data\", downloading: \"Downloading...\", packReady: \"✓ Full Pack Ready\", downloadPack: \"Download the full pack\" },\n  es: { lvlA1: \"Principiante del Atlas — Nivel A1\", lvlA2: \"Explorador del Sáhara — Nivel A2\", lvlB1: \"Aprendiz Fassi — Nivel B1\", lvlB2: \"Viajero Marrakchí — Nivel B2\", lvlC1: \"Maestro de la Medina — Nivel C1\",\n    guest: \"Invitado\", alertLogin: \"Por favor, inicia sesión para gestionar tu suscripción.\", alertDemo: \"Portal de facturación en modo demo.\",\n    alertPortalFail: \"No se puede acceder al portal de facturación.\", alertPortalError: \"Error al acceder al portal de facturación.\",\n    profileLabel: \"Perfil del Aprendiz\", proMember: \"Miembro Kenza Pro\", freeVersion: \"Versión Gratuita\",\n    passportActive: \"Tu Pasaporte Cultural está activo\", unlockAll: \"Desbloquea todo el potencial de la Darija\",\n    proDesc1: \"Acceso ilimitado a los módulos avanzados B1/B2, roleplay IA sin cuota diaria y síntesis de voz de alta fidelidad.\",\n    proDesc2: \"Pásate a Kenza Pro para acceder a los Módulos 3, 4 y 5, diálogos IA ilimitados y visados de certificación.\",\n    loading: \"Cargando...\", manageSub: \"Gestionar mi suscripción\", goPro: \"Pasar a Kenza Pro\",\n    placementTitle: \"Test de Nivel\", placementHint: \"Reevalúa tu nivel para ajustar tu recorrido.\", retakeTest: \"Repetir el test\",\n    offlineTitle: \"Modo Sin Conexión PWA\", offlineHint: \"Descarga audios y fichas para practicar sin conexión a internet.\",\n    preloaded: \"Datos precargados\", downloading: \"Descargando...\", packReady: \"✓ Pack Completo Listo\", downloadPack: \"Descargar el pack completo\" },\n  ar: { lvlA1: \"مبتدئ الأطلس — المستوى A1\", lvlA2: \"مستكشف الصحراء — المستوى A2\", lvlB1: \"تلميذ فاسي — المستوى B1\", lvlB2: \"مسافر مراكشي — المستوى B2\", lvlC1: \"أستاذ المدينة — المستوى C1\",\n    guest: \"زائر\", alertLogin: \"يرجى تسجيل الدخول لإدارة اشتراكك.\", alertDemo: \"بوابة الفوترة في الوضع التجريبي.\",\n    alertPortalFail: \"تعذر الوصول إلى بوابة الفوترة.\", alertPortalError: \"خطأ أثناء الوصول إلى بوابة الفوترة.\",\n    profileLabel: \"ملف المتعلم\", proMember: \"عضو كينزا برو\", freeVersion: \"النسخة المجانية\",\n    passportActive: \"جوازك الثقافي مُفعَّل\", unlockAll: \"افتح كل إمكانات الدارجة\",\n    proDesc1: \"وصول غير محدود للوحدات المتقدمة B1/B2، محادثات ذكاء اصطناعي دون حصة يومية وتحويل نص إلى كلام عالي الجودة.\",\n    proDesc2: \"انتقل إلى كينزا برو للوصول إلى الوحدات 3 و4 و5، وحوارات الذكاء الاصطناعي غير المحدودة وتأشيرات الشهادات.\",\n    loading: \"جاري التحميل...\", manageSub: \"إدارة اشتراكي\", goPro: \"انتقل إلى كينزا برو\",\n    placementTitle: \"اختبار تحديد المستوى\", placementHint: \"أعد تقييم مستواك لضبط مسارك.\", retakeTest: \"إعادة الاختبار\",\n    offlineTitle: \"وضع عدم الاتصال PWA\", offlineHint: \"حمّل التسجيلات والبطاقات للتدرب دون اتصال بالإنترنت.\",\n    preloaded: \"بيانات محمّلة مسبقاً\", downloading: \"جاري التنزيل...\", packReady: \"✓ الحزمة الكاملة جاهزة\", downloadPack: \"تنزيل الحزمة الكاملة\" }\n};\nfunction pvS(lang: string) {\n  const k = (lang === 'en' || lang === 'es' || lang === 'ar') ? lang : 'fr';\n  return (PV_STR as Record<string, typeof PV_STR.fr>)[k];\n}\n\nexport default function ProfileView() {");
-fix("src/components/profile/ProfileView.tsx", "PV-lang", "const { xp, streakDays, srsDeck, isPremium } = useAppStore();", "const { xp, streakDays, srsDeck, isPremium } = useAppStore();\n  const { uiLanguage } = useAppStore();\n  const S = pvS(String(uiLanguage || 'fr').toLowerCase());");
-fix("src/components/profile/ProfileView.tsx", "PV-lvlA1", "return \"Débutant Atlas — Niveau A1\";", "return S.lvlA1;");
-fix("src/components/profile/ProfileView.tsx", "PV-lvlA2", "return \"Explorateur Saharien — Niveau A2\";", "return S.lvlA2;");
-fix("src/components/profile/ProfileView.tsx", "PV-lvlB1", "return \"Apprenti Fassi — Niveau B1\";", "return S.lvlB1;");
-fix("src/components/profile/ProfileView.tsx", "PV-lvlB2", "return \"Voyageur Marrakchi — Niveau B2\";", "return S.lvlB2;");
-fix("src/components/profile/ProfileView.tsx", "PV-lvlC1", "return \"Maître de la Medina — Niveau C1\";", "return S.lvlC1;");
-fix("src/components/profile/ProfileView.tsx", "PV-guest", "|| \"Invité\";", "|| S.guest;");
-fix("src/components/profile/ProfileView.tsx", "PV-alertLogin", "alert(\"Veuillez vous connecter pour gérer votre abonnement.\");", "alert(S.alertLogin);");
-fix("src/components/profile/ProfileView.tsx", "PV-alertDemo", "alert(\"Portail de facturation en mode démo.\");", "alert(S.alertDemo);");
-fix("src/components/profile/ProfileView.tsx", "PV-alertFail", "alert(data.error || \"Impossible d'accéder au portail de facturation.\");", "alert(data.error || S.alertPortalFail);");
-fix("src/components/profile/ProfileView.tsx", "PV-alertErr", "alert(\"Erreur lors de l'accès au portail de facturation.\");", "alert(S.alertPortalError);");
-fix("src/components/profile/ProfileView.tsx", "PV-profileLabel", "<span>Profil Apprenant</span>", "<span>{S.profileLabel}</span>");
-fix("src/components/profile/ProfileView.tsx", "PV-member", "{isPremium ? 'Membre Kenza Pro' : 'Version Gratuite'}", "{isPremium ? S.proMember : S.freeVersion}");
-fix("src/components/profile/ProfileView.tsx", "PV-passport", "{isPremium ? 'Votre Passeport Culturel est actif' : 'Débloquez tout le potentiel de la Darija'}", "{isPremium ? S.passportActive : S.unlockAll}");
-fix("src/components/profile/ProfileView.tsx", "PV-desc1", "'Accès illimité aux modules avancés B1/B2, roleplay IA sans quota quotidien et synthèse vocale haute fidélité.'", "S.proDesc1");
-fix("src/components/profile/ProfileView.tsx", "PV-desc2", "'Passez à Kenza Pro pour accéder aux Modules 3, 4 et 5, aux dialogues IA illimités et aux visas de certification.'", "S.proDesc2");
-fix("src/components/profile/ProfileView.tsx", "PV-manage", "{isPortalLoading ? 'Chargement...' : 'Gérer mon abonnement'}", "{isPortalLoading ? S.loading : S.manageSub}");
-fix("src/components/profile/ProfileView.tsx", "PV-goPro", "<span>Passer à Kenza Pro</span>", "<span>{S.goPro}</span>");
-fix("src/components/profile/ProfileView.tsx", "PV-placeTitle", "Test de Positionnement</h3>", "{S.placementTitle}</h3>");
-fix("src/components/profile/ProfileView.tsx", "PV-placeHint", "Réévaluez votre niveau pour ajuster votre parcours.", "{S.placementHint}");
-fix("src/components/profile/ProfileView.tsx", "PV-retake", "Re-passer le test", "{S.retakeTest}");
-fix("src/components/profile/ProfileView.tsx", "PV-offlineTitle", "Mode Hors-Ligne PWA</h3>", "{S.offlineTitle}</h3>");
-fix("src/components/profile/ProfileView.tsx", "PV-offlineHint", "Téléchargez les audios et fiches pour pratiquer sans connexion internet.", "{S.offlineHint}");
-fix("src/components/profile/ProfileView.tsx", "PV-preloaded", "Données préchargées</span>", "{S.preloaded}</span>");
-fix("src/components/profile/ProfileView.tsx", "PV-downloadBtn", "{isDownloading ? 'Téléchargement en cours...' : downloadProgress === 100 ? '✓ Pack Complet Prêt' : 'Télécharger le pack complet'}", "{isDownloading ? S.downloading : downloadProgress === 100 ? S.packReady : S.downloadPack}");
-fix("src/components/profile/NotificationSettings.tsx", "NS-dict", "export default function NotificationSettings() {", "const NS_STR = {\n  fr: { enableNotif: \"Activer les notifications\", iosHint: \"Sur iPhone, ajoutez KENZA à votre écran d'accueil pour activer les rappels.\",\n    press: \"Appuyez sur\", then: \"puis\", homeScreen: \"\\\"Sur l'écran d'accueil\\\"\",\n    remindersTitle: \"Rappels & Notifications\", keepStreak: \"Préservez votre série d'apprentissage\",\n    dailyReminder: \"Recevez un rappel quotidien pour préserver votre série 🔥 et réviser vos mots du jour avec le SRS.\",\n    enableReminders: \"Activer les rappels\", remindersActive: \"Rappels actifs\", testDevice: \"Tester sur cet appareil\",\n    blocked: \"Notifications bloquées\",\n    blockedHint: \"Vous avez bloqué les notifications. Veuillez les réactiver dans les paramètres de votre navigateur si vous souhaitez recevoir des rappels.\" },\n  en: { enableNotif: \"Enable notifications\", iosHint: \"On iPhone, add KENZA to your home screen to enable reminders.\",\n    press: \"Tap\", then: \"then\", homeScreen: \"\\\"Add to Home Screen\\\"\",\n    remindersTitle: \"Reminders & Notifications\", keepStreak: \"Keep your learning streak alive\",\n    dailyReminder: \"Get a daily reminder to protect your streak 🔥 and review your words on time with SRS.\",\n    enableReminders: \"Enable reminders\", remindersActive: \"Reminders active\", testDevice: \"Test on this device\",\n    blocked: \"Notifications blocked\",\n    blockedHint: \"You have blocked notifications. Please re-enable them in your browser settings if you want to receive reminders.\" },\n  es: { enableNotif: \"Activar notificaciones\", iosHint: \"En iPhone, añade KENZA a tu pantalla de inicio para activar los recordatorios.\",\n    press: \"Pulsa\", then: \"luego\", homeScreen: \"\\\"Añadir a pantalla de inicio\\\"\",\n    remindersTitle: \"Recordatorios y Notificaciones\", keepStreak: \"Conserva tu racha de aprendizaje\",\n    dailyReminder: \"Recibe un recordatorio diario para mantener tu racha 🔥 y repasar tus palabras con el SRS.\",\n    enableReminders: \"Activar recordatorios\", remindersActive: \"Recordatorios activos\", testDevice: \"Probar en este dispositivo\",\n    blocked: \"Notificaciones bloqueadas\",\n    blockedHint: \"Has bloqueado las notificaciones. Reactívalas en los ajustes de tu navegador si quieres recibir recordatorios.\" },\n  ar: { enableNotif: \"تفعيل الإشعارات\", iosHint: \"على iPhone، أضف كينزا إلى شاشتك الرئيسية لتلقي التذكيرات.\",\n    press: \"اضغط على\", then: \"ثم\", homeScreen: \"\\\"إلى الشاشة الرئيسية\\\"\",\n    remindersTitle: \"التذكيرات والإشعارات\", keepStreak: \"حافظ على سلسلة التعلم\",\n    dailyReminder: \"احصل على تذكير يومي للحفاظ على سلسلتك 🔥 ومراجعة كلماتك في وقتها مع نظام SRS.\",\n    enableReminders: \"تفعيل التذكيرات\", remindersActive: \"التذكيرات مفعلة\", testDevice: \"تجربة على هذا الجهاز\",\n    blocked: \"الإشعارات محظورة\",\n    blockedHint: \"لقد قمت بحظر الإشعارات. يرجى تفعيلها من إعدادات متصفحك إذا كنت ترغب في تلقي التذكيرات.\" }\n};\nfunction nsS(lang: string) {\n  const k = (lang === 'en' || lang === 'es' || lang === 'ar') ? lang : 'fr';\n  return (NS_STR as Record<string, typeof NS_STR.fr>)[k];\n}\n\nexport default function NotificationSettings() {");
-fix("src/components/profile/NotificationSettings.tsx", "NS-lang", "const isAr = lang === 'ar' || lang.startsWith('ar');", "const isAr = lang === 'ar' || lang.startsWith('ar');\n  const S = nsS(lang);");
-fix("src/components/profile/NotificationSettings.tsx", "NS-enableNotif", ": 'Activer les notifications'}", ": S.enableNotif}");
-fix("src/components/profile/NotificationSettings.tsx", "NS-iosHint", "Sur iPhone, ajoutez KENZA à votre écran d\\'accueil pour activer les rappels.", "S.iosHint");
-fix("src/components/profile/NotificationSettings.tsx", "NS-press", ": 'Appuyez sur'}", ": S.press}");
-fix("src/components/profile/NotificationSettings.tsx", "NS-then", ": 'puis'}", ": S.then}");
-fix("src/components/profile/NotificationSettings.tsx", "NS-home", " '\"Sur l\\'écran d\\'accueil\"'", " S.homeScreen");
-fix("src/components/profile/NotificationSettings.tsx", "NS-title", ": 'Rappels & Notifications'}", ": S.remindersTitle}");
-fix("src/components/profile/NotificationSettings.tsx", "NS-streak", "Préservez votre série d\\'apprentissage", "S.keepStreak");
-fix("src/components/profile/NotificationSettings.tsx", "NS-daily", "Recevez un rappel quotidien pour préserver votre série 🔥 et réviser vos mots du jour avec le SRS.", "S.dailyReminder");
-fix("src/components/profile/NotificationSettings.tsx", "NS-enableRem", ": 'Activer les rappels'}", ": S.enableReminders}");
-fix("src/components/profile/NotificationSettings.tsx", "NS-active", ": 'Rappels actifs'}", ": S.remindersActive}");
-fix("src/components/profile/NotificationSettings.tsx", "NS-test", ": 'Tester sur cet appareil'}", ": S.testDevice}");
-fix("src/components/profile/NotificationSettings.tsx", "NS-blocked", ": 'Notifications bloquées'}", ": S.blocked}");
-fix("src/components/profile/NotificationSettings.tsx", "NS-blockedHint", "Vous avez bloqué les notifications. Veuillez les réactiver dans les paramètres de votre navigateur si vous souhaitez recevoir des rappels.", "S.blockedHint");
-prepend("src/app/api/tts/route.ts", "LINT-tts", "/* eslint-disable @typescript-eslint/no-explicit-any */");
-prepend("src/app/api/stripe/webhook/route.ts", "LINT-webhook", "/* eslint-disable @typescript-eslint/no-explicit-any */");
-prepend("src/app/api/stripe/portal/route.ts", "LINT-portal", "/* eslint-disable @typescript-eslint/no-explicit-any */");
-prepend("src/app/api/stripe/checkout/route.ts", "LINT-checkout", "/* eslint-disable @typescript-eslint/no-explicit-any */");
-prepend("src/app/api/roleplay/chat/route.ts", "LINT-roleplay", "/* eslint-disable @typescript-eslint/no-explicit-any */");
-prepend("scripts/replace-theme.js", "LINT-replace-theme", "/* eslint-disable @typescript-eslint/no-require-imports */");
-prepend("scripts/fix-arabic.js", "LINT-fix-arabic", "/* eslint-disable @typescript-eslint/no-require-imports */");
-fix("src/store/useAppStore.ts", "UAS-setLanguage", "setLanguage: (lang) => set({ uiLanguage: (lang || 'fr').toLowerCase() as any }),", "setLanguage: (lang: UILanguage) => set({ uiLanguage: (lang || 'fr').toLowerCase() as any }),");
-fix("src/store/useAppStore.ts", "UAS-addCustomWordToSRS", "addCustomWordToSRS: (word: any) => set((state) => {", "addCustomWordToSRS: (word: any) => set((state: AppState) => {");
-fix("src/store/useAppStore.ts", "UAS-updateCustomWord", "updateCustomWord: (wordId: string, updates: any) => set((state) => {", "updateCustomWord: (wordId: string, updates: any) => set((state: AppState) => {");
-fix("src/store/useAppStore.ts", "UAS-deleteCustomWord", "deleteCustomWord: (wordId: string) => set((state) => {", "deleteCustomWord: (wordId: string) => set((state: AppState) => {");
-fix("src/store/useAppStore.ts", "UAS-toggleDevUnlockAll", "toggleDevUnlockAll: () => set((state) => ({ devUnlockAll: !state.devUnlockAll })),", "toggleDevUnlockAll: () => set((state: AppState) => ({ devUnlockAll: !state.devUnlockAll })),");
-fix("src/store/useAppStore.ts", "UAS-setRegionalVariant", "setRegionalVariant: (variant) => set({ regionalVariant: variant }),", "setRegionalVariant: (variant: AppState['regionalVariant']) => set({ regionalVariant: variant }),");
-fix("src/store/useAppStore.ts", "UAS-addXp", "addXp: (amount) => set((state) => {", "addXp: (amount: number) => set((state: AppState) => {");
-fix("src/store/useAppStore.ts", "UAS-completeLesson", "completeLesson: (lessonId) => set((state) => {", "completeLesson: (lessonId: string) => set((state: AppState) => {");
-fix("src/store/useAppStore.ts", "UAS-unlockBadge", "unlockBadge: (badgeId) => set((state) => ({", "unlockBadge: (badgeId: string) => set((state: AppState) => ({");
-fix("src/store/useAppStore.ts", "UAS-useStreakFreeze", "useStreakFreeze: () => set((state) => ({", "useStreakFreeze: () => set((state: AppState) => ({");
-fix("src/store/useAppStore.ts", "UAS-recordActivity", "recordActivity: () => set((state) => {", "recordActivity: () => set((state: AppState) => {");
-fix("src/store/useAppStore.ts", "UAS-setNotation", "setNotation: (notation) => set({ preferredNotation: notation }),", "setNotation: (notation: Notation) => set({ preferredNotation: notation }),");
-fix("src/store/useAppStore.ts", "UAS-toggleSound", "toggleSound: () => set((state) => ({ soundEnabled: !state.soundEnabled })),", "toggleSound: () => set((state: AppState) => ({ soundEnabled: !state.soundEnabled })),");
-fix("src/store/useAppStore.ts", "UAS-setAudioSpeed", "setAudioSpeed: (speed) => set({ audioSpeed: speed }),", "setAudioSpeed: (speed: number) => set({ audioSpeed: speed }),");
-fix("src/store/useAppStore.ts", "UAS-addCardsToSRS", "addCardsToSRS: (wordIds) => set((state) => {", "addCardsToSRS: (wordIds: string[]) => set((state: AppState) => {");
-fix("src/store/useAppStore.ts", "UAS-reviewCard", "reviewCard: (wordId, grade) => set((state) => {", "reviewCard: (wordId: string, grade: ReviewGrade) => set((state: AppState) => {");
-fix("src/store/useAppStore.ts", "UAS-setUser", "setUser: (user) => set({ user }),", "setUser: (user: AppState['user']) => set({ user }),");
-fix("src/store/useAppStore.ts", "UAS-completeOnboarding", "completeOnboarding: (goal, minutes) => set({", "completeOnboarding: (goal: AppState['userGoal'], minutes: AppState['dailyTargetMinutes']) => set({");
-fix("src/store/useAppStore.ts", "UAS-setIsPremium", "setIsPremium: (isPremium) => set({ isPremium }),", "setIsPremium: (isPremium: boolean) => set({ isPremium }),");
-fix("src/components/auth/SaveProgressCard.tsx", "SPC-ttrack-viewed", "ttrack('save_prompt_viewed'", "track('save_prompt_viewed'");
-fix("src/components/auth/SaveProgressCard.tsx", "SPC-ttrack-clicked", "ttrack('save_prompt_clicked'", "track('save_prompt_clicked'");
-fix("src/components/auth/AuthModal.tsx", "AM-data-destructure", "const { error } = await signUpWithTracking(email, password, { username: email.split('@')[0] });", "const { data, error } = await signUpWithTracking(email, password, { username: email.split('@')[0] });");
-fix("src/types/curriculum.ts", "TYPE-ExerciseOption", "text: string; // Keeps Darija in text", "text: MultiLangText | string; // Darija in text, or localized meaning (MultiLangText)");
-fix("src/data/module3.ts", "M3-l1-chambre", "text: 'La chambre', isCorrect: false },", "text: { fr: 'La chambre', en: 'The bedroom', es: 'El dormitorio', ar: 'الغرفة' }, isCorrect: false },");
-fix("src/data/module3.ts", "M3-l1-cle", "text: 'La clé', isCorrect: true },", "text: { fr: 'La clé', en: 'The key', es: 'La llave', ar: 'المفتاح' }, isCorrect: true },");
-fix("src/data/module3.ts", "M3-l1-lit", "text: 'Le lit', isCorrect: false }", "text: { fr: 'Le lit', en: 'The bed', es: 'La cama', ar: 'السرير' }, isCorrect: false }");
-fix("src/data/module3.ts", "M3-l3-medecin", "text: 'Médecin', isCorrect: false },", "text: { fr: 'Médecin', en: 'Doctor', es: 'Médico', ar: 'طبيب' }, isCorrect: false },");
-fix("src/data/module3.ts", "M3-l3-medicament", "text: 'Médicament', isCorrect: true },", "text: { fr: 'Médicament', en: 'Medicine', es: 'Medicamento', ar: 'دواء' }, isCorrect: true },");
-fix("src/data/module3.ts", "M3-l3-malade", "text: 'Malade', isCorrect: false }", "text: { fr: 'Malade', en: 'Sick', es: 'Enfermo', ar: 'مريض' }, isCorrect: false }");
-fix("src/data/module5.ts", "M5-agree", "text: 'Je suis d\\'accord', isCorrect: false },", "text: { fr: 'Je suis d\\'accord', en: 'I agree', es: 'Estoy de acuerdo', ar: 'أنا موافق' }, isCorrect: false },");
-fix("src/data/module5.ts", "M5-pasforce", "text: 'Pas forcément', isCorrect: true },", "text: { fr: 'Pas forcément', en: 'Not necessarily', es: 'No necesariamente', ar: 'ليس بالضرورة' }, isCorrect: true },");
-fix("src/data/module5.ts", "M5-tort", "text: 'Tu as tort', isCorrect: false }", "text: { fr: 'Tu as tort', en: 'You are wrong', es: 'Estás equivocado', ar: 'أنت مخطئ' }, isCorrect: false }");
-fix("src/data/module5.ts", "M5-employe", "text: 'Employé', isCorrect: false },", "text: { fr: 'Employé', en: 'Employee', es: 'Empleado', ar: 'موظف' }, isCorrect: false },");
-fix("src/data/module5.ts", "M5-rdv", "text: 'Rendez-vous', isCorrect: false },", "text: { fr: 'Rendez-vous', en: 'Appointment', es: 'Cita', ar: 'موعد' }, isCorrect: false },");
-fix("src/data/module5.ts", "M5-projet", "text: 'Projet', isCorrect: true }", "text: { fr: 'Projet', en: 'Project', es: 'Proyecto', ar: 'مشروع' }, isCorrect: true }");
-fix("src/data/module5.ts", "M5-secret", "text: 'Garde le secret / N\\'en parle pas', isCorrect: true },", "text: { fr: 'Garde le secret / N\\'en parle pas', en: 'Keep it secret / Don\\'t talk about it', es: 'Guárdalo en secreto / No lo menciones', ar: 'احفظ السر / لا تتحدث عنه' }, isCorrect: true },");
-fix("src/data/module5.ts", "M5-passe", "text: 'Ce qui est passé est passé', isCorrect: false },", "text: { fr: 'Ce qui est passé est passé', en: 'What\\'s done is done', es: 'Lo pasado, pasado está', ar: 'ما فات مات' }, isCorrect: false },");
-fix("src/data/module5.ts", "M5-petit", "text: 'Petit à petit', isCorrect: false }", "text: { fr: 'Petit à petit', en: 'Little by little', es: 'Poco a poco', ar: 'شيئاً فشيئاً' }, isCorrect: false }");
-fix("src/data/module7.ts", "M7-tourner", "right: { text: 'Tourner la page' }", "right: { text: { fr: 'Tourner la page', en: 'Turn the page', es: 'Pasar la página', ar: 'طوّي الصفحة' } }");
-fix("src/data/module7.ts", "M7-patience", "right: { text: 'Patience et régularité' }", "right: { text: { fr: 'Patience et régularité', en: 'Patience and consistency', es: 'Paciencia y constancia', ar: 'الصبر والانتظام' } }");
-fix("src/data/module7.ts", "M7-courir", "right: { text: 'Rien ne sert de courir' }", "right: { text: { fr: 'Rien ne sert de courir', en: 'No point in rushing', es: 'No sirve de nada correr', ar: 'لا فائدة من الاستعجال' } }");
+const OB = 'src/components/onboarding/OnboardingModal.tsx';
+const PT = 'src/components/onboarding/PlacementTestModal.tsx';
+const PV = 'src/components/profile/ProfileView.tsx';
+const NS = 'src/components/profile/NotificationSettings.tsx';
 
-const DUMP_MODE = (process.env.DUMP_MODE || "on") === "on";
-report.push("DUMP_MODE: " + (DUMP_MODE ? "on" : "off"));
-if (DUMP_MODE) {
-  const tr = fs.readFileSync("src/lib/i18n/translations.ts", "utf8");
-  const trLines = tr.split("\n");
-  const TRC = 220;
-  for (let c = 0; c * TRC < trLines.length; c++) {
-    const chunk = trLines.slice(c * TRC, (c + 1) * TRC)
-      .map((l, i) => String(c * TRC + i + 1).padStart(4, "0") + "|" + l).join("\n");
-    fs.writeFileSync("docs/tr-dump-" + (c + 1) + ".txt", chunk);
-  }
-}
-fs.writeFileSync("docs/verify.json", report.join("\n"));
-console.log(report.join("\n"));
+// ---- OnboardingModal: JSX-delimited anchors (v34) ----
+apply(OB, 'OB-welcome', '>Bienvenue sur KENZA 👋</h2>', '>{S.welcome}</h2>');
+apply(OB, 'OB-goalQ', '>Quel est votre objectif principal avec la Darija ?</p>', '>{S.goalQuestion}</p>');
+apply(OB, 'OB-tempoTitle', '>Votre rythme idéal ⏱️</h2>', '>{S.tempoTitle}</h2>');
+apply(OB, 'OB-tempoQ', '>Combien de temps souhaitez-vous y consacrer par jour ?</p>', '>{S.tempoQuestion}</p>');
+apply(OB, 'OB-levelQ', '>Quel est votre niveau ? 🇲🇦</h2>', '>{S.levelQuestion}</h2>');
+apply(OB, 'OB-levelHint', '>Pour vous proposer le meilleur point de départ.</p>', '>{S.levelHint}</p>');
+apply(OB, 'OB-beginner', 'Je débute complètement\n', '{S.beginner}\n');
+apply(OB, 'OB-beginnerHint', '>Commencer depuis le Module 1</div>', '>{S.beginnerHint}</div>');
+apply(OB, 'OB-notions', "J'ai déjà des notions\n", '{S.notions}\n');
+apply(OB, 'OB-notionsHint', '>Test rapide de 2 min pour sauter des niveaux</div>', '>{S.notionsHint}</div>');
+apply(OB, 'OB-done', 'Profil configuré !\n', '{S.done}\n');
+apply(OB, 'OB-bravo', '? "Bravo ! Vous semblez avoir les bases. Vous pourrez commencer direct au Module 2."', '? S.bravo');
+apply(OB, 'OB-parfait', ': "Parfait ! Nous allons commencer par les fondations doucement."}', ': S.parfait}');
+
+// ---- PlacementTestModal: JSX-delimited anchors (v34) ----
+apply(PT, 'PT-skip', '<span>Passer et commencer à zéro</span>', '<span>{S.skip}</span>');
+apply(PT, 'PT-testDone', '>Test terminé !</h2>', '>{S.testDone}</h2>');
+apply(PT, 'PT-xp', '} XP et visas officiels débloqués !', '} {S.xpUnlocked}');
+
+// ---- ProfileView: JSX-delimited anchors (v34) ----
+apply(PV, 'PV-placeHint', '>Réévaluez votre niveau pour ajuster votre parcours.</p>', '>{S.placementHint}</p>');
+apply(PV, 'PV-retake', 'Re-passer le test\n', '{S.retakeTest}\n');
+apply(PV, 'PV-offlineHint', '>Téléchargez les audios et fiches pour pratiquer sans connexion internet.</p>', '>{S.offlineHint}</p>');
+
+// ---- NotificationSettings (v34) ----
+apply(NS, 'NS-daily', ": 'Recevez un rappel quotidien pour préserver votre série 🔥 et réviser vos mots du jour avec le SRS.'}", ': S.dailyReminder}');
+applyRx(NS, 'NS-blockedHint', /: 'Vous avez bloqué les notifications[^']*'}/, ': S.blockedHint}');
+
+report['PATCHER'] = 'v34 (i18n JSX disambiguation)';
+fs.mkdirSync('docs', { recursive: true });
+fs.writeFileSync('docs/verify.json', JSON.stringify(report, null, 2) + '\n');
+console.log(Object.entries(report).map(([k, v]) => k + ': ' + v).join('\n'));
