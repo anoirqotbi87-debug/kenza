@@ -1,4 +1,4 @@
-// patch-page.mjs v27 — typecheck wave 3: explicit param types in useAppStore (contextual typing broken by persist wrapper) + v26/v25 kept idempotent
+// patch-page.mjs v28 — typecheck wave 4: last untyped setters (setLanguage, custom-word SRS actions) + v27/v26/v25 kept idempotent
 import fs from "node:fs";
 const report = [];
 function fix(path, name, oldS, newS) {
@@ -14,6 +14,22 @@ function fix(path, name, oldS, newS) {
   report.push(name + ": OK");
 }
 
+fix("src/store/useAppStore.ts", "UAS-setLanguage",
+  "setLanguage: (lang) => set({ uiLanguage: lang }),",
+  "setLanguage: (lang: UILanguage) => set({ uiLanguage: lang }),")
+;
+fix("src/store/useAppStore.ts", "UAS-addCustomWordToSRS",
+  "addCustomWordToSRS: (word: any) => set((state) => {",
+  "addCustomWordToSRS: (word: any) => set((state: AppState) => {")
+;
+fix("src/store/useAppStore.ts", "UAS-updateCustomWord",
+  "updateCustomWord: (wordId: string, updates: any) => set((state) => {",
+  "updateCustomWord: (wordId: string, updates: any) => set((state: AppState) => {")
+;
+fix("src/store/useAppStore.ts", "UAS-deleteCustomWord",
+  "deleteCustomWord: (wordId: string) => set((state) => {",
+  "deleteCustomWord: (wordId: string) => set((state: AppState) => {")
+;
 fix("src/store/useAppStore.ts", "UAS-toggleDevUnlockAll",
   "toggleDevUnlockAll: () => set((state) => ({ devUnlockAll: !state.devUnlockAll })),",
   "toggleDevUnlockAll: () => set((state: AppState) => ({ devUnlockAll: !state.devUnlockAll })),")
@@ -62,7 +78,6 @@ fix("src/store/useAppStore.ts", "UAS-reviewCard",
   "reviewCard: (wordId, grade) => set((state) => {",
   "reviewCard: (wordId: string, grade: ReviewGrade) => set((state: AppState) => {")
 ;
-
 fix("src/components/auth/SaveProgressCard.tsx", "SPC-ttrack-viewed",
   "ttrack('save_prompt_viewed'",
   "track('save_prompt_viewed'")
@@ -87,7 +102,6 @@ fix("src/store/useAppStore.ts", "UAS-setIsPremium",
   "setIsPremium: (isPremium) => set({ isPremium }),",
   "setIsPremium: (isPremium: boolean) => set({ isPremium }),")
 ;
-
 fix("src/types/curriculum.ts", "TYPE-ExerciseOption",
   "text: string; // Keeps Darija in text",
   "text: MultiLangText | string; // Darija in text, or localized meaning (MultiLangText)")
