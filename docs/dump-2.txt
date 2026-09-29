@@ -402,7 +402,7 @@
 902|            </span>
 903|            <span>{tr("Apprendre une langue, c’est rencontrer des gens.", "Learning a language is meeting people.", "Aprender un idioma es conocer gente.", "تعلم اللغة لقاءٌ بالناس.")}</span>
 904|            <button onClick={() => switchView("space")}>
-905|              Passeport Culturel & Données <ArrowRight size={13} />
+905|              {tr("Passeport Culturel & Données", "Cultural passport & data", "Pasaporte cultural y datos", "الجواز الثقافي والبيانات")} <ArrowRight size={13} />
 906|            </button>
 907|          </footer>
 908|        </div>
@@ -423,12 +423,12 @@
 923|              <Icon size={19} />
 924|              <span>
 925|                {item.id === "today"
-926|                  ? "Accueil"
+926|                  ? tr("Accueil", "Home", "Inicio", "الرئيسية")
 927|                  : item.id === "path"
-928|                  ? "Parcours"
+928|                  ? tr("Parcours", "Journey", "Recorrido", "المسار")
 929|                  : item.id === "phrases"
-930|                  ? "Phrases"
-931|                  : "Réviser"}
+930|                  ? tr("Phrases", "Phrases", "Frases", "العبارات")
+931|                  : tr("Réviser", "Review", "Repasar", "مراجعة")}
 932|              </span>
 933|            </button>
 934|          );

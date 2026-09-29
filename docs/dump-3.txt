@@ -299,11 +299,11 @@
 1299|        <div className="callout-copy">
 1300|          <span className="mini-kicker">{tr("UNE LANGUE, DES RENCONTRES", "A LANGUAGE, ENCOUNTERS", "UN IDIOMA, ENCUENTROS", "لغةٌ ولقاءات")}</span>
 1301|          <h3>
-1302|            Pas besoin d’être parfait·e.
+1302|            {tr("Pas besoin d’être parfait·e.", "No need to be perfect.", "No hace falta ser perfecto.", "لا داعي للكمال.")}
 1303|            <br />
 1304|            <em>{tr("Il suffit de commencer.", "Just start.", "Solo empieza.", "ابدأ فقط.")}</em>
 1305|          </h3>
-1306|          <p>Chaque expression est une petite invitation à aller vers l’autre.</p>
+1306|          <p>{tr("Chaque expression est une petite invitation à aller vers l’autre.", "Every phrase is a small invitation to reach out to others.", "Cada expresión es una pequeña invitación a acercarse al otro.", "كل عبارة دعوة صغيرة للتقرب من الآخر.")}</p>
 1307|        </div>
 1308|        <button onClick={() => onNavigate("path")} aria-label="Explorer le parcours">
 1309|          <ArrowRight size={20} />
@@ -337,12 +337,12 @@
 1337|        <div className="path-banner">
 1338|          <div>
 1339|            <span className="hero-kicker">
-1340|              <Compass size={14} /> PARCOURS DÉCOUVERTE
+1340|              <Compass size={14} /> {tr("PARCOURS DÉCOUVERTE", "DISCOVERY JOURNEY", "RUTA DE DESCUBRIMIENTO", "مسار الاستكشاف")}
 1341|            </span>
 1342|            <h2>
-1343|              Les premiers pas
+1343|              {tr("Les premiers pas", "The first steps", "Los primeros pasos", "الخطوات الأولى")}
 1344|              <br />
-1345|              en darija.
+1345|              {tr("en darija.", "in darija.", "en darija.", "في الدارجة.")}
 1346|            </h2>
 1347|            <p>{tr("Trois escales pour oser dire les premiers mots.", "Three stops to dare your first words.", "Tres paradas para atreverte a hablar.", "ثلاث محطات لتبدأ كلماتك الأولى.")}</p>
 1348|          </div>
@@ -449,11 +449,11 @@
 1449|                    </span>
 1450|                    {isGated ? (
 1451|                      <button onClick={onOpenPaywall} style={{ color: "#d69b47" }}>
-1452|                        Débloquer avec Pro <ArrowRight size={14} />
+1452|                        {tr("Débloquer avec Pro", "Unlock with Pro", "Desbloquear con Pro", "افتح مع برو")} <ArrowRight size={14} />
 1453|                      </button>
 1454|                    ) : unlocked ? (
 1455|                      <button onClick={() => onStart(lesson.id)}>
-1456|                        {done ? "Revoir" : "Commencer"}
+1456|                        {done ? tr("Revoir", "Review", "Repasar", "مراجعة") : tr("Commencer", "Start", "Empezar", "ابدأ")}
 1457|                        <ArrowRight size={14} />
 1458|                      </button>
 1459|                    ) : (
@@ -487,7 +487,7 @@
 1487|          <button
 1488|            onClick={() => onOpenCheckpoint("1", "Palier A1 — Fondations")}
 1489|          >
-1490|            Passer le Checkpoint A1 <ArrowRight size={14} />
+1490|            {tr("Passer le Checkpoint A1", "Take Checkpoint A1", "Pasar el Checkpoint A1", "اجتز نقطة A1")} <ArrowRight size={14} />
 1491|          </button>
 1492|        </div>
 1493|

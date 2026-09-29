@@ -902,7 +902,7 @@ export default function Home() {
             </span>
             <span>{tr("Apprendre une langue, c’est rencontrer des gens.", "Learning a language is meeting people.", "Aprender un idioma es conocer gente.", "تعلم اللغة لقاءٌ بالناس.")}</span>
             <button onClick={() => switchView("space")}>
-              Passeport Culturel & Données <ArrowRight size={13} />
+              {tr("Passeport Culturel & Données", "Cultural passport & data", "Pasaporte cultural y datos", "الجواز الثقافي والبيانات")} <ArrowRight size={13} />
             </button>
           </footer>
         </div>
@@ -923,12 +923,12 @@ export default function Home() {
               <Icon size={19} />
               <span>
                 {item.id === "today"
-                  ? "Accueil"
+                  ? tr("Accueil", "Home", "Inicio", "الرئيسية")
                   : item.id === "path"
-                  ? "Parcours"
+                  ? tr("Parcours", "Journey", "Recorrido", "المسار")
                   : item.id === "phrases"
-                  ? "Phrases"
-                  : "Réviser"}
+                  ? tr("Phrases", "Phrases", "Frases", "العبارات")
+                  : tr("Réviser", "Review", "Repasar", "مراجعة")}
               </span>
             </button>
           );
@@ -1299,11 +1299,11 @@ function TodayView({
         <div className="callout-copy">
           <span className="mini-kicker">{tr("UNE LANGUE, DES RENCONTRES", "A LANGUAGE, ENCOUNTERS", "UN IDIOMA, ENCUENTROS", "لغةٌ ولقاءات")}</span>
           <h3>
-            Pas besoin d’être parfait·e.
+            {tr("Pas besoin d’être parfait·e.", "No need to be perfect.", "No hace falta ser perfecto.", "لا داعي للكمال.")}
             <br />
             <em>{tr("Il suffit de commencer.", "Just start.", "Solo empieza.", "ابدأ فقط.")}</em>
           </h3>
-          <p>Chaque expression est une petite invitation à aller vers l’autre.</p>
+          <p>{tr("Chaque expression est une petite invitation à aller vers l’autre.", "Every phrase is a small invitation to reach out to others.", "Cada expresión es una pequeña invitación a acercarse al otro.", "كل عبارة دعوة صغيرة للتقرب من الآخر.")}</p>
         </div>
         <button onClick={() => onNavigate("path")} aria-label="Explorer le parcours">
           <ArrowRight size={20} />
@@ -1337,12 +1337,12 @@ function PathView({
         <div className="path-banner">
           <div>
             <span className="hero-kicker">
-              <Compass size={14} /> PARCOURS DÉCOUVERTE
+              <Compass size={14} /> {tr("PARCOURS DÉCOUVERTE", "DISCOVERY JOURNEY", "RUTA DE DESCUBRIMIENTO", "مسار الاستكشاف")}
             </span>
             <h2>
-              Les premiers pas
+              {tr("Les premiers pas", "The first steps", "Los primeros pasos", "الخطوات الأولى")}
               <br />
-              en darija.
+              {tr("en darija.", "in darija.", "en darija.", "في الدارجة.")}
             </h2>
             <p>{tr("Trois escales pour oser dire les premiers mots.", "Three stops to dare your first words.", "Tres paradas para atreverte a hablar.", "ثلاث محطات لتبدأ كلماتك الأولى.")}</p>
           </div>
@@ -1449,11 +1449,11 @@ function PathView({
                     </span>
                     {isGated ? (
                       <button onClick={onOpenPaywall} style={{ color: "#d69b47" }}>
-                        Débloquer avec Pro <ArrowRight size={14} />
+                        {tr("Débloquer avec Pro", "Unlock with Pro", "Desbloquear con Pro", "افتح مع برو")} <ArrowRight size={14} />
                       </button>
                     ) : unlocked ? (
                       <button onClick={() => onStart(lesson.id)}>
-                        {done ? "Revoir" : "Commencer"}
+                        {done ? tr("Revoir", "Review", "Repasar", "مراجعة") : tr("Commencer", "Start", "Empezar", "ابدأ")}
                         <ArrowRight size={14} />
                       </button>
                     ) : (
@@ -1487,7 +1487,7 @@ function PathView({
           <button
             onClick={() => onOpenCheckpoint("1", "Palier A1 — Fondations")}
           >
-            Passer le Checkpoint A1 <ArrowRight size={14} />
+            {tr("Passer le Checkpoint A1", "Take Checkpoint A1", "Pasar el Checkpoint A1", "اجتز نقطة A1")} <ArrowRight size={14} />
           </button>
         </div>
 
@@ -1651,7 +1651,7 @@ function PhrasesView({
               setFavoritesOnly(false);
             }}
           >
-            Effacer les filtres <ArrowRight size={14} />
+            {tr("Effacer les filtres", "Clear filters", "Borrar filtros", "مسح المرشحات")} <ArrowRight size={14} />
           </button>
         </div>
       )}
@@ -1680,34 +1680,34 @@ function ReviewView({
 }) {
   const cards = [
     {
-      front: "Merci beaucoup",
+      front: tr("Merci beaucoup", "Thank you so much", "Muchas gracias", "شكراً جزيلاً"),
       back: "Shukran bzaf",
       arabic: "شكرا بزاف!",
-      hint: "Un petit mot chaleureux qui ouvre toutes les portes.",
+      hint: tr("Un petit mot chaleureux qui ouvre toutes les portes.", "A warm little word that opens every door.", "Una palabra cálida que abre todas las puertas.", "كلمة دافئة تفتح كل الأبواب."),
     },
     {
-      front: "Où est le souk ?",
+      front: tr("Où est le souk ?", "Where is the souk?", "¿Dónde está el souk?", "أين السوق؟"),
       back: "Fin kayn souk?",
       arabic: "فين كاين السوق؟",
-      hint: "Pour trouver ton chemin dans la médina.",
+      hint: tr("Pour trouver ton chemin dans la médina.", "To find your way in the medina.", "Para encontrar tu camino en la medina.", "لتجد طريقك في المدينة القديمة."),
     },
     {
-      front: "S’il vous plaît",
+      front: tr("S’il vous plaît", "Please", "Por favor", "من فضلك"),
       back: "Afak",
       arabic: "عفاك",
-      hint: "Un mot simple pour rendre tes demandes plus douces.",
+      hint: tr("Un mot simple pour rendre tes demandes plus douces.", "A simple word that softens your requests.", "Una palabra simple para suavizar tus peticiones.", "كلمة بسيطة تجعل طلباتك ألطف."),
     },
     {
-      front: "Au revoir, à bientôt",
+      front: tr("Au revoir, à bientôt", "Goodbye, see you soon", "Adiós, hasta pronto", "إلى اللقاء، أراك قريباً"),
       back: "Bslama, nshawfek",
       arabic: "بسلامة، نشوفك",
-      hint: "Une manière chaleureuse de se dire à bientôt.",
+      hint: tr("Une manière chaleureuse de se dire à bientôt.", "A warm way to say see you soon.", "Una manera cálida de decir hasta pronto.", "طريقة دافئة للقول أراك قريباً."),
     },
     {
-      front: "Je voudrais un thé",
+      front: tr("Je voudrais un thé", "I’d like a tea", "Quisiera un té", "أريد شاياً"),
       back: "Bghit wahed atay, afak",
       arabic: "بغيت واحد أتاي، عفاك",
-      hint: "Pour savourer un moment au café.",
+      hint: tr("Pour savourer un moment au café.", "To savor a moment at the café.", "Para saborear un momento en el café.", "للاستمتاع بلحظة في المقهى."),
     },
   ];
 
@@ -1718,19 +1718,19 @@ function ReviewView({
       <section className="review-main">
         <div className="review-card-top">
           <span className="mini-kicker">
-            CARTE {String((reviewIndex % cards.length) + 1).padStart(2, "0")} <i>/</i> 0{cards.length}
+            {tr("CARTE", "CARD", "TARJETA", "بطاقة")} {String((reviewIndex % cards.length) + 1).padStart(2, "0")} <i>/</i> 0{cards.length}
           </span>
           <span className="review-session">
-            <Sparkles size={14} /> Session tranquille
+            <Sparkles size={14} /> {tr("Session tranquille", "Quiet session", "Sesión tranquila", "جلسة هادئة")}
           </span>
         </div>
         <button
           className={`flashcard ${cardFlipped ? "flashcard-flipped" : ""}`}
           onClick={() => setCardFlipped(!cardFlipped)}
-          aria-label={cardFlipped ? "Voir la question" : "Retourner la carte"}
+          aria-label={cardFlipped ? tr("Voir la question", "See the question", "Ver la pregunta", "شاهد السؤال") : tr("Retourner la carte", "Flip the card", "Girar la tarjeta", "اقلب البطاقة")}
         >
           <span className="flashcard-decoration decor-top">✳</span>
-          <span className="flashcard-label">{cardFlipped ? "EN DARIJA" : "EN FRANÇAIS"}</span>
+          <span className="flashcard-label">{cardFlipped ? tr("EN DARIJA", "IN DARIJA", "EN DARIJA", "بالدارجة") : tr("EN FRANÇAIS", "IN ENGLISH", "EN ESPAÑOL", "بالعربية")}</span>
           {cardFlipped ? (
             <>
               <strong className="flashcard-answer">{card.back}</strong>
@@ -1743,7 +1743,7 @@ function ReviewView({
             <>
               <strong className="flashcard-question">{card.front}</strong>
               <span className="flashcard-tap">
-                <span className="rotate-symbol">↻</span> Touche pour révéler
+                <span className="rotate-symbol">↻</span> {tr("Touche pour révéler", "Tap to reveal", "Toca para revelar", "المس للكشف")}
               </span>
             </>
           )}
@@ -1783,8 +1783,7 @@ function ReviewView({
           <span className="mini-kicker">{tr("SANS PRESSION", "NO PRESSURE", "SIN PRESIÓN", "بدون ضغط")}</span>
           <h3>{tr("Le bon rythme, c’est le tien.", "The right pace is yours.", "El buen ritmo es el tuyo.", "الإيقاع المناسب هو إيقاعك.")}</h3>
           <p>
-            L'algorithme de répétition espacée (SRS) consolide ta mémoire à long terme. Chaque point
-            d'XP nourrit ton passeport.
+            {tr("L'algorithme de répétition espacée (SRS) consolide ta mémoire à long terme. Chaque point d'XP nourrit ton passeport.", "The spaced-repetition (SRS) algorithm consolidates your long-term memory. Every XP point feeds your passport.", "El algoritmo de repetición espaciada (SRS) consolida tu memoria a largo plazo. Cada punto de XP alimenta tu pasaporte.", "خوارزمية التكرار المتباعد (SRS) ترسّخ ذاكرتك طويلة المدى. كل نقطة XP تغذي جوازك.")}
           </p>
           <div className="aside-divider" />
           <div className="review-method">
@@ -1792,13 +1791,13 @@ function ReviewView({
             <p>
               <strong>{tr("Petit conseil", "Quick tip", "Pequeño consejo", "نصيحة")}</strong>
               <br />
-              Dis la phrase à voix haute. La mémoire aime les histoires qu’on raconte.
+              {tr("Dis la phrase à voix haute. La mémoire aime la répétition.", "Say the phrase out loud. Memory loves repetition.", "Di la frase en voz alta. La memoria ama la repetición.", "قل العبارة بصوت عالٍ. الذاكرة تحب التكرار.")} les histoires qu’on raconte.
             </p>
           </div>
         </div>
         <div className="review-alphabet">
           <span>أ ب ت</span>
-          <p>Écoute · Répète · Reviens</p>
+          <p>{tr("Écoute · Répète · Reviens", "Listen · Repeat · Come back", "Escucha · Repite · Vuelve", "استمع · كرر · عد")}</p>
         </div>
       </aside>
     </div>
@@ -1915,7 +1914,7 @@ function SpaceView({
           </div>
           {!isPremium && (
             <button className="outline-button" onClick={onOpenPaywall}>
-              Passer à Kenza Pro <ArrowRight size={14} />
+              {tr("Passer à Kenza Pro", "Go Kenza Pro", "Pasar a Kenza Pro", "انتقل إلى كنزة برو")} <ArrowRight size={14} />
             </button>
           )}
         </article>

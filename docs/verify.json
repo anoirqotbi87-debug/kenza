@@ -1,6 +1,6 @@
 {
-  "ts": "2026-09-29T00:15:38.992Z",
-  "appliedThisRun": 0,
+  "ts": "2026-09-29T00:17:09.515Z",
+  "appliedThisRun": 29,
   "already": 88,
   "missing": [
     "Cartes du jour",
@@ -31,32 +31,18 @@
     "MON ESPACE",
     "TON ESPACE",
     "objectif",
-    "Mon espace"
+    "Mon espace",
+    "Palier A1 — Fondations",
+    "Effacer ma progression locale"
   ],
-  "trCallCount": 94,
+  "trCallCount": 130,
   "checks": [
     {
       "s": "tr(\"Salam, on s’y remet ?\"",
       "ok": true
     },
     {
-      "s": "tr(\"La darija\", \"Darija\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"TON PETIT MOMENT DARIJA\"",
-      "ok": true
-    },
-    {
       "s": "tr(\"Voir mon espace\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"Voir le parcours\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"rythme régulier\"",
       "ok": true
     },
     {
@@ -68,7 +54,51 @@
       "ok": true
     },
     {
-      "s": "tr(\"Les premiers bonjours\"",
+      "s": "front: tr(\"Merci beaucoup\"",
+      "ok": true
+    },
+    {
+      "s": "front: tr(\"Je voudrais un thé\"",
+      "ok": true
+    },
+    {
+      "s": "hint: tr(\"Pour savourer un moment au café.\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"Touche pour révéler\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"Session tranquille\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"CARTE\", \"CARD\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"Accueil\", \"Home\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"EN FRANÇAIS\", \"IN ENGLISH\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"Pas besoin d’être parfait·e.\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"Les premiers pas\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"Passeport Culturel & Données\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"Écoute · Répète · Reviens\"",
       "ok": true
     }
   ]

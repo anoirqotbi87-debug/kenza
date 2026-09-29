@@ -902,7 +902,7 @@
 902|            </span>
 903|            <span>{tr("Apprendre une langue, c’est rencontrer des gens.", "Learning a language is meeting people.", "Aprender un idioma es conocer gente.", "تعلم اللغة لقاءٌ بالناس.")}</span>
 904|            <button onClick={() => switchView("space")}>
-905|              Passeport Culturel & Données <ArrowRight size={13} />
+905|              {tr("Passeport Culturel & Données", "Cultural passport & data", "Pasaporte cultural y datos", "الجواز الثقافي والبيانات")} <ArrowRight size={13} />
 906|            </button>
 907|          </footer>
 908|        </div>
@@ -923,12 +923,12 @@
 923|              <Icon size={19} />
 924|              <span>
 925|                {item.id === "today"
-926|                  ? "Accueil"
+926|                  ? tr("Accueil", "Home", "Inicio", "الرئيسية")
 927|                  : item.id === "path"
-928|                  ? "Parcours"
+928|                  ? tr("Parcours", "Journey", "Recorrido", "المسار")
 929|                  : item.id === "phrases"
-930|                  ? "Phrases"
-931|                  : "Réviser"}
+930|                  ? tr("Phrases", "Phrases", "Frases", "العبارات")
+931|                  : tr("Réviser", "Review", "Repasar", "مراجعة")}
 932|              </span>
 933|            </button>
 934|          );
@@ -1299,11 +1299,11 @@
 1299|        <div className="callout-copy">
 1300|          <span className="mini-kicker">{tr("UNE LANGUE, DES RENCONTRES", "A LANGUAGE, ENCOUNTERS", "UN IDIOMA, ENCUENTROS", "لغةٌ ولقاءات")}</span>
 1301|          <h3>
-1302|            Pas besoin d’être parfait·e.
+1302|            {tr("Pas besoin d’être parfait·e.", "No need to be perfect.", "No hace falta ser perfecto.", "لا داعي للكمال.")}
 1303|            <br />
 1304|            <em>{tr("Il suffit de commencer.", "Just start.", "Solo empieza.", "ابدأ فقط.")}</em>
 1305|          </h3>
-1306|          <p>Chaque expression est une petite invitation à aller vers l’autre.</p>
+1306|          <p>{tr("Chaque expression est une petite invitation à aller vers l’autre.", "Every phrase is a small invitation to reach out to others.", "Cada expresión es una pequeña invitación a acercarse al otro.", "كل عبارة دعوة صغيرة للتقرب من الآخر.")}</p>
 1307|        </div>
 1308|        <button onClick={() => onNavigate("path")} aria-label="Explorer le parcours">
 1309|          <ArrowRight size={20} />
@@ -1337,12 +1337,12 @@
 1337|        <div className="path-banner">
 1338|          <div>
 1339|            <span className="hero-kicker">
-1340|              <Compass size={14} /> PARCOURS DÉCOUVERTE
+1340|              <Compass size={14} /> {tr("PARCOURS DÉCOUVERTE", "DISCOVERY JOURNEY", "RUTA DE DESCUBRIMIENTO", "مسار الاستكشاف")}
 1341|            </span>
 1342|            <h2>
-1343|              Les premiers pas
+1343|              {tr("Les premiers pas", "The first steps", "Los primeros pasos", "الخطوات الأولى")}
 1344|              <br />
-1345|              en darija.
+1345|              {tr("en darija.", "in darija.", "en darija.", "في الدارجة.")}
 1346|            </h2>
 1347|            <p>{tr("Trois escales pour oser dire les premiers mots.", "Three stops to dare your first words.", "Tres paradas para atreverte a hablar.", "ثلاث محطات لتبدأ كلماتك الأولى.")}</p>
 1348|          </div>
@@ -1449,11 +1449,11 @@
 1449|                    </span>
 1450|                    {isGated ? (
 1451|                      <button onClick={onOpenPaywall} style={{ color: "#d69b47" }}>
-1452|                        Débloquer avec Pro <ArrowRight size={14} />
+1452|                        {tr("Débloquer avec Pro", "Unlock with Pro", "Desbloquear con Pro", "افتح مع برو")} <ArrowRight size={14} />
 1453|                      </button>
 1454|                    ) : unlocked ? (
 1455|                      <button onClick={() => onStart(lesson.id)}>
-1456|                        {done ? "Revoir" : "Commencer"}
+1456|                        {done ? tr("Revoir", "Review", "Repasar", "مراجعة") : tr("Commencer", "Start", "Empezar", "ابدأ")}
 1457|                        <ArrowRight size={14} />
 1458|                      </button>
 1459|                    ) : (
@@ -1487,7 +1487,7 @@
 1487|          <button
 1488|            onClick={() => onOpenCheckpoint("1", "Palier A1 — Fondations")}
 1489|          >
-1490|            Passer le Checkpoint A1 <ArrowRight size={14} />
+1490|            {tr("Passer le Checkpoint A1", "Take Checkpoint A1", "Pasar el Checkpoint A1", "اجتز نقطة A1")} <ArrowRight size={14} />
 1491|          </button>
 1492|        </div>
 1493|
@@ -1651,7 +1651,7 @@
 1651|              setFavoritesOnly(false);
 1652|            }}
 1653|          >
-1654|            Effacer les filtres <ArrowRight size={14} />
+1654|            {tr("Effacer les filtres", "Clear filters", "Borrar filtros", "مسح المرشحات")} <ArrowRight size={14} />
 1655|          </button>
 1656|        </div>
 1657|      )}
@@ -1680,34 +1680,34 @@
 1680|}) {
 1681|  const cards = [
 1682|    {
-1683|      front: "Merci beaucoup",
+1683|      front: tr("Merci beaucoup", "Thank you so much", "Muchas gracias", "شكراً جزيلاً"),
 1684|      back: "Shukran bzaf",
 1685|      arabic: "شكرا بزاف!",
-1686|      hint: "Un petit mot chaleureux qui ouvre toutes les portes.",
+1686|      hint: tr("Un petit mot chaleureux qui ouvre toutes les portes.", "A warm little word that opens every door.", "Una palabra cálida que abre todas las puertas.", "كلمة دافئة تفتح كل الأبواب."),
 1687|    },
 1688|    {
-1689|      front: "Où est le souk ?",
+1689|      front: tr("Où est le souk ?", "Where is the souk?", "¿Dónde está el souk?", "أين السوق؟"),
 1690|      back: "Fin kayn souk?",
 1691|      arabic: "فين كاين السوق؟",
-1692|      hint: "Pour trouver ton chemin dans la médina.",
+1692|      hint: tr("Pour trouver ton chemin dans la médina.", "To find your way in the medina.", "Para encontrar tu camino en la medina.", "لتجد طريقك في المدينة القديمة."),
 1693|    },
 1694|    {
-1695|      front: "S’il vous plaît",
+1695|      front: tr("S’il vous plaît", "Please", "Por favor", "من فضلك"),
 1696|      back: "Afak",
 1697|      arabic: "عفاك",
-1698|      hint: "Un mot simple pour rendre tes demandes plus douces.",
+1698|      hint: tr("Un mot simple pour rendre tes demandes plus douces.", "A simple word that softens your requests.", "Una palabra simple para suavizar tus peticiones.", "كلمة بسيطة تجعل طلباتك ألطف."),
 1699|    },
 1700|    {
-1701|      front: "Au revoir, à bientôt",
+1701|      front: tr("Au revoir, à bientôt", "Goodbye, see you soon", "Adiós, hasta pronto", "إلى اللقاء، أراك قريباً"),
 1702|      back: "Bslama, nshawfek",
 1703|      arabic: "بسلامة، نشوفك",
-1704|      hint: "Une manière chaleureuse de se dire à bientôt.",
+1704|      hint: tr("Une manière chaleureuse de se dire à bientôt.", "A warm way to say see you soon.", "Una manera cálida de decir hasta pronto.", "طريقة دافئة للقول أراك قريباً."),
 1705|    },
 1706|    {
-1707|      front: "Je voudrais un thé",
+1707|      front: tr("Je voudrais un thé", "I’d like a tea", "Quisiera un té", "أريد شاياً"),
 1708|      back: "Bghit wahed atay, afak",
 1709|      arabic: "بغيت واحد أتاي، عفاك",
-1710|      hint: "Pour savourer un moment au café.",
+1710|      hint: tr("Pour savourer un moment au café.", "To savor a moment at the café.", "Para saborear un momento en el café.", "للاستمتاع بلحظة في المقهى."),
 1711|    },
 1712|  ];
 1713|
@@ -1718,19 +1718,19 @@
 1718|      <section className="review-main">
 1719|        <div className="review-card-top">
 1720|          <span className="mini-kicker">
-1721|            CARTE {String((reviewIndex % cards.length) + 1).padStart(2, "0")} <i>/</i> 0{cards.length}
+1721|            {tr("CARTE", "CARD", "TARJETA", "بطاقة")} {String((reviewIndex % cards.length) + 1).padStart(2, "0")} <i>/</i> 0{cards.length}
 1722|          </span>
 1723|          <span className="review-session">
-1724|            <Sparkles size={14} /> Session tranquille
+1724|            <Sparkles size={14} /> {tr("Session tranquille", "Quiet session", "Sesión tranquila", "جلسة هادئة")}
 1725|          </span>
 1726|        </div>
 1727|        <button
 1728|          className={`flashcard ${cardFlipped ? "flashcard-flipped" : ""}`}
 1729|          onClick={() => setCardFlipped(!cardFlipped)}
-1730|          aria-label={cardFlipped ? "Voir la question" : "Retourner la carte"}
+1730|          aria-label={cardFlipped ? tr("Voir la question", "See the question", "Ver la pregunta", "شاهد السؤال") : tr("Retourner la carte", "Flip the card", "Girar la tarjeta", "اقلب البطاقة")}
 1731|        >
 1732|          <span className="flashcard-decoration decor-top">✳</span>
-1733|          <span className="flashcard-label">{cardFlipped ? "EN DARIJA" : "EN FRANÇAIS"}</span>
+1733|          <span className="flashcard-label">{cardFlipped ? tr("EN DARIJA", "IN DARIJA", "EN DARIJA", "بالدارجة") : tr("EN FRANÇAIS", "IN ENGLISH", "EN ESPAÑOL", "بالعربية")}</span>
 1734|          {cardFlipped ? (
 1735|            <>
 1736|              <strong className="flashcard-answer">{card.back}</strong>
@@ -1743,7 +1743,7 @@
 1743|            <>
 1744|              <strong className="flashcard-question">{card.front}</strong>
 1745|              <span className="flashcard-tap">
-1746|                <span className="rotate-symbol">↻</span> Touche pour révéler
+1746|                <span className="rotate-symbol">↻</span> {tr("Touche pour révéler", "Tap to reveal", "Toca para revelar", "المس للكشف")}
 1747|              </span>
 1748|            </>
 1749|          )}
@@ -1783,184 +1783,183 @@
 1783|          <span className="mini-kicker">{tr("SANS PRESSION", "NO PRESSURE", "SIN PRESIÓN", "بدون ضغط")}</span>
 1784|          <h3>{tr("Le bon rythme, c’est le tien.", "The right pace is yours.", "El buen ritmo es el tuyo.", "الإيقاع المناسب هو إيقاعك.")}</h3>
 1785|          <p>
-1786|            L'algorithme de répétition espacée (SRS) consolide ta mémoire à long terme. Chaque point
-1787|            d'XP nourrit ton passeport.
-1788|          </p>
-1789|          <div className="aside-divider" />
-1790|          <div className="review-method">
-1791|            <span className="method-dot" />
-1792|            <p>
-1793|              <strong>{tr("Petit conseil", "Quick tip", "Pequeño consejo", "نصيحة")}</strong>
-1794|              <br />
-1795|              Dis la phrase à voix haute. La mémoire aime les histoires qu’on raconte.
-1796|            </p>
-1797|          </div>
-1798|        </div>
-1799|        <div className="review-alphabet">
-1800|          <span>أ ب ت</span>
-1801|          <p>Écoute · Répète · Reviens</p>
-1802|        </div>
-1803|      </aside>
-1804|    </div>
-1805|  );
-1806|}
-1807|
-1808|// -------------------------------------------------------------
-1809|// Composant 5 : SpaceView (Mon Espace & Passeport)
-1810|// -------------------------------------------------------------
-1811|function SpaceView({
-1812|  completedCount,
-1813|  xp,
-1814|  streak,
-1815|  user,
-1816|  isPremium,
-1817|  onReset,
-1818|  onOpenPaywall,
-1819|  onToast,
-1820|}: {
-1821|  completedCount: number;
-1822|  xp: number;
-1823|  streak: number;
-1824|  user: any;
-1825|  isPremium: boolean;
-1826|  onReset: () => void;
-1827|  onOpenPaywall: () => void;
-1828|  onToast: (message: string) => void;
-1829|}) {
-1830|  const username =
-1831|    user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Invité(e)";
-1832|
-1833|  const passportData = {
-1834|    userName: username,
-1835|    levelName: xp >= 300 ? "Niveau A2 — Essentiels" : "Niveau A1 — Premiers Pas",
-1836|    score: Math.min(100, Math.round((xp / 500) * 100)),
-1837|    date: new Date().toLocaleDateString("fr-FR"),
-1838|    passportId: `KNZ-${user ? "PRO" : "DEMO"}-7421`,
-1839|  };
-1840|
-1841|  return (
-1842|    <div className="space-layout">
-1843|      <section className="space-card space-profile">
-1844|        <div className="profile-avatar">
-1845|          {username[0]?.toUpperCase() || "ك"}
-1846|        </div>
-1847|        <div className="profile-intro">
-1848|          <span className="mini-kicker">{tr("MON COIN KENZA", "MY KENZA CORNER", "MI RINCÓN KENZA", "ركني في كنزة")}</span>
-1849|          <h2>Salam, {username} !</h2>
-1850|          <p>
-1851|            {user
-1852|              ? `Connecté en tant que ${user.email}. Données sauvegardées dans le cloud.`
-1853|              : "Mode Invité actif. Ta progression est préservée localement sur cet appareil."}
-1854|          </p>
-1855|        </div>
-1856|        <span className="local-badge">
-1857|          <span className="privacy-dot" /> {isPremium ? "MEMBRE KENZA PRO" : "VERSION GRATUITE"}
-1858|        </span>
-1859|      </section>
-1860|
-1861|      <div className="space-stats">
-1862|        <article>
-1863|          <span className="space-stat-icon stat-blue">
-1864|            <BookOpen size={18} />
-1865|          </span>
-1866|          <span className="mini-kicker">{tr("LEÇONS", "LESSONS", "LECCIONES", "الدروس")}</span>
-1867|          <strong>
-1868|            {completedCount}
-1869|            <small> / {baseLessons.length}</small>
-1870|          </strong>
-1871|          <p>{tr("Chaque pas compte.", "Every step counts.", "Cada paso cuenta.", "كل خطوة تُحسب.")}</p>
-1872|        </article>
-1873|        <article>
-1874|          <span className="space-stat-icon stat-gold">
-1875|            <Star size={18} />
-1876|          </span>
-1877|          <span className="mini-kicker">{tr("POINTS", "POINTS", "PUNTOS", "النقاط")}</span>
-1878|          <strong>
-1879|            {xp}
-1880|            <small> XP</small>
-1881|          </strong>
-1882|          <p>{tr("Gagnés en pratiquant.", "Earned by practicing.", "Ganados practicando.", "تُكتسب بالتدريب.")}</p>
-1883|        </article>
-1884|        <article>
-1885|          <span className="space-stat-icon stat-orange">
-1886|            <Flame size={18} />
-1887|          </span>
-1888|          <span className="mini-kicker">{tr("RYTHME", "PACE", "RITMO", "الإيقاع")}</span>
-1889|          <strong>
-1890|            {streak}
-1891|            <small> {tr("jour", "day", "día", "يوم")}{streak > 1 ? "s" : ""}</small>
-1892|          </strong>
-1893|          <p>{tr("La régularité avant tout.", "Consistency above all.", "La constancia ante todo.", "الاستمرارية أولاً.")}</p>
-1894|        </article>
-1895|      </div>
-1896|
-1897|      <div className="space-data-grid">
-1898|        <article className="data-card">
-1899|          <div className="data-card-heading">
-1900|            <span className="data-icon">
-1901|              <LockKeyhole size={18} />
-1902|            </span>
-1903|            <div>
-1904|              <span className="mini-kicker">{tr("TES DONNÉES", "YOUR DATA", "TUS DATOS", "بياناتك")}</span>
-1905|              <h3>{tr("Progression & Confidentialité", "Progress & Privacy", "Progreso y privacidad", "التقدم والخصوصية")}</h3>
-1906|            </div>
-1907|          </div>
-1908|          <p>
-1909|            La progression est sécurisée. Si tu te connectes, tes leçons, favoris et points se
-1910|            synchronisent automatiquement sur tous tes appareils.
-1911|          </p>
-1912|          <div className="data-safe-row">
-1913|            <CheckCircle2 size={15} />
-1914|            <span>PWA Hors-Ligne · Sauvegarde Hybride Local & Supabase</span>
-1915|          </div>
-1916|          {!isPremium && (
-1917|            <button className="outline-button" onClick={onOpenPaywall}>
-1918|              Passer à Kenza Pro <ArrowRight size={14} />
-1919|            </button>
-1920|          )}
-1921|        </article>
-1922|
-1923|        <article className="data-card data-card-cert">
-1924|          <div className="data-card-heading">
-1925|            <span className="data-icon certificate-icon">
-1926|              <Award size={18} />
-1927|            </span>
-1928|            <div>
-1929|              <span className="mini-kicker">{tr("CERTIFICATS", "CERTIFICATES", "CERTIFICADOS", "الشهادات")}</span>
-1930|              <h3>{tr("Passeport Culturel", "Cultural passport", "Pasaporte cultural", "الجواز الثقافي")}</h3>
-1931|            </div>
-1932|          </div>
-1933|          <p>
-1934|            Valide les examens de palier pour obtenir tes visas officiels du Passeport Darija et les
-1935|            télécharger en haute résolution.
-1936|          </p>
-1937|          <div className="py-2">
-1938|            <DarijaPassportCard data={passportData} />
-1939|          </div>
-1940|        </article>
-1941|      </div>
-1942|
-1943|      <div className="space-settings">
-1944|        <div>
-1945|          <span className="mini-kicker">{tr("GESTION DU COMPTE", "ACCOUNT", "GESTIÓN DE CUENTA", "إدارة الحساب")}</span>
-1946|          <h3>{tr("Repartir de zéro", "Start over", "Empezar de cero", "البدء من جديد")}</h3>
-1947|          <p>{tr("Réinitialise les leçons, points et favoris sur cet appareil.", "Reset lessons, points and favorites on this device.", "Reinicia lecciones, puntos y favoritos en este dispositivo.", "صفّر الدروس والنقاط والمفضلة على هذا الجهاز.")}</p>
-1948|        </div>
-1949|        <button className="outline-button danger-outline" onClick={onReset}>
-1950|          Effacer ma progression locale
-1951|        </button>
-1952|      </div>
-1953|
-1954|      <div className="future-note">
-1955|        <span>
-1956|          <Sparkles size={16} />
-1957|        </span>
-1958|        <p>
-1959|          <strong>Kenza Pro :</strong> Accède à l'intégralité des modules B1 & B2, aux dialogues IA
-1960|          illimités et aux visas de certification culturels.
-1961|        </p>
-1962|      </div>
-1963|    </div>
-1964|  );
-1965|}
-1966|
+1786|            {tr("L'algorithme de répétition espacée (SRS) consolide ta mémoire à long terme. Chaque point d'XP nourrit ton passeport.", "The spaced-repetition (SRS) algorithm consolidates your long-term memory. Every XP point feeds your passport.", "El algoritmo de repetición espaciada (SRS) consolida tu memoria a largo plazo. Cada punto de XP alimenta tu pasaporte.", "خوارزمية التكرار المتباعد (SRS) ترسّخ ذاكرتك طويلة المدى. كل نقطة XP تغذي جوازك.")}
+1787|          </p>
+1788|          <div className="aside-divider" />
+1789|          <div className="review-method">
+1790|            <span className="method-dot" />
+1791|            <p>
+1792|              <strong>{tr("Petit conseil", "Quick tip", "Pequeño consejo", "نصيحة")}</strong>
+1793|              <br />
+1794|              {tr("Dis la phrase à voix haute. La mémoire aime la répétition.", "Say the phrase out loud. Memory loves repetition.", "Di la frase en voz alta. La memoria ama la repetición.", "قل العبارة بصوت عالٍ. الذاكرة تحب التكرار.")} les histoires qu’on raconte.
+1795|            </p>
+1796|          </div>
+1797|        </div>
+1798|        <div className="review-alphabet">
+1799|          <span>أ ب ت</span>
+1800|          <p>{tr("Écoute · Répète · Reviens", "Listen · Repeat · Come back", "Escucha · Repite · Vuelve", "استمع · كرر · عد")}</p>
+1801|        </div>
+1802|      </aside>
+1803|    </div>
+1804|  );
+1805|}
+1806|
+1807|// -------------------------------------------------------------
+1808|// Composant 5 : SpaceView (Mon Espace & Passeport)
+1809|// -------------------------------------------------------------
+1810|function SpaceView({
+1811|  completedCount,
+1812|  xp,
+1813|  streak,
+1814|  user,
+1815|  isPremium,
+1816|  onReset,
+1817|  onOpenPaywall,
+1818|  onToast,
+1819|}: {
+1820|  completedCount: number;
+1821|  xp: number;
+1822|  streak: number;
+1823|  user: any;
+1824|  isPremium: boolean;
+1825|  onReset: () => void;
+1826|  onOpenPaywall: () => void;
+1827|  onToast: (message: string) => void;
+1828|}) {
+1829|  const username =
+1830|    user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Invité(e)";
+1831|
+1832|  const passportData = {
+1833|    userName: username,
+1834|    levelName: xp >= 300 ? "Niveau A2 — Essentiels" : "Niveau A1 — Premiers Pas",
+1835|    score: Math.min(100, Math.round((xp / 500) * 100)),
+1836|    date: new Date().toLocaleDateString("fr-FR"),
+1837|    passportId: `KNZ-${user ? "PRO" : "DEMO"}-7421`,
+1838|  };
+1839|
+1840|  return (
+1841|    <div className="space-layout">
+1842|      <section className="space-card space-profile">
+1843|        <div className="profile-avatar">
+1844|          {username[0]?.toUpperCase() || "ك"}
+1845|        </div>
+1846|        <div className="profile-intro">
+1847|          <span className="mini-kicker">{tr("MON COIN KENZA", "MY KENZA CORNER", "MI RINCÓN KENZA", "ركني في كنزة")}</span>
+1848|          <h2>Salam, {username} !</h2>
+1849|          <p>
+1850|            {user
+1851|              ? `Connecté en tant que ${user.email}. Données sauvegardées dans le cloud.`
+1852|              : "Mode Invité actif. Ta progression est préservée localement sur cet appareil."}
+1853|          </p>
+1854|        </div>
+1855|        <span className="local-badge">
+1856|          <span className="privacy-dot" /> {isPremium ? "MEMBRE KENZA PRO" : "VERSION GRATUITE"}
+1857|        </span>
+1858|      </section>
+1859|
+1860|      <div className="space-stats">
+1861|        <article>
+1862|          <span className="space-stat-icon stat-blue">
+1863|            <BookOpen size={18} />
+1864|          </span>
+1865|          <span className="mini-kicker">{tr("LEÇONS", "LESSONS", "LECCIONES", "الدروس")}</span>
+1866|          <strong>
+1867|            {completedCount}
+1868|            <small> / {baseLessons.length}</small>
+1869|          </strong>
+1870|          <p>{tr("Chaque pas compte.", "Every step counts.", "Cada paso cuenta.", "كل خطوة تُحسب.")}</p>
+1871|        </article>
+1872|        <article>
+1873|          <span className="space-stat-icon stat-gold">
+1874|            <Star size={18} />
+1875|          </span>
+1876|          <span className="mini-kicker">{tr("POINTS", "POINTS", "PUNTOS", "النقاط")}</span>
+1877|          <strong>
+1878|            {xp}
+1879|            <small> XP</small>
+1880|          </strong>
+1881|          <p>{tr("Gagnés en pratiquant.", "Earned by practicing.", "Ganados practicando.", "تُكتسب بالتدريب.")}</p>
+1882|        </article>
+1883|        <article>
+1884|          <span className="space-stat-icon stat-orange">
+1885|            <Flame size={18} />
+1886|          </span>
+1887|          <span className="mini-kicker">{tr("RYTHME", "PACE", "RITMO", "الإيقاع")}</span>
+1888|          <strong>
+1889|            {streak}
+1890|            <small> {tr("jour", "day", "día", "يوم")}{streak > 1 ? "s" : ""}</small>
+1891|          </strong>
+1892|          <p>{tr("La régularité avant tout.", "Consistency above all.", "La constancia ante todo.", "الاستمرارية أولاً.")}</p>
+1893|        </article>
+1894|      </div>
+1895|
+1896|      <div className="space-data-grid">
+1897|        <article className="data-card">
+1898|          <div className="data-card-heading">
+1899|            <span className="data-icon">
+1900|              <LockKeyhole size={18} />
+1901|            </span>
+1902|            <div>
+1903|              <span className="mini-kicker">{tr("TES DONNÉES", "YOUR DATA", "TUS DATOS", "بياناتك")}</span>
+1904|              <h3>{tr("Progression & Confidentialité", "Progress & Privacy", "Progreso y privacidad", "التقدم والخصوصية")}</h3>
+1905|            </div>
+1906|          </div>
+1907|          <p>
+1908|            La progression est sécurisée. Si tu te connectes, tes leçons, favoris et points se
+1909|            synchronisent automatiquement sur tous tes appareils.
+1910|          </p>
+1911|          <div className="data-safe-row">
+1912|            <CheckCircle2 size={15} />
+1913|            <span>PWA Hors-Ligne · Sauvegarde Hybride Local & Supabase</span>
+1914|          </div>
+1915|          {!isPremium && (
+1916|            <button className="outline-button" onClick={onOpenPaywall}>
+1917|              {tr("Passer à Kenza Pro", "Go Kenza Pro", "Pasar a Kenza Pro", "انتقل إلى كنزة برو")} <ArrowRight size={14} />
+1918|            </button>
+1919|          )}
+1920|        </article>
+1921|
+1922|        <article className="data-card data-card-cert">
+1923|          <div className="data-card-heading">
+1924|            <span className="data-icon certificate-icon">
+1925|              <Award size={18} />
+1926|            </span>
+1927|            <div>
+1928|              <span className="mini-kicker">{tr("CERTIFICATS", "CERTIFICATES", "CERTIFICADOS", "الشهادات")}</span>
+1929|              <h3>{tr("Passeport Culturel", "Cultural passport", "Pasaporte cultural", "الجواز الثقافي")}</h3>
+1930|            </div>
+1931|          </div>
+1932|          <p>
+1933|            Valide les examens de palier pour obtenir tes visas officiels du Passeport Darija et les
+1934|            télécharger en haute résolution.
+1935|          </p>
+1936|          <div className="py-2">
+1937|            <DarijaPassportCard data={passportData} />
+1938|          </div>
+1939|        </article>
+1940|      </div>
+1941|
+1942|      <div className="space-settings">
+1943|        <div>
+1944|          <span className="mini-kicker">{tr("GESTION DU COMPTE", "ACCOUNT", "GESTIÓN DE CUENTA", "إدارة الحساب")}</span>
+1945|          <h3>{tr("Repartir de zéro", "Start over", "Empezar de cero", "البدء من جديد")}</h3>
+1946|          <p>{tr("Réinitialise les leçons, points et favoris sur cet appareil.", "Reset lessons, points and favorites on this device.", "Reinicia lecciones, puntos y favoritos en este dispositivo.", "صفّر الدروس والنقاط والمفضلة على هذا الجهاز.")}</p>
+1947|        </div>
+1948|        <button className="outline-button danger-outline" onClick={onReset}>
+1949|          Effacer ma progression locale
+1950|        </button>
+1951|      </div>
+1952|
+1953|      <div className="future-note">
+1954|        <span>
+1955|          <Sparkles size={16} />
+1956|        </span>
+1957|        <p>
+1958|          <strong>Kenza Pro :</strong> Accède à l'intégralité des modules B1 & B2, aux dialogues IA
+1959|          illimités et aux visas de certification culturels.
+1960|        </p>
+1961|      </div>
+1962|    </div>
+1963|  );
+1964|}
+1965|
