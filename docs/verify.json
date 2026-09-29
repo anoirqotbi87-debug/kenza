@@ -1,176 +1,49 @@
-{
-  "ts": "2026-09-29T16:38:50.825Z",
-  "appliedThisRun": 83,
-  "already": 0,
-  "missing": [
-    "la darija, en chemin",
-    "Grammaire active",
-    "Pratique orale",
-    "Révisions SRS",
-    "Roleplay IA",
-    "Mon Passeport",
-    "TON RYTHME",
-    "10 minutes par jour",
-    "Se connecter",
-    "TA PROCHAINE ÉTAPE",
-    "leçons terminées",
-    "points de pratique",
-    "À toi de choisir ton pas.",
-    "UN MOT À EMPORTER",
-    "5 MINUTES, PAS PLUS",
-    "IMMERSION IA",
-    "UNE LANGUE, DES RENCONTRES",
-    "Il suffit de commencer.",
-    "Trois escales pour oser dire les premiers mots.",
-    "TON AVANCÉE",
-    "À SUIVRE",
-    "PETIT CONSEIL",
-    "La régularité avant la perfection.",
-    "Palier A1 (Fondations)",
-    "À PORTÉE DE MAIN",
-    "Aucune phrase trouvée",
-    "Essaie un autre mot ou change de catégorie.",
-    "Réponds dans ta tête, puis retourne la carte pour vérifier.",
-    "Encore",
-    "Difficile",
-    "Bien",
-    "Facile",
-    "SANS PRESSION",
-    "Le bon rythme, c’est le tien.",
-    "Petit conseil",
-    "MON COIN KENZA",
-    "LEÇONS",
-    "Chaque pas compte.",
-    "POINTS",
-    "Gagnés en pratiquant.",
-    "RYTHME",
-    "La régularité avant tout.",
-    "TES DONNÉES",
-    "Progression & Confidentialité",
-    "CERTIFICATS",
-    "Passeport Culturel",
-    "GESTION DU COMPTE",
-    "Repartir de zéro",
-    "Réinitialise les leçons, points et favoris sur cet appareil.",
-    "Apprendre une langue, c’est rencontrer des gens.",
-    "Une phrase, une rencontre, une autre façon de voir le Maroc.",
-    "Cartes du jour",
-    "Au café, en taxi",
-    "Pas besoin d’être parfait·e.",
-    "Les premiers pas",
-    "Débloquer avec Pro",
-    "Passer le Checkpoint A1",
-    "Effacer les filtres",
-    "Passer à Kenza Pro",
-    "Effacer ma progression locale",
-    "Ton carnet",
-    "Vocabulaire essentiel",
-    "POUR AUJOURD’HUI",
-    "EXPLORER",
-    "Ajuster l’objectif",
-    "Continuer à apprendre",
-    "C’est parti",
-    "Voir mon espace",
-    "Voir le parcours",
-    "Passeport Culturel & Données",
-    "La darija s’ouvre à toi.",
-    "TON PETIT MOMENT DARIJA",
-    "À ton rythme, toujours.",
-    "Aujourd’hui",
-    "Mon parcours",
-    "Carnet de phrases",
-    "PRATIQUE ORALE & IA",
-    "MON ESPACE",
-    "TON ESPACE",
-    "objectif",
-    "Mon espace",
-    "TON PETIT MOMENT DARIJA",
-    "À ton rythme, toujours.",
-    "Continuer à apprendre",
-    "C’est parti",
-    "Ajuster l’objectif",
-    "La darija\n              <br />\n              s’ouvre à toi.",
-    "Voir mon espace",
-    "Voir le parcours",
-    "Vocabulaire essentiel",
-    "Cartes du jour",
-    "Au café, en taxi",
-    "rythme régulier",
-    "darija, la langue du lien",
-    "<small> jour{streak > 1 ? \"s\" : \"\"}</small>",
-    "LEÇON SUIVANTE · {nextLesson.length}",
-    "Ton carnet\n            <br />\n            de phrases",
-    "Faire une\n            <br />\n            petite révision",
-    "Mises en\n            <br />\n            situation",
-    "cardFlipped ? \"Voir la question\" : \"Retourner la carte\"",
-    "{cardFlipped ? \"EN DARIJA\" : \"EN FRANÇAIS\"}",
-    "CARTE {String((reviewIndex % cards.length) + 1).padStart(2, ",
-    "↻</span> Touche pour révéler",
-    "<Sparkles size={14} /> Session tranquille",
-    "L'algorithme de répétition espacée (SRS) consolide ta mémoir",
-    "front: \"Merci beaucoup\"",
-    "front: \"Où est le souk ?\"",
-    "front: \"S’il vous plaît\"",
-    "front: \"Au revoir, à bientôt\"",
-    "front: \"Je voudrais un thé\"",
-    "hint: \"Un petit mot chaleureux qui ouvre toutes les portes.\"",
-    "hint: \"Pour trouver ton chemin dans la médina.\"",
-    "hint: \"Un mot simple pour rendre tes demandes plus douces.\"",
-    "hint: \"Une manière chaleureuse de se dire à bientôt.\"",
-    "hint: \"Pour savourer un moment au café.\"",
-    "item.id === \"today\"\n                  ? \"Accueil\"\n          ",
-    "Les premiers pas\n              <br />\n              en darij",
-    "{done ? \"Revoir\" : \"Commencer\"}",
-    "Passeport Culturel & Données",
-    "Débloquer avec Pro",
-    "Passer le Checkpoint A1",
-    "Effacer les filtres",
-    "Passer à Kenza Pro",
-    "Palier A1 — Fondations",
-    "Chaque expression est une petite invitation à aller vers l’a",
-    "Écoute · Répète · Reviens",
-    "Effacer ma progression locale",
-    "PARCOURS DÉCOUVERTE",
-    "À demain",
-    "J’ai faim",
-    "C’est loin",
-    "Peut-être",
-    "« Bchhal hada? » permet de demander le prix de n’importe que",
-    "Donne-moi deux verres",
-    "C'est trop beau",
-    "« Wahed » = un, « atay » = thé, « afak » = s’il vous plaît.",
-    "Progression enregistrée en direct sur ton profil.",
-    "Finis l’étape avant"
-  ],
-  "trCallCount": 98,
-  "checks": [
-    {
-      "s": "tr(\"Comment dit-on « bonjour » en darija ?\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"Je voudrais\", \"I would like\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"À Tanger, comment dit-on « Qu'est-ce que",
-      "ok": true
-    },
-    {
-      "s": "tr(\"Baisse un peu s'il te plaît\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"Progression enregistrée en direct\"",
-      "ok": false
-    },
-    {
-      "s": "tr(\"Finis l’étape avant\"",
-      "ok": false
-    },
-    {
-      "s": "tr(\"LEÇON\", \"LESSON\"",
-      "ok": false
-    }
-  ]
-}
+A1-rename-def: OK
+A2-rename-calls: OK x243
+B-repair-wrapped: 0
+C1-toast-audio: OK
+C2-toast-copied: OK
+C3-toast-copyfail: OK
+C4-aria-closemenu: OK x2
+C5-aria-langswitch: OK
+C6-aria-navmain: OK
+C7-aria-navmobile: OK
+C8-aria-quitter: OK
+C9-aria-close: OK
+C10-fallback-learn: OK
+C11-fallback-oral: OK
+C12-fallback-space: OK
+C13-alt-hero: OK
+C14-plural-s: OK x2
+C15-lecon-sur: OK
+C16-tag-essentiels: OK
+C17-tag-quotidien: OK
+C18-tag-reperer: OK
+C19-tag-immersion: OK
+C20-terminee: OK
+C21-exercices: OK
+C22-valide: OK
+C23-aside-tip: OK
+C24-darija-note: OK
+C25-phrase-count: OK
+C26-aria-fav: OK
+C27-ecouter: OK
+C28-copier: OK
+C29-cat-all: OK
+C30-phrase-footnote: OK
+C31-space-privacy: OK
+C32-pwa-row: OK
+C33-cert-para: OK
+C34-erase-progress: OK
+C35-future-note: OK
+C36-note-bchhal: OK
+C37-note-wahed: OK
+C38-meaning-bslama: OK
+C39-expression-darija: OK x4
+C40-note-vocab: OK
+D-tr-def-count: 1
+D-trL-def: OK
+D-wrapped-left: OK
+D-home-export: OK
+D-trL-calls: 243
+D-tr4-calls: 149
