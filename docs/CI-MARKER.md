@@ -1,3 +1,3 @@
 # CI trigger
 
-Commit marqueur — validation typecheck après v27 (annotations explicites useAppStore).
+Validation typecheck après v31 (tous les setters useAppStore annotés, setLanguage corrigé).
