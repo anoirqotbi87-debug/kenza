@@ -33,6 +33,10 @@ build.log
 
 # generated service worker (généré par Serwist depuis src/app/sw.ts)
 public/sw.js
+public/sw.js.map
+
+# artefacts du patcher UI (supprimé) — ne pas re-committer
+docs/verify.json
 
 # env files (can opt-in for committing if needed)
 .env*
