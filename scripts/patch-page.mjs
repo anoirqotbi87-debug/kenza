@@ -1,4 +1,4 @@
-// patch-page.mjs v30 — typecheck wave 4: last untyped setters (setLanguage, custom-word SRS actions) + v27/v26/v25 kept idempotent
+// patch-page.mjs v31 — full rebuild: typecheck fixes (useAppStore setters, setLanguage, AuthModal, ttrack) + v25 i18n options. Idempotent.
 import fs from "node:fs";
 const report = [];
 function fix(path, name, oldS, newS) {
@@ -42,8 +42,7 @@ fix("src/store/useAppStore.ts", "UAS-addXp",
   "addXp: (amount) => set((state) => {",
   "addXp: (amount: number) => set((state: AppState) => {")
 ;
-fix("src/store/useAppSto
-re.ts", "UAS-completeLesson",
+fix("src/store/useAppStore.ts", "UAS-completeLesson",
   "completeLesson: (lessonId) => set((state) => {",
   "completeLesson: (lessonId: string) => set((state: AppState) => {")
 ;
@@ -79,19 +78,6 @@ fix("src/store/useAppStore.ts", "UAS-reviewCard",
   "reviewCard: (wordId, grade) => set((state) => {",
   "reviewCard: (wordId: string, grade: ReviewGrade) => set((state: AppState) => {")
 ;
-fix("src/components/auth/SaveProgressCard.tsx", "SPC-ttrack-viewed",
-  "ttrack('save_prompt_viewed'",
-  "track('save_prompt_viewed'")
-;
-fix("src/components/auth/SaveProgressCard.tsx", "SPC-ttrack-clicked",
-  "ttrack('save_prompt_clicked'",
-  "track('save_prompt_clicked'")
-;
-fix("src/components/auth/AuthModal.tsx", "AM-data-destructure",
-  "const { error } = await signUpWithTracking(email,
- password, { username: email.split('@')[0] });",
-  "const { data, error } = await signUpWithTracking(email, password, { username: email.split('@')[0] });")
-;
 fix("src/store/useAppStore.ts", "UAS-setUser",
   "setUser: (user) => set({ user }),",
   "setUser: (user: AppState['user']) => set({ user }),")
@@ -103,6 +89,18 @@ fix("src/store/useAppStore.ts", "UAS-completeOnboarding",
 fix("src/store/useAppStore.ts", "UAS-setIsPremium",
   "setIsPremium: (isPremium) => set({ isPremium }),",
   "setIsPremium: (isPremium: boolean) => set({ isPremium }),")
+;
+fix("src/components/auth/SaveProgressCard.tsx", "SPC-ttrack-viewed",
+  "ttrack('save_prompt_viewed'",
+  "track('save_prompt_viewed'")
+;
+fix("src/components/auth/SaveProgressCard.tsx", "SPC-ttrack-clicked",
+  "ttrack('save_prompt_clicked'",
+  "track('save_prompt_clicked'")
+;
+fix("src/components/auth/AuthModal.tsx", "AM-data-destructure",
+  "const { error } = await signUpWithTracking(email, password, { username: email.split('@')[0] });",
+  "const { data, error } = await signUpWithTracking(email, password, { username: email.split('@')[0] });")
 ;
 fix("src/types/curriculum.ts", "TYPE-ExerciseOption",
   "text: string; // Keeps Darija in text",
@@ -132,8 +130,7 @@ fix("src/data/module3.ts", "M3-l3-malade",
   "text: 'Malade', isCorrect: false }",
   "text: { fr: 'Malade', en: 'Sick', es: 'Enfermo', ar: 'مريض' }, isCorrect: false }")
 ;
-fix("src/data/module5.ts", "M5-a
-gree",
+fix("src/data/module5.ts", "M5-agree",
   "text: 'Je suis d\\'accord', isCorrect: false },",
   "text: { fr: 'Je suis d\\'accord', en: 'I agree', es: 'Estoy de acuerdo', ar: 'أنا موافق' }, isCorrect: false },")
 ;
@@ -171,8 +168,7 @@ fix("src/data/module5.ts", "M5-petit",
 ;
 fix("src/data/module7.ts", "M7-tourner",
   "right: { text: 'Tourner la page' }",
-  "right: { text: { fr: 'Tourner 
-la page', en: 'Turn the page', es: 'Pasar la página', ar: 'طوّي الصفحة' } }")
+  "right: { text: { fr: 'Tourner la page', en: 'Turn the page', es: 'Pasar la página', ar: 'طوّي الصفحة' } }")
 ;
 fix("src/data/module7.ts", "M7-patience",
   "right: { text: 'Patience et régularité' }",
