@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, Volume2, Trophy, AlertCircle, RefreshCw, MessageSquare, CarFront, Coffee, ShoppingBag, Globe, ArrowRight } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useTranslation, useAppStore } from '../../store/useAppStore';
 import { playAudio } from '../../lib/audio';
 import { useVoiceRecognition } from '../../hooks/useVoiceRecognition';
 import { calculateSimilarity } from '../../utils/phonemeMatcher';
+import type { VoiceEvaluationResult } from '../../utils/phonemeMatcher';
 import VoiceFeedbackCard from '../voice/VoiceFeedbackCard';
 import { trackEvent } from '../../utils/analytics';
 
@@ -25,7 +27,7 @@ const speechExercises = [
 type RPScenario = {
   id: string;
   name: string;
-  icon: any;
+  icon: LucideIcon;
   context: string;
   npcFirstLine: { arabizi: string; arabic: string; translation: string };
   userChoices: { id: string; arabizi: string; arabic: string; translation: string; nextNpcLine?: { arabizi: string; arabic: string; translation: string } }[];
@@ -75,7 +77,7 @@ export default function SpeechTrainer() {
 
   // STATE ÉLOCUTION
   const [exerciseIndex, setExerciseIndex] = useState(0);
-  const [evaluation, setEvaluation] = useState<any>(null);
+  const [evaluation, setEvaluation] = useState<VoiceEvaluationResult | null>(null);
   const currentExercise = speechExercises[exerciseIndex];
 
   // Voice recognition
@@ -93,16 +95,7 @@ export default function SpeechTrainer() {
     const evalResult = calculateSimilarity(spokenText, currentExercise.arabizi, currentExercise.arabic);
     const score = evalResult.score;
     
-    let feedback: string = t.modules.speech.keepPracticing;
-    if (score > 80) feedback = t.modules.speech.excellent;
-    else if (score > 50) feedback = t.modules.speech.veryClear;
-
-    setEvaluation({
-      score,
-      feedback,
-      recognizedText: spokenText,
-      targetText: currentExercise.arabic
-    });
+    setEvaluation(evalResult);
 
     if (score >= 60) {
       addXp(10);

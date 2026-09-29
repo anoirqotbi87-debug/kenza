@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Volume2, Info, ArrowRight, RotateCw } from 'lucide-react';
+import { Volume2, Info, RotateCw } from 'lucide-react';
 import { VocabularySRSData, ReviewGrade, SRSCard } from '../../types/srs';
 import { playAudio } from '../../lib/audio';
 import { useAppStore, useTranslation } from '../../store/useAppStore';

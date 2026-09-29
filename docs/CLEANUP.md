@@ -45,3 +45,24 @@
   - Hooks : `useAudioWalkPlayer`, `useMediaSession`, `useNetworkStatus`, `useNotifications`, `usePassportShare`.
   - Docs/scripts : `docs/CI-MARKER.md`, `docs/dump-*.txt`, `docs/literals-page.txt`, `docs/scope-page.txt`, `docs/tr-dump-*.txt`, `docs/verify.json`, `scripts/find-hardcoded.py`, `scripts/fix-arabic.js`, `scripts/patch-page-hook.py`, `scripts/patch-page-i18n.py`, `scripts/patch-paywall-keys.py`, `scripts/patch-ui-home-keys.py`, `scripts/replace-theme.js`, `scripts/verify-fixes.py`, `supabase/archive/`.
 - **CI finale** : `npm ci` ✓ · `typecheck` ✓ · `lint` ✓ (0 erreur) · `build` ✓.
+
+## Vague 3 — Zéro warning ESLint (2026-09-29)
+
+- **ESLint : 0 erreur / 0 warning** (136 → 106 → 0).
+  - **Vague A** (`no-unused-vars`) : imports/composants/constantes morts supprimés.
+  - **Vague B/C** : `<img>` → `next/image` (avec `unoptimized` pour les avatars OAuth distants) ; police custom → `next/font`.
+  - **Vague D** (`no-explicit-any`, 106 → 0) : remplacement par des types réels plutôt que par des casts.
+    - `types/srs.ts` : `VocabularySRSData.translation` typé `MultiLangText | string` ; ajout de
+      `CustomVocabularyItem` (`notes`, `source`) qui était utilisé dans le store et l'éditeur de cartes.
+    - `store/useAppStore.ts` : `user: User | null` (type Supabase), `customVocabulary` typé,
+      `partialize`/`migrate` sur `AppState` (avec garde `!persistedState` conservée).
+    - `types/curriculum.ts` : `UserProfile.srsDeck: Record<string, SRSCard>`.
+    - `lib/i18n/utils.ts` : `getExerciseText(item: object | string | number | null | undefined)`.
+    - `hooks/useVoiceRecognition.ts` : typings minimaux de la Web Speech API (pas de `any`).
+    - **`src/app/sw.ts`** : les `handler: "CacheFirst" as any` + `options.expiration` étaient une API
+      obsolète silencieusement ignorée. Réécrit avec l'API Serwist v9 : `new CacheFirst({ cacheName,
+      plugins: [new ExpirationPlugin({...})] })`, `new NetworkOnly()`, `declare const self:
+      ServiceWorkerGlobalScope` + `/// <reference lib="webworker" />`. Le cache runtime (TTS/audio/fonts)
+      est désormais réellement actif.
+    - Pages i18n : `(t as any).pages.x` → `t.pages.x` (les clés existent dans les 4 langues).
+- **CI finale** : `typecheck` ✓ · `lint` ✓ (0/0) · `build` ✓.

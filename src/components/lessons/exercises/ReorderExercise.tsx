@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Exercise, Notation } from '../../../types/curriculum';
+import { Exercise, Notation, MultiLangText } from '../../../types/curriculum';
 import { shuffle } from '../../../lib/shuffle';
+import { getExerciseText } from '../../../lib/i18n/utils';
+import { useTranslation } from '../../../store/useAppStore';
 
-const getWordText = (item: any): string => {
+const getWordText = (item: NotationItem): string => {
   if (!item) return '';
   if (typeof item === 'string') return item;
   if (typeof item === 'number') return String(item);
@@ -23,6 +25,21 @@ const getWordText = (item: any): string => {
   return JSON.stringify(item);
 };
 
+type NotationItem = string | {
+  arabizi?: string;
+  arabic?: string;
+  translation?: MultiLangText | string;
+  text?: MultiLangText | string;
+  id?: string;
+  isCorrect?: boolean;
+  label?: unknown;
+  word?: unknown;
+  value?: unknown;
+  content?: unknown;
+};
+
+type ReorderWord = NotationItem & { id: string; displayText: React.ReactNode };
+
 interface ReorderExerciseProps {
   exercise: Exercise;
   preferredNotation: Notation;
@@ -31,7 +48,8 @@ interface ReorderExerciseProps {
 }
 
 export default function ReorderExercise({ exercise, preferredNotation, onUpdate, isAnswerChecked }: ReorderExerciseProps) {
-  const getTextForNotation = (item: any, notation: Notation) => {
+  const { lang } = useTranslation();
+  const getTextForNotation = (item: NotationItem, notation: Notation): React.ReactNode => {
     if (typeof item === 'string') return item;
     if (notation === 'arabizi' && item.arabizi) return item.arabizi;
     if (notation === 'arabic' && item.arabic) return <span className="font-arabic">{item.arabic}</span>;
@@ -41,14 +59,14 @@ export default function ReorderExercise({ exercise, preferredNotation, onUpdate,
         <span className="text-slate-800 font-arabic text-lg">{item.arabic}</span>
       </div>
     );
-    if (item.translation) return item.translation;
+    if (item.translation) return typeof item.translation === 'string' ? item.translation : getExerciseText(item.translation, lang);
     return getWordText(item);
   };
 
-  const [orderedWords, setOrderedWords] = useState<any[]>([]);
-  const [availableWords, setAvailableWords] = useState<any[]>(() => {
+  const [orderedWords, setOrderedWords] = useState<ReorderWord[]>([]);
+  const [availableWords, setAvailableWords] = useState<ReorderWord[]>(() => {
     if (!exercise.options) return [];
-    const words = exercise.options.map((opt: any) => ({
+    const words = exercise.options.map((opt) => ({
       ...opt,
       id: opt.id || getWordText(opt),
       displayText: getTextForNotation(opt, preferredNotation)
@@ -57,7 +75,7 @@ export default function ReorderExercise({ exercise, preferredNotation, onUpdate,
   });
 
 
-  const handleAdd = (word: any) => {
+  const handleAdd = (word: ReorderWord) => {
     if (isAnswerChecked) return;
     const newOrdered = [...orderedWords, word];
     setOrderedWords(newOrdered);
@@ -65,7 +83,7 @@ export default function ReorderExercise({ exercise, preferredNotation, onUpdate,
     onUpdate(newOrdered.map(w => w.id));
   };
 
-  const handleRemove = (word: any, index: number) => {
+  const handleRemove = (word: ReorderWord, index: number) => {
     if (isAnswerChecked) return;
     const newOrdered = orderedWords.filter((_, i) => i !== index);
     setOrderedWords(newOrdered);

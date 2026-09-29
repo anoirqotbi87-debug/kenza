@@ -47,9 +47,7 @@ export default function SaveProgressCard({ variant, lessonsCompleted, onSave, on
       <p className="text-xs text-blue-700/80 text-center mt-2">{t.savePrompt.reassurance}</p>
       <button
         onClick={() => {
-          t
-
-track('save_prompt_dismissed', { variant, lessons_completed: lessonsCompleted }, '/lesson');
+          track('save_prompt_dismissed', { variant, lessons_completed: lessonsCompleted }, '/lesson');
           onLater();
         }}
         className="w-full mt-2 py-2 text-sm font-bold text-slate-500 hover:text-slate-700"

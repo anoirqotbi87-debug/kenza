@@ -4,10 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { Download, X, Share } from 'lucide-react';
 import { useTranslation } from '../../store/useAppStore';
 
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
 export default function InstallPwaBanner() {
   const { t } = useTranslation();
   const inst = t.modules.install;
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   // Initialise synchronously from the browser so no state is set from an effect.
   const [isIOS] = useState(() => {
     if (typeof window === 'undefined') return false;
@@ -17,7 +22,7 @@ export default function InstallPwaBanner() {
   const [isStandalone] = useState(() => {
     if (typeof window === 'undefined') return true;
     return window.matchMedia('(display-mode: standalone)').matches ||
-      (window.navigator as any).standalone === true;
+      (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
   });
   const [dismissed, setDismissed] = useState(() => {
     if (typeof window === 'undefined') return true;
@@ -29,15 +34,15 @@ export default function InstallPwaBanner() {
 
   useEffect(() => {
     // Listen for beforeinstallprompt (Android / Chrome)
-    const handleBeforeInstallPrompt = (e: any) => {
+    const handleBeforeInstallPrompt = (e: BeforeInstallPromptEvent) => {
       e.preventDefault();
       setDeferredPrompt(e);
     };
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt as EventListener);
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt as EventListener);
     };
   }, []);
 

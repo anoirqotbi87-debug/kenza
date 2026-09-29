@@ -1,5 +1,6 @@
 import React from 'react';
 import * as Icons from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { CardIllustration as CardIllustrationType } from '../../types/srs';
 
 interface Props {
@@ -10,7 +11,7 @@ export default function CardIllustration({ illustration }: Props) {
   if (!illustration || !illustration.iconName) return null;
   
   // Dynamically load the Lucide icon based on string name
-  const IconComponent = (Icons as any)[illustration.iconName];
+  const IconComponent = (Icons as unknown as Record<string, LucideIcon>)[illustration.iconName];
   
   if (!IconComponent) return null;
 

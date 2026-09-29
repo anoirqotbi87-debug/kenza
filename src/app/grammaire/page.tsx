@@ -5,6 +5,7 @@ import { BookOpen, Play } from 'lucide-react';
 import { module4Lessons } from '@/data/module4';
 import type { Lesson, MultiLangText } from '@/types/curriculum';
 import { useAppStore, useTranslation } from '@/store/useAppStore';
+import type { UILanguage } from '@/lib/i18n/translations';
 import { getLocalizedText } from '@/lib/i18n/utils';
 import ExerciseRunner from '@/components/ExerciseRunner';
 import ConjugationTable from '@/components/grammar/ConjugationTable';
@@ -17,8 +18,8 @@ export default function GrammairePage() {
   const lang = uiLanguage || 'fr';
   const isAr = lang === 'ar';
 
-  const tp = (t as any).pages?.grammaire || {};
-  const localized = (text: MultiLangText | string | undefined) => getLocalizedText(text, lang as any);
+  const tp = t.pages.grammaire;
+  const localized = (text: MultiLangText | string | undefined) => getLocalizedText(text, lang as UILanguage);
 
   return (
     <div dir={isAr ? 'rtl' : 'ltr'} className="min-h-screen bg-[#F7F3EA]">

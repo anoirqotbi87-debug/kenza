@@ -64,7 +64,7 @@ export default function CheckpointResult({ levelId, levelName, score, totalQuest
         passportId
       });
     }
-  }, [passed]);
+  }, [levelId, levelName, percentage, passed, dateStr, passportId, saveResult]);
 
   return (
     <div className="fixed inset-0 z-[100] bg-[#1B2A4A]/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">

@@ -1,6 +1,7 @@
+/// <reference lib="webworker" />
 import { defaultCache } from "@serwist/next/worker";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
-import { Serwist } from "serwist";
+import { Serwist, CacheFirst, NetworkOnly, ExpirationPlugin } from "serwist";
 
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
@@ -8,7 +9,9 @@ declare global {
   }
 }
 
-declare const self: any;
+declare const self: ServiceWorkerGlobalScope & SerwistGlobalConfig;
+
+const DAY = 24 * 60 * 60;
 
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
@@ -19,48 +22,36 @@ const serwist = new Serwist({
   runtimeCaching: [
     {
       matcher: /^\/api\/roleplay\//i,
-      handler: "NetworkOnly" as any,
+      handler: new NetworkOnly(),
     },
     {
       matcher: ({ url }: { url: URL }) => url.pathname.startsWith('/api/tts'),
-      handler: "CacheFirst" as any,
-      options: {
+      handler: new CacheFirst({
         cacheName: "kenza-v2-tts-cache",
-        expiration: {
-          maxEntries: 200,
-          maxAgeSeconds: 30 * 24 * 60 * 60, // 30 jours
-        },
-      },
+        plugins: [new ExpirationPlugin({ maxEntries: 200, maxAgeSeconds: 30 * DAY })],
+      }),
     },
     {
       matcher: /\.(?:mp3|wav|ogg|m4a)$/i,
-      handler: "CacheFirst" as any,
-      options: {
+      handler: new CacheFirst({
         cacheName: "kenza-v2-audio-cache",
-        expiration: {
-          maxEntries: 250,
-          maxAgeSeconds: 30 * 24 * 60 * 60, // 30 jours
-        },
-      },
+        plugins: [new ExpirationPlugin({ maxEntries: 250, maxAgeSeconds: 30 * DAY })],
+      }),
     },
     {
       matcher: /\.(?:woff|woff2|eot|ttf|otf)$/i,
-      handler: "CacheFirst" as any,
-      options: {
+      handler: new CacheFirst({
         cacheName: "kenza-v2-fonts-cache",
-        expiration: {
-          maxEntries: 50,
-          maxAgeSeconds: 365 * 24 * 60 * 60, // 1 an
-        },
-      },
+        plugins: [new ExpirationPlugin({ maxEntries: 50, maxAgeSeconds: 365 * DAY })],
+      }),
     },
     ...defaultCache,
-  ] as any,
+  ],
 });
 
 serwist.addEventListeners();
 
-self.addEventListener('activate', (event: any) => {
+self.addEventListener('activate', (event: ExtendableEvent) => {
   event.waitUntil(
     caches.keys().then((cacheNames: string[]) => {
       return Promise.all(
@@ -72,26 +63,21 @@ self.addEventListener('activate', (event: any) => {
   );
 });
 
-
-self.addEventListener('notificationclick', (event: any) => {
-  // 1. Fermer immédiatement la notification du volet système
+self.addEventListener('notificationclick', (event: NotificationEvent) => {
   event.notification.close();
 
-  // 2. Extraire l'URL cible (avec fallback)
   const targetUrl = new URL(
     event.notification.data?.url || '/?tab=srs',
     self.location.origin
   ).href;
 
-  // 3. Encadrer l'opération dans waitUntil
   event.waitUntil(
     self.clients
       .matchAll({ type: 'window', includeUncontrolled: true })
-      .then(async (windowClients: any[]) => {
-        // Rechercher si un onglet/fenêtre de l'application est déjà ouvert
+      .then(async (clients) => {
+        const windowClients = clients as WindowClient[];
         for (const client of windowClients) {
           if (new URL(client.url).origin === self.location.origin) {
-            // Si la fenêtre est déjà sur la bonne URL, simplement lui donner le focus
             if (client.url !== targetUrl && 'navigate' in client) {
               await client.navigate(targetUrl);
             }
@@ -99,7 +85,6 @@ self.addEventListener('notificationclick', (event: any) => {
           }
         }
 
-        // Si aucune fenêtre n'est ouverte, lancer l'application en standalone
         if (self.clients.openWindow) {
           return self.clients.openWindow(targetUrl);
         }

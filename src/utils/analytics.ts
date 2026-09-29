@@ -9,7 +9,7 @@ export interface AnalyticsPayloads {
   plan_selected: { plan: 'monthly' | 'yearly'; currency: 'EUR' | 'MAD'; price: number };
   pricing_modal_dismissed: undefined;
   audio_walk_started: { moduleName: string; itemCount: number };
-  [key: string]: any; // Fallback for other events
+  [key: string]: unknown; // Fallback for other events
 }
 
 export const trackEvent = <K extends keyof AnalyticsPayloads>(
@@ -30,7 +30,7 @@ export const trackEvent = <K extends keyof AnalyticsPayloads>(
       keepalive: true
     }).catch(() => {});
     */
-  } catch (e) {
+  } catch {
     // Silent fail
   }
 };

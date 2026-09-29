@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import {
   ArrowDownRight,
   ArrowLeft,
@@ -23,7 +23,6 @@ import {
   LockKeyhole,
   Menu,
   MessageCircle,
-  RotateCcw,
   Search,
   Sparkles,
   Star,
@@ -31,10 +30,11 @@ import {
   Volume2,
   X,
   Crown,
-  Lock,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import Image from "next/image";
 import { useAppStore, useTranslation } from "@/store/useAppStore";
+import type { User } from "@supabase/supabase-js";
 
 const tr = (fr: string, en: string, es: string, ar: string) => {
   const lang = useAppStore.getState().uiLanguage;
@@ -262,7 +262,7 @@ export default function Home() {
   const [reviewIndex, setReviewIndex] = useState(0);
   const [cardFlipped, setCardFlipped] = useState(false);
   const [toast, setToast] = useState("");
-  const showToast = (message: string) => setToast(message);
+  const showToast = useCallback((message: string) => setToast(message), []);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [prevView, setPrevView] = useState<View>(view);
   if (prevView !== view) {
@@ -299,7 +299,7 @@ export default function Home() {
       : id === "phrases" ? "phrasebook"
       : id === "review" ? "review"
       : null;
-    return key ? ((t as any).side?.[key] as string | undefined) : undefined;
+    return key ? (t.side[key as keyof typeof t.side] as string | undefined) : undefined;
   };
 
   const handleGoogleLogin = async () => {
@@ -397,15 +397,16 @@ export default function Home() {
   // 2. Adaptateur universel pour les phrases (Format Manus ↔ Format KENZA)
   const allPhrases: Phrase[] = useMemo(() => {
     const rawVocabulary = (srsVocabulary || []).slice(0, 40).map((w, idx) => {
+      const legacy = w as unknown as { translations?: Record<string, string>; front?: string; back?: string };
       let meaningText = tr("Expression en darija", "Darija expression", "Expresión en darija", "عبارة بالدارجة");
-      if (typeof (w as any).translation === "string") {
-        meaningText = (w as any).translation;
-      } else if ((w as any).translation && typeof (w as any).translation === "object") {
-        meaningText = (w as any).translation.fr || (w as any).translation.en || tr("Expression en darija", "Darija expression", "Expresión en darija", "عبارة بالدارجة");
-      } else if ((w as any).translations?.fr) {
-        meaningText = (w as any).translations.fr;
-      } else if (typeof (w as any).back === "string") {
-        meaningText = (w as any).back;
+      if (typeof w.translation === "string") {
+        meaningText = w.translation;
+      } else if (w.translation && typeof w.translation === "object") {
+        meaningText = w.translation.fr || w.translation.en || tr("Expression en darija", "Darija expression", "Expresión en darija", "عبارة بالدارجة");
+      } else if (legacy.translations?.fr) {
+        meaningText = legacy.translations.fr;
+      } else if (typeof legacy.back === "string") {
+        meaningText = legacy.back;
       }
 
       let cat = trL(lang, tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات"), "Essentials", "Lo esencial", "الأساسيات");
@@ -417,14 +418,22 @@ export default function Home() {
       return {
         id: w.id || `vocab_${idx}`,
         category: cat,
-        darija: w.arabizi || (w as any).front || "",
+        darija: w.arabizi || legacy.front || "",
         arabic: w.arabic || "",
         meaning: meaningText,
         note: (w.example?.arabizi ? `Ex: ${w.example.arabizi}` : "") || tr("Vocabulaire du quotidien avec audio naturel.", "Everyday vocabulary with natural audio.", "Vocabulario cotidiano con audio natural.", "مفردات يومية بصوت طبيعي."),
       };
     });
 
-    const combined: any[] = [...phrases];
+    type LegacyPhrase = Omit<Phrase, 'meaning'> & {
+      meaning?: string | Record<string, string>;
+      front?: string;
+      arabizi?: string;
+      back?: string | Record<string, string>;
+      translation?: string | Record<string, string>;
+      notes?: string;
+    };
+    const combined: LegacyPhrase[] = [...phrases];
     for (const v of rawVocabulary) {
       if (v.darija && !combined.some((p) => (p.darija || p.front || "").toLowerCase() === (v.darija || "").toLowerCase())) {
         combined.push(v);
@@ -640,7 +649,7 @@ export default function Home() {
           </button>
         </div>
 
-        <div className="sidebar-label">{(t as any).side?.learn || tr("APPRENDRE", "LEARN", "APRENDER", "تعلّم")}</div>
+        <div className="sidebar-label">{t.side.learn || tr("APPRENDRE", "LEARN", "APRENDER", "تعلّم")}</div>
         <nav className="side-nav" aria-label={tr("Navigation principale", "Main navigation", "Navegación principal", "التنقل الرئيسي")}>
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -674,7 +683,7 @@ export default function Home() {
           </a>
         </nav>
 
-        <div className="sidebar-label sidebar-label-spaced">{(t as any).side?.oral || tr("PRATIQUE ORALE & IA", "SPEAKING & AI", "PRÁCTICA ORAL E IA", "المحادثة والذكاء الاصطناعي")}</div>
+        <div className="sidebar-label sidebar-label-spaced">{t.side.oral || tr("PRATIQUE ORALE & IA", "SPEAKING & AI", "PRÁCTICA ORAL E IA", "المحادثة والذكاء الاصطناعي")}</div>
         <button
           onClick={() => setShowScenarioSelector(true)}
           className="nav-item"
@@ -683,7 +692,7 @@ export default function Home() {
           <span>{trL(lang, "Roleplay IA", "AI roleplay", "Roleplay IA", "حوار مع الذكاء الاصطناعي")}</span>
         </button>
 
-        <div className="sidebar-label sidebar-label-spaced">{(t as any).side?.space || tr("TON ESPACE", "YOUR SPACE", "TU ESPACIO", "فضاؤك")}</div>
+        <div className="sidebar-label sidebar-label-spaced">{t.side.space || tr("TON ESPACE", "YOUR SPACE", "TU ESPACIO", "فضاؤك")}</div>
         <button
           onClick={() => switchView("space")}
           className={`nav-item ${view === "space" ? "nav-item-active" : ""}`}
@@ -811,9 +820,12 @@ export default function Home() {
                 title={user.email || t.nav.profile}
               >
                 {user.user_metadata?.avatar_url ? (
-                  <img
+                  <Image
                     src={user.user_metadata.avatar_url}
                     alt={user.user_metadata?.full_name || trL(lang, "Profil", "Profile", "Perfil", "الملف الشخصي")}
+                    width={32}
+                    height={32}
+                    unoptimized
                     className="w-full h-full object-cover rounded-full"
                   />
                 ) : user.user_metadata?.full_name ? (
@@ -1197,10 +1209,13 @@ function TodayView({
             </div>
           </div>
           <div className="hero-image-wrap" aria-hidden="true">
-            <img
+            <Image
               className="hero-image"
               src="/manus-storage/kenza-hero_99e35384.jpg"
               alt={tr("Maroc médina", "Moroccan medina", "Medina de Marruecos", "مدينة مغربية")}
+              fill
+              sizes="48vw"
+              priority
             />
             <div className="hero-image-wash" />
             <div className="hero-image-caption">
@@ -1226,10 +1241,12 @@ function TodayView({
             <span>/ 0{totalLessons}</span>
           </div>
           <div className="next-illustration">
-            <img
+            <Image
               className="next-photo"
               src="/manus-storage/kenza-market_a0db8277.jpg"
               alt={t.modules.home.imgMintTea}
+              width={105}
+              height={105}
             />
             <div className="cup-shadow" />
             <div className="tea-cup">
@@ -1886,12 +1903,11 @@ function SpaceView({
   isPremium,
   onReset,
   onOpenPaywall,
-  onToast,
 }: {
   completedCount: number;
   xp: number;
   streak: number;
-  user: any;
+  user: User | null;
   isPremium: boolean;
   onReset: () => void;
   onOpenPaywall: () => void;

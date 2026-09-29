@@ -4,15 +4,28 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useAppStore, useTranslation } from '../../store/useAppStore';
 import { getWordFromDictionary } from '../../data/srs-deck';
 import { getLocalizedText } from '../../lib/i18n/utils';
-import { Search, Plus, BookOpen, BrainCircuit, CheckCircle, Trash2, Edit2, Play, Mic, MessageCircle, Book } from 'lucide-react';
+import { Search, Plus, BookOpen, BrainCircuit, CheckCircle, Trash2, Edit2, Play, MessageCircle, Book } from 'lucide-react';
 import { playAudio } from '../../lib/audio';
 import CustomCardEditor from './CustomCardEditor';
+import { SRSCard, CustomVocabularyItem, VocabularySRSData } from '../../types/srs';
+import type { UILanguage } from '../../lib/i18n/translations';
+
+type ProcessedCard = SRSCard & {
+  dictWord?: VocabularySRSData;
+  translation: string;
+  arabizi: string;
+  arabic: string;
+  source: 'roleplay' | 'module' | 'manual';
+  isDue: boolean;
+  isMastered: boolean;
+  filterStatus: string;
+};
 
 export default function DeckManagerView() {
   const { srsDeck, customVocabulary, deleteCustomWord, uiLanguage } = useAppStore();
   const { t } = useTranslation();
   const rawLang = uiLanguage || 'fr';
-  const lang = String(rawLang).toLowerCase() as any;
+  const lang = String(rawLang).toLowerCase() as UILanguage;
   const isAr = lang === 'ar' || lang.startsWith('ar');
   const dk = t.modules.decks;
 
@@ -20,7 +33,7 @@ export default function DeckManagerView() {
   const [activeFilter, setActiveFilter] = useState<'all' | 'due' | 'learning' | 'mastered'>('all');
   
   const [isEditorOpen, setIsEditorOpen] = useState(false);
-  const [cardToEdit, setCardToEdit] = useState<any | null>(null);
+  const [cardToEdit, setCardToEdit] = useState<CustomVocabularyItem | null>(null);
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
 
@@ -99,7 +112,7 @@ export default function DeckManagerView() {
     }
   };
 
-  const handlePlayTTS = async (card: any) => {
+  const handlePlayTTS = async (card: ProcessedCard) => {
     if (playingId) return;
     
     // Check if offline and attempt to verify if cached (we'll just try to play it, but we can pre-warn if needed)
@@ -111,7 +124,6 @@ export default function DeckManagerView() {
       if (card.dictWord?.audioUrl) {
         await playAudio('', card.dictWord.audioUrl);
       } else {
-        const textToSpeak = card.arabic || card.arabizi;
         await playAudio(card.arabizi, card.arabic); // playAudio handles (text, arabicText as audioUrl if not ending with .mp3)
       }
     } catch (e) {
@@ -191,7 +203,7 @@ export default function DeckManagerView() {
             return (
               <button
                 key={filter.id}
-                onClick={() => setActiveFilter(filter.id as any)}
+                onClick={() => setActiveFilter(filter.id as 'all' | 'due' | 'learning' | 'mastered')}
                 className={`flex items-center gap-2 whitespace-nowrap px-4 py-2.5 rounded-full text-sm font-medium transition-all ${
                   isActive 
                     ? 'bg-slate-800 text-white shadow-md' 

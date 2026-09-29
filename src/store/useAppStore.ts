@@ -1,7 +1,8 @@
 import { create } from 'zustand';
+import type { User } from '@supabase/supabase-js';
 import { persist } from 'zustand/middleware';
 import { Notation } from '../types/curriculum';
-import { SRSCard, ReviewGrade } from '../types/srs';
+import { SRSCard, ReviewGrade, CustomVocabularyItem } from '../types/srs';
 
 import { UILanguage, translations } from '../lib/i18n/translations';
 import { getLocalTodayDateString, getDaysDifference } from '../utils/dateUtils';
@@ -9,8 +10,8 @@ import { getLocalTodayDateString, getDaysDifference } from '../utils/dateUtils';
 import { srsService } from '../services/srsService';
 interface AppState {
   // User Progress
-  user: any;
-  setUser: (user: any) => void;
+  user: User | null;
+  setUser: (user: User | null) => void;
   xp: number;
   streakDays: number;
   streakFreezes: number;
@@ -21,7 +22,7 @@ interface AppState {
   
   // SRS State
   srsDeck: Record<string, SRSCard>; // Map of wordId to SRSCard
-  customVocabulary: Record<string, any>;
+  customVocabulary: Record<string, CustomVocabularyItem>;
   
   // Settings
   preferredNotation: Notation;
@@ -44,8 +45,8 @@ interface AppState {
   
   // SRS Actions
   addCardsToSRS: (wordIds: string[]) => void;
-  addCustomWordToSRS: (word: any) => void;
-  updateCustomWord: (wordId: string, updates: any) => void;
+  addCustomWordToSRS: (word: CustomVocabularyItem) => void;
+  updateCustomWord: (wordId: string, updates: Partial<CustomVocabularyItem>) => void;
   deleteCustomWord: (wordId: string) => void;
   reviewCard: (wordId: string, grade: ReviewGrade) => void;
   getDueCards: () => SRSCard[];
@@ -187,7 +188,7 @@ export const useAppStore = create<AppState>()(
 
       setAudioSpeed: (speed: number) => set({ audioSpeed: speed }),
       
-      setLanguage: (lang: UILanguage) => set({ uiLanguage: (lang || 'fr').toLowerCase() as any }),
+      setLanguage: (lang: UILanguage) => set({ uiLanguage: (lang || 'fr').toLowerCase() as UILanguage }),
       
       addCardsToSRS: (wordIds: string[]) => set((state: AppState) => {
         const newDeck = { ...state.srsDeck };
@@ -210,7 +211,7 @@ export const useAppStore = create<AppState>()(
         return { srsDeck: newDeck };
       }),
       
-      addCustomWordToSRS: (word: any) => set((state: AppState) => {
+      addCustomWordToSRS: (word: CustomVocabularyItem) => set((state: AppState) => {
         const newVocab = { ...state.customVocabulary, [word.id]: word };
         const newDeck = { ...state.srsDeck };
         const now = new Date().toISOString();
@@ -228,7 +229,7 @@ export const useAppStore = create<AppState>()(
         return { customVocabulary: newVocab, srsDeck: newDeck };
       }),
 
-      updateCustomWord: (wordId: string, updates: any) => set((state: AppState) => {
+      updateCustomWord: (wordId: string, updates: Partial<CustomVocabularyItem>) => set((state: AppState) => {
         if (!state.customVocabulary[wordId]) return state;
         const newVocab = { 
           ...state.customVocabulary, 
@@ -269,27 +270,29 @@ export const useAppStore = create<AppState>()(
     {
       name: 'darija-quest-storage',
       version: 3,
-      partialize: (state: any) => {
+      partialize: (state: AppState) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { devUnlockAll, ...rest } = state;
         return rest;
       },
-      migrate: (persistedState: any, version: number) => {
+      migrate: (persistedState: unknown, version: number) => {
+        if (!persistedState) return persistedState as AppState;
+        const state = persistedState as AppState & { devUnlockAll?: boolean };
         if (version < 2) {
-          if (persistedState.srsDeck) {
-            const hasLegacyCards = Object.keys(persistedState.srsDeck).some(
+          if (state.srsDeck) {
+            const hasLegacyCards = Object.keys(state.srsDeck).some(
               id => id.toLowerCase().startsWith('word_v')
             );
             if (hasLegacyCards) {
               // Purge legacy deck entirely so new one can take over
-              persistedState.srsDeck = {};
+              state.srsDeck = {};
             }
           }
         }
-        if (version < 3 && persistedState) {
-          delete persistedState.devUnlockAll;
+        if (version < 3) {
+          delete (state as { devUnlockAll?: boolean }).devUnlockAll;
         }
-        return persistedState;
+        return state;
       }
     }
   )

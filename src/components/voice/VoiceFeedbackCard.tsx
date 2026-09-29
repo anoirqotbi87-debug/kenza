@@ -15,7 +15,7 @@ export default function VoiceFeedbackCard({ evaluation, onRetry, onListenModel }
   const { t } = useTranslation();
   if (!evaluation) return null;
 
-  const { score, targetPhonemes, transcript } = evaluation;
+  const { score, targetPhonemes } = evaluation;
 
   let headerColor = 'text-green-600';
   let headerBg = 'bg-green-50 border-green-200';

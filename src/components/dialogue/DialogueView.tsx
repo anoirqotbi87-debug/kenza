@@ -8,7 +8,6 @@ import DialogueBubble from './DialogueBubble';
 import DialogueUserInput from './DialogueUserInput';
 import DialogueSummaryModal from './DialogueSummaryModal';
 import { ArrowLeft, Volume2, VolumeX } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 
 interface DialogueViewProps {
   scenario: DialogueScenario;
@@ -21,7 +20,6 @@ export default function DialogueView({ scenario, onExit }: DialogueViewProps) {
     state,
     currentTurn,
     isListening,
-    transcript,
     startListening,
     stopListening,
     skipUserTurn

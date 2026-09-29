@@ -61,8 +61,8 @@ export default function DarijaPassportCard({ data }: DarijaPassportCardProps) {
         setTimeout(() => setShareSuccess(false), 3000);
         await handleDownload(); // Auto download as fallback
       }
-    } catch (e: any) {
-      if (e.name !== 'AbortError') {
+    } catch (e) {
+      if (!(e instanceof DOMException && e.name === 'AbortError')) {
         console.error("Share failed", e);
       }
     } finally {

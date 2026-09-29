@@ -33,8 +33,8 @@ export async function withSessionRefresh<T>(mutationFn: () => Promise<T>): Promi
     }
 
     return await mutationFn();
-  } catch (err: any) {
-    console.error('[Supabase Mutation] Network or Authorization Error:', err.message || err);
+  } catch (err) {
+    console.error('[Supabase Mutation] Network or Authorization Error:', err instanceof Error ? err.message : err);
     return null; // Fail gracefully without crashing the app
   }
 }

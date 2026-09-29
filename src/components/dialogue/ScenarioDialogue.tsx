@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Exercise, Notation, DialogueChoice } from '../../types/curriculum';
+import { Exercise, Notation, DialogueChoice, MultiLangText } from '../../types/curriculum';
 import { Volume2, User, CarFront } from 'lucide-react';
 import { playAudio } from '../../lib/audio';
 import { useAppStore, useTranslation } from '../../store/useAppStore';
@@ -25,7 +25,8 @@ export default function ScenarioDialogue({ exercise, preferredNotation, onComple
     onComplete(choice.isOptimal);
   };
 
-  const getTextForNotation = (item: any) => {
+  const getTextForNotation = (item?: { arabizi?: string; arabic?: string; translation?: MultiLangText | string }) => {
+    if (!item) return '';
     if (typeof item === 'string') return item;
     if (preferredNotation === 'arabizi' && item.arabizi) return item.arabizi;
     if (preferredNotation === 'arabic' && item.arabic) return item.arabic;

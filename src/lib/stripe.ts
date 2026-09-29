@@ -4,7 +4,7 @@ const stripeSecretKey = process.env.STRIPE_SECRET_KEY || '';
 
 export const stripe = stripeSecretKey
   ? new Stripe(stripeSecretKey, {
-      apiVersion: '2025-02-24.acacia' as any,
+      apiVersion: '2025-02-24.acacia' as Stripe.LatestApiVersion,
       appInfo: {
         name: 'Kenza Darija Quest',
         version: '1.0.0',

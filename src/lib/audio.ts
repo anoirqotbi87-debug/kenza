@@ -6,7 +6,8 @@ const audioCache = new Map<string, AudioBuffer>();
 
 function getAudioContext(): AudioContext {
   if (!audioCtx) {
-    audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const webkitAudioContext = (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    audioCtx = new (window.AudioContext || webkitAudioContext)();
   }
   return audioCtx;
 }
@@ -164,7 +165,7 @@ export const playAudio = async (text: string, audioUrl?: string, soundEnabled: b
         utterance.onerror = () => resolve();
         
         window.speechSynthesis.speak(utterance);
-      } catch (err) {
+      } catch {
         resolve();
       }
     });

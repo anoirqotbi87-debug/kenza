@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { DialogueScenario, DialogueTurn } from '../types/dialogue';
 import { useVoiceRecognition } from './useVoiceRecognition';
 import { calculateSimilarity } from '../utils/phonemeMatcher';
@@ -135,7 +135,7 @@ export function useDialogueRunner(scenario: DialogueScenario, soundEnabled: bool
     if (!isListening && transcript && state.userWaiting && currentTurn?.speaker === 'user') {
       validateUserInputRef.current(transcript);
     }
-  }, [isListening, transcript, state.userWaiting]);
+  }, [isListening, transcript, state.userWaiting, currentTurn?.speaker]);
 
   const skipUserTurn = () => {
     if (!currentTurn) return;

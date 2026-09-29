@@ -143,7 +143,7 @@ export const syncService = {
           repetition: item.repetition,
           easeFactor: Number(item.ease_factor),
           dueDate: item.due_date,
-          state: item.state as any
+          state: item.state as SRSCard['state']
         };
       });
       useAppStore.setState({ srsDeck: newDeck });

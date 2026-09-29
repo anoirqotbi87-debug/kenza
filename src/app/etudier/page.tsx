@@ -5,6 +5,7 @@ import { BookOpen, CheckCircle2, Lock, Play } from 'lucide-react';
 import { fullCurriculum } from '@/data/curriculum';
 import type { Lesson, MultiLangText } from '@/types/curriculum';
 import { useAppStore, useTranslation } from '@/store/useAppStore';
+import type { UILanguage } from '@/lib/i18n/translations';
 import { getLocalizedText } from '@/lib/i18n/utils';
 import ExerciseRunner from '@/components/ExerciseRunner';
 import PaywallModal from '@/components/monetization/PaywallModal';
@@ -20,10 +21,10 @@ export default function EtudierPage() {
   const isAr = lang === 'ar';
   const PREMIUM_MODULES = ['5', '6', '7'];
 
-  const tp = (t as any).pages?.etudier || {};
-  const tc = (t as any).common || {};
+  const tp = t.pages.etudier;
+  const tc = t.common;
 
-  const localized = (text: MultiLangText | string | undefined) => getLocalizedText(text, lang as any);
+  const localized = (text: MultiLangText | string | undefined) => getLocalizedText(text, lang as UILanguage);
 
   const handleStart = (moduleKey: string, lesson: Lesson) => {
     if (PREMIUM_MODULES.includes(moduleKey) && !isPremium) {

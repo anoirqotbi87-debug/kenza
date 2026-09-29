@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { X, Mail, Lock, User, LogIn } from 'lucide-react';
+import { X, Mail, Lock, LogIn } from 'lucide-react';
 import { syncService } from '../../lib/syncService';
+import Image from 'next/image';
 import { signUpWithTracking, track } from '../../lib/tracking';
 import { useTranslation } from '../../store/useAppStore';
 
@@ -44,11 +45,12 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 'l
         await syncService.syncCloudToLocal(data.user.id);
         onSuccess();
       }
-    } catch (err: any) {
-      if (err.message?.includes("Email not confirmed")) {
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      if (message.includes("Email not confirmed")) {
         setError("Email non confirmé. Vérifiez votre boîte de réception.");
       } else {
-        setError(err.message || "Erreur lors de la connexion");
+        setError(message || "Erreur lors de la connexion");
       }
     } finally {
       setLoading(false);
@@ -87,15 +89,16 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 'l
       if (data.user && !data.session) {
         setMessage("Compte créé ! Si un email de confirmation est requis, veuillez vérifier votre boîte de réception et vos courriers indésirables (Spam).");
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("Erreur Inscription :", err);
+      const message = err instanceof Error ? err.message : String(err);
       // Traduction des erreurs Supabase courantes
-      if (err.message?.includes("User already registered")) {
+      if (message.includes("User already registered")) {
         setError("Cette adresse email est déjà enregistrée. Veuillez vous connecter.");
-      } else if (err.message?.includes("Password should be")) {
+      } else if (message.includes("Password should be")) {
         setError("Le mot de passe doit contenir au moins 6 caractères.");
       } else {
-        setError(err.message || "Erreur lors de l'inscription.");
+        setError(message || "Erreur lors de l'inscription.");
       }
     } finally {
       setLoading(false);
@@ -132,9 +135,9 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 'l
           throw error;
         }
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error(`Erreur ${provider} OAuth :`, err);
-      setError(err.message || `Impossible de se connecter avec ${provider} pour le moment.`);
+      setError(err instanceof Error ? err.message : `Impossible de se connecter avec ${provider} pour le moment.`);
     }
   };
 
@@ -244,7 +247,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 'l
               onClick={() => handleOAuth('google')} 
               className="flex-1 bg-[#FDFCF8] border border-[#E8E2D5] hover:bg-[#F7F3EA] text-[#1B2A4A] font-bold py-2.5 rounded-full transition-colors flex items-center justify-center gap-2 text-xs shadow-xs"
             >
-              <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-4 h-4" />
+              <Image src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width={16} height={16} className="w-4 h-4" unoptimized />
               <span>{t.auth.google}</span>
             </button>
           </div>

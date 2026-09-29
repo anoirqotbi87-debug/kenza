@@ -11,7 +11,7 @@ export default function ParlerPage() {
   const lang = uiLanguage || 'fr';
   const isAr = lang === 'ar';
 
-  const tp = (t as any).pages?.parler || {};
+  const tp = t.pages.parler;
 
   return (
     <div dir={isAr ? 'rtl' : 'ltr'} className="min-h-screen bg-[#F7F3EA]">

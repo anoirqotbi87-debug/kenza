@@ -2,12 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import { useAppStore, useTranslation } from '../../store/useAppStore';
 
-import { VocabularySRSData } from '../../types/srs';
+import { CustomVocabularyItem } from '../../types/srs';
 
 interface CustomCardEditorProps {
   isOpen: boolean;
   onClose: () => void;
-  cardToEdit?: VocabularySRSData | null;
+  cardToEdit?: CustomVocabularyItem | null;
 }
 
 export default function CustomCardEditor({ isOpen, onClose, cardToEdit }: CustomCardEditorProps) {
@@ -27,7 +27,7 @@ export default function CustomCardEditor({ isOpen, onClose, cardToEdit }: Custom
 
   // Re-initialise the fields when the editor opens or the target card changes.
   // Adjusting state during render is React's recommended pattern for this.
-  const [prevInit, setPrevInit] = useState<{ isOpen: boolean; cardToEdit?: VocabularySRSData | null }>({ isOpen, cardToEdit });
+  const [prevInit, setPrevInit] = useState<{ isOpen: boolean; cardToEdit?: CustomVocabularyItem | null }>({ isOpen, cardToEdit });
   if (prevInit.isOpen !== isOpen || prevInit.cardToEdit !== cardToEdit) {
     setPrevInit({ isOpen, cardToEdit });
     if (isOpen) {
@@ -42,7 +42,7 @@ export default function CustomCardEditor({ isOpen, onClose, cardToEdit }: Custom
           transText = cardToEdit.translation.fr;
         }
         setTranslation(transText);
-        setNotes((cardToEdit as any).notes || '');
+        setNotes(cardToEdit.notes || '');
       } else {
         setArabizi('');
         setTranslation('');

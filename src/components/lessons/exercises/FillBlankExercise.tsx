@@ -1,10 +1,19 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Exercise, Notation } from '../../../types/curriculum';
+import { Exercise, Notation, MultiLangText } from '../../../types/curriculum';
 
 import { getExerciseText } from '../../../lib/i18n/utils';
 import { useTranslation } from '../../../store/useAppStore';
+
+type NotationItem = string | {
+  id?: string;
+  arabizi?: string;
+  arabic?: string;
+  text?: MultiLangText | string;
+  isCorrect?: boolean;
+  translation?: MultiLangText | string;
+};
 
 interface FillBlankExerciseProps {
   exercise: Exercise;
@@ -23,12 +32,12 @@ export default function FillBlankExercise({ exercise, preferredNotation, onUpdat
     onUpdate(id);
   };
 
-  const getTextForNotation = (item: any, notation: Notation) => {
+  const getTextForNotation = (item: NotationItem, notation: Notation): React.ReactNode => {
     if (typeof item === 'string') return item;
     if (notation === 'arabizi' && item.arabizi) return item.arabizi;
     if (notation === 'arabic' && item.arabic) return item.arabic;
     if (notation === 'duo' && item.arabizi && item.arabic) return `${item.arabizi} / ${item.arabic}`;
-    if (item.translation) return item.translation;
+    if (item.translation) return typeof item.translation === 'string' ? item.translation : getExerciseText(item.translation, lang);
     return getExerciseText(item, lang);
   };
 

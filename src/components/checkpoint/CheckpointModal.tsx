@@ -1,14 +1,14 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { X, Check, ArrowRight, Volume2 } from 'lucide-react';
 import { srsVocabulary } from '../../data/srs-deck';
 import { checkpointA2 } from '../../data/checkpoints/checkpointA2';
+import type { MultiLangText } from '../../types/curriculum';
 import { checkpointB1 } from '../../data/checkpoints/checkpointB1';
 import { checkpointB2 } from '../../data/checkpoints/checkpointB2';
 import { useTranslation, useAppStore } from '../../store/useAppStore';
 import { playAudio } from '../../lib/audio';
-import { getVariantForWord } from '../../data/regionalVariants';
 import CheckpointResult from './CheckpointResult';
 import { shuffle } from '../../lib/shuffle';
 
@@ -20,7 +20,7 @@ interface CheckpointModalProps {
 
 export default function CheckpointModal({ levelId, levelName, onClose }: CheckpointModalProps) {
   const { t, lang } = useTranslation();
-  const { soundEnabled, preferredNotation, regionalVariant } = useAppStore();
+  const { soundEnabled, preferredNotation } = useAppStore();
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
@@ -32,7 +32,7 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
   // Generate 12 random questions from vocabulary
   const questions = useMemo(() => {
     if (levelId === '3') {
-      return shuffle(checkpointA2.questions.map((q: any) => ({
+      return shuffle(checkpointA2.questions.map((q) => ({
         id: q.id,
         prompt: q.prompt,
         answerId: q.answerId,
@@ -43,7 +43,7 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
     }
 
     if (levelId === '4') {
-      return shuffle(checkpointB1.questions.map((q: any) => ({
+      return shuffle(checkpointB1.questions.map((q) => ({
         id: q.id,
         prompt: q.prompt,
         answerId: q.answerId,
@@ -54,7 +54,7 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
     }
 
     if (levelId === '5') {
-      return shuffle(checkpointB2.questions.map((q: any) => ({
+      return shuffle(checkpointB2.questions.map((q) => ({
         id: q.id,
         prompt: q.prompt,
         answerId: q.answerId,
@@ -77,7 +77,7 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
         ...distractors.map(d => ({ id: d.id, arabizi: d.arabizi, arabic: d.arabic }))
       ]);
 
-      const tMap: any = (word as any).translations || (word as any).translation || { fr: '' };
+      const tMap = (word.translation || { fr: '' }) as MultiLangText | string | Record<string, string>;
       const prompt = typeof tMap === 'string' ? tMap : tMap[lang] || tMap.fr;
 
       return {
@@ -176,7 +176,7 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-auto sm:mt-8">
-          {currentQ.options.map((opt: any) => {
+          {currentQ.options.map((opt) => {
             const isSelected = selectedOption === opt.id;
             const isCorrectOption = isAnswerChecked && opt.id === currentQ.answerId;
             const isWrongSelection = isAnswerChecked && isSelected && opt.id !== currentQ.answerId;

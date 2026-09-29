@@ -28,8 +28,8 @@ export async function openDB(): Promise<IDBDatabase> {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
     request.onerror = () => reject(request.error);
     request.onsuccess = () => resolve(request.result);
-    request.onupgradeneeded = (e: any) => {
-      const db = e.target.result;
+    request.onupgradeneeded = (e: IDBVersionChangeEvent) => {
+      const db = (e.target as IDBOpenDBRequest).result;
       if (!db.objectStoreNames.contains(STORE_NAME)) {
         db.createObjectStore(STORE_NAME);
       }
@@ -63,8 +63,8 @@ export async function saveAudio(key: string, blob: Blob): Promise<void> {
         }
       };
     });
-  } catch (e: any) {
-    if (e.name === 'QuotaExceededError') {
+  } catch (e) {
+    if (e instanceof DOMException && e.name === 'QuotaExceededError') {
       console.warn('[Storage] QuotaExceededError (Catch): Pack audio trop volumineux. Lecture basculée en streaming.');
     } else {
       console.warn('saveAudio failed:', e);
@@ -82,7 +82,7 @@ export async function getOfflineAudio(key: string): Promise<Blob | null> {
       request.onsuccess = () => resolve(request.result || null);
       request.onerror = () => reject(request.error);
     });
-  } catch (e) {
+  } catch {
     return null;
   }
 }

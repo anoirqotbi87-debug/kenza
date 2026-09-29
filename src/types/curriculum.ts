@@ -1,3 +1,5 @@
+import type { SRSCard } from './srs';
+
 export type Notation = 'arabizi' | 'arabic' | 'duo';
 
 export interface UserProfile {
@@ -7,7 +9,7 @@ export interface UserProfile {
   xp: number;
   streakDays: number;
   masteredWords: string[];
-  srsDeck: Record<string, any>; // Simplified for MVP
+  srsDeck: Record<string, SRSCard>;
   preferredNotation: Notation;
 }
 

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Layers, Flame, Award, Trophy } from 'lucide-react';
 import { useAppStore, useTranslation } from '@/store/useAppStore';
+import type { LucideIcon } from 'lucide-react';
 import SRSDashboard from '@/components/srs/SRSDashboard';
 import DeckManagerView from '@/components/srs/DeckManagerView';
 import Leaderboard from '@/components/gamification/Leaderboard';
@@ -19,9 +20,9 @@ export default function RevisionsPage() {
   const isAr = lang === 'ar';
   const [tab, setTab] = useState<Tab>('srs');
 
-  const tp = (t as any).pages?.revisions || {};
+  const tp = t.pages.revisions;
 
-  const tabs: { id: Tab; label: string; icon: any }[] = [
+  const tabs: { id: Tab; label: string; icon: LucideIcon }[] = [
     { id: 'srs', label: tp.tabSrs || 'Révision intelligente', icon: Layers },
     { id: 'decks', label: tp.tabDecks || 'Mes paquets de cartes', icon: Flame },
     { id: 'gamification', label: tp.tabGamification || 'Progression & Badges', icon: Trophy },

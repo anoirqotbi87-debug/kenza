@@ -17,11 +17,16 @@ export interface CardIllustration {
   category?: string;
 }
 
+export type CustomVocabularyItem = VocabularySRSData & {
+  notes?: string;
+  source?: 'roleplay' | 'module' | 'manual';
+};
+
 export interface VocabularySRSData {
   id: string; // the wordId
   arabizi: string;
   arabic: string;
-  translation: any;
+  translation: MultiLangText | string;
   category?: string;
   audioUrl?: string;
   illustration?: CardIllustration;

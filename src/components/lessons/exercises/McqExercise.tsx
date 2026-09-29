@@ -1,11 +1,20 @@
 'use client';
 
 import React from 'react';
-import { Exercise, Notation } from '../../../types/curriculum';
+import { Exercise, Notation, MultiLangText } from '../../../types/curriculum';
 
 import { getExerciseText } from '../../../lib/i18n/utils';
 import { useTranslation } from '../../../store/useAppStore';
 import { trackEvent } from '../../../utils/analytics';
+
+type NotationItem = string | {
+  id?: string;
+  arabizi?: string;
+  arabic?: string;
+  text?: MultiLangText | string;
+  isCorrect?: boolean;
+  translation?: MultiLangText | string;
+};
 
 interface McqExerciseProps {
   exercise: Exercise;
@@ -15,7 +24,7 @@ interface McqExerciseProps {
   isAnswerChecked: boolean;
 }
 
-const getTextForNotation = (item: any, notation: Notation, lang: string) => {
+const getTextForNotation = (item: NotationItem, notation: Notation, lang: string): React.ReactNode => {
   if (typeof item === 'string') return item;
   if (notation === 'arabizi' && item.arabizi) return item.arabizi;
   if (notation === 'arabic' && item.arabic) return item.arabic;
@@ -25,7 +34,7 @@ const getTextForNotation = (item: any, notation: Notation, lang: string) => {
       <span className="text-slate-800 font-arabic text-xl">{item.arabic}</span>
     </div>
   );
-  if (item.translation) return item.translation; // fallback
+  if (item.translation) return typeof item.translation === 'string' ? item.translation : getExerciseText(item.translation, lang); // fallback
   return getExerciseText(item, lang);
 };
 
@@ -42,7 +51,7 @@ function McqOption({
   isAnswerChecked,
   onSelect,
 }: {
-  option: any;
+  option: NotationItem;
   exercise: Exercise;
   preferredNotation: Notation;
   isSelected: boolean;
@@ -52,13 +61,14 @@ function McqOption({
   const { t, lang } = useTranslation();
   const [showExplanation, setShowExplanation] = React.useState(false);
 
-  const isCorrectOption = isAnswerChecked && option.id === exercise.answer;
-  const isWrongSelection = isAnswerChecked && isSelected && option.id !== exercise.answer;
+  const optionId = typeof option === 'string' ? option : option.id;
+  const isCorrectOption = isAnswerChecked && optionId === exercise.answer;
+  const isWrongSelection = isAnswerChecked && isSelected && optionId !== exercise.answer;
 
   return (
     <div className="flex flex-col">
       <button
-        onClick={() => !isAnswerChecked && onSelect(option.id)}
+        onClick={() => !isAnswerChecked && optionId && onSelect(optionId)}
         disabled={isAnswerChecked}
         className={`
           p-6 rounded-2xl border-2 text-center text-lg font-medium transition-all min-h-[100px] flex items-center justify-center

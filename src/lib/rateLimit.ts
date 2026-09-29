@@ -25,9 +25,10 @@ export async function checkRateLimit(
     }
 
     return { allowed: !!data };
-  } catch (err: any) {
-    console.error('[RateLimit] Unexpected error:', err?.message || err);
-    return { allowed: true, error: String(err?.message || err) };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error('[RateLimit] Unexpected error:', message);
+    return { allowed: true, error: message };
   }
 }
 

@@ -39,7 +39,7 @@ export function useCheckpointProgress() {
               }
             }
           }
-        } catch (e) {
+        } catch {
           // Pas d'impact si le parsing échoue
         }
 
@@ -47,7 +47,7 @@ export function useCheckpointProgress() {
           const merged = { ...prev, ...cloudData };
           try {
             localStorage.setItem('kenza_checkpoints', JSON.stringify(merged));
-          } catch (e) {}
+          } catch {}
           return merged;
         });
       });

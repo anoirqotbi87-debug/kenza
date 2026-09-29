@@ -45,7 +45,7 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
   const dialoguesDesc = sc.dialoguesDesc;
   const exploreTitle = sc.exploreMore;
 
-  const scenarioCategoryIcon = (category: string) => {
+  const scenarioCategoryIcon = (category?: string) => {
     switch (category) {
       case 'transport': return '🚕';
       case 'food': case 'cafe': return '☕';
@@ -56,7 +56,7 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
     }
   };
 
-  const handleScenarioClick = (scenario: any) => {
+  const handleScenarioClick = (scenario: DialogueScenario) => {
     if (scenario.tier === 'premium' && !isPremium) {
       onRequirePremium();
       return;
@@ -219,7 +219,7 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {ALL_SCENARIOS.map((scenario) => {
-                const s: any = scenario;
+                const s = scenario;
                 const isLocked = s.tier === 'premium' && !isPremium;
                 return (
                   <div

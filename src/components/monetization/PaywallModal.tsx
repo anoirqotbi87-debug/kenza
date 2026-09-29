@@ -82,9 +82,9 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
         alert(pw.upgradeSuccess);
         onClose();
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error('[Paywall Checkout Error]:', err);
-      setErrorMessage(err.message || pw.errorRetry);
+      setErrorMessage(err instanceof Error ? err.message : pw.errorRetry);
     } finally {
       setLoading(false);
     }

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Lesson } from '../types/curriculum';
+import { Lesson, LessonStep } from '../types/curriculum';
 import { useAppStore, useTranslation } from '../store/useAppStore';
 import { X, Check, Volume2, Info, ArrowRight, Heart, HeartCrack, Trophy } from 'lucide-react';
 import McqExercise from './lessons/exercises/McqExercise';
@@ -194,10 +194,10 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
           <div className="flex flex-col items-center justify-center h-full space-y-8 text-center animate-in fade-in zoom-in duration-300">
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 text-center">
               <h3 className="text-xl font-bold text-slate-800 mb-4">
-                {getLocalizedText((step as any).title || step.exercise?.prompt, lang)}
+                {getLocalizedText((step.content as LessonStep['content'])?.title || step.exercise?.prompt, lang)}
               </h3>
               <div className="text-slate-600 mb-6 leading-relaxed">
-                {getLocalizedText((step as any).content || step.exercise?.explanation, lang)}
+                {getLocalizedText((step.content as LessonStep['content'])?.description || step.exercise?.explanation, lang)}
               </div>
             </div>
           </div>

@@ -29,7 +29,7 @@ export default function LanguageSelector({ variant = 'light', className = '', sh
   const { uiLanguage, setLanguage } = useAppStore();
   const { t } = useTranslation();
 
-  const ariaLabel = (t as any).common?.interfaceLanguage || "Langue de l'interface";
+  const ariaLabel = t.common.interfaceLanguage || "Langue de l'interface";
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setLanguage(e.target.value as UILanguage);

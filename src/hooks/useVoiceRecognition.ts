@@ -2,11 +2,38 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 
-// Window augmentation for Speech Recognition API
+// Minimal typings for the Web Speech API (not part of lib.dom.d.ts).
+interface SpeechRecognitionAlternativeLike {
+  transcript: string;
+}
+interface SpeechRecognitionResultLike {
+  [index: number]: SpeechRecognitionAlternativeLike;
+  length: number;
+}
+interface SpeechRecognitionEventLike {
+  resultIndex: number;
+  results: { length: number; [index: number]: SpeechRecognitionResultLike };
+}
+interface SpeechRecognitionErrorEventLike {
+  error: string;
+}
+interface SpeechRecognitionLike {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  start(): void;
+  stop(): void;
+  onstart: (() => void) | null;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEventLike) => void) | null;
+  onend: (() => void) | null;
+}
+type SpeechRecognitionCtor = new () => SpeechRecognitionLike;
+
 declare global {
   interface Window {
-    SpeechRecognition: any;
-    webkitSpeechRecognition: any;
+    SpeechRecognition?: SpeechRecognitionCtor;
+    webkitSpeechRecognition?: SpeechRecognitionCtor;
   }
 }
 
@@ -19,7 +46,7 @@ export function useVoiceRecognition(lang = 'ar-MA', timeoutMs = 5000) {
   const [transcript, setTranscript] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   // Ref mirrors isListening so stopListening can stay referentially stable
   // while still reading the current value.
@@ -36,7 +63,7 @@ export function useVoiceRecognition(lang = 'ar-MA', timeoutMs = 5000) {
     if (recognitionRef.current && isListeningRef.current) {
       try {
         recognitionRef.current.stop();
-      } catch(e) {}
+      } catch {}
     }
     setIsListening(false);
   }, []);
@@ -62,7 +89,7 @@ export function useVoiceRecognition(lang = 'ar-MA', timeoutMs = 5000) {
       }, timeoutMs);
     };
 
-    recognitionRef.current.onresult = (event: any) => {
+    recognitionRef.current.onresult = (event: SpeechRecognitionEventLike) => {
       // Reset timeout on speech detection
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = setTimeout(() => {
@@ -76,7 +103,7 @@ export function useVoiceRecognition(lang = 'ar-MA', timeoutMs = 5000) {
       setTranscript(currentTranscript);
     };
 
-    recognitionRef.current.onerror = (event: any) => {
+    recognitionRef.current.onerror = (event: SpeechRecognitionErrorEventLike) => {
       if (event.error === 'not-allowed') {
         setError("Permission micro refusée. Veuillez autoriser l'accès au microphone.");
       } else if (event.error === 'no-speech') {
@@ -93,11 +120,11 @@ export function useVoiceRecognition(lang = 'ar-MA', timeoutMs = 5000) {
 
     try {
       recognitionRef.current.start();
-    } catch (err: any) {
-      if (err.name === 'InvalidStateError') {
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'InvalidStateError') {
         // Already started, safely ignore
       } else {
-        setError(err.message);
+        setError(err instanceof Error ? err.message : String(err));
         setIsListening(false);
       }
     }

@@ -26,7 +26,7 @@ export default function PageHeader({ badge, title, backHref = '/', actions }: Pa
   const { uiLanguage } = useAppStore();
   const { t } = useTranslation();
   const isAr = uiLanguage === 'ar';
-  const backLabel = (t as any).common?.back || 'Retour';
+  const backLabel = t.common.back || 'Retour';
 
   return (
     <header

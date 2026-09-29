@@ -117,7 +117,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
       id: wordId,
       arabic: ar || '',
       arabizi: arz || '',
-      translation: { fr: fr || '', en: fr || '', ar: ar || '' },
+      translation: { fr: fr || '', en: fr || '', es: fr || '', ar: ar || '' },
       category: `roleplay_${personaId}`,
       illustration: { iconName: personaId === 'taxi' ? 'Car' : personaId === 'cafe' ? 'Coffee' : 'ShoppingBag' }
     });
