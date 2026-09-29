@@ -1,20 +1,20 @@
-TYPE-ExerciseOption: OK
-M3-l1-chambre: OK
-M3-l1-cle: OK
-M3-l1-lit: OK
-M3-l3-medecin: OK
-M3-l3-medicament: OK
-M3-l3-malade: OK
-M5-agree: OK
-M5-pasforce: OK
-M5-tort: OK
-M5-employe: OK
-M5-rdv: OK
-M5-projet: OK
-M5-secret: OK
-M5-passe: OK
-M5-petit: OK
-M7-tourner: OK
-M7-patience: OK
-M7-courir: OK
+TYPE-ExerciseOption: OK (already)
+M3-l1-chambre: OK (already)
+M3-l1-cle: OK (already)
+M3-l1-lit: OK (already)
+M3-l3-medecin: OK (already)
+M3-l3-medicament: OK (already)
+M3-l3-malade: OK (already)
+M5-agree: OK (already)
+M5-pasforce: OK (already)
+M5-tort: OK (already)
+M5-employe: OK (already)
+M5-rdv: OK (already)
+M5-projet: OK (already)
+M5-secret: OK (already)
+M5-passe: OK (already)
+M5-petit: OK (already)
+M7-tourner: OK (already)
+M7-patience: OK (already)
+M7-courir: OK (already)
 DUMP_MODE: on
