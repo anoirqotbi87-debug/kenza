@@ -1247,10 +1247,10 @@ function TodayView({
         <div>
           <span className="eyebrow">
             <span className="eyebrow-line" />
-            {tr(lang, "{tr("POUR AUJOURD’HUI", "FOR TODAY", "PARA HOY", "لهذا اليوم")}", "FOR TODAY", "PARA HOY", "لهذا اليوم")}
+            {tr(lang, "POUR AUJOURD’HUI", "FOR TODAY", "PARA HOY", "لهذا اليوم")}
+          </span>
           <h2>{tr(lang, "À toi de choisir ton pas.", "Your pace, your choice.", "Tú eliges tu paso.", "اختر خطوتك.")}</h2>
         </div>
-        <button className="plain-link" onClick={() => onNavigate("path")}>
           {tr(lang, "Voir le parcours", "View the journey", "Ver la ruta", "المسار")} <ArrowRight size={15} />
         </button>
       </div>
