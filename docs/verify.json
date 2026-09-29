@@ -1,0 +1,123 @@
+{
+  "ts": "2026-09-29T00:10:17.090Z",
+  "appliedThisRun": 0,
+  "already": 88,
+  "missing": [
+    "Cartes du jour",
+    "Au café, en taxi",
+    "Pas besoin d’être parfait·e.",
+    "Les premiers pas",
+    "Débloquer avec Pro",
+    "Passer le Checkpoint A1",
+    "Effacer les filtres",
+    "Passer à Kenza Pro",
+    "Effacer ma progression locale",
+    "Ton carnet",
+    "Vocabulaire essentiel",
+    "POUR AUJOURD’HUI",
+    "Ajuster l’objectif",
+    "Continuer à apprendre",
+    "C’est parti",
+    "Voir mon espace",
+    "Voir le parcours",
+    "Passeport Culturel & Données",
+    "La darija s’ouvre à toi.",
+    "TON PETIT MOMENT DARIJA",
+    "À ton rythme, toujours.",
+    "Aujourd’hui",
+    "Mon parcours",
+    "Carnet de phrases",
+    "PRATIQUE ORALE & IA",
+    "MON ESPACE",
+    "TON ESPACE",
+    "objectif",
+    "Mon espace"
+  ],
+  "trCallCount": 94,
+  "checks": [
+    {
+      "s": "tr(\"Salam, on s’y remet ?\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"La darija\", \"Darija\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"TON PETIT MOMENT DARIJA\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"Continuer à apprendre\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"C’est parti\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"Terminer la leçon\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"Voir mon espace\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"Voir le parcours\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"Vocabulaire essentiel\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"Cartes du jour\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"Au café, en taxi\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"rythme régulier\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"jour\", \"day\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"darija, la langue du lien\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"POUR AUJOURD’HUI\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"LEÇON SUIVANTE\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"Ton carnet\", \"Your phrase\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"Faire une\", \"Do a quick\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"Mises en\", \"Real-life\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"Les premiers bonjours\"",
+      "ok": true
+    },
+    {
+      "s": "tr(\"Saluer, se présenter, créer le lien\"",
+      "ok": true
+    }
+  ]
+}
