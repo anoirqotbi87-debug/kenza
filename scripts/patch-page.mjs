@@ -54,7 +54,8 @@ fixFile(P, "A1-rename-def",
   report.push("B-repair-wrapped: " + count);
 })();
 fixFile(P, "E2-category-sentinel-init", 'useState("Tout voir")', 'useState("__all__")');
-fixFile(P, "E3-category-sentinel-reset", 'setCategory("Tout voir")', 'setCategory("__all__")');
+fixFile(P, "E3-category-sentinel-reset", 'setCategory("Tout voir")', '
+setCategory("__all__")');
 
 // ---- PART 2: PR#1 funnel-tracking integration (only when the tracking lib is present) ----
 const TRACKING_READY = fs.existsSync("src/lib/tracking.ts");
@@ -75,7 +76,8 @@ if (TRACKING_READY) {
     'useEffect(() => {\n    setMobileMenuOpen(false);\n    window.scrollTo({ top: 0, behavior: "smooth" });\n  }, [view]);\n\n  // Chaque vue est suivie comme une page virtuelle (funnel)\n  useEffect(() => {\n    track("page_view", { view }, `/${view}`);\n  }, [view]);');
   fixFile(P, "F5-tr-lesson-started",
     'setLessonId(id);\n    setQuestionIndex(0);\n    setSelectedAnswer(null);\n  };',
-    'track("lesson_started", { lesson_id: id, is_first_lesson: completedLessons.length === 0 }, "/lesson");\n    setSavePromptHidden(false);\n    setLessonJustDone(false);\n    setLessonId(id);\n    setQuestionIndex(0);\n    setSelectedAnswer(null);\n  };');
+    'track("lesson_starte
+d", { lesson_id: id, is_first_lesson: completedLessons.length === 0 }, "/lesson");\n    setSavePromptHidden(false);\n    setLessonJustDone(false);\n    setLessonId(id);\n    setQuestionIndex(0);\n    setSelectedAnswer(null);\n  };');
   fixFile(P, "F6-tr-lesson-completed",
     'const firstCompletion = !completedLessons.includes(activeLesson.id);\n    if (firstCompletion) {\n      completeLesson(activeLesson.id);\n      addXp(activeLesson.questions.length * 10);\n    }',
     'const firstCompletion = !completedLessons.includes(activeLesson.id);\n    if (firstCompletion) {\n      track("lesson_completed", { lesson_id: activeLesson.id, lessons_completed_total: completedLessons.length + 1 }, "/lesson");\n      setLessonJustDone(true);\n      completeLesson(activeLesson.id);\n      addXp(activeLesson.questions.length * 10);\n    }');
@@ -84,7 +86,8 @@ if (TRACKING_READY) {
     'const currentHeader = headerTitle[view];\n\n  // Invitation a sauvegarder la progression (invites uniquement) apres une lecon\n  const savePromptVariant = isGuest && lessonJustDone && !savePromptHidden\n    ? getSavePromptVariant(completedCount, streakDays)\n    : null;');
   fixFile(P, "F8-tr-render",
     '      <InstallPwaBanner />',
-    '      {savePromptVariant && (\n        <div className="fixed inset-x-0 bottom-24 sm:bottom-8 z-40 flex justify-center px-4">\n          <div className="w-full max-w-sm">\n            <SaveProgressCard\n              variant={savePromptVariant}\n              lessonsCompleted={completedCount}\n              onSave={() => {\n                track("cta_click", { cta: "save_progress" }, `/${view}`);\n                setAuthMode("signup");\n                setSavePromptHidden(true);\n              }}\n              onLater={() => {\n                dismissSavePrompt(completedCount);\n                setSavePromptHidden(true);\n              }}\n            />\n          </div>\n        </div>\n      )}\n\n      {authMode && (\n        <AuthModal\n          key={authMode}\n          isOpen\n          initialMode={authMode}\n          onClose={() => setAuthMode(null)}\n          onSuccess={() => setAuthMode(null)}\n        />\n      )}\n\n      <InstallPwaBanner />');
+    '      {savePromptVariant && (\n        <div className="fixed inset-x-0 bottom-24 sm:bottom-8 z-40 flex justify-center px-4">\n          <div className="w-full max-w-sm">\n            <SaveProgressCard\n              variant={savePromptVariant}\n              lessonsCompleted={completedCount}\n              onSave={() => {\n                track("cta_click", { cta: "save_progress" }, `/${view}`);\n                setAuthMode("signup");\n                setSavePromptHidden(true);\n              }}\n              onLater={() => {\n                dismissSavePrompt(completedCount);\n                setSavePromptHidden(true);\n              }}\n            />\n          </div>\n        </div>\n      )}\n\n      {authMode
+ && (\n        <AuthModal\n          key={authMode}\n          isOpen\n          initialMode={authMode}\n          onClose={() => setAuthMode(null)}\n          onSuccess={() => setAuthMode(null)}\n        />\n      )}\n\n      <InstallPwaBanner />');
 
   // --- layout.tsx : TrackingProvider ---
   fixFile("src/app/layout.tsx", "L1-import",
@@ -102,7 +105,8 @@ if (TRACKING_READY) {
   // --- useAppStore.ts : devUnlockAll piloté par variable d'environnement ---
   fixFile("src/store/useAppStore.ts", "U1-devunlock",
     "devUnlockAll: false, // Prod: locked progression",
-    "devUnlockAll: process.env.NEXT_PUBLIC_DEV_UNLOCK_ALL === 'true', // Prod : verrouille ; en local : NEXT_PUBLIC_DEV_UNLOCK_ALL=true");
+    "devUnlockAll: process.env.NEXT_PUBLIC_DEV_UNLOCK_ALL === 'true', // Prod : verrouille ; en local : NEXT_PUBLIC_DEV_UNLOCK_ALL=
+true");
   fixFile("src/store/useAppStore.ts", "U2-persist-v3",
     "name: 'darija-quest-storage',\n      version: 2,",
     "name: 'darija-quest-storage',\n      version: 3,\n      // devUnlockAll n'est plus sauvegarde : il depend uniquement de la variable d'environnement\n      partialize: (state: any) => {\n        // eslint-disable-next-line @typescript-eslint/no-unused-vars\n        const { devUnlockAll, ...rest } = state;\n        return rest;\n      },");
@@ -122,7 +126,8 @@ if (TRACKING_READY) {
     "export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtra }: ExerciseRunnerProps) {");
   fixFile("src/components/ExerciseRunner.tsx", "X4-exercise-answered",
     "setIsCorrect(correct);\n    setIsAnswerChecked(true);",
-    "setIsCorrect(correct);\n    setIsAnswerChecked(true);\n\n    track('exercise_answered', {\n      lesson_id: lesson.id,\n      step: currentStepIndex,\n      total_steps: lesson.steps.length,\n      exercise_type: type,\n      correct,\n    }, '/lesson');\n    if (!correct && lives === 1) {\n      track('lesson_failed', { lesson_id: lesson.id, step: currentStepIndex, total_steps: lesson.steps.length }, '/lesson');\n    }");
+    "setIsCorrect(correct);\n    setIsAnswerChecked(true);\n\n    track('exercise_answered', {\n      lesson_id: le
+sson.id,\n      step: currentStepIndex,\n      total_steps: lesson.steps.length,\n      exercise_type: type,\n      correct,\n    }, '/lesson');\n    if (!correct && lives === 1) {\n      track('lesson_failed', { lesson_id: lesson.id, step: currentStepIndex, total_steps: lesson.steps.length }, '/lesson');\n    }");
   fixFile("src/components/ExerciseRunner.tsx", "X5-congrats-spacing",
     '<div className="flex gap-8 mb-12">',
     '<div className={`flex gap-8 ${finishExtra ? \'mb-6\' : \'mb-12\'}`}>');
@@ -138,7 +143,8 @@ if (TRACKING_READY) {
     "import React, { useState } from 'react';",
     "import React, { useEffect, useState } from 'react';");
   fixFile("src/components/auth/AuthModal.tsx", "A2-track-import",
-    "import { syncService } from '../../lib/syncService';",
+    "import { sy
+ncService } from '../../lib/syncService';",
     "import { syncService } from '../../lib/syncService';\nimport { signUpWithTracking, track } from '../../lib/tracking';");
   fixFile("src/components/auth/AuthModal.tsx", "A3-props",
     "interface AuthModalProps {\n  isOpen: boolean;\n  onClose: () => void;\n  onSuccess: () => void;\n}",
@@ -157,7 +163,8 @@ if (TRACKING_READY) {
     "track('signup_started', { method: 'email' }, '/auth');\n      const { data, error } = await signUpWithTracking(email, password, { username: email.split('@')[0] });\n      if (error) {\n        track('signup_failed', { method: 'email', error: error.message?.slice(0, 200) }, '/auth');\n        throw error;\n      }");
   fixFile("src/components/auth/AuthModal.tsx", "A8-oauth-tracking",
     "const { error } = await supabase.auth.signInWithOAuth({",
-    "track(isLogin ? 'login_started' : 'signup_started', { method: provider }, '/auth');\n      const { error } = await supabase.auth.signInWithOAuth({");
+    "track(isLogin ? 'login_started' : 'signup_started',
+ { method: provider }, '/auth');\n      const { error } = await supabase.auth.signInWithOAuth({");
   fixFile("src/components/auth/AuthModal.tsx", "A9-zindex",
     "fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1B2A4A]/60",
     "fixed inset-0 z-[60] flex items-center justify-center p-4 bg-[#1B2A4A]/60");
@@ -169,7 +176,8 @@ if (TRACKING_READY) {
     'continueGuest: "Continuer en mode invité", google: "Continuer avec Google",\n      headerLogin: "Se connecter", checkEmail: "Compte créé. Confirmez votre adresse via l\'e-mail que nous venons d\'envoyer, puis revenez ici : votre progression sera sauvegardée."\n    },\n    savePrompt: {\n      title: "Ne perdez pas vos progrès",\n      body: "Créez votre compte gratuit pour garder vos XP, votre série et reprendre sur n\'importe quel appareil.",\n      reminderTitle: "Vos progrès ne sont pas encore sauvegardés",\n      reminderBody: "Vous avez déjà {xp} XP et {lessons} leçons terminées. Ils ne sont enregistrés que sur cet appareil : créez un compte gratuit pour ne rien perdre.",\n      cta: "Sauvegarder ma progression",\n      later: "Plus tard",\n      reassurance: "Gratuit · 30 secondes · Avec Google ou e-mail"\n    },');
   fixFile(TRF, "T2-en-saveprompt",
     'continueGuest: "Continue as guest", google: "Continue with Google"\n    },',
-    'continueGuest: "Continue as guest", google: "Continue with Google",\n      headerLogin: "Log in", checkEmail: "Account created. Confirm your address using the email we just sent, then come back here: your progress will be saved."\n    },\n    savePrompt: {\n      title: "Don\'t lose your progress",\n      body: "Create your free account to keep your XP and streak, and pick up on any device.",\n      reminderTitle: "Your progress isn\'t saved yet",\n      reminderBody: "You already have {xp} XP and {lessons} lessons completed. They\'re only stored on this device: create a free account so you don\'t lose anything.",\n      cta: "Save my progress",\n      later: "Later",\n      reassurance: "Free · 30 seconds · With Google or email"\n    },');
+    'continueGuest: "Continue as guest", google: "Continue with Google",\n      headerLogin: "Log in", checkEmail: "Account created. Confirm your address using the email we just sent, then come back here: your progress will be saved."\n    },\n    savePrompt: {\n      title: "Don\'t lose your progress",\n      body: "Create your free account to keep your XP and streak, and pick up on any device.",\n      reminderTitle: "Your progress isn\'t saved yet",\n      reminde
+rBody: "You already have {xp} XP and {lessons} lessons completed. They\'re only stored on this device: create a free account so you don\'t lose anything.",\n      cta: "Save my progress",\n      later: "Later",\n      reassurance: "Free · 30 seconds · With Google or email"\n    },');
   fixFile(TRF, "T3-es-saveprompt",
     'continueGuest: "Continuar como invitado", google: "Continuar con Google"\n    },',
     'continueGuest: "Continuar como invitado", google: "Continuar con Google",\n      headerLogin: "Iniciar sesión", checkEmail: "Cuenta creada. Confirma tu dirección con el correo que te acabamos de enviar y vuelve aquí: tu progreso se guardará."\n    },\n    savePrompt: {\n      title: "No pierdas tu progreso",\n      body: "Crea tu cuenta gratuita para conservar tus XP y tu racha, y continuar en cualquier dispositivo.",\n      reminderTitle: "Tu progreso aún no está guardado",\n      reminderBody: "Ya tienes {xp} XP y {lessons} lecciones completadas. Solo están guardados en este dispositivo: crea una cuenta gratuita para no perder nada.",\n      cta: "Guardar mi progreso",\n      later: "Más tarde",\n      reassurance: "Gratis · 30 segundos · Con Google o correo"\n    },');
@@ -178,7 +186,8 @@ if (TRACKING_READY) {
     'continueGuest: "الاستمرار كضيف", google: "الاستمرار مع جوجل",\n      headerLogin: "تسجيل الدخول", checkEmail: "تم إنشاء الحساب. أكّد بريدك الإلكتروني عبر الرسالة التي أرسلناها للتو، ثم عد إلى هنا: سيتم حفظ تقدّمك."\n    },\n    savePrompt: {\n      title: "لا تفقد تقدّمك",\n      body: "أنشئ حسابك المجاني للاحتفاظ بنقاط XP وسلسلة أيامك، والمتابعة على أي جهاز.",\n      reminderTitle: "تقدّمك غير محفوظ بعد",\n      reminderBody: "لديك بالفعل {xp} XP و{lessons} دروس مكتملة. إنها محفوظة على هذا الجهاز فقط: أنشئ حسابًا مجانيًا حتى لا تفقد شيئًا.",\n      cta: "احفظ تقدّمي",\n      later: "لاحقًا",\n      reassurance: "مجاني · 30 ثانية · عبر جوجل أو البريد الإلكتروني"\n    },');
 }
 
-// ---- PART 3: dumps + verify (only when DUMP_MODE=on, i.e. main runs) ----
+// 
+---- PART 3: dumps + verify (only when DUMP_MODE=on, i.e. main runs) ----
 const DUMP_MODE = (process.env.DUMP_MODE || "on") === "on";
 report.push("DUMP_MODE: " + (DUMP_MODE ? "on" : "off"));
 if (DUMP_MODE) {

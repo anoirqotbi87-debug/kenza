@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useAppStore, useTranslation } from '../store/useAppStore';
 import SmartReviewSession from './srs/SmartReviewSession';
 import DailyReviewCard from './dashboard/DailyReviewCard';
+import { track } from '../lib/tracking';
 
 interface DashboardProps {
   onStartLesson: (lessonId: string) => void;
@@ -20,7 +21,10 @@ export default function Dashboard({ onStartLesson }: DashboardProps) {
 
       {/* Gamification Dashboard */}
       <section className="flex flex-col gap-6 animate-in slide-in-from-bottom-4">
-        <DailyReviewCard onStartReview={() => setIsReviewSessionOpen(true)} />
+        <DailyReviewCard onStartReview={() => {
+            track('cta_click', { cta: 'daily_practice' }, '/learn');
+            setIsReviewSessionOpen(true);
+          }} />
       </section>
     </div>
   );
