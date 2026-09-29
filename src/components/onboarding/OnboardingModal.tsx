@@ -3,6 +3,53 @@ import { useAppStore } from '../../store/useAppStore';
 import PlacementTestModal from './PlacementTestModal';
 import { Compass, Briefcase, Heart, Clock, Zap, ArrowRight, CheckCircle2 } from 'lucide-react';
 
+const OB_STR = {
+  fr: { welcome: "Bienvenue sur KENZA 👋", goalQuestion: "Quel est votre objectif principal avec la Darija ?",
+    goals: { travel: { title: "Voyage & Découverte", desc: "Souk, taxi, politesse" }, expat: { title: "Installation & Expatriation", desc: "Administratif, logement" }, family: { title: "Famille & Conjoint", desc: "Vocabulaire chaleureux" } },
+    tempoTitle: "Votre rythme idéal ⏱️", tempoQuestion: "Combien de temps souhaitez-vous y consacrer par jour ?",
+    tempos: { 5: { title: "Tranquille", desc: "5 min / jour" }, 10: { title: "Régulier", desc: "10 min / jour" }, 15: { title: "Intensif", desc: "15 min / jour" } },
+    levelQuestion: "Quel est votre niveau ? 🇲🇦", levelHint: "Pour vous proposer le meilleur point de départ.",
+    beginner: "Je débute complètement", beginnerHint: "Commencer depuis le Module 1",
+    notions: "J'ai déjà des notions", notionsHint: "Test rapide de 2 min pour sauter des niveaux",
+    done: "Profil configuré !", youScored: "Vous avez eu",
+    bravo: "Bravo ! Vous semblez avoir les bases. Vous pourrez commencer direct au Module 2.",
+    parfait: "Parfait ! Nous allons commencer par les fondations doucement.", start: "Commencer l'aventure" },
+  en: { welcome: "Welcome to KENZA 👋", goalQuestion: "What is your main goal with Darija?",
+    goals: { travel: { title: "Travel & Discovery", desc: "Souk, taxi, politeness" }, expat: { title: "Moving & Expat Life", desc: "Admin, housing" }, family: { title: "Family & Partner", desc: "Warm vocabulary" } },
+    tempoTitle: "Your ideal pace ⏱️", tempoQuestion: "How much time do you want to spend per day?",
+    tempos: { 5: { title: "Relaxed", desc: "5 min / day" }, 10: { title: "Regular", desc: "10 min / day" }, 15: { title: "Intensive", desc: "15 min / day" } },
+    levelQuestion: "What's your level? 🇲🇦", levelHint: "So we can suggest the best starting point.",
+    beginner: "I'm a complete beginner", beginnerHint: "Start from Module 1",
+    notions: "I already know some", notionsHint: "Quick 2-min test to skip levels",
+    done: "Profile set up!", youScored: "You scored",
+    bravo: "Great! You seem to have the basics. You can start directly at Module 2.",
+    parfait: "Perfect! We'll start gently with the foundations.", start: "Start the adventure" },
+  es: { welcome: "¡Bienvenido a KENZA 👋!", goalQuestion: "¿Cuál es tu principal objetivo con la Darija?",
+    goals: { travel: { title: "Viaje y Descubrimiento", desc: "Souk, taxi, cortesía" }, expat: { title: "Instalación y Expatriación", desc: "Trámites, vivienda" }, family: { title: "Familia y Pareja", desc: "Vocabulario cercano" } },
+    tempoTitle: "Tu ritmo ideal ⏱️", tempoQuestion: "¿Cuánto tiempo quieres dedicarle al día?",
+    tempos: { 5: { title: "Tranquilo", desc: "5 min / día" }, 10: { title: "Constante", desc: "10 min / día" }, 15: { title: "Intensivo", desc: "15 min / día" } },
+    levelQuestion: "¿Cuál es tu nivel? 🇲🇦", levelHint: "Para ofrecerte el mejor punto de partida.",
+    beginner: "Empiezo de cero", beginnerHint: "Comenzar desde el Módulo 1",
+    notions: "Ya tengo nociones", notionsHint: "Test rápido de 2 min para saltar niveles",
+    done: "¡Perfil configurado!", youScored: "Has obtenido",
+    bravo: "¡Bravo! Parece que tienes las bases. Podrás empezar directamente en el Módulo 2.",
+    parfait: "¡Perfecto! Empezaremos poco a poco por los fundamentos.", start: "Empezar la aventura" },
+  ar: { welcome: "مرحبا بك في كينزا 👋", goalQuestion: "ما هدفك الأساسي مع الدارجة؟",
+    goals: { travel: { title: "سفر واستكشاف", desc: "سوق، طاكسي، أدب" }, expat: { title: "الاستقرار والهجرة", desc: "إدارة، سكن" }, family: { title: "العائلة والشريك", desc: "مفردات دافئة" } },
+    tempoTitle: "إيقاعك المثالي ⏱️", tempoQuestion: "كم من الوقت تريد أن تخصص يومياً؟",
+    tempos: { 5: { title: "هادئ", desc: "5 دقائق / يوم" }, 10: { title: "منتظم", desc: "10 دقائق / يوم" }, 15: { title: "مكثف", desc: "15 دقيقة / يوم" } },
+    levelQuestion: "ما مستواك؟ 🇲🇦", levelHint: "لنقترح عليك أفضل نقطة انطلاق.",
+    beginner: "أبدأ من الصفر", beginnerHint: "ابدأ من الوحدة 1",
+    notions: "لدي بعض المفاهيم", notionsHint: "اختبار سريع لدقيقتين لتجاوز مستويات",
+    done: "تم إعداد حسابك!", youScored: "حصلت على",
+    bravo: "أحسنت! يبدو أنك تملك الأساسيات. يمكنك البدء مباشرة بالوحدة 2.",
+    parfait: "ممتاز! سنبدأ بهدوء من الأساسيات.", start: "ابدأ المغامرة" }
+};
+function obS(lang: string) {
+  const k = (lang === 'en' || lang === 'es' || lang === 'ar') ? lang : 'fr';
+  return (OB_STR as Record<string, typeof OB_STR.fr>)[k];
+}
+
 const GOALS = [
   { id: 'travel', title: 'Voyage & Découverte', desc: 'Souk, taxi, politesse', icon: Compass, color: 'text-amber-500', bg: 'bg-amber-100' },
   { id: 'expat', title: 'Installation & Expatriation', desc: 'Administratif, logement', icon: Briefcase, color: 'text-blue-500', bg: 'bg-blue-100' },
@@ -16,6 +63,8 @@ const TEMPOS = [
 ];
 export default function OnboardingModal() {
   const { completeOnboarding, completeLesson } = useAppStore();
+  const { uiLanguage } = useAppStore();
+  const S = obS(String(uiLanguage || 'fr').toLowerCase());
   const [step, setStep] = useState(1);
   const [goal, setGoal] = useState<string | null>(null);
   const [tempo, setTempo] = useState<number | null>(null);
@@ -82,8 +131,8 @@ export default function OnboardingModal() {
                       <g.icon className="w-6 h-6" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-slate-800">{g.title}</h3>
-                      <p className="text-sm text-slate-500">{g.desc}</p>
+                      <h3 className="font-bold text-slate-800">{(S.goals as Record<string, { title: string; desc: string }>)[g.id]?.title || g.title}</h3>
+                      <p className="text-sm text-slate-500">{(S.goals as Record<string, { title: string; desc: string }>)[g.id]?.desc || g.desc}</p>
                     </div>
                   </button>
                 ))}
@@ -110,8 +159,8 @@ export default function OnboardingModal() {
                       <t.icon className="w-6 h-6" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-slate-800">{t.title}</h3>
-                      <p className="text-sm text-slate-500">{t.desc}</p>
+                      <h3 className="font-bold text-slate-800">{(S.tempos as Record<number, { title: string; desc: string }>)[t.id]?.title || t.title}</h3>
+                      <p className="text-sm text-slate-500">{(S.tempos as Record<number, { title: string; desc: string }>)[t.id]?.desc || t.desc}</p>
                     </div>
                   </button>
                 ))}
@@ -169,7 +218,7 @@ export default function OnboardingModal() {
                 Profil configuré !
               </h2>
               <p className="text-slate-500 text-lg">
-                Vous avez eu {quizScore} / 3 au test.<br/>
+                {S.youScored} {quizScore} / 3.<br/>
                 {quizScore >= 2 
                   ? "Bravo ! Vous semblez avoir les bases. Vous pourrez commencer direct au Module 2." 
                   : "Parfait ! Nous allons commencer par les fondations doucement."}
@@ -178,7 +227,7 @@ export default function OnboardingModal() {
                 onClick={handleFinish}
                 className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-lg flex items-center justify-center gap-2 transition-colors mt-8"
               >
-                Commencer l'aventure <ArrowRight className="w-5 h-5" />
+                {S.start} <ArrowRight className="w-5 h-5" />
               </button>
             </div>
           )}

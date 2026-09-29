@@ -9,6 +9,29 @@ interface PlacementTestModalProps {
   onComplete?: (level: 'A1' | 'A2' | 'B1') => void;
 }
 
+const PT_STR = {
+  fr: { question: "Question", skip: "Passer et commencer à zéro", result: "Résultat", testDone: "Test terminé !",
+    scoreLine: "Vous avez obtenu un score de", levelLabel: "Niveau attribué", xpUnlocked: "XP et visas officiels débloqués !",
+    lvlA1: "Débutant (A1)", lvlA2: "Élémentaire (A2)", lvlB1: "Intermédiaire (B1)",
+    recM1: "Commencer au Module 1", recM3: "Commencer au Module 3", recM4: "Commencer au Module 4" },
+  en: { question: "Question", skip: "Skip and start from scratch", result: "Result", testDone: "Test complete!",
+    scoreLine: "You scored", levelLabel: "Assigned level", xpUnlocked: "XP and official visas unlocked!",
+    lvlA1: "Beginner (A1)", lvlA2: "Elementary (A2)", lvlB1: "Intermediate (B1)",
+    recM1: "Start at Module 1", recM3: "Start at Module 3", recM4: "Start at Module 4" },
+  es: { question: "Pregunta", skip: "Saltar y empezar de cero", result: "Resultado", testDone: "¡Test terminado!",
+    scoreLine: "Has obtenido una puntuación de", levelLabel: "Nivel asignado", xpUnlocked: "¡XP y visas oficiales desbloqueados!",
+    lvlA1: "Principiante (A1)", lvlA2: "Elemental (A2)", lvlB1: "Intermedio (B1)",
+    recM1: "Comenzar en el Módulo 1", recM3: "Comenzar en el Módulo 3", recM4: "Comenzar en el Módulo 4" },
+  ar: { question: "سؤال", skip: "تخطَّ وابدأ من الصفر", result: "النتيجة", testDone: "انتهى الاختبار!",
+    scoreLine: "حصلت على نقطة", levelLabel: "المستوى المُحدَّد", xpUnlocked: "نقاط XP وتأشيرات رسمية مفتوحة!",
+    lvlA1: "مبتدئ (A1)", lvlA2: "أساسي (A2)", lvlB1: "متوسط (B1)",
+    recM1: "ابدأ من الوحدة 1", recM3: "ابدأ من الوحدة 3", recM4: "ابدأ من الوحدة 4" }
+};
+function ptS(lang: string) {
+  const k = (lang === 'en' || lang === 'es' || lang === 'ar') ? lang : 'fr';
+  return (PT_STR as Record<string, typeof PT_STR.fr>)[k];
+}
+
 const PLACEMENT_QUESTIONS = [
   // Niveau A1
   {
@@ -65,6 +88,8 @@ const PLACEMENT_QUESTIONS = [
 
 export default function PlacementTestModal({ isOpen, onClose, onComplete }: PlacementTestModalProps) {
   const { addXp, completeLesson, user } = useAppStore();
+  const { uiLanguage } = useAppStore();
+  const S = ptS(String(uiLanguage || 'fr').toLowerCase());
   const [currentQ, setCurrentQ] = useState(0);
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
@@ -150,18 +175,18 @@ export default function PlacementTestModal({ isOpen, onClose, onComplete }: Plac
     onClose();
   };
 
-  let levelAssigned = 'Débutant (A1)';
-  let recommendation = 'Commencer au Module 1';
+  let levelAssigned = S.lvlA1;
+  let recommendation = S.recM1;
   let levelColor = 'bg-slate-100 text-slate-800';
   let badgeIcon = Award;
 
   if (score >= 6) {
-    levelAssigned = 'Intermédiaire (B1)';
-    recommendation = 'Commencer au Module 4';
+    levelAssigned = S.lvlB1;
+    recommendation = S.recM4;
     levelColor = 'bg-blue-100 text-blue-800';
   } else if (score >= 3) {
-    levelAssigned = 'Élémentaire (A2)';
-    recommendation = 'Commencer au Module 3';
+    levelAssigned = S.lvlA2;
+    recommendation = S.recM3;
     levelColor = 'bg-emerald-100 text-emerald-800';
   }
 
@@ -194,7 +219,7 @@ export default function PlacementTestModal({ isOpen, onClose, onComplete }: Plac
             <div className="space-y-6">
               <div className="mb-6">
                 <span className="inline-block px-3 py-1 bg-[#C9A05C]/20 border border-[#C9A05C]/40 text-[#C9A05C] text-xs font-bold uppercase tracking-wider rounded-full mb-3">
-                  Question {currentQ + 1} / {PLACEMENT_QUESTIONS.length}
+                  {S.question} {currentQ + 1} / {PLACEMENT_QUESTIONS.length}
                 </span>
                 <h3 className="font-serif text-xl md:text-2xl font-bold text-[#1B2A4A]">
                   {PLACEMENT_QUESTIONS[currentQ].q}
@@ -233,16 +258,16 @@ export default function PlacementTestModal({ isOpen, onClose, onComplete }: Plac
               
               <div>
                 <div className="text-[#C9A05C] text-xs font-bold tracking-[0.25em] uppercase mb-1">
-                  — Résultat
+                  — {S.result}
                 </div>
                 <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#1B2A4A] mb-1">Test terminé !</h2>
                 <p className="text-xs sm:text-sm text-[#7A7670]">
-                  Vous avez obtenu un score de <strong className="text-[#1B2A4A]">{score} / {PLACEMENT_QUESTIONS.length}</strong>.
+                  {S.scoreLine} <strong className="text-[#1B2A4A]">{score} / {PLACEMENT_QUESTIONS.length}</strong>.
                 </p>
               </div>
 
               <div className="bg-[#F7F3EA] p-5 rounded-2xl border border-[#E8E2D5]">
-                <p className="text-xs text-[#7A7670] mb-1 uppercase tracking-wider font-semibold">Niveau attribué</p>
+                <p className="text-xs text-[#7A7670] mb-1 uppercase tracking-wider font-semibold">{S.levelLabel}</p>
                 <p className="font-serif text-xl sm:text-2xl font-bold text-[#1B2A4A]">{levelAssigned}</p>
                 {score >= 3 && (
                   <p className="text-xs text-[#7A9174] font-bold mt-2">

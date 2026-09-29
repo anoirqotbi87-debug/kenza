@@ -1,3 +1,80 @@
+OB-dict: OK
+OB-lang: OK
+OB-welcome: AMBIGUOUS (2)
+OB-goalQ: AMBIGUOUS (2)
+OB-gtitle: OK
+OB-gdesc: OK
+OB-tempoTitle: AMBIGUOUS (2)
+OB-tempoQ: AMBIGUOUS (2)
+OB-ttitle: OK
+OB-tdesc: OK
+OB-levelQ: AMBIGUOUS (2)
+OB-levelHint: AMBIGUOUS (2)
+OB-beginner: AMBIGUOUS (2)
+OB-beginnerHint: AMBIGUOUS (2)
+OB-notions: AMBIGUOUS (2)
+OB-notionsHint: AMBIGUOUS (2)
+OB-done: AMBIGUOUS (2)
+OB-scoreline: OK
+OB-bravo: AMBIGUOUS (2)
+OB-parfait: AMBIGUOUS (2)
+OB-start: OK
+PT-dict: OK
+PT-lang: OK
+PT-question: OK
+PT-skip: AMBIGUOUS (2)
+PT-result: OK
+PT-testDone: AMBIGUOUS (2)
+PT-scoreLine: OK
+PT-levelLabel: OK
+PT-xp: AMBIGUOUS (2)
+PT-lvlA1: OK
+PT-lvlB1: OK
+PT-lvlA2: OK
+PT-recM1: OK
+PT-recM4: OK
+PT-recM3: OK
+PV-dict: OK
+PV-lang: OK
+PV-lvlA1: OK
+PV-lvlA2: OK
+PV-lvlB1: OK
+PV-lvlB2: OK
+PV-lvlC1: OK
+PV-guest: OK
+PV-alertLogin: OK
+PV-alertDemo: OK
+PV-alertFail: OK
+PV-alertErr: OK
+PV-profileLabel: OK
+PV-member: OK
+PV-passport: OK
+PV-desc1: OK
+PV-desc2: OK
+PV-manage: OK
+PV-goPro: OK
+PV-placeTitle: OK
+PV-placeHint: AMBIGUOUS (2)
+PV-retake: AMBIGUOUS (2)
+PV-offlineTitle: OK
+PV-offlineHint: AMBIGUOUS (2)
+PV-preloaded: OK
+PV-downloadBtn: OK
+NS-dict: OK
+NS-lang: OK
+NS-enableNotif: OK
+NS-iosHint: OK
+NS-press: OK
+NS-then: OK
+NS-home: OK
+NS-title: OK
+NS-streak: OK
+NS-daily: AMBIGUOUS (2)
+NS-enableRem: OK
+NS-active: OK
+NS-test: OK
+NS-blocked: OK
+NS-blockedHint: AMBIGUOUS (2)
 LINT-tts: OK (already)
 LINT-webhook: OK (already)
 LINT-portal: OK (already)
