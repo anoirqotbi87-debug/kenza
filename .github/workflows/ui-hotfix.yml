@@ -1,0 +1,48 @@
+name: UI hotfix patcher
+
+on:
+  push:
+    branches: [main, feat/funnel-tracking]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Align shared files with main (no-op on main runs)
+        run: |
+          git rev-parse --verify origin/main >/dev/null 2>&1 || git fetch origin main
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
+            git checkout origin/main -- src/app/page.tsx src/app/layout.tsx src/lib/syncService.ts src/store/useAppStore.ts src/components/ExerciseRunner.tsx src/components/auth/AuthModal.tsx src/lib/i18n/translations.ts
+            git rm -rq --ignore-unmatch docs
+            git checkout origin/main -- docs
+          fi
+
+      - name: Detect run context (dumps only on main)
+        run: |
+          if [ "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)" ]; then
+            echo "DUMP_MODE=on" >> $GITHUB_ENV
+          else
+            echo "DUMP_MODE=off" >> $GITHUB_ENV
+          fi
+
+      - name: Apply patch / dump literals
+        run: node scripts/patch-page.mjs
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "no changes to commit"
+          else
+            git commit -m "chore: auto-patch (responsive topbar + literals dump)"
+            git push
+          fi
