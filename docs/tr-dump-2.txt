@@ -1,0 +1,220 @@
+0221|      speech: { listenModel: "Listen to the model", listening: "Listening...", pressMic: "Tap the mic to speak", keepPracticing: "Keep practicing!", veryClear: "Very clear, well done!", excellent: "Excellent pronunciation!", speechRecognition: "Speech recognition:"},
+0222|      grammar: { positive: "Positive", negative: "Negative", toMe: "To me", toYou: "To you", toHim: "To him", understood: "I understood", notUnderstood: "I didn't understand", iEat: "I eat", iDontEat: "I don't eat", iWillGo: "I will go", youWillGo: "You will go" },
+0223|      badges: { cafeLesson: "Complete the café lesson", taxi: "Handle the petit taxi successfully", souk: "Master bargaining", earnXp: "Earn 500 XP"},
+0224|      roleplay: { addedToSrs: "Phrase added to your SRS deck!", saveToSrs: "Save to my deck (SRS)", listeningSpeak: "Listening (speak)...", inputPlaceholder: "Your message in Darija or French...", missionComplete: "Mission accomplished! You held the conversation.", claimXp: "Claim my +25 XP and leave"},
+0225|      scenario: { subtitle: "Practice with immersive Moroccan characters", dialoguesTitle: "Scripted dialogues (Real-life situations)", dialoguesDesc: "Practice real-life situations with automatic correction", exploreMore: "Explore more", fullPath: "Full path (7 modules)", pronunciation: "Pronunciation training", revisions: "Reviews & Card decks", internetRequired: "Internet Connection Required", internetDesc: "Free AI conversations require a network connection. Meanwhile, your offline modules remain available.", launchSrs: "Start an SRS review", modalTitle: "AI Roleplay Situations", grammar: "Grammar & Conjugation", back: "Back"},
+0226|      paywall: { errorInit: "Error initializing payment", upgradeSuccess: "Account upgraded to Kenza Pro (Demo Mode)!", errorRetry: "Could not initialize payment. Please try again.", closeLabel: "Close dialog", advancedPath: "ADVANCED PATH", unlockB1B2: "Unlock Modules B1 & B2", advancedDesc: "Continue your journey to Tangier and deepen your grasp of the Moroccan dialect.", aiImmersion: "UNLIMITED AI IMMERSION", unlimitedAi: "Unlimited AI Conversations", aiSubtitle: "You have used your free AI session for today. Go Kenza Pro to chat freely with all personas.", culturalKicker: "CULTURAL PASSPORT", masterDarija: "Master Darija without limits", culturalSubtitle: "Unlock the full potential of your Darija learning with complete access to the Kenza ecosystem.", benefit1: "Full access to Modules 3, 4 and 5 (Levels B1 & B2)", benefit2: "Unlimited AI roleplay (All personas and scenarios, no quota)", benefit3: "Natural text-to-speech (TTS) & 100% offline mode", benefit4: "Official Cultural Passport visas & mastery tracking", certified: "Certified learning — Guaranteed no commitment", plansTitle: "Kenza Pro plans", chooseCadence: "Choose your pace", cadenceDesc: "Invest in your speaking confidence. Change anytime.", bestOffer: "-40% · Best offer", yearly: "Yearly Plan", billed: "Billed {total}", perMonth: "/ month", monthly: "Monthly Plan", monthlyDesc: "Total freedom, no commitment", preparing: "Preparing payment...", unlockCta: "Unlock Kenza Pro", securePayment: "Encrypted and secure payment · Cancel in 1 click anytime." },
+0227|      install: { title: "Install KENZA", iosHintA: "Tap the share icon", iosHintB: "then \"Add to Home Screen\" for quick access.", androidHint: "Add the app to your home screen for the best experience.", button: "Install the app" },
+0228|      passport: { title: "My Darija Passport", guest: "GUEST", copied: "Copied!", shareText: "I passed my {level} of Moroccan Darija on KENZA with a score of {score}%!", passportTitle: "DARIJA PASSPORT", holder: "Holder", levelValidated: "Level Passed", score: "SCORE", validated: "VALIDATED", save: "Save", share: "Share" },
+0229|      ui: { navReview: "Review", offlineActive: "Offline Mode active — Modules and SRS reviews available without connection", onlineRestored: "Connection restored", voiceRetry: "Needs work, listen to Jamal again.", voiceUnderstandable: "Understandable, work on the sounds below.", readingSpeed: "Reading speed", addNewWord: "Add a new word", notePlaceholder: "e.g. Heard at the café, useful to say goodbye.", addToReviews: "Add to my reviews", excellentAnswer: "Excellent answer!", verify: "Check", hideTranslation: "Hide translation", showTranslation: "Show translation", listeningNow: "Listening...", holdToTalk: "Hold or tap to speak", accuracy: "Accuracy", editWord: "Edit expression", inDarijaArabizi: "In Darija (Arabizi)", translationLabel: "Translation", inArabicLetters: "In Arabic letters (optional)", notesContext: "Notes / Context (optional)" },
+0230|      home: { seeAll: "See all", googleError: "Could not start Google sign-in.", proActivated: "Congratulations! Your Kenza Pro subscription is active.", phrasesDesc: "Everyday vocabulary with natural audio.", audioPronAria: "Audio pronunciation of the phrase.", phraseCopied: "Phrase copied to clipboard.", graded: "Graded: {grade}", gradeAgain: "to review", gradeHard: "hard", gradeGood: "good", gradeEasy: "easy", resetConfirm: "Clear local progress on this device?", resetDone: "Local progress reset.", dailyGoal: "Daily goal: 10 minutes of practice every day.", langSwitcher: "Language selector", switchToFr: "Switch to French", switchToEn: "Switch to English", switchToEs: "Switch to Spanish", switchToAr: "Switch to Arabic", openSpace: "Open my space", closeLesson: "Close lesson", explorePath: "Explore the path", lessonLocked: "{title}, locked", startLesson: "Start {title}", reviewLesson: "Review {title}", catEssentials: "THE ESSENTIALS", catDaily: "EVERYDAY", catLocate: "GET AROUND", catAdvanced: "ADVANCED IMMERSION", validated: "Passed ✓", removeFav: "Remove from favorites", addFav: "Add to favorites" , imgMedina: "Moroccan medina", imgMintTea: "Mint tea", inProgress: "In progress" },
+0231|    }
+0232|  },
+0233|  es: {
+0234|    side: {
+0235|      today: "Hoy", path: "Mi ruta", phrases: "Mis frases", review: "Repaso del día",
+0236|      learn: "APRENDER", oral: "PRÁCTICA ORAL & IA", space: "TU ESPACIO"
+0237|    },
+0238|    nav: {
+0239|      home: "Inicio", parcours: "Ruta", phrasebook: "Frases", review: "Repasar",
+0240|      speech: "Práctica oral", profile: "Perfil", learn: "Aprender", grammar: "Gramática",
+0241|      speak: "Hablar", revise: "Repasar"
+0242|    },
+0243|    header: {
+0244|      guestMode: "Modo Invitado", logout: "Cerrar sesión", arabizi: "Arabizi (3afak)", arabic: "Árabe (عفاك)", duo: "Bilingüe",
+0245|      menu: "Menú", settings: "Ajustes", profile: "Ver perfil", login: "Iniciar sesión / Registrarse",
+0246|      notation: "Notación:", dialect: "Dialecto:", uiLanguage: "Idioma de la interfaz:",
+0247|      sound: "Sonido", soundOn: "Sonido activado", soundOff: "Sonido desactivado", offline: "Sin conexión", offlineReady: "Listo sin conexión",
+0248|      openMenu: "Abrir el menú de navegación", closeMenu: "Cerrar el menú", preferences: "Preferencias de idioma"
+0249|    },
+0250|    dashboard: {
+0251|      xp: "XP", module: "Módulo", current: "ACTUAL", start: "Empezar",
+0252|      dailyTraining: "Entrenamiento Diario",
+0253|      reviewPrompt: "Repasa tus palabras difíciles para reforzar tu memoria.",
+0254|      dailyPractice: "Práctica del Día",
+0255|      currentStreak: "RACHA ACTUAL", streakDays: "Días", streakFreeze: "Congelación", streakFreezes: "Congelaciones",
+0256|      weeklyLeagues: "Ligas Semanales", yourTrophies: "Tus Trofeos", youGuest: "Tú (Invitado)",
+0257|      badgeCafeMaster: "Maestro del Café", badgeTaxiAce: "As del Taxi", badgeSoukNego: "Negociador del Zoco", badgePolyglot: "Políglota del Atlas",
+0258|      loading: "Cargando...", anonymous: "Anónimo", remainingCards: "Cartas restantes:",
+0259|      trackA: "Gramática y Fundamentos", trackB: "Situaciones y Conversaciones Reales"
+0260|    },
+0261|    lessons: {
+0262|      check: "Comprobar", continue: "Continuar", retry: "Reintentar", gameOver: "¡Sin vidas!",
+0263|      congrats: "¡Lección completada!", lives: "Vidas",
+0264|      excellent: "¡Excelente!", oops: "¡Ups!", chooseAnswer: "Elige tu respuesta:",
+0265|      grammarTitle: "Gramática Activa", grammarDesc: "Explora los mecanismos del idioma.",
+0266|      steps: "pasos", level: "Nivel", locked: "Bloqueado", completed: "Completado",
+0267|      unavailable: "Lección no disponible",
+0268|      unavailableDesc: "La lección solicitada no se pudo cargar o no contiene pasos.",
+0269|      backToDashboard: "Volver al panel", keepGoing: "¡Sigue así!",
+0270|      xpEarned: "XP ganados", wellDone: "¡Bien hecho!", tryAgain: "Casi — recuerda esto.",
+0271|      whyWrong: "¿Por qué me equivoqué?", whyWrongDefault: "Esta respuesta es incorrecta. Observa la respuesta correcta en verde y compara las pronunciaciones.",
+0272|      finish: "Terminar", nextStep: "Siguiente paso"
+0273|    },
+0274|    srs: {
+0275|      flip: "Girar tarjeta", again: "Otra vez", hard: "Difícil", good: "Bien", easy: "Fácil",
+0276|      dueToday: "Tarjetas para hoy", tapToFlip: "Toca para girar ->",
+0277|      answer: "RESPUESTA", translateArabizi: "Traduce al Arabizi", translateArabic: "Traduce al Árabe", translateDuo: "Traduce al Darija (Bilingüe)",
+0278|      allCaughtUp: "¡Todo al día!",
+0279|      allCaughtUpDesc: "No tienes tarjetas para repasar hoy. Vuelve mañana para consolidar tu memoria.",
+0280|      backToMenu: "Volver al Menú",
+0281|      sessionComplete: "Sesión Completada",
+0282|      sessionCompleteDesc: "Has repasado {count} palabras con éxito. ¡+{xp} XP ganados!",
+0283|      smartReviewsTitle: "Repasos Inteligentes",
+0284|      smartReviewsDesc: "Memoriza el vocabulario del Darija para siempre con nuestro sistema de repetición espaciada.",
+0285|      cardsToReview: "Tarjetas para repasar",
+0286|      startSession: "Comenzar sesión"
+0287|    },
+0288|    leagues: {
+0289|      bronze: "Bronce", silver: "Plata", gold: "Oro", diamond: "Diamante"
+0290|    },
+0291|    auth: {
+0292|      login: "Iniciar sesión", signup: "Registrarse", email: "Correo electrónico", password: "Contraseña",
+0293|      continueGuest: "Continuar como invitado", google: "Continuar con Google",
+0294|      headerLogin: "Iniciar sesión", checkEmail: "Cuenta creada. Confirma tu dirección con el correo que te acabamos de enviar y vuelve aquí: tu progreso se guardará."
+0295|    },
+0296|    savePrompt: {
+0297|      title: "No pierdas tu progreso",
+0298|      body: "Crea tu cuenta gratuita para conservar tus XP y tu racha, y continuar en cualquier dispositivo.",
+0299|      reminderTitle: "Tu progreso aún no está guardado",
+0300|      reminderBody: "Ya tienes {xp} XP y {lessons} lecciones completadas. Solo están guardados en este dispositivo: crea una cuenta gratuita para no perder nada.",
+0301|      cta: "Guardar mi progreso",
+0302|      later: "Más tarde",
+0303|      reassurance: "Gratis · 30 segundos · Con Google o correo"
+0304|    },
+0305|    common: {
+0306|      back: "Atrás", loading: "Cargando...", close: "Cerrar", save: "Guardar", cancel: "Cancelar",
+0307|      continue: "Continuar", retry: "Reintentar", start: "Empezar", check: "Comprobar", next: "Siguiente",
+0308|      previous: "Anterior", yes: "Sí", no: "No", ok: "OK", error: "Error", success: "Éxito",
+0309|      language: "Idioma", interfaceLanguage: "Idioma de la interfaz", chooseLanguage: "Elegir idioma",
+0310|      offline: "Sin conexión", offlineReady: "Listo sin conexión", online: "En línea", guest: "Invitado",
+0311|      premium: "Premium", free: "Gratis", locked: "Bloqueado", unlock: "Desbloquear",
+0312|      days: "Días", day: "Día", minutes: "min", level: "Nivel", xp: "XP", streak: "Racha",
+0313|      module: "Módulo", lessons: "Lecciones", words: "palabras", progress: "Progreso", seeAll: "Ver todo",
+0314|      comingSoon: "Próximamente", search: "Buscar", all: "Ver todo", menu: "Menú",
+0315|      profile: "Perfil", login: "Iniciar sesión", signup: "Registrarse", logout: "Cerrar sesión",
+0316|      home: "Inicio", steps: "pasos", rights: "Todos los derechos reservados", madeWith: "Hecho con",
+0317|      unavailable: "Lección no disponible",
+0318|      unavailableDesc: "La lección solicitada no se pudo cargar o no contiene pasos.",
+0319|      backToDashboard: "Volver al panel"
+0320|    },
+0321|    pages: {
+0322|      etudier: { badge: "Currículo completo", title: "Tu recorrido completo — 7 módulos", module: "Módulo", steps: "pasos", level: "Nivel", premium: "Kenza Pro" },
+0323|      grammaire: { badge: "Gramática Activa", title: "Gramática y Conjugación", conjugationTable: "Tabla de conjugación", grammarLessons: "Lecciones de gramática (Módulo 4)", steps: "pasos" },
+0324|      parler: { badge: "Práctica Oral", title: "Entrenador de pronunciación" },
+0325|      revisions: {
+0326|        badge: "Repasos y Progreso", title: "Repasos y Mazos de tarjetas",
+0327|        tabSrs: "Repaso inteligente", tabDecks: "Mis mazos de tarjetas", tabGamification: "Progreso y Logros",
+0328|        activityMap: "Mapa de actividad", myBadges: "Mis logros", weeklyLeague: "Ligas semanales"
+0329|      }
+0330|    },
+0331|    footer: { tagline: "Aprende Darija marroquí, paso a paso.", rights: "Todos los derechos reservados." },
+0332|    modules: {
+0333|      srs: { spacedRepetition: "Repetición Espaciada", relisten: "Volver a escuchar", revealHint: "Haz clic o pulsa Espacio para revelar la respuesta" },
+0334|      decks: { title: "Gestor de mazos", cardsInCollection: "tarjetas en tu colección", newWord: "Nueva palabra", searchPlaceholder: "Buscar una palabra, una traducción...", toReview: "Por repasar", noCards: "No se encontraron tarjetas", noCardsDesc: "Prueba otra palabra clave o cambia tus filtros de búsqueda.", all: "Todas", learning: "En aprendizaje", mastered: "Adquiridas", roleplay: "Roleplay", manual: "Manual", module: "Módulo", deleteConfirm: "¿Seguro que quieres eliminar esta tarjeta?", audioOffline: "Audio no disponible sin conexión"},
+0335|      speech: { listenModel: "Escuchar el modelo", listening: "Escuchando...", pressMic: "Toca el micrófono para hablar", keepPracticing: "¡Sigue practicando!", veryClear: "¡Muy claro, bien hecho!", excellent: "¡Excelente pronunciación!", speechRecognition: "Reconocimiento de voz:"},
+0336|      grammar: { positive: "Positivo", negative: "Negativo", toMe: "A mí", toYou: "A ti", toHim: "A él", understood: "Entendí", notUnderstood: "No entendí", iEat: "Como", iDontEat: "No como", iWillGo: "Voy a ir", youWillGo: "Vas a ir" },
+0337|      badges: { cafeLesson: "Completar la lección del café", taxi: "Manejar el petit taxi con éxito", souk: "Dominar el regateo", earnXp: "Gana 500 XP"},
+0338|      roleplay: { addedToSrs: "¡Frase añadida a tu mazo SRS!", saveToSrs: "Guardar en mi mazo (SRS)", listeningSpeak: "Escuchando (habla)...", inputPlaceholder: "Tu mensaje en Darija o Francés...", missionComplete: "¡Misión cumplida! Mantuviste la conversación.", claimXp: "Reclamar mis +25 XP y salir"},
+0339|      scenario: { subtitle: "Practica con personajes marroquíes inmersivos", dialoguesTitle: "Diálogos guionizados (Situaciones reales)", dialoguesDesc: "Practica situaciones reales con corrección automática", exploreMore: "Explorar más", fullPath: "Ruta completa (7 módulos)", pronunciation: "Entrenamiento de pronunciación", revisions: "Repasos y mazos de cartas", internetRequired: "Conexión a Internet requerida", internetDesc: "Las conversaciones libres con IA requieren conexión de red. Mientras tanto, tus módulos sin conexión siguen disponibles.", launchSrs: "Iniciar un repaso SRS", modalTitle: "Situaciones con IA", grammar: "Gramática y Conjugación", back: "Atrás"},
+0340|      paywall: { errorInit: "Error al inicializar el pago", upgradeSuccess: "¡Cuenta actualizada a Kenza Pro (Modo Demo)!", errorRetry: "No se pudo inicializar el pago. Inténtalo de nuevo.", closeLabel: "Cerrar ventana", advancedPath: "RUTA AVANZADA", unlockB1B2: "Desbloquea los Módulos B1 y B2", advancedDesc: "Continúa tu viaje hacia Tánger y profundiza en las sutilezas del dialecto marroquí.", aiImmersion: "INMERSIÓN IA SIN LÍMITE", unlimitedAi: "Conversaciones IA Ilimitadas", aiSubtitle: "Has agotado tu sesión de IA gratuita de hoy. Pasa a Kenza Pro para conversar libremente con todos los personajes.", culturalKicker: "PASAPORTE CULTURAL", masterDarija: "Domina la Darija sin límites", culturalSubtitle: "Libera todo el potencial de tu aprendizaje de Darija con acceso completo al ecosistema Kenza.", benefit1: "Acceso total a los Módulos 3, 4 y 5 (Niveles B1 y B2)", benefit2: "Roleplay IA ilimitado (Todos los personajes y escenarios sin cuota)", benefit3: "Voz sintetizada (TTS) natural y modo 100% sin conexión", benefit4: "Visados oficiales del Pasaporte Cultural y seguimiento de dominio", certified: "Aprendizaje certificado — Garantizado sin compromiso", plansTitle: "Planes Kenza Pro", chooseCadence: "Elige tu ritmo", cadenceDesc: "Invierte en tu fluidez oral. Modificable en cualquier momento.", bestOffer: "-40% · Mejor oferta", yearly: "Plan Anual", billed: "Facturado {total}", perMonth: "/ mes", monthly: "Plan Mensual", monthlyDesc: "Libertad total, sin compromiso", preparing: "Preparando el pago...", unlockCta: "Desbloquear Kenza Pro", securePayment: "Pago cifrado y seguro · Cancela en 1 clic cuando quieras." },
+0341|      install: { title: "Instalar KENZA", iosHintA: "Toca el icono de compartir", iosHintB: "y luego «Añadir a pantalla de inicio» para un acceso rápido.", androidHint: "Añade la app a tu pantalla de inicio para una experiencia óptima.", button: "Instalar la aplicación" },
+0342|      passport: { title: "Mi Pasaporte Darija", guest: "INVITADO(A)", copied: "¡Copiado!", shareText: "¡Aprobé mi {level} de Darija marroquí en KENZA con una puntuación del {score}%!", passportTitle: "PASAPORTE DARIJA", holder: "Titular", levelValidated: "Nivel Aprobado", score: "PUNTOS", validated: "VALIDADO", save: "Guardar", share: "Compartir" },
+0343|      ui: { navReview: "Repasar", offlineActive: "Modo Sin Conexión activo — Módulos y repasos SRS disponibles sin conexión", onlineRestored: "Conexión restablecida", voiceRetry: "Por mejorar, escucha de nuevo a Jamal.", voiceUnderstandable: "Comprensible, trabaja los sonidos de abajo.", readingSpeed: "Velocidad de lectura", addNewWord: "Añadir una palabra nueva", notePlaceholder: "ej. Escuchado en el café, útil para despedirse.", addToReviews: "Añadir a mis repasos", excellentAnswer: "¡Excelente respuesta!", verify: "Comprobar", hideTranslation: "Ocultar la traducción", showTranslation: "Ver la traducción", listeningNow: "Escuchando...", holdToTalk: "Mantén o toca para hablar", accuracy: "Precisión", editWord: "Editar expresión", inDarijaArabizi: "En Darija (Arabizi)", translationLabel: "Traducción", inArabicLetters: "En letras árabes (opcional)", notesContext: "Notas / Contexto (opcional)", incorrect: "Incorrecto", correctAnswer: "Respuesta correcta:" },
+0344|      home: { seeAll: "Ver todo", googleError: "No se pudo iniciar sesión con Google.", proActivated: "¡Felicidades! Tu suscripción a Kenza Pro está activa.", phrasesDesc: "Vocabulario cotidiano con audio natural.", audioPronAria: "Pronunciación en audio de la frase.", phraseCopied: "Frase copiada al portapapeles.", graded: "Valorado: {grade}", gradeAgain: "por repasar", gradeHard: "difícil", gradeGood: "bien", gradeEasy: "fácil", resetConfirm: "¿Borrar el progreso local en este dispositivo?", resetDone: "Progreso local restablecido.", dailyGoal: "Objetivo diario: 10 minutos de práctica cada día.", langSwitcher: "Selector de idioma", switchToFr: "Cambiar a francés", switchToEn: "Cambiar a inglés", switchToEs: "Cambiar a español", switchToAr: "Cambiar a árabe", openSpace: "Abrir mi espacio", closeLesson: "Cerrar la lección", explorePath: "Explorar la ruta", lessonLocked: "{title}, bloqueada", startLesson: "Empezar {title}", reviewLesson: "Repasar {title}", catEssentials: "LO ESENCIAL", catDaily: "A DIARIO", catLocate: "ORIENTARSE", catAdvanced: "INMERSIÓN AVANZADA", validated: "Aprobado ✓", removeFav: "Quitar de favoritos", addFav: "Añadir a favoritos", imgMedina: "Medina de Marruecos", imgMintTea: "Té con menta", inProgress: "En curso" },
+0345|    }
+0346|  },
+0347|  ar: {
+0348|    side: {
+0349|      today: "اليوم", path: "مساري", phrases: "دفتر العبارات", review: "مراجعة اليوم",
+0350|      learn: "تعلّم", oral: "التحدث والذكاء الاصطناعي", space: "مساحتك"
+0351|    },
+0352|    nav: {
+0353|      home: "الرئيسية", parcours: "المسار", phrasebook: "العبارات", review: "المراجعة",
+0354|      speech: "التحدث", profile: "الملف", learn: "تعلّم", grammar: "القواعد",
+0355|      speak: "تحدّث", revise: "راجع"
+0356|    },
+0357|    header: {
+0358|      guestMode: "وضع الضيف", logout: "تسجيل الخروج", arabizi: "عربيزي (3afak)", arabic: "عربي (عفاك)", duo: "مزدوج",
+0359|      menu: "القائمة", settings: "الإعدادات", profile: "عرض الملف", login: "تسجيل الدخول / إنشاء حساب",
+0360|      notation: "الكتابة:", dialect: "اللهجة:", uiLanguage: "لغة الواجهة:",
+0361|      sound: "الصوت", soundOn: "الصوت مفعّل", soundOff: "الصوت مكتوم", offline: "بدون اتصال", offlineReady: "جاهز دون اتصال",
+0362|      openMenu: "فتح قائمة التنقل", closeMenu: "إغلاق القائمة", preferences: "تفضيلات اللغة"
+0363|    },
+0364|    dashboard: {
+0365|      xp: "نقاط", module: "وحدة", current: "الحالي", start: "ابدأ",
+0366|      dailyTraining: "التدريب اليومي",
+0367|      reviewPrompt: "راجع كلماتك الصعبة لتعزيز ذاكرتك.",
+0368|      dailyPractice: "تمرين اليوم",
+0369|      currentStreak: "السلسلة الحالية", streakDays: "أيام", streakFreeze: "تجميد", streakFreezes: "تجميد",
+0370|      weeklyLeagues: "الدوريات الأسبوعية", yourTrophies: "جوائزك", youGuest: "أنت (ضيف)",
+0371|      badgeCafeMaster: "خبير المقهى", badgeTaxiAce: "بطل التاكسي", badgeSoukNego: "مفاوض السوق", badgePolyglot: "متحدث لغات الأطلس",
+0372|      loading: "جاري التحميل...", anonymous: "مجهول", remainingCards: "البطاقات المتبقية:",
+0373|      trackA: "القواعد والأساسيات", trackB: "المواقف والمحادثات اليومية"
+0374|    },
+0375|    lessons: {
+0376|      check: "تحقق", continue: "استمر", retry: "حاول مجدداً", gameOver: "لقد نفذت محاولاتك!",
+0377|      congrats: "اكتمل الدرس!", lives: "محاولات",
+0378|      excellent: "ممتاز!", oops: "عفواً!", chooseAnswer: "اختر إجابتك:",
+0379|      grammarTitle: "القواعد النشطة", grammarDesc: "اكتشف آليات اللغة.",
+0380|      steps: "خطوات", level: "المستوى", locked: "مقفل", completed: "مكتمل",
+0381|      unavailable: "الدرس غير متاح",
+0382|      unavailableDesc: "لم يتم تحميل الدرس المطلوب أو أنه لا يحتوي على أي خطوات.",
+0383|      backToDashboard: "العودة إلى اللوحة", keepGoing: "واصل التقدم!",
+0384|      xpEarned: "نقاط مكتسبة", wellDone: "أحسنت!", tryAgain: "تقريباً — تذكّر هذا.",
+0385|      whyWrong: "لماذا أخطأت؟", whyWrongDefault: "هذه الإجابة غير صحيحة. انظر إلى الإجابة الصحيحة باللون الأخضر وقارن النطق.",
+0386|      finish: "إنهاء", nextStep: "الخطوة التالية"
+0387|    },
+0388|    srs: {
+0389|      flip: "اقلب البطاقة", again: "مجدداً", hard: "صعب", good: "جيد", easy: "سهل",
+0390|      dueToday: "بطاقات اليوم", tapToFlip: "انقر للقلب ->",
+0391|      answer: "الإجابة", translateArabizi: "ترجم إلى العَربي زي", translateArabic: "ترجم إلى العربية", translateDuo: "ترجم إلى الدارجة (ثنائي)",
+0392|      allCaughtUp: "أنت على اكتمال!",
+0393|      allCaughtUpDesc: "لا توجد بطاقات للمراجعة اليوم. عد غداً لتثبيت ذاكرتك.",
+0394|      backToMenu: "العودة للقائمة",
+0395|      sessionComplete: "انتهت الجلسة",
+0396|      sessionCompleteDesc: "راجعت {count} كلمات بنجاح. +{xp} نقطة مكتسبة!",
+0397|      smartReviewsTitle: "المراجعات الذكية",
+0398|      smartReviewsDesc: "احفظ مفردات الدارجة للأبد بنظام التكرار المتباعد.",
+0399|      cardsToReview: "بطاقات للمراجعة",
+0400|      startSession: "ابدأ الجلسة"
+0401|    },
+0402|    leagues: {
+0403|      bronze: "برونزية", silver: "فضية", gold: "ذهبية", diamond: "ماسية"
+0404|    },
+0405|    auth: {
+0406|      login: "تسجيل الدخول", signup: "إنشاء حساب", email: "البريد الإلكتروني", password: "كلمة المرور",
+0407|      continueGuest: "المتابعة كضيف", google: "المتابعة عبر Google",
+0408|      headerLogin: "تسجيل الدخول", checkEmail: "تم إنشاء الحساب. أكّد بريدك الإلكتروني عبر الرسالة التي أرسلناها للتو، ثم عد إلى هنا: سيتم حفظ تقدّمك."
+0409|    },
+0410|    savePrompt: {
+0411|      title: "لا تفقد تقدّمك",
+0412|      body: "أنشئ حسابك المجاني لاحتفاظ بنقاط XP وسلسلة أيامك، والمتابعة على أي جهاز.",
+0413|      reminderTitle: "تقدّمك غير محفوظ بعد",
+0414|      reminderBody: "لديك بالفعل {xp} XP و{lessons} دروس مكتملة. إنها محفوظة على هذا الجهاز فقط: أنشئ حسابًا مجانيًا حتى لا تفقد شيئًا.",
+0415|      cta: "احفظ تقدّمي",
+0416|      later: "لاحقًا",
+0417|      reassurance: "مجاني · 30 ثانية · عبر جوجل أو البريد الإلكتروني"
+0418|    },
+0419|    common: {
+0420|      back: "رجوع", loading: "جاري التحميل...", close: "إغلاق", save: "حفظ", cancel: "إلغاء",
+0421|      continue: "استمر", retry: "حاول مجدداً", start: "ابدأ", check: "تحقق", next: "التالي",
+0422|      previous: "السابق", yes: "نعم", no: "لا", ok: "حسناً", error: "خطأ", success: "نجاح",
+0423|      language: "اللغة", interfaceLanguage: "لغة الواجهة", chooseLanguage: "اختر اللغة",
+0424|      offline: "بدون اتصال", offlineReady: "جاهز دون اتصال", online: "متصل", guest: "ضيف",
+0425|      premium: "مميز", free: "مجاني", locked: "مقفل", unlock: "فتح",
+0426|      days: "أيام", day: "يوم", minutes: "دقيقة", level: "المستوى", xp: "نقاط", streak: "السلسلة",
+0427|      module: "وحدة", lessons: "دروس", words: "كلمات", progress: "التقدم", seeAll: "عرض الكل",
+0428|      comingSoon: "قريباً", search: "بحث", all: "عرض الكل", menu: "القائمة",
+0429|      profile: "الملف", login: "تسجيل الدخول", signup: "إنشاء حساب", logout: "تسجيل الخروج",
+0430|      home: "الرئيسية", steps: "خطوات", rights: "جميع الحقوق محفوظة", madeWith: "صُنع بـ",
+0431|      unavailable: "الدرس غير متاح",
+0432|      unavailableDesc: "لم يتم تحميل الدرس المطلوب أو أنه لا يحتوي على أي خطوات.",
+0433|      backToDashboard: "العودة إلى اللوحة"
+0434|    },
+0435|    pages: {
+0436|      etudier: { badge: "المسار الكامل", title: "مسارك الكامل — 7 وحدات", module: "الوحدة", steps: "خطوات", level: "المستوى", premium: "Kenza Pro" },
+0437|      grammaire: { badge: "القواعد النشطة", title: "القواعد والتصريف", conjugationTable: "جدول التصريف", grammarLessons: "دروس القواعد (الوحدة 4)", steps: "خطوات" },
+0438|      parler: { badge: "التدريب الشفهي", title: "تدريب النطق" },
+0439|      revisions: {
+0440|        badge: "المراجعات والتقدم", title: "المراجعات وبطاقاتي",
