@@ -56,6 +56,11 @@ import InstallPwaBanner from "@/components/pwa/InstallPwaBanner";
 import DarijaPassportCard from "@/components/certificate/DarijaPassportCard";
 import { PersonaId } from "@/lib/ai/prompts";
 import { srsVocabulary } from "@/data/srs-deck";
+import { track } from "@/lib/tracking";
+import { useAuthUser } from "@/lib/useAuthUser";
+import { dismissSavePrompt, getSavePromptVariant } from "@/lib/savePrompt";
+import AuthModal from "@/components/auth/AuthModal";
+import SaveProgressCard from "@/components/auth/SaveProgressCard";
 
 export type View = "today" | "path" | "phrases" | "review" | "space";
 
@@ -239,6 +244,9 @@ export default function Home() {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [authMode, setAuthMode] = useState<"login" | "signup" | null>(null);
+  const [savePromptHidden, setSavePromptHidden] = useState(false);
+  const [lessonJustDone, setLessonJustDone] = useState(false);
   const [category, setCategory] = useState("__all__");
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [favorites, setFavorites] = useState<string[]>([]);
@@ -267,6 +275,7 @@ export default function Home() {
   } = useAppStore();
 
   const { t } = useTranslation();
+  const { isGuest } = useAuthUser();
   const { lang, lessons, phrases, navItems } = useLocalizedContent();
   const navLabel = (id: string) => {
     const key =
@@ -380,6 +389,11 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [view]);
 
+  // Chaque vue est suivie comme une page virtuelle (funnel)
+  useEffect(() => {
+    track("page_view", { view }, `/${view}`);
+  }, [view]);
+
   // 2. Adaptateur universel pour les phrases (Format Manus ↔ Format KENZA)
   const allPhrases: Phrase[] = useMemo(() => {
     const rawVocabulary = (srsVocabulary || []).slice(0, 40).map((w, idx) => {
@@ -489,6 +503,9 @@ export default function Home() {
       return;
     }
 
+    track("lesson_started", { lesson_id: id, is_first_lesson: completedLessons.length === 0 }, "/lesson");
+    setSavePromptHidden(false);
+    setLessonJustDone(false);
     setLessonId(id);
     setQuestionIndex(0);
     setSelectedAnswer(null);
@@ -504,6 +521,8 @@ export default function Home() {
 
     const firstCompletion = !completedLessons.includes(activeLesson.id);
     if (firstCompletion) {
+      track("lesson_completed", { lesson_id: activeLesson.id, lessons_completed_total: completedLessons.length + 1 }, "/lesson");
+      setLessonJustDone(true);
       completeLesson(activeLesson.id);
       addXp(activeLesson.questions.length * 10);
     }
@@ -594,6 +613,11 @@ export default function Home() {
   };
 
   const currentHeader = headerTitle[view];
+
+  // Invitation a sauvegarder la progression (invites uniquement) apres une lecon
+  const savePromptVariant = isGuest && lessonJustDone && !savePromptHidden
+    ? getSavePromptVariant(completedCount, streakDays)
+    : null;
 
   return (
     <div className="app-shell">
@@ -1090,6 +1114,36 @@ export default function Home() {
             <X size={15} />
           </button>
         </div>
+      )}
+
+      {savePromptVariant && (
+        <div className="fixed inset-x-0 bottom-24 sm:bottom-8 z-40 flex justify-center px-4">
+          <div className="w-full max-w-sm">
+            <SaveProgressCard
+              variant={savePromptVariant}
+              lessonsCompleted={completedCount}
+              onSave={() => {
+                track("cta_click", { cta: "save_progress" }, `/${view}`);
+                setAuthMode("signup");
+                setSavePromptHidden(true);
+              }}
+              onLater={() => {
+                dismissSavePrompt(completedCount);
+                setSavePromptHidden(true);
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {authMode && (
+        <AuthModal
+          key={authMode}
+          isOpen
+          initialMode={authMode}
+          onClose={() => setAuthMode(null)}
+          onSuccess={() => setAuthMode(null)}
+        />
       )}
 
       <InstallPwaBanner />

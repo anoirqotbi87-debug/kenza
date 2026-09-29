@@ -10,6 +10,7 @@ import MatchingExercise from './lessons/exercises/MatchingExercise';
 import FillBlankExercise from './lessons/exercises/FillBlankExercise';
 import ScenarioDialogue from './dialogue/ScenarioDialogue';
 import { playAudio } from '../lib/audio';
+import { track } from '../lib/tracking';
 import ConjugationTable from './grammar/ConjugationTable';
 import { getLocalizedText } from '../lib/i18n/utils';
 import { renderArabiziWithBadges } from './ui/PhoneticBadge';
@@ -19,9 +20,11 @@ interface ExerciseRunnerProps {
   lesson: Lesson;
   onComplete: () => void;
   onClose: () => void;
+  /** Contenu optionnel affiche sur l'ecran de felicitations (ex. invitation a sauvegarder). */
+  finishExtra?: React.ReactNode;
 }
 
-export default function ExerciseRunner({ lesson, onComplete, onClose }: ExerciseRunnerProps) {
+export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtra }: ExerciseRunnerProps) {
   // --- Tous les hooks sont appelés inconditionnellement (règles des Hooks React) ---
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isAnswerChecked, setIsAnswerChecked] = useState(false);
@@ -87,6 +90,17 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
 
     setIsCorrect(correct);
     setIsAnswerChecked(true);
+
+    track('exercise_answered', {
+      lesson_id: lesson.id,
+      step: currentStepIndex,
+      total_steps: lesson.steps.length,
+      exercise_type: type,
+      correct,
+    }, '/lesson');
+    if (!correct && lives === 1) {
+      track('lesson_failed', { lesson_id: lesson.id, step: currentStepIndex, total_steps: lesson.steps.length }, '/lesson');
+    }
     
     if (correct) {
       setXpGained(prev => prev + 10);
@@ -148,7 +162,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
         </div>
         <h2 className="text-4xl font-black text-amber-500 mb-2">{t.lessons.congrats}</h2>
 
-        <div className="flex gap-8 mb-12">
+        <div className={`flex gap-8 ${finishExtra ? 'mb-6' : 'mb-12'}`}>
           <div className="bg-blue-50 border border-blue-100 p-6 rounded-3xl min-w-[140px]">
             <div className="text-blue-500 text-sm font-bold uppercase mb-1">XP</div>
             <div className="text-3xl font-black text-blue-600">+{xpGained}</div>
@@ -162,6 +176,8 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
             </div>
           </div>
         </div>
+
+        {finishExtra}
 
         <button onClick={onComplete} className="px-12 py-4 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-bold text-xl shadow-lg transition-transform hover:scale-105 active:scale-95 w-full max-w-sm">
           {t.lessons.continue}
@@ -312,7 +328,17 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
     <div className="fixed inset-0 bg-[#F7F3EA] text-[#1B2A4A] z-50 flex flex-col">
       {/* Header */}
       <header className="p-4 bg-[#FDFCF8] border-b border-[#E8E2D5] flex items-center gap-6 max-w-5xl mx-auto w-full shadow-xs">
-        <button onClick={onClose} className="p-2 text-[#7A7670] hover:text-[#1B2A4A] rounded-full hover:bg-[#E8E2D5]/50 transition-colors">
+        <button
+          onClick={() => {
+            track('lesson_abandoned', {
+              lesson_id: lesson.id,
+              step: currentStepIndex,
+              total_steps: lesson.steps.length,
+              lives,
+            }, '/lesson');
+            onClose();
+          }}
+          className="p-2 text-[#7A7670] hover:text-[#1B2A4A] rounded-full hover:bg-[#E8E2D5]/50 transition-colors">
           <X className="w-5 h-5" />
         </button>
         <div className="flex-1 h-3 bg-[#E8E2D5] rounded-full overflow-hidden">

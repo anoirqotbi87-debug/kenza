@@ -1,400 +1,400 @@
-0401|      else if (w.category) cat = w.category;
-0402|
-0403|      return {
-0404|        id: w.id || `vocab_${idx}`,
-0405|        category: cat,
-0406|        darija: w.arabizi || (w as any).front || "",
-0407|        arabic: w.arabic || "",
-0408|        meaning: meaningText,
-0409|        note: (w.example?.arabizi ? `Ex: ${w.example.arabizi}` : "") || tr("Vocabulaire du quotidien avec audio naturel.", "Everyday vocabulary with natural audio.", "Vocabulario cotidiano con audio natural.", "مفردات يومية بصوت طبيعي."),
-0410|      };
-0411|    });
-0412|
-0413|    const combined: any[] = [...phrases];
-0414|    for (const v of rawVocabulary) {
-0415|      if (v.darija && !combined.some((p) => (p.darija || p.front || "").toLowerCase() === (v.darija || "").toLowerCase())) {
-0416|        combined.push(v);
-0417|      }
-0418|    }
-0419|
-0420|    return combined.map((p) => {
-0421|      let meaningStr = tr("Expression en darija", "Darija expression", "Expresión en darija", "عبارة بالدارجة");
-0422|      if (typeof p.meaning === "string") {
-0423|        meaningStr = p.meaning;
-0424|      } else if (p.meaning && typeof p.meaning === "object") {
-0425|        meaningStr = p.meaning.fr || p.meaning.en || "";
-0426|      } else if (typeof p.back === "string") {
-0427|        meaningStr = p.back;
-0428|      } else if (p.back && typeof p.back === "object") {
-0429|        meaningStr = p.back.fr || p.back.en || "";
-0430|      } else if (p.translation) {
-0431|        meaningStr = typeof p.translation === "string" ? p.translation : p.translation.fr || p.translation.en || "";
-0432|      }
+0401|      if (typeof (w as any).translation === "string") {
+0402|        meaningText = (w as any).translation;
+0403|      } else if ((w as any).translation && typeof (w as any).translation === "object") {
+0404|        meaningText = (w as any).translation.fr || (w as any).translation.en || tr("Expression en darija", "Darija expression", "Expresión en darija", "عبارة بالدارجة");
+0405|      } else if ((w as any).translations?.fr) {
+0406|        meaningText = (w as any).translations.fr;
+0407|      } else if (typeof (w as any).back === "string") {
+0408|        meaningText = (w as any).back;
+0409|      }
+0410|
+0411|      let cat = trL(lang, tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات"), "Essentials", "Lo esencial", "الأساسيات");
+0412|      if (w.category === "polite_social") cat = trL(lang, tr("Saluer", "Greeting", "Saludar", "التحية"), "Greeting", "Saludar", "التحية");
+0413|      else if (w.category === "food_drink") cat = trL(lang, tr("Au café", "At the café", "En el café", "في المقهى"), "At the café", "En el café", "في المقهى");
+0414|      else if (w.category === "directions") cat = trL(lang, tr("Se déplacer", "Getting around", "Desplazarse", "التنقل"), "Getting around", "Desplazarse", "التنقل");
+0415|      else if (w.category) cat = w.category;
+0416|
+0417|      return {
+0418|        id: w.id || `vocab_${idx}`,
+0419|        category: cat,
+0420|        darija: w.arabizi || (w as any).front || "",
+0421|        arabic: w.arabic || "",
+0422|        meaning: meaningText,
+0423|        note: (w.example?.arabizi ? `Ex: ${w.example.arabizi}` : "") || tr("Vocabulaire du quotidien avec audio naturel.", "Everyday vocabulary with natural audio.", "Vocabulario cotidiano con audio natural.", "مفردات يومية بصوت طبيعي."),
+0424|      };
+0425|    });
+0426|
+0427|    const combined: any[] = [...phrases];
+0428|    for (const v of rawVocabulary) {
+0429|      if (v.darija && !combined.some((p) => (p.darija || p.front || "").toLowerCase() === (v.darija || "").toLowerCase())) {
+0430|        combined.push(v);
+0431|      }
+0432|    }
 0433|
-0434|      return {
-0435|        id: String(p.id || Math.random()),
-0436|        category: String(p.category || trL(lang, tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات"), "Essentials", "Lo esencial", "الأساسيات")),
-0437|        darija: String(p.darija || p.front || p.arabizi || ""),
-0438|        arabic: String(p.arabic || ""),
-0439|        meaning: String(meaningStr || tr("Expression en darija", "Darija expression", "Expresión en darija", "عبارة بالدارجة")),
-0440|        note: String(p.note || p.notes || ""),
-0441|      };
-0442|    });
-0443|  }, [phrases, lang]);
-0444|
-0445|  const completedCount = completedLessons.length;
-0446|  const nextLesson =
-0447|    lessons.find((lesson) => !completedLessons.includes(lesson.id)) ??
-0448|    lessons[lessons.length - 1];
-0449|  const activeLesson = lessons.find((lesson) => lesson.id === lessonId) ?? null;
-0450|  const activeQuestion = activeLesson?.questions[questionIndex] ?? null;
-0451|
-0452|  // 4. Sécurisation de la liste des catégories
-0453|  const categories = useMemo(() => {
-0454|    return ["__all__", ...Array.from(new Set(allPhrases.map((phrase) => phrase.category).filter(Boolean)))];
-0455|  }, [allPhrases]);
-0456|
-0457|  // 3. Sécurisation de la recherche textuelle
-0458|  const filteredPhrases = useMemo(() => {
-0459|    const searchLower = (search || "").toLowerCase().trim();
-0460|    return allPhrases.filter((phrase) => {
-0461|      const matchesCategory = category === "__all__" || phrase.category === category;
-0462|      const searchTarget = `${phrase.darija || ""} ${phrase.arabic || ""} ${phrase.meaning || ""} ${phrase.category || ""}`.toLowerCase();
-0463|      const matchesSearch = !searchLower || searchTarget.includes(searchLower);
-0464|      const matchesFavorite = !favoritesOnly || safeFavorites.includes(phrase.id);
-0465|      return matchesCategory && matchesSearch && matchesFavorite;
-0466|    });
-0467|  }, [category, search, favoritesOnly, safeFavorites, allPhrases]);
-0468|
-0469|  const showToast = (message: string) => setToast(message);
+0434|    return combined.map((p) => {
+0435|      let meaningStr = tr("Expression en darija", "Darija expression", "Expresión en darija", "عبارة بالدارجة");
+0436|      if (typeof p.meaning === "string") {
+0437|        meaningStr = p.meaning;
+0438|      } else if (p.meaning && typeof p.meaning === "object") {
+0439|        meaningStr = p.meaning.fr || p.meaning.en || "";
+0440|      } else if (typeof p.back === "string") {
+0441|        meaningStr = p.back;
+0442|      } else if (p.back && typeof p.back === "object") {
+0443|        meaningStr = p.back.fr || p.back.en || "";
+0444|      } else if (p.translation) {
+0445|        meaningStr = typeof p.translation === "string" ? p.translation : p.translation.fr || p.translation.en || "";
+0446|      }
+0447|
+0448|      return {
+0449|        id: String(p.id || Math.random()),
+0450|        category: String(p.category || trL(lang, tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات"), "Essentials", "Lo esencial", "الأساسيات")),
+0451|        darija: String(p.darija || p.front || p.arabizi || ""),
+0452|        arabic: String(p.arabic || ""),
+0453|        meaning: String(meaningStr || tr("Expression en darija", "Darija expression", "Expresión en darija", "عبارة بالدارجة")),
+0454|        note: String(p.note || p.notes || ""),
+0455|      };
+0456|    });
+0457|  }, [phrases, lang]);
+0458|
+0459|  const completedCount = completedLessons.length;
+0460|  const nextLesson =
+0461|    lessons.find((lesson) => !completedLessons.includes(lesson.id)) ??
+0462|    lessons[lessons.length - 1];
+0463|  const activeLesson = lessons.find((lesson) => lesson.id === lessonId) ?? null;
+0464|  const activeQuestion = activeLesson?.questions[questionIndex] ?? null;
+0465|
+0466|  // 4. Sécurisation de la liste des catégories
+0467|  const categories = useMemo(() => {
+0468|    return ["__all__", ...Array.from(new Set(allPhrases.map((phrase) => phrase.category).filter(Boolean)))];
+0469|  }, [allPhrases]);
 0470|
-0471|  const startLesson = (id: string) => {
-0472|    const lesson = lessons.find((item) => item.id === id);
-0473|    if (!lesson) return;
-0474|
-0475|    // Premium gating check
-0476|    if (lesson.isPremium && !isPremium) {
-0477|      setPricingSource("module_locked");
-0478|      return;
-0479|    }
-0480|
-0481|    const index = lessons.findIndex((item) => item.id === id);
-0482|    const canStart =
-0483|      index === 0 ||
-0484|      completedLessons.includes(lessons[index - 1].id) ||
-0485|      completedLessons.includes(id);
-0486|
-0487|    if (!canStart) {
-0488|      showToast(trL(lang, "Termine la leçon précédente pour continuer ton parcours.", "Finish the previous lesson to continue your path.", "Termina la lección anterior para continuar tu recorrido.", "أكمل الدرس السابق لمواصلة مسارك."));
-0489|      return;
-0490|    }
-0491|
-0492|    setLessonId(id);
-0493|    setQuestionIndex(0);
-0494|    setSelectedAnswer(null);
-0495|  };
-0496|
-0497|  const advanceQuestion = () => {
-0498|    if (!activeLesson || !activeQuestion || !selectedAnswer) return;
-0499|    if (questionIndex < activeLesson.questions.length - 1) {
-0500|      setQuestionIndex((current) => current + 1);
-0501|      setSelectedAnswer(null);
-0502|      return;
-0503|    }
-0504|
-0505|    const firstCompletion = !completedLessons.includes(activeLesson.id);
-0506|    if (firstCompletion) {
-0507|      completeLesson(activeLesson.id);
-0508|      addXp(activeLesson.questions.length * 10);
-0509|    }
-0510|
-0511|    setLessonId(null);
-0512|    setSelectedAnswer(null);
-0513|    showToast(
-0514|      firstCompletion
-0515|        ? trL(lang, `Bravo ! Leçon terminée · +${activeLesson.questions.length * 10} XP`, `Well done! Lesson complete · +${activeLesson.questions.length * 10} XP`, `¡Bravo! Lección completada · +${activeLesson.questions.length * 10} XP`, `أحسنت! أكملت الدرس · +${activeLesson.questions.length * 10} XP`)
-0516|        : trL(lang, "Leçon revue avec succès.", "Lesson reviewed successfully.", "Lección repasada con éxito.", "تمت مراجعة الدرس بنجاح.")
-0517|    );
-0518|  };
-0519|
-0520|  const toggleFavorite = (id: string) => {
-0521|    const current = Array.isArray(favorites) ? favorites : [];
-0522|    const updated = current.includes(id)
-0523|      ? current.filter((item) => item !== id)
-0524|      : [...current, id];
-0525|    saveFavorites(updated);
-0526|  };
-0527|
-0528|  const playPhrase = (darija: string, arabic: string) => {
-0529|    if (!darija && !arabic) return;
-0530|    playAudio(darija || "", arabic || "", true);
-0531|    showToast(tr("Prononciation audio de la phrase.", "Natural voice pronunciation of the phrase.", "Pronunciación de voz natural de la frase.", "نطق صوتي طبيعي للعبارة."));
-0532|  };
-0533|
-0534|  const copyPhrase = async (phrase: Phrase) => {
-0535|    try {
-0536|      const text = `${phrase.darija || ""} ${phrase.arabic ? `(${phrase.arabic})` : ""} — ${phrase.meaning || ""}`.trim();
-0537|      await navigator.clipboard.writeText(text);
-0538|      showToast(tr("Phrase copiée dans le presse-papiers.", "Phrase copied to clipboard.", "Frase copiada al portapapeles.", "تم نسخ العبارة إلى الحافظة."));
-0539|    } catch {
-0540|      showToast(tr("Copie indisponible.", "Copy unavailable.", "Copia no disponible.", "النسخ غير متاح."));
-0541|    }
-0542|  };
-0543|
-0544|  const gradeReview = (grade: "again" | "hard" | "good" | "easy") => {
-0545|    const award = grade === "easy" ? 5 : grade === "good" ? 3 : grade === "hard" ? 2 : 1;
-0546|    addXp(award);
-0547|    setCardFlipped(false);
-0548|    setReviewIndex((current) => current + 1);
-0549|    showToast(
-0550|      `${t.modules.home.graded.replace("{grade}", grade === "again" ? t.modules.home.gradeAgain : grade === "hard" ? t.modules.home.gradeHard : grade === "good" ? t.modules.home.gradeGood : t.modules.home.gradeEasy)} · +${award} XP`
-0551|    );
-0552|  };
-0553|
-0554|  const resetProgress = () => {
-0555|    const confirmed = window.confirm(t.modules.home.resetConfirm);
-0556|    if (!confirmed) return;
-0557|    resetData();
-0558|    localStorage.removeItem("kenza_favorites");
-0559|    setFavorites([]);
-0560|    showToast(t.modules.home.resetDone);
+0471|  // 3. Sécurisation de la recherche textuelle
+0472|  const filteredPhrases = useMemo(() => {
+0473|    const searchLower = (search || "").toLowerCase().trim();
+0474|    return allPhrases.filter((phrase) => {
+0475|      const matchesCategory = category === "__all__" || phrase.category === category;
+0476|      const searchTarget = `${phrase.darija || ""} ${phrase.arabic || ""} ${phrase.meaning || ""} ${phrase.category || ""}`.toLowerCase();
+0477|      const matchesSearch = !searchLower || searchTarget.includes(searchLower);
+0478|      const matchesFavorite = !favoritesOnly || safeFavorites.includes(phrase.id);
+0479|      return matchesCategory && matchesSearch && matchesFavorite;
+0480|    });
+0481|  }, [category, search, favoritesOnly, safeFavorites, allPhrases]);
+0482|
+0483|  const showToast = (message: string) => setToast(message);
+0484|
+0485|  const startLesson = (id: string) => {
+0486|    const lesson = lessons.find((item) => item.id === id);
+0487|    if (!lesson) return;
+0488|
+0489|    // Premium gating check
+0490|    if (lesson.isPremium && !isPremium) {
+0491|      setPricingSource("module_locked");
+0492|      return;
+0493|    }
+0494|
+0495|    const index = lessons.findIndex((item) => item.id === id);
+0496|    const canStart =
+0497|      index === 0 ||
+0498|      completedLessons.includes(lessons[index - 1].id) ||
+0499|      completedLessons.includes(id);
+0500|
+0501|    if (!canStart) {
+0502|      showToast(trL(lang, "Termine la leçon précédente pour continuer ton parcours.", "Finish the previous lesson to continue your path.", "Termina la lección anterior para continuar tu recorrido.", "أكمل الدرس السابق لمواصلة مسارك."));
+0503|      return;
+0504|    }
+0505|
+0506|    track("lesson_started", { lesson_id: id, is_first_lesson: completedLessons.length === 0 }, "/lesson");
+0507|    setSavePromptHidden(false);
+0508|    setLessonJustDone(false);
+0509|    setLessonId(id);
+0510|    setQuestionIndex(0);
+0511|    setSelectedAnswer(null);
+0512|  };
+0513|
+0514|  const advanceQuestion = () => {
+0515|    if (!activeLesson || !activeQuestion || !selectedAnswer) return;
+0516|    if (questionIndex < activeLesson.questions.length - 1) {
+0517|      setQuestionIndex((current) => current + 1);
+0518|      setSelectedAnswer(null);
+0519|      return;
+0520|    }
+0521|
+0522|    const firstCompletion = !completedLessons.includes(activeLesson.id);
+0523|    if (firstCompletion) {
+0524|      track("lesson_completed", { lesson_id: activeLesson.id, lessons_completed_total: completedLessons.length + 1 }, "/lesson");
+0525|      setLessonJustDone(true);
+0526|      completeLesson(activeLesson.id);
+0527|      addXp(activeLesson.questions.length * 10);
+0528|    }
+0529|
+0530|    setLessonId(null);
+0531|    setSelectedAnswer(null);
+0532|    showToast(
+0533|      firstCompletion
+0534|        ? trL(lang, `Bravo ! Leçon terminée · +${activeLesson.questions.length * 10} XP`, `Well done! Lesson complete · +${activeLesson.questions.length * 10} XP`, `¡Bravo! Lección completada · +${activeLesson.questions.length * 10} XP`, `أحسنت! أكملت الدرس · +${activeLesson.questions.length * 10} XP`)
+0535|        : trL(lang, "Leçon revue avec succès.", "Lesson reviewed successfully.", "Lección repasada con éxito.", "تمت مراجعة الدرس بنجاح.")
+0536|    );
+0537|  };
+0538|
+0539|  const toggleFavorite = (id: string) => {
+0540|    const current = Array.isArray(favorites) ? favorites : [];
+0541|    const updated = current.includes(id)
+0542|      ? current.filter((item) => item !== id)
+0543|      : [...current, id];
+0544|    saveFavorites(updated);
+0545|  };
+0546|
+0547|  const playPhrase = (darija: string, arabic: string) => {
+0548|    if (!darija && !arabic) return;
+0549|    playAudio(darija || "", arabic || "", true);
+0550|    showToast(tr("Prononciation audio de la phrase.", "Natural voice pronunciation of the phrase.", "Pronunciación de voz natural de la frase.", "نطق صوتي طبيعي للعبارة."));
+0551|  };
+0552|
+0553|  const copyPhrase = async (phrase: Phrase) => {
+0554|    try {
+0555|      const text = `${phrase.darija || ""} ${phrase.arabic ? `(${phrase.arabic})` : ""} — ${phrase.meaning || ""}`.trim();
+0556|      await navigator.clipboard.writeText(text);
+0557|      showToast(tr("Phrase copiée dans le presse-papiers.", "Phrase copied to clipboard.", "Frase copiada al portapapeles.", "تم نسخ العبارة إلى الحافظة."));
+0558|    } catch {
+0559|      showToast(tr("Copie indisponible.", "Copy unavailable.", "Copia no disponible.", "النسخ غير متاح."));
+0560|    }
 0561|  };
 0562|
-0563|  const switchView = (next: View) => {
-0564|    setView(next);
-0565|    setMobileMenuOpen(false);
-0566|  };
-0567|
-0568|  const headerTitle: Record<View, { eyebrow: string; title: string; description: string }> = {
-0569|    today: {
-0570|      eyebrow: trL(lang, tr("TON ESPACE D’APPRENTISSAGE", "YOUR LEARNING SPACE", "TU ESPACIO DE APRENDIZAJE", "فضاء تعلمك"), "YOUR LEARNING SPACE", "TU ESPACIO DE APRENDIZAJE", "فضاء تعلمك"),
-0571|      title: trL(lang, tr("Salam, on s’y remet ?", "Salam, shall we get going?", "Salam, ¿retomamos?", "سلام، نكمل؟"), "Salam, shall we get going?", "Salam, ¿retomamos?", "سلام، نكمل؟"),
-0572|      description: trL(lang, tr("Un petit pas en darija aujourd’hui, une grande porte ouverte demain.", "A small step in darija today, a big door open tomorrow.", "Un pequeño paso en darija hoy, una gran puerta abierta mañana.", "خطوة صغيرة في الدارجة اليوم، وباب كبير مفتوح غداً."), "A small step in darija today, a big door open tomorrow.", "Un pequeño paso en darija hoy, una gran puerta abierta mañana.", "خطوة صغيرة في الدارجة اليوم، وباب كبير مفتوح غداً."),
-0573|    },
-0574|    path: {
-0575|      eyebrow: trL(lang, tr("LE CHEMIN SE FAIT EN PARLANT", "THE PATH IS MADE BY SPEAKING", "EL CAMINO SE HACE HABLANDO", "الطريق يُصنع بالكلام"), "THE PATH IS MADE BY SPEAKING", "EL CAMINO SE HACE HABLANDO", "الطريق يُصنع بالكلام"),
-0576|      title: trL(lang, tr("Ton parcours", "Your journey", "Tu recorrido", "مسارك"), "Your journey", "Tu recorrido", "مسارك"),
-0577|      description: trL(lang, tr("Des premiers mots aux conversations qui te ressemblent.", "From first words to conversations that feel like you.", "De las primeras palabras a conversaciones que te representen.", "من الكلمات الأولى إلى أحاديث تشبهك."), "From first words to conversations that feel like you.", "De las primeras palabras a conversaciones que te representen.", "من الكلمات الأولى إلى أحاديث تشبهك."),
-0578|    },
-0579|    phrases: {
-0580|      eyebrow: trL(lang, tr("LES MOTS QUI RAPPROCHENT", "WORDS THAT BRING US CLOSER", "PALABRAS QUE ACERCAN", "كلمات تُقرّب"), "WORDS THAT BRING US CLOSER", "PALABRAS QUE ACERCAN", "كلمات تُقرّب"),
-0581|      title: trL(lang, tr("Ton carnet de phrases", "Your phrase book", "Tu cuaderno de frases", "دفتر عباراتك"), "Your phrase book", "Tu cuaderno de frases", "دفتر عباراتك"),
-0582|      description: trL(lang, tr("Des expressions utiles, vivantes, prêtes à t’accompagner.", "Useful, lively expressions, ready to go with you.", "Expresiones útiles y vivas, listas para acompañarte.", "عبارات مفيدة حيّة، جاهزة لمرافقتك."), "Useful, lively expressions, ready to go with you.", "Expresiones útiles y vivas, listas para acompañarte.", "عبارات مفيدة حيّة، جاهزة لمرافقتك."),
-0583|    },
-0584|    review: {
-0585|      eyebrow: trL(lang, tr("ANCRER, SANS SE PRESSER", "ANCHOR IN, NO RUSH", "ANCLAR, SIN PRISA", "ترسيخ، بلا استعجال"), "ANCHOR IN, NO RUSH", "ANCLAR, SIN PRISA", "ترسيخ، بلا استعجال"),
-0586|      title: trL(lang, tr("Révision du jour", "Today’s review", "Revisión del día", "مراجعة اليوم"), "Today’s review", "Revisión del día", "مراجعة اليوم"),
-0587|      description: trL(lang, tr("Quelques cartes bien choisies pour laisser les mots s’installer.", "A few well-chosen cards to let the words settle.", "Algunas cartas bien elegidas para que las palabras se asienten.", "بعض البطاقات المنتقاة لتستقر الكلمات."), "A few well-chosen cards to let the words settle.", "Algunas cartas bien elegidas para que las palabras se asienten.", "بعض البطاقات المنتقاة لتستقر الكلمات."),
-0588|    },
-0589|    space: {
-0590|      eyebrow: trL(lang, tr("UN ESPACE À TOI", "A SPACE OF YOUR OWN", "UN ESPACIO PARA TI", "فضاء لك"), "A SPACE OF YOUR OWN", "UN ESPACIO PARA TI", "فضاء لك"),
-0591|      title: trL(lang, "Mon espace & Passeport", "My space & Passport", "Mi espacio y Pasaporte", "مساحتي وجواز السفر"),
-0592|      description: trL(lang, "Ta progression et tes visas officiels, sous ton contrôle.", "Your progress and official visas, under your control.", "Tu progreso y tus visados oficiales, bajo tu control.", "تقدمك وتأشيراتك الرسمية، تحت سيطرتك."),
-0593|    },
-0594|  };
-0595|
-0596|  const currentHeader = headerTitle[view];
-0597|
-0598|  return (
-0599|    <div className="app-shell">
-0600|      {/* Sidebar Desktop & Mobile Slideout */}
-0601|      <aside className={`sidebar ${mobileMenuOpen ? "sidebar-open" : ""}`}>
-0602|        <div className="brand-lockup">
-0603|          <div className="brand-mark" aria-hidden="true">
-0604|            <span>ك</span>
-0605|            <i />
-0606|          </div>
-0607|          <div>
-0608|            <span className="brand-name">KENZA</span>
-0609|            <span className="brand-tagline">{trL(lang, "la darija, en chemin", "darija, one step at a time", "la darija, paso a paso", "الدارجة، على الطريق")}</span>
-0610|          </div>
-0611|          <button
-0612|            className="icon-button mobile-close"
-0613|            aria-label={tr("Fermer le menu", "Close the menu", "Cerrar el menú", "إغلاق القائمة")}
-0614|            onClick={() => setMobileMenuOpen(false)}
-0615|          >
-0616|            <X size={19} />
-0617|          </button>
-0618|        </div>
-0619|
-0620|        <div className="sidebar-label">{(t as any).side?.learn || tr("APPRENDRE", "LEARN", "APRENDER", "تعلّم")}</div>
-0621|        <nav className="side-nav" aria-label={tr("Navigation principale", "Main navigation", "Navegación principal", "التنقل الرئيسي")}>
-0622|          {navItems.map((item) => {
-0623|            const Icon = item.icon;
-0624|            return (
-0625|              <button
-0626|                key={item.id}
-0627|                onClick={() => switchView(item.id)}
-0628|                className={`nav-item ${view === item.id ? "nav-item-active" : ""}`}
-0629|                aria-current={view === item.id ? "page" : undefined}
-0630|              >
-0631|                <Icon size={19} strokeWidth={1.8} /> <span>{navLabel(item.id) || item.label}</span>
-0632|                {item.id === "review" && <span className="nav-count">4</span>}
-0633|              </button>
-0634|            );
-0635|          })}
-0636|        </nav>
-0637|
-0638|        <div className="sidebar-label">{trL(lang, "EXPLORER", "EXPLORE", "EXPLORAR", "استكشف")}</div>
-0639|        <nav className="side-nav" aria-label={trL(lang, "Ressources d'étude", "Study resources", "Recursos de estudio", "موارد الدراسة")}>
-0640|          <a href="/etudier" className="nav-item">
-0641|            <span>{trL(lang, "Étudier — Modules complets", "Study — Full modules", "Estudiar — Módulos completos", "الدراسة — الوحدات الكاملة")}</span>
-0642|          </a>
-0643|          <a href="/grammaire" className="nav-item">
-0644|            <span>{trL(lang, "Grammaire active", "Active grammar", "Gramática activa", "القواعد النشطة")}</span>
-0645|          </a>
-0646|          <a href="/parler" className="nav-item">
-0647|            <span>{trL(lang, "Pratique orale", "Speaking practice", "Práctica oral", "تدريب النطق")}</span>
-0648|          </a>
-0649|          <a href="/revisions" className="nav-item">
-0650|            <span>{trL(lang, "Révisions SRS", "SRS review", "Repaso SRS", "مراجعة SRS")}</span>
-0651|          </a>
-0652|        </nav>
-0653|
-0654|        <div className="sidebar-label sidebar-label-spaced">{(t as any).side?.oral || tr("PRATIQUE ORALE & IA", "SPEAKING & AI", "PRÁCTICA ORAL E IA", "المحادثة والذكاء الاصطناعي")}</div>
-0655|        <button
-0656|          onClick={() => setShowScenarioSelector(true)}
-0657|          className="nav-item"
-0658|        >
-0659|          <MessageCircle size={19} strokeWidth={1.8} />
-0660|          <span>{trL(lang, "Roleplay IA", "AI roleplay", "Roleplay IA", "حوار مع الذكاء الاصطناعي")}</span>
-0661|        </button>
-0662|
-0663|        <div className="sidebar-label sidebar-label-spaced">{(t as any).side?.space || tr("TON ESPACE", "YOUR SPACE", "TU ESPACIO", "فضاؤك")}</div>
-0664|        <button
-0665|          onClick={() => switchView("space")}
-0666|          className={`nav-item ${view === "space" ? "nav-item-active" : ""}`}
-0667|          aria-current={view === "space" ? "page" : undefined}
-0668|        >
-0669|          <Award size={19} strokeWidth={1.8} />
-0670|          <span>{trL(lang, "Mon Passeport", "My passport", "Mi pasaporte", "جوازي")}</span>
-0671|        </button>
-0672|
-0673|        <div className="sidebar-spacer" />
-0674|
-0675|        <div className="daily-goal-card">
-0676|          <div className="goal-orbit">
-0677|            <Target size={17} />
-0678|          </div>
-0679|          <div className="goal-topline">
-0680|            <span>{trL(lang, "TON RYTHME", "YOUR PACE", "TU RITMO", "إيقاعك")}</span>
-0681|            <span>{Math.min(100, Math.round(((completedCount * 3) / 10) * 100))}%</span>
-0682|          </div>
-0683|          <strong>{trL(lang, "10 minutes par jour", "10 minutes a day", "10 minutos al día", "10 دقائق يومياً")}</strong>
-0684|          <div className="goal-track">
-0685|            <span style={{ width: `${Math.min(100, ((completedCount * 3) / 10) * 100)}%` }} />
-0686|          </div>
-0687|          <button
-0688|            onClick={() => showToast(t.modules.home.dailyGoal)}
-0689|            className="goal-link"
-0690|          >
-0691|            {trL(lang, tr("Ajuster l’objectif", "Adjust goal", "Ajustar objetivo", "عدّل الهدف"), "Adjust goal", "Ajustar objetivo", "عدّل الهدف")} <ArrowRight size={14} />
-0692|          </button>
-0693|        </div>
-0694|
-0695|        <div className="sidebar-footer">
-0696|          <span className="privacy-dot" />
-0697|          <span>{user ? user.email?.split("@")[0] : trL(lang, "Mode Invité actif", "Guest mode active", "Modo invitado activo", "وضع الضيف مُفعّل")}</span>
-0698|          <button
-0699|            aria-label={trL(lang, "En savoir plus sur les données", "Learn more about data", "Más información sobre los datos", "اعرف المزيد عن البيانات")}
-0700|            onClick={() => switchView("space")}
-0701|          >
-0702|            <CircleHelp size={14} />
-0703|          </button>
-0704|        </div>
-0705|      </aside>
-0706|
-0707|      {mobileMenuOpen && (
-0708|        <button
-0709|          className="mobile-scrim"
-0710|          aria-label={tr("Fermer le menu", "Close the menu", "Cerrar el menú", "إغلاق القائمة")}
-0711|          onClick={() => setMobileMenuOpen(false)}
-0712|        />
-0713|      )}
-0714|
-0715|      {/* Main Area */}
-0716|      <main className="main-area">
-0717|        <header className="topbar">
-0718|          <button
-0719|            className="icon-button mobile-menu-trigger"
-0720|            aria-label={t.modules.home.langSwitcher}
-0721|            onClick={() => setMobileMenuOpen(true)}
-0722|          >
-0723|            <Menu size={21} />
-0724|          </button>
-0725|          <div className="breadcrumbs">
-0726|            <span>KENZA</span>
-0727|            <ChevronRight size={14} />
-0728|            <span>{currentHeader.eyebrow.toLocaleLowerCase(lang)}</span>
-0729|          </div>
-0730|          <div className="topbar-actions">
-0731|            {/* Sélecteur de langue bilingue */}
-0732|            <div className="lang-switcher" role="group" aria-label={tr("Sélecteur de langue", "Language switcher", "Selector de idioma", "مبدل اللغة")}>
-0733|              <Globe size={13} className="lang-icon" />
-0734|              <button
-0735|                type="button"
-0736|                onClick={() => setLanguage("fr")}
-0737|                className={`lang-btn ${uiLanguage === "fr" ? "lang-btn-active" : ""}`}
-0738|                aria-label={t.modules.home.switchToFr}
-0739|              >
-0740|                FR
-0741|              </button>
-0742|              <span className="lang-sep">|</span>
-0743|              <button
-0744|                type="button"
-0745|                onClick={() => setLanguage("en")}
-0746|                className={`lang-btn ${uiLanguage === "en" ? "lang-btn-active" : ""}`}
-0747|                aria-label={t.modules.home.switchToEn}
-0748|              >
-0749|                EN
-0750|              </button>
-0751|              <span className="lang-sep">|</span>
-0752|              <button
-0753|                type="button"
-0754|                onClick={() => setLanguage("es")}
-0755|                className={`lang-btn ${uiLanguage === "es" ? "lang-btn-active" : ""}`}
-0756|                aria-label={t.modules.home.switchToEs}
-0757|              >
-0758|                ES
-0759|              </button>
-0760|              <span className="lang-sep">|</span>
-0761|              <button
-0762|                type="button"
-0763|                onClick={() => setLanguage("ar")}
-0764|                className={`lang-btn ${uiLanguage === "ar" ? "lang-btn-active" : ""}`}
-0765|                aria-label={t.modules.home.switchToAr}
-0766|              >
-0767|                AR
-0768|              </button>
-0769|            </div>
-0770|
-0771|            {/* Toggle Son */}
-0772|            <button
-0773|              className="sound-toggle"
-0774|              onClick={toggleSound}
-0775|              title={soundEnabled ? trL(lang, "Audio activé", "Audio on", "Audio activado", "الصوت مُفعّل") : trL(lang, "Audio muet", "Audio muted", "Audio silenciado", "الصوت مكتوم")}
-0776|              aria-label={soundEnabled ? trL(lang, "Couper le son", "Mute sound", "Silenciar", "كتم الصوت") : trL(lang, "Activer le son", "Enable sound", "Activar sonido", "تفعيل الصوت")}
-0777|            >
-0778|              <Headphones size={15} />
-0779|              <span>{soundEnabled ? trL(lang, "Son actif", "Sound on", "Sonido activo", "الصوت مُفعّل") : trL(lang, "Son coupé", "Sound off", "Sonido apagado", "الصوت مُغلق")}</span>
-0780|            </button>
-0781|
-0782|            {/* Connexion Google & Profil */}
-0783|            {user ? (
-0784|              <button
-0785|                className="top-avatar"
-0786|                aria-label={t.modules.home.openSpace}
-0787|                onClick={() => switchView("space")}
-0788|                title={user.email || t.nav.profile}
-0789|              >
-0790|                {user.user_metadata?.avatar_url ? (
-0791|                  <img
-0792|                    src={user.user_metadata.avatar_url}
-0793|                    alt={user.user_metadata?.full_name || trL(lang, "Profil", "Profile", "Perfil", "الملف الشخصي")}
-0794|                    className="w-full h-full object-cover rounded-full"
-0795|                  />
-0796|                ) : user.user_metadata?.full_name ? (
-0797|                  user.user_metadata.full_name[0].toUpperCase()
-0798|                ) : user.email ? (
-0799|                  user.email[0].toUpperCase()
-0800|                ) : (
+0563|  const gradeReview = (grade: "again" | "hard" | "good" | "easy") => {
+0564|    const award = grade === "easy" ? 5 : grade === "good" ? 3 : grade === "hard" ? 2 : 1;
+0565|    addXp(award);
+0566|    setCardFlipped(false);
+0567|    setReviewIndex((current) => current + 1);
+0568|    showToast(
+0569|      `${t.modules.home.graded.replace("{grade}", grade === "again" ? t.modules.home.gradeAgain : grade === "hard" ? t.modules.home.gradeHard : grade === "good" ? t.modules.home.gradeGood : t.modules.home.gradeEasy)} · +${award} XP`
+0570|    );
+0571|  };
+0572|
+0573|  const resetProgress = () => {
+0574|    const confirmed = window.confirm(t.modules.home.resetConfirm);
+0575|    if (!confirmed) return;
+0576|    resetData();
+0577|    localStorage.removeItem("kenza_favorites");
+0578|    setFavorites([]);
+0579|    showToast(t.modules.home.resetDone);
+0580|  };
+0581|
+0582|  const switchView = (next: View) => {
+0583|    setView(next);
+0584|    setMobileMenuOpen(false);
+0585|  };
+0586|
+0587|  const headerTitle: Record<View, { eyebrow: string; title: string; description: string }> = {
+0588|    today: {
+0589|      eyebrow: trL(lang, tr("TON ESPACE D’APPRENTISSAGE", "YOUR LEARNING SPACE", "TU ESPACIO DE APRENDIZAJE", "فضاء تعلمك"), "YOUR LEARNING SPACE", "TU ESPACIO DE APRENDIZAJE", "فضاء تعلمك"),
+0590|      title: trL(lang, tr("Salam, on s’y remet ?", "Salam, shall we get going?", "Salam, ¿retomamos?", "سلام، نكمل؟"), "Salam, shall we get going?", "Salam, ¿retomamos?", "سلام، نكمل؟"),
+0591|      description: trL(lang, tr("Un petit pas en darija aujourd’hui, une grande porte ouverte demain.", "A small step in darija today, a big door open tomorrow.", "Un pequeño paso en darija hoy, una gran puerta abierta mañana.", "خطوة صغيرة في الدارجة اليوم، وباب كبير مفتوح غداً."), "A small step in darija today, a big door open tomorrow.", "Un pequeño paso en darija hoy, una gran puerta abierta mañana.", "خطوة صغيرة في الدارجة اليوم، وباب كبير مفتوح غداً."),
+0592|    },
+0593|    path: {
+0594|      eyebrow: trL(lang, tr("LE CHEMIN SE FAIT EN PARLANT", "THE PATH IS MADE BY SPEAKING", "EL CAMINO SE HACE HABLANDO", "الطريق يُصنع بالكلام"), "THE PATH IS MADE BY SPEAKING", "EL CAMINO SE HACE HABLANDO", "الطريق يُصنع بالكلام"),
+0595|      title: trL(lang, tr("Ton parcours", "Your journey", "Tu recorrido", "مسارك"), "Your journey", "Tu recorrido", "مسارك"),
+0596|      description: trL(lang, tr("Des premiers mots aux conversations qui te ressemblent.", "From first words to conversations that feel like you.", "De las primeras palabras a conversaciones que te representen.", "من الكلمات الأولى إلى أحاديث تشبهك."), "From first words to conversations that feel like you.", "De las primeras palabras a conversaciones que te representen.", "من الكلمات الأولى إلى أحاديث تشبهك."),
+0597|    },
+0598|    phrases: {
+0599|      eyebrow: trL(lang, tr("LES MOTS QUI RAPPROCHENT", "WORDS THAT BRING US CLOSER", "PALABRAS QUE ACERCAN", "كلمات تُقرّب"), "WORDS THAT BRING US CLOSER", "PALABRAS QUE ACERCAN", "كلمات تُقرّب"),
+0600|      title: trL(lang, tr("Ton carnet de phrases", "Your phrase book", "Tu cuaderno de frases", "دفتر عباراتك"), "Your phrase book", "Tu cuaderno de frases", "دفتر عباراتك"),
+0601|      description: trL(lang, tr("Des expressions utiles, vivantes, prêtes à t’accompagner.", "Useful, lively expressions, ready to go with you.", "Expresiones útiles y vivas, listas para acompañarte.", "عبارات مفيدة حيّة، جاهزة لمرافقتك."), "Useful, lively expressions, ready to go with you.", "Expresiones útiles y vivas, listas para acompañarte.", "عبارات مفيدة حيّة، جاهزة لمرافقتك."),
+0602|    },
+0603|    review: {
+0604|      eyebrow: trL(lang, tr("ANCRER, SANS SE PRESSER", "ANCHOR IN, NO RUSH", "ANCLAR, SIN PRISA", "ترسيخ، بلا استعجال"), "ANCHOR IN, NO RUSH", "ANCLAR, SIN PRISA", "ترسيخ، بلا استعجال"),
+0605|      title: trL(lang, tr("Révision du jour", "Today’s review", "Revisión del día", "مراجعة اليوم"), "Today’s review", "Revisión del día", "مراجعة اليوم"),
+0606|      description: trL(lang, tr("Quelques cartes bien choisies pour laisser les mots s’installer.", "A few well-chosen cards to let the words settle.", "Algunas cartas bien elegidas para que las palabras se asienten.", "بعض البطاقات المنتقاة لتستقر الكلمات."), "A few well-chosen cards to let the words settle.", "Algunas cartas bien elegidas para que las palabras se asienten.", "بعض البطاقات المنتقاة لتستقر الكلمات."),
+0607|    },
+0608|    space: {
+0609|      eyebrow: trL(lang, tr("UN ESPACE À TOI", "A SPACE OF YOUR OWN", "UN ESPACIO PARA TI", "فضاء لك"), "A SPACE OF YOUR OWN", "UN ESPACIO PARA TI", "فضاء لك"),
+0610|      title: trL(lang, "Mon espace & Passeport", "My space & Passport", "Mi espacio y Pasaporte", "مساحتي وجواز السفر"),
+0611|      description: trL(lang, "Ta progression et tes visas officiels, sous ton contrôle.", "Your progress and official visas, under your control.", "Tu progreso y tus visados oficiales, bajo tu control.", "تقدمك وتأشيراتك الرسمية، تحت سيطرتك."),
+0612|    },
+0613|  };
+0614|
+0615|  const currentHeader = headerTitle[view];
+0616|
+0617|  // Invitation a sauvegarder la progression (invites uniquement) apres une lecon
+0618|  const savePromptVariant = isGuest && lessonJustDone && !savePromptHidden
+0619|    ? getSavePromptVariant(completedCount, streakDays)
+0620|    : null;
+0621|
+0622|  return (
+0623|    <div className="app-shell">
+0624|      {/* Sidebar Desktop & Mobile Slideout */}
+0625|      <aside className={`sidebar ${mobileMenuOpen ? "sidebar-open" : ""}`}>
+0626|        <div className="brand-lockup">
+0627|          <div className="brand-mark" aria-hidden="true">
+0628|            <span>ك</span>
+0629|            <i />
+0630|          </div>
+0631|          <div>
+0632|            <span className="brand-name">KENZA</span>
+0633|            <span className="brand-tagline">{trL(lang, "la darija, en chemin", "darija, one step at a time", "la darija, paso a paso", "الدارجة، على الطريق")}</span>
+0634|          </div>
+0635|          <button
+0636|            className="icon-button mobile-close"
+0637|            aria-label={tr("Fermer le menu", "Close the menu", "Cerrar el menú", "إغلاق القائمة")}
+0638|            onClick={() => setMobileMenuOpen(false)}
+0639|          >
+0640|            <X size={19} />
+0641|          </button>
+0642|        </div>
+0643|
+0644|        <div className="sidebar-label">{(t as any).side?.learn || tr("APPRENDRE", "LEARN", "APRENDER", "تعلّم")}</div>
+0645|        <nav className="side-nav" aria-label={tr("Navigation principale", "Main navigation", "Navegación principal", "التنقل الرئيسي")}>
+0646|          {navItems.map((item) => {
+0647|            const Icon = item.icon;
+0648|            return (
+0649|              <button
+0650|                key={item.id}
+0651|                onClick={() => switchView(item.id)}
+0652|                className={`nav-item ${view === item.id ? "nav-item-active" : ""}`}
+0653|                aria-current={view === item.id ? "page" : undefined}
+0654|              >
+0655|                <Icon size={19} strokeWidth={1.8} /> <span>{navLabel(item.id) || item.label}</span>
+0656|                {item.id === "review" && <span className="nav-count">4</span>}
+0657|              </button>
+0658|            );
+0659|          })}
+0660|        </nav>
+0661|
+0662|        <div className="sidebar-label">{trL(lang, "EXPLORER", "EXPLORE", "EXPLORAR", "استكشف")}</div>
+0663|        <nav className="side-nav" aria-label={trL(lang, "Ressources d'étude", "Study resources", "Recursos de estudio", "موارد الدراسة")}>
+0664|          <a href="/etudier" className="nav-item">
+0665|            <span>{trL(lang, "Étudier — Modules complets", "Study — Full modules", "Estudiar — Módulos completos", "الدراسة — الوحدات الكاملة")}</span>
+0666|          </a>
+0667|          <a href="/grammaire" className="nav-item">
+0668|            <span>{trL(lang, "Grammaire active", "Active grammar", "Gramática activa", "القواعد النشطة")}</span>
+0669|          </a>
+0670|          <a href="/parler" className="nav-item">
+0671|            <span>{trL(lang, "Pratique orale", "Speaking practice", "Práctica oral", "تدريب النطق")}</span>
+0672|          </a>
+0673|          <a href="/revisions" className="nav-item">
+0674|            <span>{trL(lang, "Révisions SRS", "SRS review", "Repaso SRS", "مراجعة SRS")}</span>
+0675|          </a>
+0676|        </nav>
+0677|
+0678|        <div className="sidebar-label sidebar-label-spaced">{(t as any).side?.oral || tr("PRATIQUE ORALE & IA", "SPEAKING & AI", "PRÁCTICA ORAL E IA", "المحادثة والذكاء الاصطناعي")}</div>
+0679|        <button
+0680|          onClick={() => setShowScenarioSelector(true)}
+0681|          className="nav-item"
+0682|        >
+0683|          <MessageCircle size={19} strokeWidth={1.8} />
+0684|          <span>{trL(lang, "Roleplay IA", "AI roleplay", "Roleplay IA", "حوار مع الذكاء الاصطناعي")}</span>
+0685|        </button>
+0686|
+0687|        <div className="sidebar-label sidebar-label-spaced">{(t as any).side?.space || tr("TON ESPACE", "YOUR SPACE", "TU ESPACIO", "فضاؤك")}</div>
+0688|        <button
+0689|          onClick={() => switchView("space")}
+0690|          className={`nav-item ${view === "space" ? "nav-item-active" : ""}`}
+0691|          aria-current={view === "space" ? "page" : undefined}
+0692|        >
+0693|          <Award size={19} strokeWidth={1.8} />
+0694|          <span>{trL(lang, "Mon Passeport", "My passport", "Mi pasaporte", "جوازي")}</span>
+0695|        </button>
+0696|
+0697|        <div className="sidebar-spacer" />
+0698|
+0699|        <div className="daily-goal-card">
+0700|          <div className="goal-orbit">
+0701|            <Target size={17} />
+0702|          </div>
+0703|          <div className="goal-topline">
+0704|            <span>{trL(lang, "TON RYTHME", "YOUR PACE", "TU RITMO", "إيقاعك")}</span>
+0705|            <span>{Math.min(100, Math.round(((completedCount * 3) / 10) * 100))}%</span>
+0706|          </div>
+0707|          <strong>{trL(lang, "10 minutes par jour", "10 minutes a day", "10 minutos al día", "10 دقائق يومياً")}</strong>
+0708|          <div className="goal-track">
+0709|            <span style={{ width: `${Math.min(100, ((completedCount * 3) / 10) * 100)}%` }} />
+0710|          </div>
+0711|          <button
+0712|            onClick={() => showToast(t.modules.home.dailyGoal)}
+0713|            className="goal-link"
+0714|          >
+0715|            {trL(lang, tr("Ajuster l’objectif", "Adjust goal", "Ajustar objetivo", "عدّل الهدف"), "Adjust goal", "Ajustar objetivo", "عدّل الهدف")} <ArrowRight size={14} />
+0716|          </button>
+0717|        </div>
+0718|
+0719|        <div className="sidebar-footer">
+0720|          <span className="privacy-dot" />
+0721|          <span>{user ? user.email?.split("@")[0] : trL(lang, "Mode Invité actif", "Guest mode active", "Modo invitado activo", "وضع الضيف مُفعّل")}</span>
+0722|          <button
+0723|            aria-label={trL(lang, "En savoir plus sur les données", "Learn more about data", "Más información sobre los datos", "اعرف المزيد عن البيانات")}
+0724|            onClick={() => switchView("space")}
+0725|          >
+0726|            <CircleHelp size={14} />
+0727|          </button>
+0728|        </div>
+0729|      </aside>
+0730|
+0731|      {mobileMenuOpen && (
+0732|        <button
+0733|          className="mobile-scrim"
+0734|          aria-label={tr("Fermer le menu", "Close the menu", "Cerrar el menú", "إغلاق القائمة")}
+0735|          onClick={() => setMobileMenuOpen(false)}
+0736|        />
+0737|      )}
+0738|
+0739|      {/* Main Area */}
+0740|      <main className="main-area">
+0741|        <header className="topbar">
+0742|          <button
+0743|            className="icon-button mobile-menu-trigger"
+0744|            aria-label={t.modules.home.langSwitcher}
+0745|            onClick={() => setMobileMenuOpen(true)}
+0746|          >
+0747|            <Menu size={21} />
+0748|          </button>
+0749|          <div className="breadcrumbs">
+0750|            <span>KENZA</span>
+0751|            <ChevronRight size={14} />
+0752|            <span>{currentHeader.eyebrow.toLocaleLowerCase(lang)}</span>
+0753|          </div>
+0754|          <div className="topbar-actions">
+0755|            {/* Sélecteur de langue bilingue */}
+0756|            <div className="lang-switcher" role="group" aria-label={tr("Sélecteur de langue", "Language switcher", "Selector de idioma", "مبدل اللغة")}>
+0757|              <Globe size={13} className="lang-icon" />
+0758|              <button
+0759|                type="button"
+0760|                onClick={() => setLanguage("fr")}
+0761|                className={`lang-btn ${uiLanguage === "fr" ? "lang-btn-active" : ""}`}
+0762|                aria-label={t.modules.home.switchToFr}
+0763|              >
+0764|                FR
+0765|              </button>
+0766|              <span className="lang-sep">|</span>
+0767|              <button
+0768|                type="button"
+0769|                onClick={() => setLanguage("en")}
+0770|                className={`lang-btn ${uiLanguage === "en" ? "lang-btn-active" : ""}`}
+0771|                aria-label={t.modules.home.switchToEn}
+0772|              >
+0773|                EN
+0774|              </button>
+0775|              <span className="lang-sep">|</span>
+0776|              <button
+0777|                type="button"
+0778|                onClick={() => setLanguage("es")}
+0779|                className={`lang-btn ${uiLanguage === "es" ? "lang-btn-active" : ""}`}
+0780|                aria-label={t.modules.home.switchToEs}
+0781|              >
+0782|                ES
+0783|              </button>
+0784|              <span className="lang-sep">|</span>
+0785|              <button
+0786|                type="button"
+0787|                onClick={() => setLanguage("ar")}
+0788|                className={`lang-btn ${uiLanguage === "ar" ? "lang-btn-active" : ""}`}
+0789|                aria-label={t.modules.home.switchToAr}
+0790|              >
+0791|                AR
+0792|              </button>
+0793|            </div>
+0794|
+0795|            {/* Toggle Son */}
+0796|            <button
+0797|              className="sound-toggle"
+0798|              onClick={toggleSound}
+0799|              title={soundEnabled ? trL(lang, "Audio activé", "Audio on", "Audio activado", "الصوت مُفعّل") : trL(lang, "Audio muet", "Audio muted", "Audio silenciado", "الصوت مكتوم")}
+0800|              aria-label={soundEnabled ? trL(lang, "Couper le son", "Mute sound", "Silenciar", "كتم الصوت") : trL(lang, "Activer le son", "Enable sound", "Activar sonido", "تفعيل الصوت")}

@@ -1,24 +1,30 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { X, Mail, Lock, User, LogIn } from 'lucide-react';
 import { syncService } from '../../lib/syncService';
+import { signUpWithTracking, track } from '../../lib/tracking';
 import { useTranslation } from '../../store/useAppStore';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  initialMode?: 'login' | 'signup';
 }
 
-export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
-  const [isLogin, setIsLogin] = useState(true);
+export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 'login' }: AuthModalProps) {
+  const [isLogin, setIsLogin] = useState(initialMode === 'login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation();
+
+  useEffect(() => {
+    if (isOpen) track('auth_modal_viewed', { mode: initialMode }, '/auth');
+  }, [isOpen, initialMode]);
 
   const [message, setMessage] = useState<string | null>(null);
 
@@ -56,15 +62,12 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            username: email.split('@')[0],
-          },
-        },
-      });
+      track('signup_started', { method: 'email' }, '/auth');
+      const { error } = await signUpWithTracking(email, password, { username: email.split('@')[0] });
+      if (error) {
+        track('signup_failed', { method: 'email', error: error.message?.slice(0, 200) }, '/auth');
+        throw error;
+      }
 
       if (error) throw error;
 
@@ -114,6 +117,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         ? 'https://kenza-dusky.vercel.app'
         : (typeof window !== 'undefined' ? window.location.origin : 'https://kenza-dusky.vercel.app');
         
+      track(isLogin ? 'login_started' : 'signup_started', { method: provider }, '/auth');
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
@@ -135,7 +139,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1B2A4A]/60 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-[#1B2A4A]/60 backdrop-blur-md animate-in fade-in duration-200">
       <div className="bg-[#FDFCF8] rounded-3xl w-full max-w-md overflow-hidden shadow-2xl border border-[#E8E2D5] relative animate-in zoom-in-95 duration-200">
         <button 
           onClick={onClose}

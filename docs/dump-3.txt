@@ -1,400 +1,400 @@
-0801|                  "K"
-0802|                )}
-0803|              </button>
-0804|            ) : (
-0805|              <button
-0806|                type="button"
-0807|                onClick={handleGoogleLogin}
-0808|                className="google-login-btn"
-0809|                aria-label={trL(lang, "Se connecter avec Google", "Sign in with Google", "Iniciar sesión con Google", "تسجيل الدخول عبر Google")}
-0810|                title={trL(lang, "Se connecter avec Google", "Sign in with Google", "Iniciar sesión con Google", "تسجيل الدخول عبر Google")}
-0811|              >
-0812|                <svg className="google-icon" width="13" height="13" viewBox="0 0 24 24">
-0813|                  <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
-0814|                  <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/>
-0815|                  <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.16 0 10.02 0 12s.45 3.84 1.25 5.42l4.03-3.15z"/>
-0816|                  <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-0817|                </svg>
-0818|                <span>{trL(lang, "Se connecter", "Sign in", "Iniciar sesión", "تسجيل الدخول")}</span>
-0819|              </button>
-0820|            )}
-0821|          </div>
-0822|        </header>
-0823|
-0824|        <div className="content-wrap">
-0825|          <section className="page-heading">
-0826|            <div>
-0827|              <div className="eyebrow">
-0828|                <span className="eyebrow-line" />
-0829|                {currentHeader.eyebrow}
-0830|              </div>
-0831|              <h1>{currentHeader.title}</h1>
-0832|              <p>{currentHeader.description}</p>
-0833|            </div>
-0834|            <div className="date-chip">
-0835|              <span className="date-sun">☼</span>
-0836|              <span>
-0837|                {new Intl.DateTimeFormat(getDateLocale(lang), {
-0838|                  weekday: "long",
-0839|                  day: "numeric",
-0840|                  month: "long",
-0841|                }).format(new Date())}
-0842|              </span>
-0843|            </div>
-0844|          </section>
-0845|
-0846|          {/* VUE 1 : AUJOURD'HUI */}
-0847|          {view === "today" && (
-0848|            <TodayView
-0849|              completedCount={completedCount}
-0850|              xp={xp}
-0851|              streak={streakDays}
-0852|              nextLesson={nextLesson}
-0853|              onStart={startLesson}
-0854|              onNavigate={switchView}
-0855|              onOpenRoleplay={() => setShowScenarioSelector(true)}
-0856|            />
-0857|          )}
-0858|
-0859|          {/* VUE 2 : MON PARCOURS */}
-0860|          {view === "path" && (
-0861|            <PathView
-0862|              completedLessons={completedLessons}
-0863|              onStart={startLesson}
-0864|              onOpenCheckpoint={(id, name) => setCheckpointOpen({ id, name })}
-0865|              onOpenPaywall={() => setPricingSource("module_locked")}
-0866|              isPremium={isPremium}
-0867|            />
-0868|          )}
+0801|            >
+0802|              <Headphones size={15} />
+0803|              <span>{soundEnabled ? trL(lang, "Son actif", "Sound on", "Sonido activo", "الصوت مُفعّل") : trL(lang, "Son coupé", "Sound off", "Sonido apagado", "الصوت مُغلق")}</span>
+0804|            </button>
+0805|
+0806|            {/* Connexion Google & Profil */}
+0807|            {user ? (
+0808|              <button
+0809|                className="top-avatar"
+0810|                aria-label={t.modules.home.openSpace}
+0811|                onClick={() => switchView("space")}
+0812|                title={user.email || t.nav.profile}
+0813|              >
+0814|                {user.user_metadata?.avatar_url ? (
+0815|                  <img
+0816|                    src={user.user_metadata.avatar_url}
+0817|                    alt={user.user_metadata?.full_name || trL(lang, "Profil", "Profile", "Perfil", "الملف الشخصي")}
+0818|                    className="w-full h-full object-cover rounded-full"
+0819|                  />
+0820|                ) : user.user_metadata?.full_name ? (
+0821|                  user.user_metadata.full_name[0].toUpperCase()
+0822|                ) : user.email ? (
+0823|                  user.email[0].toUpperCase()
+0824|                ) : (
+0825|                  "K"
+0826|                )}
+0827|              </button>
+0828|            ) : (
+0829|              <button
+0830|                type="button"
+0831|                onClick={handleGoogleLogin}
+0832|                className="google-login-btn"
+0833|                aria-label={trL(lang, "Se connecter avec Google", "Sign in with Google", "Iniciar sesión con Google", "تسجيل الدخول عبر Google")}
+0834|                title={trL(lang, "Se connecter avec Google", "Sign in with Google", "Iniciar sesión con Google", "تسجيل الدخول عبر Google")}
+0835|              >
+0836|                <svg className="google-icon" width="13" height="13" viewBox="0 0 24 24">
+0837|                  <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+0838|                  <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/>
+0839|                  <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.16 0 10.02 0 12s.45 3.84 1.25 5.42l4.03-3.15z"/>
+0840|                  <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+0841|                </svg>
+0842|                <span>{trL(lang, "Se connecter", "Sign in", "Iniciar sesión", "تسجيل الدخول")}</span>
+0843|              </button>
+0844|            )}
+0845|          </div>
+0846|        </header>
+0847|
+0848|        <div className="content-wrap">
+0849|          <section className="page-heading">
+0850|            <div>
+0851|              <div className="eyebrow">
+0852|                <span className="eyebrow-line" />
+0853|                {currentHeader.eyebrow}
+0854|              </div>
+0855|              <h1>{currentHeader.title}</h1>
+0856|              <p>{currentHeader.description}</p>
+0857|            </div>
+0858|            <div className="date-chip">
+0859|              <span className="date-sun">☼</span>
+0860|              <span>
+0861|                {new Intl.DateTimeFormat(getDateLocale(lang), {
+0862|                  weekday: "long",
+0863|                  day: "numeric",
+0864|                  month: "long",
+0865|                }).format(new Date())}
+0866|              </span>
+0867|            </div>
+0868|          </section>
 0869|
-0870|          {/* VUE 3 : CARNET DE PHRASES */}
-0871|          {view === "phrases" && (
-0872|            <PhrasesView
-0873|              search={search}
-0874|              searchInputRef={searchInputRef}
-0875|              setSearch={setSearch}
-0876|              category={category}
-0877|              setCategory={setCategory}
-0878|              categories={categories}
-0879|              phrases={filteredPhrases}
-0880|              favorites={safeFavorites}
-0881|              favoritesOnly={favoritesOnly}
-0882|              setFavoritesOnly={setFavoritesOnly}
-0883|              onFavorite={toggleFavorite}
-0884|              onPlay={playPhrase}
-0885|              onCopy={copyPhrase}
-0886|            />
-0887|          )}
-0888|
-0889|          {/* VUE 4 : RÉVISION SRS */}
-0890|          {view === "review" && (
-0891|            <ReviewView
-0892|              reviewIndex={reviewIndex}
-0893|              cardFlipped={cardFlipped}
-0894|              setCardFlipped={setCardFlipped}
-0895|              onGrade={gradeReview}
-0896|            />
-0897|          )}
-0898|
-0899|          {/* VUE 5 : MON ESPACE / PASSEPORT */}
-0900|          {view === "space" && (
-0901|            <SpaceView
-0902|              completedCount={completedCount}
-0903|              xp={xp}
-0904|              streak={streakDays}
-0905|              user={user}
-0906|              isPremium={isPremium}
-0907|              onReset={resetProgress}
-0908|              onOpenPaywall={() => setPricingSource("profile_upgrade")}
-0909|              onToast={showToast}
+0870|          {/* VUE 1 : AUJOURD'HUI */}
+0871|          {view === "today" && (
+0872|            <TodayView
+0873|              completedCount={completedCount}
+0874|              xp={xp}
+0875|              streak={streakDays}
+0876|              nextLesson={nextLesson}
+0877|              onStart={startLesson}
+0878|              onNavigate={switchView}
+0879|              onOpenRoleplay={() => setShowScenarioSelector(true)}
+0880|            />
+0881|          )}
+0882|
+0883|          {/* VUE 2 : MON PARCOURS */}
+0884|          {view === "path" && (
+0885|            <PathView
+0886|              completedLessons={completedLessons}
+0887|              onStart={startLesson}
+0888|              onOpenCheckpoint={(id, name) => setCheckpointOpen({ id, name })}
+0889|              onOpenPaywall={() => setPricingSource("module_locked")}
+0890|              isPremium={isPremium}
+0891|            />
+0892|          )}
+0893|
+0894|          {/* VUE 3 : CARNET DE PHRASES */}
+0895|          {view === "phrases" && (
+0896|            <PhrasesView
+0897|              search={search}
+0898|              searchInputRef={searchInputRef}
+0899|              setSearch={setSearch}
+0900|              category={category}
+0901|              setCategory={setCategory}
+0902|              categories={categories}
+0903|              phrases={filteredPhrases}
+0904|              favorites={safeFavorites}
+0905|              favoritesOnly={favoritesOnly}
+0906|              setFavoritesOnly={setFavoritesOnly}
+0907|              onFavorite={toggleFavorite}
+0908|              onPlay={playPhrase}
+0909|              onCopy={copyPhrase}
 0910|            />
 0911|          )}
 0912|
-0913|          <footer className="page-footer">
-0914|            <span>
-0915|              KENZA <span className="footer-arabic">كنزة</span>
-0916|            </span>
-0917|            <span>{trL(lang, "Apprendre une langue, c’est rencontrer des gens.", "Learning a language is meeting people.", "Aprender un idioma es conocer gente.", "تعلم اللغة لقاءٌ بالناس.")}</span>
-0918|            <button onClick={() => switchView("space")}>
-0919|              {trL(lang, "Passeport Culturel & Données", "Cultural passport & data", "Pasaporte cultural y datos", "الجواز الثقافي والبيانات")} <ArrowRight size={13} />
-0920|            </button>
-0921|          </footer>
-0922|        </div>
-0923|      </main>
-0924|
-0925|      {/* Mobile Bottom Navigation (Visible sous 900px) */}
-0926|      <nav className="mobile-bottom-nav" aria-label={tr("Navigation mobile", "Mobile navigation", "Navegación móvil", "التنقل على الهاتف")}>
-0927|        {navItems.map((item) => {
-0928|          const Icon = item.icon;
-0929|          return (
-0930|            <button
-0931|              key={item.id}
-0932|              onClick={() => switchView(item.id)}
-0933|              className={view === item.id ? "mobile-nav-active" : ""}
-0934|              aria-label={navLabel(item.id) || item.label}
-0935|              aria-current={view === item.id ? "page" : undefined}
-0936|            >
-0937|              <Icon size={19} />
-0938|              <span>
-0939|                {item.id === "today"
-0940|                  ? trL(lang, "Accueil", "Home", "Inicio", "الرئيسية")
-0941|                  : item.id === "path"
-0942|                  ? trL(lang, "Parcours", "Journey", "Recorrido", "المسار")
-0943|                  : item.id === "phrases"
-0944|                  ? trL(lang, "Phrases", "Phrases", "Frases", "العبارات")
-0945|                  : trL(lang, "Réviser", "Review", "Repasar", "مراجعة")}
-0946|              </span>
-0947|            </button>
-0948|          );
-0949|        })}
-0950|      </nav>
-0951|
-0952|      {/* Modale d'Exercice Manus */}
-0953|      {lessonId && activeLesson && activeQuestion && (
-0954|        <div
-0955|          className="modal-scrim"
-0956|          role="presentation"
-0957|          onMouseDown={(event) => {
-0958|            if (event.target === event.currentTarget) setLessonId(null);
-0959|          }}
-0960|        >
-0961|          <section className="lesson-modal" role="dialog" aria-modal="true" aria-labelledby="lesson-title">
-0962|            <div className="lesson-modal-top">
-0963|              <button onClick={() => setLessonId(null)} className="icon-button" aria-label={t.modules.home.closeLesson}>
-0964|                <ArrowLeft size={19} />
-0965|              </button>
-0966|              <div className="lesson-progress-label">
-0967|                <span>{trL(lang, "LEÇON", "LESSON", "LECCIÓN", "درس")} · {activeLesson.length.toUpperCase()}</span>
-0968|                <span>
-0969|                  {questionIndex + 1} / {activeLesson.questions.length}
-0970|                </span>
-0971|              </div>
-0972|              <button onClick={() => setLessonId(null)} className="icon-button" aria-label={tr("Quitter", "Leave", "Salir", "خروج")}>
-0973|                <X size={18} />
-0974|              </button>
-0975|            </div>
-0976|            <div className="lesson-progress-track">
-0977|              <span style={{ width: `${((questionIndex + 1) / activeLesson.questions.length) * 100}%` }} />
-0978|            </div>
-0979|            <div className="lesson-modal-body">
-0980|              <div className="lesson-kicker">
-0981|                <span className="lesson-kicker-icon">
-0982|                  <Languages size={16} />
-0983|                </span>{" "}
-0984|                {activeLesson.title}
-0985|              </div>
-0986|              <h2 id="lesson-title">{activeQuestion.prompt}</h2>
-0987|              <p className="lesson-helper">{activeQuestion.helper}</p>
-0988|              <div className="answer-list">
-0989|                {activeQuestion.options.map((option, index) => {
-0990|                  const isCorrect = selectedAnswer !== null && option === activeQuestion.answer;
-0991|                  const isWrong = selectedAnswer === option && !isCorrect;
-0992|                  const letter = String.fromCharCode(65 + index);
-0993|                  return (
-0994|                    <button
-0995|                      key={option}
-0996|                      onClick={() => {
-0997|                        if (!selectedAnswer) setSelectedAnswer(option);
-0998|                      }}
-0999|                      disabled={Boolean(selectedAnswer)}
-1000|                      className={`answer-option ${selectedAnswer === option ? "answer-selected" : ""} ${
-1001|                        isCorrect ? "answer-correct" : ""
-1002|                      } ${isWrong ? "answer-wrong" : ""}`}
-1003|                    >
-1004|                      <span className="answer-letter">{isCorrect ? <Check size={17} /> : letter}</span>
-1005|                      <span>{option}</span>
-1006|                      {isCorrect && <CheckCircle2 className="answer-check" size={19} />}
-1007|                    </button>
-1008|                  );
-1009|                })}
-1010|              </div>
-1011|              {selectedAnswer && (
-1012|                <div
-1013|                  className={`answer-feedback ${
-1014|                    selectedAnswer === activeQuestion.answer ? "feedback-good" : "feedback-try"
-1015|                  }`}
-1016|                >
-1017|                  <strong>
-1018|                    {selectedAnswer === activeQuestion.answer ? trL(lang, "Bien joué !", "Well done!", "¡Bien hecho!", "أحسنت!") : trL(lang, "Presque — retiens ceci.", "Almost — remember this.", "Casi — recuerda esto.", "تقريبًا — تذكر هذا.")}
-1019|                  </strong>
-1020|                  <span>{activeQuestion.note}</span>
-1021|                </div>
-1022|              )}
-1023|              <button
-1024|                className="primary-button lesson-next"
-1025|                onClick={advanceQuestion}
-1026|                disabled={!selectedAnswer}
-1027|              >
-1028|                {questionIndex === activeLesson.questions.length - 1 ? trL(lang, tr("Terminer la leçon", "Finish the lesson", "Terminar la lección", "أنهِ الدرس"), "Finish the lesson", "Terminar la lección", "أنهِ الدرس") : trL(lang, tr("Continuer", "Continue", "Continuar", "متابعة"), "Continue", "Continuar", "متابعة")}
-1029|                <ArrowRight size={17} />
-1030|              </button>
-1031|              <div className="local-note">
-1032|                <LockKeyhole size={13} /> {trL(lang, tr("Progression enregistrée en direct sur ton profil.", "Progress saved live to your profile.", "Progreso guardado en directo en tu perfil.", "تقدمك يُحفظ مباشرة في ملفك."), "Progress saved live to your profile.", "Progreso guardado en directo en tu perfil.", "تقدمك يُحفظ مباشرة في ملفك.")}
-1033|              </div>
-1034|            </div>
-1035|          </section>
-1036|        </div>
-1037|      )}
-1038|
-1039|      {/* Roleplay Scenario Selector */}
-1040|      {showScenarioSelector && (
-1041|        <ScenarioSelectorModal
-1042|          onClose={() => setShowScenarioSelector(false)}
-1043|          onSelectAi={(personaId) => {
-1044|            setActivePersonaId(personaId);
-1045|            setShowScenarioSelector(false);
-1046|          }}
-1047|          onRequirePremium={() => setPricingSource("roleplay_locked")}
-1048|          onStartSrs={() => {
-1049|            setShowScenarioSelector(false);
-1050|            setView("review");
-1051|          }}
-1052|        />
-1053|      )}
-1054|
-1055|      {/* Fullscreen Roleplay IA Persona View */}
-1056|      {activePersonaId && (
-1057|        <div className="fixed inset-0 z-50 bg-[#FDFCF8] flex flex-col">
-1058|          <AiRoleplayView
-1059|            personaId={activePersonaId}
-1060|            onClose={() => setActivePersonaId(null)}
-1061|          />
-1062|        </div>
-1063|      )}
-1064|
-1065|      {/* Checkpoint Modal */}
-1066|      {checkpointOpen && (
-1067|        <CheckpointModal
-1068|          levelId={checkpointOpen.id}
-1069|          levelName={checkpointOpen.name}
-1070|          onClose={() => setCheckpointOpen(null)}
-1071|        />
-1072|      )}
-1073|
-1074|      {/* Paywall Modal */}
-1075|      {pricingSource && (
-1076|        <PaywallModal
-1077|          onClose={() => setPricingSource(null)}
-1078|          source={pricingSource}
-1079|        />
-1080|      )}
-1081|
-1082|      {/* Toast Notification */}
-1083|      {toast && (
-1084|        <div className="toast-message" role="status" aria-live="polite">
-1085|          <span className="toast-check">
-1086|            <Check size={15} />
-1087|          </span>
-1088|          {toast}
-1089|          <button aria-label={tr("Fermer", "Close", "Cerrar", "إغلاق")} onClick={() => setToast("")}>
-1090|            <X size={15} />
-1091|          </button>
-1092|        </div>
-1093|      )}
-1094|
-1095|      <InstallPwaBanner />
-1096|    </div>
-1097|  );
-1098|}
-1099|
-1100|// -------------------------------------------------------------
-1101|// Composant 1 : TodayView
-1102|// -------------------------------------------------------------
-1103|function TodayView({
-1104|  completedCount,
-1105|  xp,
-1106|  streak,
-1107|  nextLesson,
-1108|  onStart,
-1109|  onNavigate,
-1110|  onOpenRoleplay,
-1111|}: {
-1112|  completedCount: number;
-1113|  xp: number;
-1114|  streak: number;
-1115|  nextLesson: Lesson;
-1116|  onStart: (id: string) => void;
-1117|  onNavigate: (view: View) => void;
-1118|  onOpenRoleplay: () => void;
-1119|}) {
-1120|  const { t } = useTranslation();
-1121|  const { lang, lessons } = useLocalizedContent();
-1122|  const totalLessons = lessons.length;
-1123|
-1124|  return (
-1125|    <>
-1126|      <div className="today-grid">
-1127|        <article className="hero-panel">
-1128|          <div className="hero-texture" />
-1129|          <div className="hero-copy">
-1130|            <span className="hero-kicker">
-1131|              <Sparkles size={14} /> {trL(lang, "TON PETIT MOMENT DARIJA", "YOUR LITTLE DARIJA MOMENT", "TU MOMENTO DARIJA", "لحظتك مع الدارجة")}
-1132|            </span>
-1133|            <h2>
-1134|              {trL(lang, "La darija", "Darija", "La darija", "الدارجة")}
-1135|              <br />
-1136|              {trL(lang, "s’ouvre à toi.", "opens up to you.", "se abre a ti.", "تنفتح عليك.")}
-1137|            </h2>
-1138|            <p>{trL(lang, "Une phrase, une rencontre, une autre façon de voir le Maroc.", "A phrase, an encounter, another way to see Morocco.", "Una frase, un encuentro, otra forma de ver Marruecos.", "عبارة، لقاء، وطريقة أخرى لرؤية المغرب.")}</p>
-1139|            <button className="hero-button" onClick={() => onStart(nextLesson.id)}>
-1140|              {trL(lang, "Continuer à apprendre", "Keep learning", "Seguir aprendiendo", "واصل التعلم")} <ArrowRight size={16} />
-1141|            </button>
-1142|            <div className="hero-footnote">
-1143|              <span className="hero-foot-line" /> {trL(lang, "À ton rythme, toujours.", "At your pace, always.", "A tu ritmo, siempre.", "على إيقاعك، دائماً.")}
-1144|            </div>
-1145|          </div>
-1146|          <div className="hero-image-wrap" aria-hidden="true">
-1147|            <img
-1148|              className="hero-image"
-1149|              src="/manus-storage/kenza-hero_99e35384.jpg"
-1150|              alt={tr("Maroc médina", "Moroccan medina", "Medina de Marruecos", "مدينة مغربية")}
-1151|            />
-1152|            <div className="hero-image-wash" />
-1153|            <div className="hero-image-caption">
-1154|              <span>دَارِيجة</span>
-1155|              <small>{trL(lang, "darija, la langue du lien", "darija, the language of connection", "darija, la lengua del vínculo", "الدارجة، لغة التواصل")}</small>
-1156|            </div>
-1157|          </div>
-1158|          <div className="hero-medallion" aria-hidden="true">
-1159|            <span>مرحبا</span>
-1160|            <small>marhba</small>
-1161|          </div>
-1162|        </article>
-1163|
-1164|        <article className="next-card">
-1165|          <div className="next-card-head">
-1166|            <span className="mini-kicker">{trL(lang, "TA PROCHAINE ÉTAPE", "YOUR NEXT STEP", "TU PRÓXIMO PASO", "خطوتك التالية")}</span>
-1167|            <span className="next-icon">
-1168|              <ArrowDownRight size={17} />
-1169|            </span>
-1170|          </div>
-1171|          <div className="lesson-number">
-1172|            0{Math.min(completedCount + 1, totalLessons)}{" "}
-1173|            <span>/ 0{totalLessons}</span>
-1174|          </div>
-1175|          <div className="next-illustration">
-1176|            <img
-1177|              className="next-photo"
-1178|              src="/manus-storage/kenza-market_a0db8277.jpg"
-1179|              alt={t.modules.home.imgMintTea}
-1180|            />
-1181|            <div className="cup-shadow" />
-1182|            <div className="tea-cup">
-1183|              <span />
-1184|              <i />
-1185|            </div>
-1186|            <div className="tea-steam steam-one" />
-1187|            <div className="tea-steam steam-two" />
-1188|            <div className="tea-leaf leaf-one" />
-1189|            <div className="tea-leaf leaf-two" />
-1190|          </div>
-1191|          <div className="next-card-copy">
-1192|            <span className="lesson-pill">{trL(lang, "LEÇON SUIVANTE", "NEXT LESSON", "PRÓXIMA LECCIÓN", "الدرس التالي")} · {nextLesson.length}</span>
-1193|            <h3>{nextLesson.title}</h3>
-1194|            <p>{nextLesson.subtitle}</p>
-1195|          </div>
-1196|          <button className="text-link" onClick={() => onStart(nextLesson.id)}>
-1197|            {trL(lang, "C’est parti", "Let’s go", "¡Vamos!", "هيا بنا")} <ArrowRight size={15} />
-1198|          </button>
-1199|        </article>
-1200|      </div>
+0913|          {/* VUE 4 : RÉVISION SRS */}
+0914|          {view === "review" && (
+0915|            <ReviewView
+0916|              reviewIndex={reviewIndex}
+0917|              cardFlipped={cardFlipped}
+0918|              setCardFlipped={setCardFlipped}
+0919|              onGrade={gradeReview}
+0920|            />
+0921|          )}
+0922|
+0923|          {/* VUE 5 : MON ESPACE / PASSEPORT */}
+0924|          {view === "space" && (
+0925|            <SpaceView
+0926|              completedCount={completedCount}
+0927|              xp={xp}
+0928|              streak={streakDays}
+0929|              user={user}
+0930|              isPremium={isPremium}
+0931|              onReset={resetProgress}
+0932|              onOpenPaywall={() => setPricingSource("profile_upgrade")}
+0933|              onToast={showToast}
+0934|            />
+0935|          )}
+0936|
+0937|          <footer className="page-footer">
+0938|            <span>
+0939|              KENZA <span className="footer-arabic">كنزة</span>
+0940|            </span>
+0941|            <span>{trL(lang, "Apprendre une langue, c’est rencontrer des gens.", "Learning a language is meeting people.", "Aprender un idioma es conocer gente.", "تعلم اللغة لقاءٌ بالناس.")}</span>
+0942|            <button onClick={() => switchView("space")}>
+0943|              {trL(lang, "Passeport Culturel & Données", "Cultural passport & data", "Pasaporte cultural y datos", "الجواز الثقافي والبيانات")} <ArrowRight size={13} />
+0944|            </button>
+0945|          </footer>
+0946|        </div>
+0947|      </main>
+0948|
+0949|      {/* Mobile Bottom Navigation (Visible sous 900px) */}
+0950|      <nav className="mobile-bottom-nav" aria-label={tr("Navigation mobile", "Mobile navigation", "Navegación móvil", "التنقل على الهاتف")}>
+0951|        {navItems.map((item) => {
+0952|          const Icon = item.icon;
+0953|          return (
+0954|            <button
+0955|              key={item.id}
+0956|              onClick={() => switchView(item.id)}
+0957|              className={view === item.id ? "mobile-nav-active" : ""}
+0958|              aria-label={navLabel(item.id) || item.label}
+0959|              aria-current={view === item.id ? "page" : undefined}
+0960|            >
+0961|              <Icon size={19} />
+0962|              <span>
+0963|                {item.id === "today"
+0964|                  ? trL(lang, "Accueil", "Home", "Inicio", "الرئيسية")
+0965|                  : item.id === "path"
+0966|                  ? trL(lang, "Parcours", "Journey", "Recorrido", "المسار")
+0967|                  : item.id === "phrases"
+0968|                  ? trL(lang, "Phrases", "Phrases", "Frases", "العبارات")
+0969|                  : trL(lang, "Réviser", "Review", "Repasar", "مراجعة")}
+0970|              </span>
+0971|            </button>
+0972|          );
+0973|        })}
+0974|      </nav>
+0975|
+0976|      {/* Modale d'Exercice Manus */}
+0977|      {lessonId && activeLesson && activeQuestion && (
+0978|        <div
+0979|          className="modal-scrim"
+0980|          role="presentation"
+0981|          onMouseDown={(event) => {
+0982|            if (event.target === event.currentTarget) setLessonId(null);
+0983|          }}
+0984|        >
+0985|          <section className="lesson-modal" role="dialog" aria-modal="true" aria-labelledby="lesson-title">
+0986|            <div className="lesson-modal-top">
+0987|              <button onClick={() => setLessonId(null)} className="icon-button" aria-label={t.modules.home.closeLesson}>
+0988|                <ArrowLeft size={19} />
+0989|              </button>
+0990|              <div className="lesson-progress-label">
+0991|                <span>{trL(lang, "LEÇON", "LESSON", "LECCIÓN", "درس")} · {activeLesson.length.toUpperCase()}</span>
+0992|                <span>
+0993|                  {questionIndex + 1} / {activeLesson.questions.length}
+0994|                </span>
+0995|              </div>
+0996|              <button onClick={() => setLessonId(null)} className="icon-button" aria-label={tr("Quitter", "Leave", "Salir", "خروج")}>
+0997|                <X size={18} />
+0998|              </button>
+0999|            </div>
+1000|            <div className="lesson-progress-track">
+1001|              <span style={{ width: `${((questionIndex + 1) / activeLesson.questions.length) * 100}%` }} />
+1002|            </div>
+1003|            <div className="lesson-modal-body">
+1004|              <div className="lesson-kicker">
+1005|                <span className="lesson-kicker-icon">
+1006|                  <Languages size={16} />
+1007|                </span>{" "}
+1008|                {activeLesson.title}
+1009|              </div>
+1010|              <h2 id="lesson-title">{activeQuestion.prompt}</h2>
+1011|              <p className="lesson-helper">{activeQuestion.helper}</p>
+1012|              <div className="answer-list">
+1013|                {activeQuestion.options.map((option, index) => {
+1014|                  const isCorrect = selectedAnswer !== null && option === activeQuestion.answer;
+1015|                  const isWrong = selectedAnswer === option && !isCorrect;
+1016|                  const letter = String.fromCharCode(65 + index);
+1017|                  return (
+1018|                    <button
+1019|                      key={option}
+1020|                      onClick={() => {
+1021|                        if (!selectedAnswer) setSelectedAnswer(option);
+1022|                      }}
+1023|                      disabled={Boolean(selectedAnswer)}
+1024|                      className={`answer-option ${selectedAnswer === option ? "answer-selected" : ""} ${
+1025|                        isCorrect ? "answer-correct" : ""
+1026|                      } ${isWrong ? "answer-wrong" : ""}`}
+1027|                    >
+1028|                      <span className="answer-letter">{isCorrect ? <Check size={17} /> : letter}</span>
+1029|                      <span>{option}</span>
+1030|                      {isCorrect && <CheckCircle2 className="answer-check" size={19} />}
+1031|                    </button>
+1032|                  );
+1033|                })}
+1034|              </div>
+1035|              {selectedAnswer && (
+1036|                <div
+1037|                  className={`answer-feedback ${
+1038|                    selectedAnswer === activeQuestion.answer ? "feedback-good" : "feedback-try"
+1039|                  }`}
+1040|                >
+1041|                  <strong>
+1042|                    {selectedAnswer === activeQuestion.answer ? trL(lang, "Bien joué !", "Well done!", "¡Bien hecho!", "أحسنت!") : trL(lang, "Presque — retiens ceci.", "Almost — remember this.", "Casi — recuerda esto.", "تقريبًا — تذكر هذا.")}
+1043|                  </strong>
+1044|                  <span>{activeQuestion.note}</span>
+1045|                </div>
+1046|              )}
+1047|              <button
+1048|                className="primary-button lesson-next"
+1049|                onClick={advanceQuestion}
+1050|                disabled={!selectedAnswer}
+1051|              >
+1052|                {questionIndex === activeLesson.questions.length - 1 ? trL(lang, tr("Terminer la leçon", "Finish the lesson", "Terminar la lección", "أنهِ الدرس"), "Finish the lesson", "Terminar la lección", "أنهِ الدرس") : trL(lang, tr("Continuer", "Continue", "Continuar", "متابعة"), "Continue", "Continuar", "متابعة")}
+1053|                <ArrowRight size={17} />
+1054|              </button>
+1055|              <div className="local-note">
+1056|                <LockKeyhole size={13} /> {trL(lang, tr("Progression enregistrée en direct sur ton profil.", "Progress saved live to your profile.", "Progreso guardado en directo en tu perfil.", "تقدمك يُحفظ مباشرة في ملفك."), "Progress saved live to your profile.", "Progreso guardado en directo en tu perfil.", "تقدمك يُحفظ مباشرة في ملفك.")}
+1057|              </div>
+1058|            </div>
+1059|          </section>
+1060|        </div>
+1061|      )}
+1062|
+1063|      {/* Roleplay Scenario Selector */}
+1064|      {showScenarioSelector && (
+1065|        <ScenarioSelectorModal
+1066|          onClose={() => setShowScenarioSelector(false)}
+1067|          onSelectAi={(personaId) => {
+1068|            setActivePersonaId(personaId);
+1069|            setShowScenarioSelector(false);
+1070|          }}
+1071|          onRequirePremium={() => setPricingSource("roleplay_locked")}
+1072|          onStartSrs={() => {
+1073|            setShowScenarioSelector(false);
+1074|            setView("review");
+1075|          }}
+1076|        />
+1077|      )}
+1078|
+1079|      {/* Fullscreen Roleplay IA Persona View */}
+1080|      {activePersonaId && (
+1081|        <div className="fixed inset-0 z-50 bg-[#FDFCF8] flex flex-col">
+1082|          <AiRoleplayView
+1083|            personaId={activePersonaId}
+1084|            onClose={() => setActivePersonaId(null)}
+1085|          />
+1086|        </div>
+1087|      )}
+1088|
+1089|      {/* Checkpoint Modal */}
+1090|      {checkpointOpen && (
+1091|        <CheckpointModal
+1092|          levelId={checkpointOpen.id}
+1093|          levelName={checkpointOpen.name}
+1094|          onClose={() => setCheckpointOpen(null)}
+1095|        />
+1096|      )}
+1097|
+1098|      {/* Paywall Modal */}
+1099|      {pricingSource && (
+1100|        <PaywallModal
+1101|          onClose={() => setPricingSource(null)}
+1102|          source={pricingSource}
+1103|        />
+1104|      )}
+1105|
+1106|      {/* Toast Notification */}
+1107|      {toast && (
+1108|        <div className="toast-message" role="status" aria-live="polite">
+1109|          <span className="toast-check">
+1110|            <Check size={15} />
+1111|          </span>
+1112|          {toast}
+1113|          <button aria-label={tr("Fermer", "Close", "Cerrar", "إغلاق")} onClick={() => setToast("")}>
+1114|            <X size={15} />
+1115|          </button>
+1116|        </div>
+1117|      )}
+1118|
+1119|      {savePromptVariant && (
+1120|        <div className="fixed inset-x-0 bottom-24 sm:bottom-8 z-40 flex justify-center px-4">
+1121|          <div className="w-full max-w-sm">
+1122|            <SaveProgressCard
+1123|              variant={savePromptVariant}
+1124|              lessonsCompleted={completedCount}
+1125|              onSave={() => {
+1126|                track("cta_click", { cta: "save_progress" }, `/${view}`);
+1127|                setAuthMode("signup");
+1128|                setSavePromptHidden(true);
+1129|              }}
+1130|              onLater={() => {
+1131|                dismissSavePrompt(completedCount);
+1132|                setSavePromptHidden(true);
+1133|              }}
+1134|            />
+1135|          </div>
+1136|        </div>
+1137|      )}
+1138|
+1139|      {authMode && (
+1140|        <AuthModal
+1141|          key={authMode}
+1142|          isOpen
+1143|          initialMode={authMode}
+1144|          onClose={() => setAuthMode(null)}
+1145|          onSuccess={() => setAuthMode(null)}
+1146|        />
+1147|      )}
+1148|
+1149|      <InstallPwaBanner />
+1150|    </div>
+1151|  );
+1152|}
+1153|
+1154|// -------------------------------------------------------------
+1155|// Composant 1 : TodayView
+1156|// -------------------------------------------------------------
+1157|function TodayView({
+1158|  completedCount,
+1159|  xp,
+1160|  streak,
+1161|  nextLesson,
+1162|  onStart,
+1163|  onNavigate,
+1164|  onOpenRoleplay,
+1165|}: {
+1166|  completedCount: number;
+1167|  xp: number;
+1168|  streak: number;
+1169|  nextLesson: Lesson;
+1170|  onStart: (id: string) => void;
+1171|  onNavigate: (view: View) => void;
+1172|  onOpenRoleplay: () => void;
+1173|}) {
+1174|  const { t } = useTranslation();
+1175|  const { lang, lessons } = useLocalizedContent();
+1176|  const totalLessons = lessons.length;
+1177|
+1178|  return (
+1179|    <>
+1180|      <div className="today-grid">
+1181|        <article className="hero-panel">
+1182|          <div className="hero-texture" />
+1183|          <div className="hero-copy">
+1184|            <span className="hero-kicker">
+1185|              <Sparkles size={14} /> {trL(lang, "TON PETIT MOMENT DARIJA", "YOUR LITTLE DARIJA MOMENT", "TU MOMENTO DARIJA", "لحظتك مع الدارجة")}
+1186|            </span>
+1187|            <h2>
+1188|              {trL(lang, "La darija", "Darija", "La darija", "الدارجة")}
+1189|              <br />
+1190|              {trL(lang, "s’ouvre à toi.", "opens up to you.", "se abre a ti.", "تنفتح عليك.")}
+1191|            </h2>
+1192|            <p>{trL(lang, "Une phrase, une rencontre, une autre façon de voir le Maroc.", "A phrase, an encounter, another way to see Morocco.", "Una frase, un encuentro, otra forma de ver Marruecos.", "عبارة، لقاء، وطريقة أخرى لرؤية المغرب.")}</p>
+1193|            <button className="hero-button" onClick={() => onStart(nextLesson.id)}>
+1194|              {trL(lang, "Continuer à apprendre", "Keep learning", "Seguir aprendiendo", "واصل التعلم")} <ArrowRight size={16} />
+1195|            </button>
+1196|            <div className="hero-footnote">
+1197|              <span className="hero-foot-line" /> {trL(lang, "À ton rythme, toujours.", "At your pace, always.", "A tu ritmo, siempre.", "على إيقاعك، دائماً.")}
+1198|            </div>
+1199|          </div>
+1200|          <div className="hero-image-wrap" aria-hidden="true">

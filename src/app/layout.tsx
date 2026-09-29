@@ -3,6 +3,7 @@ import "./globals.css";
 import I18nProvider from '../components/I18nProvider';
 import NetworkStatus from '../components/NetworkStatus';
 import DirSync from '../components/DirSync';
+import TrackingProvider from '../components/TrackingProvider';
 
 export const metadata: Metadata = {
   title: "KENZA - Apprendre la Darija Marocaine de A à Z",
@@ -29,7 +30,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <DirSync />
         <I18nProvider>
           <NetworkStatus />
-          {children}
+          <TrackingProvider>
+            {children}
+          </TrackingProvider>
         </I18nProvider>
       </body>
     </html>

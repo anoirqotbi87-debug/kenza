@@ -82,7 +82,7 @@ export const useAppStore = create<AppState>()(
       audioSpeed: 1.0,
       uiLanguage: 'fr',
       regionalVariant: 'casablanca',
-      devUnlockAll: false, // Prod: locked progression
+      devUnlockAll: process.env.NEXT_PUBLIC_DEV_UNLOCK_ALL === 'true', // Prod : verrouille ; en local : NEXT_PUBLIC_DEV_UNLOCK_ALL=true
       
       hasCompletedOnboarding: false,
       userGoal: null,
@@ -269,7 +269,12 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'darija-quest-storage',
-      version: 2,
+      version: 3,
+      partialize: (state: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { devUnlockAll, ...rest } = state;
+        return rest;
+      },
       migrate: (persistedState: any, version: number) => {
         if (version < 2) {
           if (persistedState.srsDeck) {
@@ -281,6 +286,9 @@ export const useAppStore = create<AppState>()(
               persistedState.srsDeck = {};
             }
           }
+        }
+        if (version < 3 && persistedState) {
+          delete persistedState.devUnlockAll;
         }
         return persistedState;
       }
