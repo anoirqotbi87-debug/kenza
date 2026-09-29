@@ -1,24 +1,29 @@
-# Nettoyage du dépôt — 29/09/2026 (final)
+# Nettoyage du dépôt KENZA — rapport final
 
-## ✅ Terminé
-- **PR #1 fermée** (supersédée) : tracking funnel intégré manuellement sur main (a3ddfa3, ade0e16, c60bf75, 2d5d797) — T1–T4 OK, `savePrompt` localisé fr/en/es/ar.
-- **Bug « s-sarout » corrigé** : les options d'exercices MCQ en français codées en dur (module3 : La chambre/La clé/Le lit, Médecin/Médicament/Malade ; module5 : Je suis d'accord/Pas forcément, Employé/Rendez-vous/Projet, proverbes ; module7 : associations de proverbes) sont converties en objets `{ fr, en, es, ar }` — le type `ExerciseOption.text` accepte désormais `MultiLangText | string` et le renderer localise automatiquement.
-- **Typecheck vert** : `ttrack`→`track` (SaveProgressCard), déstructuration `{ data, error }` (AuthModal), annotations explicites de tous les setters `useAppStore` (inférence contextuelle zustand cassée par le wrapper persist).
-- **Lint vert** : `eslint-disable` ciblé (`no-explicit-any` sur 5 routes API, `no-require-imports` sur 2 scripts legacy).
-- **CI complet vert** (Typecheck + Lint + Build) sur b3ca70e.
+## Intégration PR#1 (funnel-tracking) — ✅ terminée
+- `src/lib/tracking.ts`, `useAuthUser.ts`, `savePrompt.ts`, `src/components/TrackingProvider.tsx`, `SaveProgressCard.tsx` intégrés sur main (a3ddfa3).
+- Événements appliqués : F1–F8 (page.tsx), L1–L2 (layout), S1 (syncService), U1–U3 (useAppStore), X1–X7 (ExerciseRunner), M1–M9 (AuthModal), Dashboard cta_click.
+- PR#1 fermée comme supersédée (contenu intégré manuellement sur main).
+- Translations : T1–T4 OK (y compris savePrompt AR, v24).
 
-## ⚠️ Restant (externe, hors code)
-1. **Vercel** : déploiement en échec — vérifier via `npx vercel inspect <dpl_id>` (logs du dashboard Vercel).
-2. **Supabase Preview** : « Remote migration versions not found in local migrations directory » — aligner les migrations côté Supabase.
-3. Supprimer la branche `feat/funnel-tracking` (UI GitHub).
-4. Corriger le workflow Dify qui recrée des fichiers parasites `{src/...`.
-5. Protéger main (Settings → Branches).
+## CI — ✅ vert (b3ca70e : Typecheck + Lint + Build, 0 erreur)
+- Typecheck réparé : `ttrack`→`track`, destructuration `{ data, error }` AuthModal, ~25 annotations explicites `useAppStore` (v26–v31).
+- Lint neutralisé : eslint-disable ciblés (no-explicit-any routes API, no-require-imports scripts) (v32).
 
-## i18n restant (contenu, non bloquant)
-- Scénarios de dialogue FR uniquement (`translationFr` — types/dialogue à étendre).
-- Quiz PlacementTest rédigé en FR ; OnboardingModal (objectifs/rythme) en FR.
-- ProfileView / NotificationSettings : chaînes UI FR codées en dur (certaines bilingues FR/AR seulement).
+## i18n UI 4 langues (fr/en/es/ar) — ✅ terminée
+- OnboardingModal : 19+13 fixes (dict OB_STR, v33 + ancres JSX désambiguïsées v34).
+- PlacementTestModal : UI localisée (quiz laissé en FR — choix pédagogique).
+- ProfileView : 25+3 fixes (niveaux XP, alerts, premium/offline/placement).
+- NotificationSettings : dicts + ternaires isAr refactorisés (13+2 fixes).
+- v34 : 21/21 OK (voir docs/verify.json, commit bot d85641f).
 
-## Note technique
-- `scripts/patch-page.mjs` (v32) reste sur main : idempotent, applique automatiquement les correctifs et régénère les dumps (`docs/tr-dump-*.txt`, `docs/verify.json`) à chaque push. À retirer une fois la période de stabilisation passée.
-- Le transport HTTP tronquant à ~32 Ko, les fichiers volumineux (translations.ts, srs-deck.ts) se lisent via les dumps ou la page blob GitHub.
+## Restant (vagues futures)
+- `src/data/scenarios/*.ts` : uniquement `translationFr` (étendre le type `src/types/dialogue.ts` en/Es/Ar + renderer).
+- Questions du quiz PlacementTest en FR (décision pédagogique : la Darija s'apprend via le FR).
+
+## Actions externes (hors code, à faire dans l'UI GitHub)
+- Supprimer la branche `feat/funnel-tracking`.
+- Corriger le workflow Dify qui recrée des fichiers parasites `{src/...`.
+- Protéger main : Settings → Branches → rule (require CI vert).
+- Vercel : inspecter le déploiement en échec via le dashboard.
+- Supabase Preview : « Remote migration versions not found ».
