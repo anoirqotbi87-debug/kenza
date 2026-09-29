@@ -67,7 +67,7 @@ export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
       user: null,
-      setUser: (user) => set({ user }),
+      setUser: (user: AppState['user']) => set({ user }),
       xp: 0,
       streakDays: 1,
       streakFreezes: 1,
@@ -89,12 +89,12 @@ export const useAppStore = create<AppState>()(
       dailyTargetMinutes: null,
       isPremium: false,
       
-      completeOnboarding: (goal, minutes) => set({
+      completeOnboarding: (goal: AppState['userGoal'], minutes: AppState['dailyTargetMinutes']) => set({
         hasCompletedOnboarding: true,
         userGoal: goal,
         dailyTargetMinutes: minutes
       }),
-      setIsPremium: (isPremium) => set({ isPremium }),
+      setIsPremium: (isPremium: boolean) => set({ isPremium }),
       
       toggleDevUnlockAll: () => set((state) => ({ devUnlockAll: !state.devUnlockAll })),
       setRegionalVariant: (variant) => set({ regionalVariant: variant }),

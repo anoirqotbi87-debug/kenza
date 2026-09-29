@@ -63,7 +63,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 'l
 
     try {
       track('signup_started', { method: 'email' }, '/auth');
-      const { error } = await signUpWithTracking(email, password, { username: email.split('@')[0] });
+      const { data, error } = await signUpWithTracking(email, password, { username: email.split('@')[0] });
       if (error) {
         track('signup_failed', { method: 'email', error: error.message?.slice(0, 200) }, '/auth');
         throw error;
