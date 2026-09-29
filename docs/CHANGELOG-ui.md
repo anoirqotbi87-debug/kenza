@@ -1,11 +1,5 @@
-# UI changelog
- 2026-09-29: i18n contenu principal (v7→v12) - 77980e2 (bot, v12): tr() helper module-level (useAppStore.getState) — fix scope errors - 2a75d4e (bot, v9): réparation translations.ts - 2916e53 (bot, v8): 70 chaînes tr() dans page.tsx
 
-## v13 — i18n contenu étendu (2026-09-28)
-- Mode `str` : valeurs de l'objet `headerTitle` enveloppées dans tr().
-- Mode `node` : 10 chaînes hero/nav traduites.
-- Nettoyage : suppression du fichier parasite `{src/app/api/roleplay/chat/route.ts` (commit Dify a1cb4c3).
-
-## v14 — after/mid/multi modes (2026-09-28)
-- Modes after/mid/multi pour les formes JSX non-standards : hero h2 multi-lignes, kicker Sparkles, boutons CTA avec ArrowRight.
-- Bot 481cccc : 10 lignes traduites supplémentaires.
+## v15 — formes JSX non matchées + données leçon (2026-09-29)
+- Correction des entrées jamais appliquées : Voir mon espace, Voir le parcours, Vocabulaire essentiel, Cartes du jour, Au café en taxi (mode mid) ; rythme régulier, darija la langue du lien (node) ; POUR AUJOURD’HUI, jour, LEÇON SUIVANTE (raw) ; Ton carnet/de phrases, Faire une/petite révision, Mises en/situation (multi).
+- Données : titre + sous-titre de la leçon 1 traduits (str).
+- v15.1 : rapport docs/verify.json — 21/21 checks OK, 94 appels tr().
