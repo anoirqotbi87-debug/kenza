@@ -49,8 +49,7 @@ CREATE OR REPLACE FUNCTION public.sync_user_progress(
 )
 RETURNS void AS $$
 DECLARE
-  current_xp integ
-er;
+  current_xp integer;
 BEGIN
   -- Verify caller
   IF auth.uid() IS NULL THEN

@@ -15,9 +15,11 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
 CREATE POLICY "Users can view own profile" 
   ON public.profiles FOR SELECT USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 CREATE POLICY "Users can update own profile" 
   ON public.profiles FOR UPDATE USING (auth.uid() = id);
 
@@ -51,17 +53,18 @@ CREATE TABLE IF NOT EXISTS public.lesson_progress (
 
 ALTER TABLE public.lesson_progress ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own lesson progress" ON public.lesson_progress;
 CREATE POLICY "Users can view own lesson progress" 
   ON public.lesson_progress FOR SELECT USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update own lesson progress" ON public.lesson_progress;
 CREATE POLICY "Users can update own lesson progress" 
   ON public.lesson_progress FOR ALL USING (auth.uid() = user_id);
 
 
 -- 3. SRS Items Table (Vocabulary)
 CREATE TABLE IF NOT EXISTS public.srs_items (
-  user_id UUID REFERENCES auth.
-users(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   word_id TEXT NOT NULL,
   interval INTEGER DEFAULT 0,
   repetition INTEGER DEFAULT 0,
@@ -73,9 +76,11 @@ users(id) ON DELETE CASCADE,
 
 ALTER TABLE public.srs_items ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own SRS items" ON public.srs_items;
 CREATE POLICY "Users can view own SRS items" 
   ON public.srs_items FOR SELECT USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update own SRS items" ON public.srs_items;
 CREATE POLICY "Users can update own SRS items" 
   ON public.srs_items FOR ALL USING (auth.uid() = user_id);
 
@@ -92,8 +97,10 @@ CREATE TABLE IF NOT EXISTS public.user_checkpoints (
 
 ALTER TABLE public.user_checkpoints ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own checkpoints" ON public.user_checkpoints;
 CREATE POLICY "Users can view own checkpoints" 
   ON public.user_checkpoints FOR SELECT USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update own checkpoints" ON public.user_checkpoints;
 CREATE POLICY "Users can update own checkpoints" 
   ON public.user_checkpoints FOR ALL USING (auth.uid() = user_id);
