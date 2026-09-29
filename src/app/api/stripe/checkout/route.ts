@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe, PRICING_CONFIG } from '@/lib/stripe';
 import { createClient } from '@supabase/supabase-js';

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { streamText } from 'ai';
 import { google } from '@ai-sdk/google';
 import { getSystemPrompt, PersonaId } from '@/lib/ai/prompts';
