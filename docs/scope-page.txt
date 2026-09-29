@@ -1,1438 +1,1966 @@
-trLines: 592,621,627,630,633,643,653,663,666,801,900,1119,1147,1193,1206,1233,1245,1260,1275,1297,1301,1344,1355,1433,1474,1475,1481,1577,1641,1642,1752,1757,1761,1765,1769,1780,1781,1790,1845,1863,1868,1874,1879,1885,1890,1901,1902,1926,1927,1942,1943,1944
-513|    playAudio(darija || "", arabic || "", true);
-514|    showToast("Prononciation audio de la phrase.");
-515|  };
-516|
-517|  const copyPhrase = async (phrase: Phrase) => {
-518|    try {
-519|      const text = `${phrase.darija || ""} ${phrase.arabic ? `(${phrase.arabic})` : ""} — ${phrase.meaning || ""}`.trim();
-520|      await navigator.clipboard.writeText(text);
-521|      showToast("Phrase copiée dans le presse-papiers.");
-522|    } catch {
-523|      showToast("Copie indisponible.");
-524|    }
-525|  };
-526|
-527|  const gradeReview = (grade: "again" | "hard" | "good" | "easy") => {
-528|    const award = grade === "easy" ? 5 : grade === "good" ? 3 : grade === "hard" ? 2 : 1;
-529|    addXp(award);
-530|    setCardFlipped(false);
-531|    setReviewIndex((current) => current + 1);
-532|    showToast(
-533|      `Noté : ${grade === "again" ? "à revoir" : grade === "hard" ? "difficile" : grade === "good" ? "bien" : "facile"} · +${award} XP`
-534|    );
-535|  };
-536|
-537|  const resetProgress = () => {
-538|    const confirmed = window.confirm("Effacer la progression locale sur cet appareil ?");
-539|    if (!confirmed) return;
-540|    resetData();
-541|    localStorage.removeItem("kenza_favorites");
-542|    setFavorites([]);
-543|    showToast("Progression locale réinitialisée.");
-544|  };
-545|
-546|  const switchView = (next: View) => {
-547|    setView(next);
-548|    setMobileMenuOpen(false);
-549|  };
-550|
-551|  const headerTitle: Record<View, { eyebrow: string; title: string; description: string }> = {
-552|    today: {
-553|      eyebrow: "TON ESPACE D’APPRENTISSAGE",
-554|      title: "Salam, on s’y remet ?",
-555|      description: "Un petit pas en darija aujourd’hui, une grande porte ouverte demain.",
-556|    },
-557|    path: {
-558|      eyebrow: "LE CHEMIN SE FAIT EN PARLANT",
-559|      title: "Ton parcours",
-560|      description: "Des premiers mots aux conversations qui te ressemblent.",
-561|    },
-562|    phrases: {
-563|      eyebrow: "LES MOTS QUI RAPPROCHENT",
-564|      title: "Ton carnet de phrases",
-565|      description: "Des expressions utiles, vivantes, prêtes à t’accompagner.",
-566|    },
-567|    review: {
-568|      eyebrow: "ANCRER, SANS SE PRESSER",
-569|      title: "Révision du jour",
-570|      description: "Quelques cartes bien choisies pour laisser les mots s’installer.",
-571|    },
-572|    space: {
-573|      eyebrow: "UN ESPACE À TOI",
-574|      title: "Mon espace & Passeport",
-575|      description: "Ta progression et tes visas officiels, sous ton contrôle.",
-576|    },
-577|  };
-578|
-579|  const currentHeader = headerTitle[view];
-580|
-581|  return (
-582|    <div className="app-shell">
-583|      {/* Sidebar Desktop & Mobile Slideout */}
-584|      <aside className={`sidebar ${mobileMenuOpen ? "sidebar-open" : ""}`}>
-585|        <div className="brand-lockup">
-586|          <div className="brand-mark" aria-hidden="true">
-587|            <span>ك</span>
-588|            <i />
-589|          </div>
-590|          <div>
-591|            <span className="brand-name">KENZA</span>
-592|            <span className="brand-tagline">{tr("la darija, en chemin", "darija, one step at a time", "la darija, paso a paso", "الدارجة، على الطريق")}</span>
-593|          </div>
-594|          <button
-595|            className="icon-button mobile-close"
-596|            aria-label="Fermer le menu"
-597|            onClick={() => setMobileMenuOpen(false)}
-598|          >
-599|            <X size={19} />
-600|          </button>
-601|        </div>
-602|
-603|        <div className="sidebar-label">{(t as any).side?.learn || "APPRENDRE"}</div>
-604|        <nav className="side-nav" aria-label="Navigation principale">
-605|          {navItems.map((item) => {
-606|            const Icon = item.icon;
-607|            return (
-608|              <button
-609|                key={item.id}
-610|                onClick={() => switchView(item.id)}
-611|                className={`nav-item ${view === item.id ? "nav-item-active" : ""}`}
-612|                aria-current={view === item.id ? "page" : undefined}
-613|              >
-614|                <Icon size={19} strokeWidth={1.8} /> <span>{navLabel(item.id) || item.label}</span>
-615|                {item.id === "review" && <span className="nav-count">4</span>}
-616|              </button>
-617|            );
-618|          })}
-619|        </nav>
-620|
-621|        <div className="sidebar-label">{tr("EXPLORER", "EXPLORE", "EXPLORAR", "استكشف")}</div>
-622|        <nav className="side-nav" aria-label="Ressources d'étude">
-623|          <a href="/etudier" className="nav-item">
-624|            <span>Étudier — Modules complets</span>
-625|          </a>
-626|          <a href="/grammaire" className="nav-item">
-627|            <span>{tr("Grammaire active", "Active grammar", "Gramática activa", "القواعد النشطة")}</span>
+1|'use client';
+2|
+3|import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
+4|import {
+5|  ArrowDownRight,
+6|  ArrowLeft,
+7|  ArrowRight,
+8|  Award,
+9|  Bookmark,
+10|  BookOpen,
+11|  Check,
+12|  CheckCircle2,
+13|  ChevronRight,
+14|  CircleHelp,
+15|  Compass,
+16|  Flame,
+17|  Globe,
+18|  Headphones,
+19|  Heart,
+20|  Home as HomeIcon,
+21|  Languages,
+22|  Leaf,
+23|  LockKeyhole,
+24|  Menu,
+25|  MessageCircle,
+26|  RotateCcw,
+27|  Search,
+28|  Sparkles,
+29|  Star,
+30|  Target,
+31|  Volume2,
+32|  X,
+33|  Crown,
+34|  Lock,
+35|} from "lucide-react";
+36|import type { LucideIcon } from "lucide-react";
+37|import { useAppStore, useTranslation } from "@/store/useAppStore";
+38|
+39|const tr = (fr: string, en: string, es: string, ar: string) => {
+40|  const lang = useAppStore.getState().uiLanguage;
+41|  return lang === "en" ? en : lang === "es" ? es : lang === "ar" ? ar : fr;
+42|};
+43|import { playAudio } from "@/lib/audio";
+44|import { supabase } from "@/lib/supabase";
+45|import { syncService } from "@/lib/syncService";
+46|import { useCheckpointProgress } from "@/hooks/useCheckpointProgress";
+47|import CheckpointModal from "@/components/checkpoint/CheckpointModal";
+48|import ScenarioSelectorModal from "@/components/dialogue/ScenarioSelectorModal";
+49|import AiRoleplayView from "@/components/dialogue/AiRoleplayView";
+50|import PaywallModal from "@/components/monetization/PaywallModal";
+51|import InstallPwaBanner from "@/components/pwa/InstallPwaBanner";
+52|import DarijaPassportCard from "@/components/certificate/DarijaPassportCard";
+53|import { PersonaId } from "@/lib/ai/prompts";
+54|import { srsVocabulary } from "@/data/srs-deck";
+55|
+56|export type View = "today" | "path" | "phrases" | "review" | "space";
+57|
+58|export type Question = {
+59|  prompt: string;
+60|  helper: string;
+61|  options: string[];
+62|  answer: string;
+63|  note: string;
+64|};
+65|
+66|export type Lesson = {
+67|  id: string;
+68|  title: string;
+69|  subtitle: string;
+70|  length: string;
+71|  status: "done" | "current" | "locked";
+72|  isPremium?: boolean;
+73|  questions: Question[];
+74|};
+75|
+76|export type Phrase = {
+77|  id: string;
+78|  category: string;
+79|  darija: string;
+80|  arabic: string;
+81|  meaning: string;
+82|  note: string;
+83|};
+84|
+85|const baseLessons: Lesson[] = [
+86|  {
+87|    id: "hello",
+88|    title: tr("Les premiers bonjours", "The first hellos", "Los primeros saludos", "أول التحيات"),
+89|    subtitle: tr("Saluer, se présenter, créer le lien", "Greet, introduce yourself, connect", "Saludar, presentarse, crear el vínculo", "التحية والتعاريف وبناء الرابط"),
+90|    length: "6 min",
+91|    status: "current",
+92|    questions: [
+93|      {
+94|        prompt: "Comment dit-on « bonjour » en darija ?",
+95|        helper: "Choisis la formule la plus naturelle.",
+96|        options: ["Salam", "Shukran", "Bslama"],
+97|        answer: "Salam",
+98|        note: "« Salam » veut dire paix. C’est le bonjour simple, chaleureux et passe-partout.",
+99|      },
+100|      {
+101|        prompt: "Tu rencontres quelqu’un pour la première fois. Que dis-tu ?",
+102|        helper: "Pense à une formule de bienvenue.",
+103|        options: ["Labas?", "Tsharrafna", "Afak"],
+104|        answer: "Tsharrafna",
+105|        note: "« Tsharrafna » signifie littéralement « enchanté·e ». Une belle façon de faire connaissance.",
+106|      },
+107|      {
+108|        prompt: "Que signifie « labas? »",
+109|        helper: "Une question qu’on entend partout.",
+110|        options: ["Où vas-tu ?", "Ça va ?", "À demain"],
+111|        answer: "Ça va ?",
+112|        note: "« Labas? » est le petit « ça va ? » du quotidien. On répond souvent « labas, hamdullah ».",
+113|      },
+114|    ],
+115|  },
+116|  {
+117|    id: "cafe",
+118|    title: "Au café du coin",
+119|    subtitle: "Commander un thé à la menthe",
+120|    length: "8 min",
+121|    status: "locked",
+122|    questions: [
+123|      {
+124|        prompt: "Comment demander un thé, s’il vous plaît ?",
+125|        helper: "Une formule utile au café.",
+126|        options: ["Atay, afak", "Fin ghadi?", "Smah liya"],
+127|        answer: "Atay, afak",
+128|        note: "« Atay, afak » : un thé, s’il vous plaît. « Afak » ajoute la politesse.",
+129|      },
+130|      {
+131|        prompt: "Qu’est-ce que « bghit » veut dire ?",
+132|        helper: "Un mot très pratique pour commander.",
+133|        options: ["Je voudrais", "J’ai faim", "C’est loin"],
+134|        answer: "Je voudrais",
+135|        note: "« Bghit » veut dire « je veux » ou « je voudrais », selon le contexte.",
+136|      },
+137|    ],
+138|  },
+139|  {
+140|    id: "medina",
+141|    title: "Se repérer dans la médina",
+142|    subtitle: "Demander son chemin sans stress",
+143|    length: "7 min",
+144|    status: "locked",
+145|    questions: [
+146|      {
+147|        prompt: "Comment demander « où est… ? »",
+148|        helper: "La phrase qui débloque une promenade.",
+149|        options: ["Fin kayn…?", "Chhal hadi?", "Mumkin…?"],
+150|        answer: "Fin kayn…?",
+151|        note: "« Fin kayn…? » signifie « où se trouve… ? ». Ajoute le lieu que tu cherches.",
+152|      },
+153|      {
+154|        prompt: "Que signifie « yallah » ?",
+155|        helper: "Un mot qu’on entend souvent.",
+156|        options: ["Allons-y", "Peut-être", "Merci beaucoup"],
+157|        answer: "Allons-y",
+158|        note: "« Yallah » invite à partir, à avancer, ou simplement à se lancer.",
+159|      },
+160|    ],
+161|  },
+162|  {
+163|    id: "marrakech",
+164|    title: "Négocier au souk de Marrakech",
+165|    subtitle: "Les nombres et les prix (Niveau A2)",
+166|    length: "9 min",
+167|    status: "locked",
+168|    isPremium: true,
+169|    questions: [
+170|      {
+171|        prompt: "Comment demander « Combien coûte ceci ? »",
+172|        helper: "Expression clé pour entamer la discussion.",
+173|        options: ["Bchhal hada?", "Fin mchiti?", "Labas 3lik?"],
+174|        answer: "Bchhal hada?",
+175|        note: "« Bchhal hada? » permet de demander le prix de n'importe quel article.",
+176|      },
+177|      {
+178|        prompt: "Que veut dire « Naqas chwiya 3afak » ?",
+179|        helper: "La formule cordiale de marchandage.",
+180|        options: ["Baisse un peu s'il te plaît", "Donne-moi deux verres", "C'est trop beau"],
+181|        answer: "Baisse un peu s'il te plaît",
+182|        note: "« Naqas chwiya » = réduis un peu. Utilisé avec le sourire !",
+183|      },
+184|    ],
+185|  },
+186|  {
+187|    id: "tanger",
+188|    title: "Voyage à Tanger (Chamali)",
+189|    subtitle: "Les subtilités régionales (Niveau B2)",
+190|    length: "10 min",
+191|    status: "locked",
+192|    isPremium: true,
+193|    questions: [
+194|      {
+195|        prompt: "À Tanger, comment dit-on « Qu'est-ce que tu veux ? »",
+196|        helper: "Remplace le standard « Chno bghiti ».",
+197|        options: ["Chni katchof?", "Chni katsaksi?", "Chni khassek?"],
+198|        answer: "Chni khassek?",
+199|        note: "Dans le nord (Chamali), on utilise « Chni » au lieu de « Chno ».",
+200|      },
+201|    ],
+202|  },
+203|];
+204|
+205|const defaultPhrases: Phrase[] = [
+206|  { id: "salam", category: "Saluer", darija: "Salam, labas?", arabic: "سلام، لاباس؟", meaning: "Salut, ça va ?", note: "La formule la plus simple pour ouvrir une conversation." },
+207|  { id: "bikhir", category: "Saluer", darija: "Labas, hamdullah.", arabic: "لاباس، الحمد لله.", meaning: "Ça va, merci / Dieu merci.", note: "La réponse classique à « labas? »." },
+208|  { id: "afak", category: "Au café", darija: "Wahed atay, afak.", arabic: "واحد أتاي، عفاك.", meaning: "Un thé, s’il vous plaît.", note: "« Wahed » = un, « atay » = thé, « afak » = s’il te plaît." },
+209|  { id: "bghit", category: "Au café", darija: "Bghit lma, afak.", arabic: "بغيت الما، عفاك.", meaning: "Je voudrais de l’eau, s’il vous plaît.", note: "Remplace « lma » par ce que tu aimerais commander." },
+210|  { id: "fin", category: "Se déplacer", darija: "Fin kayn souk?", arabic: "فين كاين السوق؟", meaning: "Où est le souk ?", note: "Utilise cette structure pour demander un lieu." },
+211|  { id: "shukran", category: "Les essentiels", darija: "Shukran bzaf!", arabic: "شكرا بزاف!", meaning: "Merci beaucoup !", note: "« Bzaf » signifie beaucoup — un mot qui sert partout." },
+212|  { id: "smah", category: "Les essentiels", darija: "Smah liya.", arabic: "سمح ليا.", meaning: "Excuse-moi / pardon.", note: "Pour attirer l’attention ou demander pardon, avec douceur." },
+213|  { id: "bslama", category: "Saluer", darija: "Bslama, nshawfek.", arabic: "بسلامة، نشوفك.", meaning: "Au revoir, à bientôt.", note: "Une façon amicale de prendre congé." },
+214|];
+215|
+216|const navItems: { id: View; label: string; icon: LucideIcon }[] = [
+217|  { id: "today", label: "Aujourd’hui", icon: HomeIcon },
+218|  { id: "path", label: "Mon parcours", icon: Compass },
+219|  { id: "phrases", label: "Carnet de phrases", icon: Bookmark },
+220|  { id: "review", label: tr("Révision du jour", "Today’s review", "Revisión del día", "مراجعة اليوم"), icon: Sparkles },
+221|];
+222|
+223|export default function Home() {
+224|  const [view, setView] = useState<View>("today");
+225|  const [lessonId, setLessonId] = useState<string | null>(null);
+226|  const [questionIndex, setQuestionIndex] = useState(0);
+227|  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+228|  const [search, setSearch] = useState("");
+229|  const [category, setCategory] = useState("Tout voir");
+230|  const [favoritesOnly, setFavoritesOnly] = useState(false);
+231|  const [favorites, setFavorites] = useState<string[]>([]);
+232|  const [reviewIndex, setReviewIndex] = useState(0);
+233|  const [cardFlipped, setCardFlipped] = useState(false);
+234|  const [toast, setToast] = useState("");
+235|  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+236|  const searchInputRef = useRef<HTMLInputElement>(null);
+237|
+238|  // Zustand Store Integration
+239|  const {
+240|    xp,
+241|    streakDays,
+242|    completedLessons,
+243|    addXp,
+244|    completeLesson,
+245|    user,
+246|    setUser,
+247|    resetData,
+248|    soundEnabled,
+249|    toggleSound,
+250|    isPremium,
+251|    setIsPremium,
+252|    uiLanguage,
+253|    setLanguage,
+254|  } = useAppStore();
+255|
+256|  const { t } = useTranslation();
+257|  const navLabel = (id: string) => {
+258|    const key =
+259|      id === "today" ? "home"
+260|      : id === "path" ? "parcours"
+261|      : id === "phrases" ? "phrasebook"
+262|      : id === "review" ? "review"
+263|      : null;
+264|    return key ? ((t as any).side?.[key] as string | undefined) : undefined;
+265|  };
+266|
+267|  const handleGoogleLogin = async () => {
+268|    try {
+269|      const { error } = await supabase.auth.signInWithOAuth({
+270|        provider: "google",
+271|        options: {
+272|          redirectTo: typeof window !== "undefined" ? window.location.origin : undefined,
+273|        },
+274|      });
+275|      if (error) throw error;
+276|    } catch {
+277|      showToast("Impossible d'initier la connexion Google.");
+278|    }
+279|  };
+280|
+281|  const [checkpointOpen, setCheckpointOpen] = useState<{ id: string; name: string } | null>(null);
+282|  const [showScenarioSelector, setShowScenarioSelector] = useState(false);
+283|  const [activePersonaId, setActivePersonaId] = useState<PersonaId | null>(null);
+284|  const [pricingSource, setPricingSource] = useState<string | null>(null);
+285|
+286|  // 1. Sécurisation absolue de favorites (Null-Safety)
+287|  useEffect(() => {
+288|    try {
+289|      const stored = localStorage.getItem("kenza_favorites");
+290|      if (stored) {
+291|        const parsed = JSON.parse(stored);
+292|        if (Array.isArray(parsed)) {
+293|          setFavorites(parsed);
+294|          return;
+295|        }
+296|      }
+297|    } catch {}
+298|    setFavorites([]);
+299|  }, []);
+300|
+301|  const saveFavorites = (next: string[]) => {
+302|    const safeNext = Array.isArray(next) ? next : [];
+303|    setFavorites(safeNext);
+304|    try {
+305|      localStorage.setItem("kenza_favorites", JSON.stringify(safeNext));
+306|    } catch {}
+307|  };
+308|
+309|  const safeFavorites = useMemo(() => {
+310|    return Array.isArray(favorites) ? favorites : [];
+311|  }, [favorites]);
+312|
+313|  // Auth sync
+314|  useEffect(() => {
+315|    supabase.auth.getSession().then(({ data: { session } }) => {
+316|      if (session?.user) setUser(session.user);
+317|    });
+318|
+319|    const {
+320|      data: { subscription },
+321|    } = supabase.auth.onAuthStateChange(async (event, session) => {
+322|      if (event === "SIGNED_IN" && session?.user) {
+323|        setUser(session.user);
+324|        await syncService.syncCloudToLocal(session.user.id);
+325|      } else if (event === "SIGNED_OUT") {
+326|        setUser(null);
+327|        resetData();
+328|      }
+329|    });
+330|
+331|    return () => subscription.unsubscribe();
+332|  }, [setUser, resetData]);
+333|
+334|  // Check URL params (e.g. Stripe callback)
+335|  useEffect(() => {
+336|    if (typeof window === "undefined") return;
+337|    const searchParams = new URLSearchParams(window.location.search);
+338|    const upgradeStatus = searchParams.get("upgrade");
+339|    if (upgradeStatus === "success") {
+340|      setIsPremium(true);
+341|      showToast("Félicitations ! Votre abonnement Kenza Pro est activé.");
+342|      window.history.replaceState({}, document.title, window.location.pathname);
+343|    }
+344|  }, [setIsPremium]);
+345|
+346|  useEffect(() => {
+347|    if (!toast) return;
+348|    const timer = window.setTimeout(() => setToast(""), 3500);
+349|    return () => window.clearTimeout(timer);
+350|  }, [toast]);
+351|
+352|  useEffect(() => {
+353|    const handleShortcut = (event: KeyboardEvent) => {
+354|      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+355|        event.preventDefault();
+356|        setView("phrases");
+357|        window.setTimeout(() => searchInputRef.current?.focus(), 60);
+358|      }
+359|    };
+360|    window.addEventListener("keydown", handleShortcut);
+361|    return () => window.removeEventListener("keydown", handleShortcut);
+362|  }, []);
+363|
+364|  useEffect(() => {
+365|    setMobileMenuOpen(false);
+366|    window.scrollTo({ top: 0, behavior: "smooth" });
+367|  }, [view]);
+368|
+369|  // 2. Adaptateur universel pour les phrases (Format Manus ↔ Format KENZA)
+370|  const allPhrases: Phrase[] = useMemo(() => {
+371|    const rawVocabulary = (srsVocabulary || []).slice(0, 40).map((w, idx) => {
+372|      let meaningText = "Expression en darija";
+373|      if (typeof (w as any).translation === "string") {
+374|        meaningText = (w as any).translation;
+375|      } else if ((w as any).translation && typeof (w as any).translation === "object") {
+376|        meaningText = (w as any).translation.fr || (w as any).translation.en || "Expression en darija";
+377|      } else if ((w as any).translations?.fr) {
+378|        meaningText = (w as any).translations.fr;
+379|      } else if (typeof (w as any).back === "string") {
+380|        meaningText = (w as any).back;
+381|      }
+382|
+383|      let cat = "Les essentiels";
+384|      if (w.category === "polite_social") cat = "Saluer";
+385|      else if (w.category === "food_drink") cat = "Au café";
+386|      else if (w.category === "directions") cat = "Se déplacer";
+387|      else if (w.category) cat = w.category;
+388|
+389|      return {
+390|        id: w.id || `vocab_${idx}`,
+391|        category: cat,
+392|        darija: w.arabizi || (w as any).front || "",
+393|        arabic: w.arabic || "",
+394|        meaning: meaningText,
+395|        note: (w.example?.arabizi ? `Ex: ${w.example.arabizi}` : "") || "Vocabulaire du quotidien avec audio naturel.",
+396|      };
+397|    });
+398|
+399|    const combined: any[] = [...defaultPhrases];
+400|    for (const v of rawVocabulary) {
+401|      if (v.darija && !combined.some((p) => (p.darija || p.front || "").toLowerCase() === (v.darija || "").toLowerCase())) {
+402|        combined.push(v);
+403|      }
+404|    }
+405|
+406|    return combined.map((p) => {
+407|      let meaningStr = "Expression en darija";
+408|      if (typeof p.meaning === "string") {
+409|        meaningStr = p.meaning;
+410|      } else if (p.meaning && typeof p.meaning === "object") {
+411|        meaningStr = p.meaning.fr || p.meaning.en || "";
+412|      } else if (typeof p.back === "string") {
+413|        meaningStr = p.back;
+414|      } else if (p.back && typeof p.back === "object") {
+415|        meaningStr = p.back.fr || p.back.en || "";
+416|      } else if (p.translation) {
+417|        meaningStr = typeof p.translation === "string" ? p.translation : p.translation.fr || p.translation.en || "";
+418|      }
+419|
+420|      return {
+421|        id: String(p.id || Math.random()),
+422|        category: String(p.category || "Les essentiels"),
+423|        darija: String(p.darija || p.front || p.arabizi || ""),
+424|        arabic: String(p.arabic || ""),
+425|        meaning: String(meaningStr || "Expression en darija"),
+426|        note: String(p.note || p.notes || ""),
+427|      };
+428|    });
+429|  }, []);
+430|
+431|  const completedCount = completedLessons.length;
+432|  const nextLesson =
+433|    baseLessons.find((lesson) => !completedLessons.includes(lesson.id)) ??
+434|    baseLessons[baseLessons.length - 1];
+435|  const activeLesson = baseLessons.find((lesson) => lesson.id === lessonId) ?? null;
+436|  const activeQuestion = activeLesson?.questions[questionIndex] ?? null;
+437|
+438|  // 4. Sécurisation de la liste des catégories
+439|  const categories = useMemo(() => {
+440|    return ["Tout voir", ...Array.from(new Set(allPhrases.map((phrase) => phrase.category).filter(Boolean)))];
+441|  }, [allPhrases]);
+442|
+443|  // 3. Sécurisation de la recherche textuelle
+444|  const filteredPhrases = useMemo(() => {
+445|    const searchLower = (search || "").toLowerCase().trim();
+446|    return allPhrases.filter((phrase) => {
+447|      const matchesCategory = category === "Tout voir" || phrase.category === category;
+448|      const searchTarget = `${phrase.darija || ""} ${phrase.arabic || ""} ${phrase.meaning || ""} ${phrase.category || ""}`.toLowerCase();
+449|      const matchesSearch = !searchLower || searchTarget.includes(searchLower);
+450|      const matchesFavorite = !favoritesOnly || safeFavorites.includes(phrase.id);
+451|      return matchesCategory && matchesSearch && matchesFavorite;
+452|    });
+453|  }, [category, search, favoritesOnly, safeFavorites, allPhrases]);
+454|
+455|  const showToast = (message: string) => setToast(message);
+456|
+457|  const startLesson = (id: string) => {
+458|    const lesson = baseLessons.find((item) => item.id === id);
+459|    if (!lesson) return;
+460|
+461|    // Premium gating check
+462|    if (lesson.isPremium && !isPremium) {
+463|      setPricingSource("module_locked");
+464|      return;
+465|    }
+466|
+467|    const index = baseLessons.findIndex((item) => item.id === id);
+468|    const canStart =
+469|      index === 0 ||
+470|      completedLessons.includes(baseLessons[index - 1].id) ||
+471|      completedLessons.includes(id);
+472|
+473|    if (!canStart) {
+474|      showToast("Termine la leçon précédente pour continuer ton parcours.");
+475|      return;
+476|    }
+477|
+478|    setLessonId(id);
+479|    setQuestionIndex(0);
+480|    setSelectedAnswer(null);
+481|  };
+482|
+483|  const advanceQuestion = () => {
+484|    if (!activeLesson || !activeQuestion || !selectedAnswer) return;
+485|    if (questionIndex < activeLesson.questions.length - 1) {
+486|      setQuestionIndex((current) => current + 1);
+487|      setSelectedAnswer(null);
+488|      return;
+489|    }
+490|
+491|    const firstCompletion = !completedLessons.includes(activeLesson.id);
+492|    if (firstCompletion) {
+493|      completeLesson(activeLesson.id);
+494|      addXp(activeLesson.questions.length * 10);
+495|    }
+496|
+497|    setLessonId(null);
+498|    setSelectedAnswer(null);
+499|    showToast(
+500|      firstCompletion
+501|        ? `Bravo ! Leçon terminée · +${activeLesson.questions.length * 10} XP`
+502|        : "Leçon revue avec succès."
+503|    );
+504|  };
+505|
+506|  const toggleFavorite = (id: string) => {
+507|    const current = Array.isArray(favorites) ? favorites : [];
+508|    const updated = current.includes(id)
+509|      ? current.filter((item) => item !== id)
+510|      : [...current, id];
+511|    saveFavorites(updated);
+512|  };
+513|
+514|  const playPhrase = (darija: string, arabic: string) => {
+515|    if (!darija && !arabic) return;
+516|    playAudio(darija || "", arabic || "", true);
+517|    showToast("Prononciation audio de la phrase.");
+518|  };
+519|
+520|  const copyPhrase = async (phrase: Phrase) => {
+521|    try {
+522|      const text = `${phrase.darija || ""} ${phrase.arabic ? `(${phrase.arabic})` : ""} — ${phrase.meaning || ""}`.trim();
+523|      await navigator.clipboard.writeText(text);
+524|      showToast("Phrase copiée dans le presse-papiers.");
+525|    } catch {
+526|      showToast("Copie indisponible.");
+527|    }
+528|  };
+529|
+530|  const gradeReview = (grade: "again" | "hard" | "good" | "easy") => {
+531|    const award = grade === "easy" ? 5 : grade === "good" ? 3 : grade === "hard" ? 2 : 1;
+532|    addXp(award);
+533|    setCardFlipped(false);
+534|    setReviewIndex((current) => current + 1);
+535|    showToast(
+536|      `Noté : ${grade === "again" ? "à revoir" : grade === "hard" ? "difficile" : grade === "good" ? "bien" : "facile"} · +${award} XP`
+537|    );
+538|  };
+539|
+540|  const resetProgress = () => {
+541|    const confirmed = window.confirm("Effacer la progression locale sur cet appareil ?");
+542|    if (!confirmed) return;
+543|    resetData();
+544|    localStorage.removeItem("kenza_favorites");
+545|    setFavorites([]);
+546|    showToast("Progression locale réinitialisée.");
+547|  };
+548|
+549|  const switchView = (next: View) => {
+550|    setView(next);
+551|    setMobileMenuOpen(false);
+552|  };
+553|
+554|  const headerTitle: Record<View, { eyebrow: string; title: string; description: string }> = {
+555|    today: {
+556|      eyebrow: tr("TON ESPACE D’APPRENTISSAGE", "YOUR LEARNING SPACE", "TU ESPACIO DE APRENDIZAJE", "فضاء تعلمك"),
+557|      title: tr("Salam, on s’y remet ?", "Salam, shall we get going?", "Salam, ¿retomamos?", "سلام، نكمل؟"),
+558|      description: tr("Un petit pas en darija aujourd’hui, une grande porte ouverte demain.", "A small step in darija today, a big door open tomorrow.", "Un pequeño paso en darija hoy, una gran puerta abierta mañana.", "خطوة صغيرة في الدارجة اليوم، وباب كبير مفتوح غداً."),
+559|    },
+560|    path: {
+561|      eyebrow: tr("LE CHEMIN SE FAIT EN PARLANT", "THE PATH IS MADE BY SPEAKING", "EL CAMINO SE HACE HABLANDO", "الطريق يُصنع بالكلام"),
+562|      title: tr("Ton parcours", "Your journey", "Tu recorrido", "مسارك"),
+563|      description: tr("Des premiers mots aux conversations qui te ressemblent.", "From first words to conversations that feel like you.", "De las primeras palabras a conversaciones que te representen.", "من الكلمات الأولى إلى أحاديث تشبهك."),
+564|    },
+565|    phrases: {
+566|      eyebrow: tr("LES MOTS QUI RAPPROCHENT", "WORDS THAT BRING US CLOSER", "PALABRAS QUE ACERCAN", "كلمات تُقرّب"),
+567|      title: tr("Ton carnet de phrases", "Your phrase book", "Tu cuaderno de frases", "دفتر عباراتك"),
+568|      description: tr("Des expressions utiles, vivantes, prêtes à t’accompagner.", "Useful, lively expressions, ready to go with you.", "Expresiones útiles y vivas, listas para acompañarte.", "عبارات مفيدة حيّة، جاهزة لمرافقتك."),
+569|    },
+570|    review: {
+571|      eyebrow: tr("ANCRER, SANS SE PRESSER", "ANCHOR IN, NO RUSH", "ANCLAR, SIN PRISA", "ترسيخ، بلا استعجال"),
+572|      title: tr("Révision du jour", "Today’s review", "Revisión del día", "مراجعة اليوم"),
+573|      description: tr("Quelques cartes bien choisies pour laisser les mots s’installer.", "A few well-chosen cards to let the words settle.", "Algunas cartas bien elegidas para que las palabras se asienten.", "بعض البطاقات المنتقاة لتستقر الكلمات."),
+574|    },
+575|    space: {
+576|      eyebrow: tr("UN ESPACE À TOI", "A SPACE OF YOUR OWN", "UN ESPACIO PARA TI", "فضاء لك"),
+577|      title: "Mon espace & Passeport",
+578|      description: "Ta progression et tes visas officiels, sous ton contrôle.",
+579|    },
+580|  };
+581|
+582|  const currentHeader = headerTitle[view];
+583|
+584|  return (
+585|    <div className="app-shell">
+586|      {/* Sidebar Desktop & Mobile Slideout */}
+587|      <aside className={`sidebar ${mobileMenuOpen ? "sidebar-open" : ""}`}>
+588|        <div className="brand-lockup">
+589|          <div className="brand-mark" aria-hidden="true">
+590|            <span>ك</span>
+591|            <i />
+592|          </div>
+593|          <div>
+594|            <span className="brand-name">KENZA</span>
+595|            <span className="brand-tagline">{tr("la darija, en chemin", "darija, one step at a time", "la darija, paso a paso", "الدارجة، على الطريق")}</span>
+596|          </div>
+597|          <button
+598|            className="icon-button mobile-close"
+599|            aria-label="Fermer le menu"
+600|            onClick={() => setMobileMenuOpen(false)}
+601|          >
+602|            <X size={19} />
+603|          </button>
+604|        </div>
+605|
+606|        <div className="sidebar-label">{(t as any).side?.learn || "APPRENDRE"}</div>
+607|        <nav className="side-nav" aria-label="Navigation principale">
+608|          {navItems.map((item) => {
+609|            const Icon = item.icon;
+610|            return (
+611|              <button
+612|                key={item.id}
+613|                onClick={() => switchView(item.id)}
+614|                className={`nav-item ${view === item.id ? "nav-item-active" : ""}`}
+615|                aria-current={view === item.id ? "page" : undefined}
+616|              >
+617|                <Icon size={19} strokeWidth={1.8} /> <span>{navLabel(item.id) || item.label}</span>
+618|                {item.id === "review" && <span className="nav-count">4</span>}
+619|              </button>
+620|            );
+621|          })}
+622|        </nav>
+623|
+624|        <div className="sidebar-label">{tr("EXPLORER", "EXPLORE", "EXPLORAR", "استكشف")}</div>
+625|        <nav className="side-nav" aria-label="Ressources d'étude">
+626|          <a href="/etudier" className="nav-item">
+627|            <span>Étudier — Modules complets</span>
 628|          </a>
-629|          <a href="/parler" className="nav-item">
-630|            <span>{tr("Pratique orale", "Speaking practice", "Práctica oral", "تدريب النطق")}</span>
+629|          <a href="/grammaire" className="nav-item">
+630|            <span>{tr("Grammaire active", "Active grammar", "Gramática activa", "القواعد النشطة")}</span>
 631|          </a>
-632|          <a href="/revisions" className="nav-item">
-633|            <span>{tr("Révisions SRS", "SRS review", "Repaso SRS", "مراجعة SRS")}</span>
+632|          <a href="/parler" className="nav-item">
+633|            <span>{tr("Pratique orale", "Speaking practice", "Práctica oral", "تدريب النطق")}</span>
 634|          </a>
-635|        </nav>
-636|
-637|        <div className="sidebar-label sidebar-label-spaced">{(t as any).side?.oral || "PRATIQUE ORALE & IA"}</div>
-638|        <button
-639|          onClick={() => setShowScenarioSelector(true)}
-640|          className="nav-item"
-641|        >
-642|          <MessageCircle size={19} strokeWidth={1.8} />
-643|          <span>{tr("Roleplay IA", "AI roleplay", "Roleplay IA", "حوار مع الذكاء الاصطناعي")}</span>
-644|        </button>
-645|
-646|        <div className="sidebar-label sidebar-label-spaced">{(t as any).side?.space || "TON ESPACE"}</div>
-647|        <button
-648|          onClick={() => switchView("space")}
-649|          className={`nav-item ${view === "space" ? "nav-item-active" : ""}`}
-650|          aria-current={view === "space" ? "page" : undefined}
-651|        >
-652|          <Award size={19} strokeWidth={1.8} />
-653|          <span>{tr("Mon Passeport", "My passport", "Mi pasaporte", "جوازي")}</span>
-654|        </button>
-655|
-656|        <div className="sidebar-spacer" />
-657|
-658|        <div className="daily-goal-card">
-659|          <div className="goal-orbit">
-660|            <Target size={17} />
-661|          </div>
-662|          <div className="goal-topline">
-663|            <span>{tr("TON RYTHME", "YOUR PACE", "TU RITMO", "إيقاعك")}</span>
-664|            <span>{Math.min(100, Math.round(((completedCount * 3) / 10) * 100))}%</span>
-665|          </div>
-666|          <strong>{tr("10 minutes par jour", "10 minutes a day", "10 minutos al día", "10 دقائق يومياً")}</strong>
-667|          <div className="goal-track">
-668|            <span style={{ width: `${Math.min(100, ((completedCount * 3) / 10) * 100)}%` }} />
-669|          </div>
-670|          <button
-671|            onClick={() => showToast("Objectif quotidien : 10 minutes de pratique chaque jour.")}
-672|            className="goal-link"
-673|          >
-674|            Ajuster l’objectif <ArrowRight size={14} />
-675|          </button>
-676|        </div>
-677|
-678|        <div className="sidebar-footer">
-679|          <span className="privacy-dot" />
-680|          <span>{user ? user.email?.split("@")[0] : "Mode Invité actif"}</span>
-681|          <button
-682|            aria-label="En savoir plus sur les données"
-683|            onClick={() => switchView("space")}
-684|          >
-685|            <CircleHelp size={14} />
-686|          </button>
-687|        </div>
-688|      </aside>
-689|
-690|      {mobileMenuOpen && (
-691|        <button
-692|          className="mobile-scrim"
-693|          aria-label="Fermer le menu"
-694|          onClick={() => setMobileMenuOpen(false)}
-695|        />
-696|      )}
-697|
-698|      {/* Main Area */}
-699|      <main className="main-area">
-700|        <header className="topbar">
-701|          <button
-702|            className="icon-button mobile-menu-trigger"
-703|            aria-label="Ouvrir le menu"
-704|            onClick={() => setMobileMenuOpen(true)}
-705|          >
-706|            <Menu size={21} />
-707|          </button>
-708|          <div className="breadcrumbs">
-709|            <span>KENZA</span>
-710|            <ChevronRight size={14} />
-711|            <span>{currentHeader.eyebrow.toLocaleLowerCase("fr")}</span>
-712|          </div>
-713|          <div className="topbar-actions">
-714|            {/* Sélecteur de langue bilingue */}
-715|            <div className="lang-switcher" role="group" aria-label="Sélecteur de langue">
-716|              <Globe size={13} className="lang-icon" />
-717|              <button
-718|                type="button"
-719|                onClick={() => setLanguage("fr")}
-720|                className={`lang-btn ${uiLanguage === "fr" ? "lang-btn-active" : ""}`}
-721|                aria-label="Passer en français"
-722|              >
-723|                FR
-724|              </button>
-725|              <span className="lang-sep">|</span>
-726|              <button
-727|                type="button"
-728|                onClick={() => setLanguage("en")}
-729|                className={`lang-btn ${uiLanguage === "en" ? "lang-btn-active" : ""}`}
-730|                aria-label="Switch to English"
-731|              >
-732|                EN
-733|              </button>
-734|              <span className="lang-sep">|</span>
-735|              <button
-736|                type="button"
-737|                onClick={() => setLanguage("es")}
-738|                className={`lang-btn ${uiLanguage === "es" ? "lang-btn-active" : ""}`}
-739|                aria-label="Cambiar a español"
-740|              >
-741|                ES
-742|              </button>
-743|              <span className="lang-sep">|</span>
-744|              <button
-745|                type="button"
-746|                onClick={() => setLanguage("ar")}
-747|                className={`lang-btn ${uiLanguage === "ar" ? "lang-btn-active" : ""}`}
-748|                aria-label="Passer en arabe"
-749|              >
-750|                AR
-751|              </button>
-752|            </div>
-753|
-754|            {/* Toggle Son */}
-755|            <button
-756|              className="sound-toggle"
-757|              onClick={toggleSound}
-758|              title={soundEnabled ? "Audio activé" : "Audio muet"}
-759|              aria-label={soundEnabled ? "Couper le son" : "Activer le son"}
-760|            >
-761|              <Headphones size={15} />
-762|              <span>{soundEnabled ? "Son actif" : "Son coupé"}</span>
-763|            </button>
-764|
-765|            {/* Connexion Google & Profil */}
-766|            {user ? (
-767|              <button
-768|                className="top-avatar"
-769|                aria-label="Ouvrir mon espace"
-770|                onClick={() => switchView("space")}
-771|                title={user.email || "Mon profil"}
-772|              >
-773|                {user.user_metadata?.avatar_url ? (
-774|                  <img
-775|                    src={user.user_metadata.avatar_url}
-776|                    alt={user.user_metadata?.full_name || "Profil"}
-777|                    className="w-full h-full object-cover rounded-full"
-778|                  />
-779|                ) : user.user_metadata?.full_name ? (
-780|                  user.user_metadata.full_name[0].toUpperCase()
-781|                ) : user.email ? (
-782|                  user.email[0].toUpperCase()
-783|                ) : (
-784|                  "K"
-785|                )}
-786|              </button>
-787|            ) : (
-788|              <button
-789|                type="button"
-790|                onClick={handleGoogleLogin}
-791|                className="google-login-btn"
-792|                aria-label="Se connecter avec Google"
-793|                title="Se connecter avec Google"
-794|              >
-795|                <svg className="google-icon" width="13" height="13" viewBox="0 0 24 24">
-796|                  <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
-797|                  <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/>
-798|                  <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.16 0 10.02 0 12s.45 3.84 1.25 5.42l4.03-3.15z"/>
-799|                  <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-800|                </svg>
-801|                <span>{tr("Se connecter", "Sign in", "Iniciar sesión", "تسجيل الدخول")}</span>
-802|              </button>
-803|            )}
-804|          </div>
-805|        </header>
-806|
-807|        <div className="content-wrap">
-808|          <section className="page-heading">
-809|            <div>
-810|              <div className="eyebrow">
-811|                <span className="eyebrow-line" />
-812|                {currentHeader.eyebrow}
-813|              </div>
-814|              <h1>{currentHeader.title}</h1>
-815|              <p>{currentHeader.description}</p>
-816|            </div>
-817|            <div className="date-chip">
-818|              <span className="date-sun">☼</span>
-819|              <span>
-820|                {new Intl.DateTimeFormat("fr-FR", {
-821|                  weekday: "long",
-822|                  day: "numeric",
-823|                  month: "long",
-824|                }).format(new Date())}
-825|              </span>
-826|            </div>
-827|          </section>
-828|
-829|          {/* VUE 1 : AUJOURD'HUI */}
-830|          {view === "today" && (
-831|            <TodayView
-832|              completedCount={completedCount}
-833|              xp={xp}
-834|              streak={streakDays}
-835|              nextLesson={nextLesson}
-836|              onStart={startLesson}
-837|              onNavigate={switchView}
-838|              onOpenRoleplay={() => setShowScenarioSelector(true)}
-839|            />
-840|          )}
-841|
-842|          {/* VUE 2 : MON PARCOURS */}
-843|          {view === "path" && (
-844|            <PathView
-845|              completedLessons={completedLessons}
-846|              onStart={startLesson}
-847|              onOpenCheckpoint={(id, name) => setCheckpointOpen({ id, name })}
-848|              onOpenPaywall={() => setPricingSource("module_locked")}
-849|              isPremium={isPremium}
-850|            />
-851|          )}
-852|
-853|          {/* VUE 3 : CARNET DE PHRASES */}
-854|          {view === "phrases" && (
-855|            <PhrasesView
-856|              search={search}
-857|              searchInputRef={searchInputRef}
-858|              setSearch={setSearch}
-859|              category={category}
-860|              setCategory={setCategory}
-861|              categories={categories}
-862|              phrases={filteredPhrases}
-863|              favorites={safeFavorites}
-864|              favoritesOnly={favoritesOnly}
-865|              setFavoritesOnly={setFavoritesOnly}
-866|              onFavorite={toggleFavorite}
-867|              onPlay={playPhrase}
-868|              onCopy={copyPhrase}
-869|            />
-870|          )}
-871|
-872|          {/* VUE 4 : RÉVISION SRS */}
-873|          {view === "review" && (
-874|            <ReviewView
-875|              reviewIndex={reviewIndex}
-876|              cardFlipped={cardFlipped}
-877|              setCardFlipped={setCardFlipped}
-878|              onGrade={gradeReview}
-879|            />
-880|          )}
-881|
-882|          {/* VUE 5 : MON ESPACE / PASSEPORT */}
-883|          {view === "space" && (
-884|            <SpaceView
-885|              completedCount={completedCount}
-886|              xp={xp}
-887|              streak={streakDays}
-888|              user={user}
-889|              isPremium={isPremium}
-890|              onReset={resetProgress}
-891|              onOpenPaywall={() => setPricingSource("profile_upgrade")}
-892|              onToast={showToast}
-893|            />
-894|          )}
-895|
-896|          <footer className="page-footer">
-897|            <span>
-898|              KENZA <span className="footer-arabic">كنزة</span>
-899|            </span>
-900|            <span>{tr("Apprendre une langue, c’est rencontrer des gens.", "Learning a language is meeting people.", "Aprender un idioma es conocer gente.", "تعلم اللغة لقاءٌ بالناس.")}</span>
-901|            <button onClick={() => switchView("space")}>
-902|              Passeport Culturel & Données <ArrowRight size={13} />
-903|            </button>
-904|          </footer>
-905|        </div>
-906|      </main>
-907|
-908|      {/* Mobile Bottom Navigation (Visible sous 900px) */}
-909|      <nav className="mobile-bottom-nav" aria-label="Navigation mobile">
-910|        {navItems.map((item) => {
-911|          const Icon = item.icon;
-912|          return (
-913|            <button
-914|              key={item.id}
-915|              onClick={() => switchView(item.id)}
-916|              className={view === item.id ? "mobile-nav-active" : ""}
-917|              aria-label={navLabel(item.id) || item.label}
-918|              aria-current={view === item.id ? "page" : undefined}
-919|            >
-920|              <Icon size={19} />
-921|              <span>
-922|                {item.id === "today"
-923|                  ? "Accueil"
-924|                  : item.id === "path"
-925|                  ? "Parcours"
-926|                  : item.id === "phrases"
-927|                  ? "Phrases"
-928|                  : "Réviser"}
-929|              </span>
-930|            </button>
-931|          );
-932|        })}
-933|      </nav>
-934|
-935|      {/* Modale d'Exercice Manus */}
-936|      {lessonId && activeLesson && activeQuestion && (
-937|        <div
-938|          className="modal-scrim"
-939|          role="presentation"
-940|          onMouseDown={(event) => {
-941|            if (event.target === event.currentTarget) setLessonId(null);
-942|          }}
-943|        >
-944|          <section className="lesson-modal" role="dialog" aria-modal="true" aria-labelledby="lesson-title">
-945|            <div className="lesson-modal-top">
-946|              <button onClick={() => setLessonId(null)} className="icon-button" aria-label="Fermer la leçon">
-947|                <ArrowLeft size={19} />
-948|              </button>
-949|              <div className="lesson-progress-label">
-950|                <span>LEÇON · {activeLesson.length.toUpperCase()}</span>
-951|                <span>
-952|                  {questionIndex + 1} / {activeLesson.questions.length}
-953|                </span>
-954|              </div>
-955|              <button onClick={() => setLessonId(null)} className="icon-button" aria-label="Quitter">
-956|                <X size={18} />
-957|              </button>
-958|            </div>
-959|            <div className="lesson-progress-track">
-960|              <span style={{ width: `${((questionIndex + 1) / activeLesson.questions.length) * 100}%` }} />
+635|          <a href="/revisions" className="nav-item">
+636|            <span>{tr("Révisions SRS", "SRS review", "Repaso SRS", "مراجعة SRS")}</span>
+637|          </a>
+638|        </nav>
+639|
+640|        <div className="sidebar-label sidebar-label-spaced">{(t as any).side?.oral || "PRATIQUE ORALE & IA"}</div>
+641|        <button
+642|          onClick={() => setShowScenarioSelector(true)}
+643|          className="nav-item"
+644|        >
+645|          <MessageCircle size={19} strokeWidth={1.8} />
+646|          <span>{tr("Roleplay IA", "AI roleplay", "Roleplay IA", "حوار مع الذكاء الاصطناعي")}</span>
+647|        </button>
+648|
+649|        <div className="sidebar-label sidebar-label-spaced">{(t as any).side?.space || "TON ESPACE"}</div>
+650|        <button
+651|          onClick={() => switchView("space")}
+652|          className={`nav-item ${view === "space" ? "nav-item-active" : ""}`}
+653|          aria-current={view === "space" ? "page" : undefined}
+654|        >
+655|          <Award size={19} strokeWidth={1.8} />
+656|          <span>{tr("Mon Passeport", "My passport", "Mi pasaporte", "جوازي")}</span>
+657|        </button>
+658|
+659|        <div className="sidebar-spacer" />
+660|
+661|        <div className="daily-goal-card">
+662|          <div className="goal-orbit">
+663|            <Target size={17} />
+664|          </div>
+665|          <div className="goal-topline">
+666|            <span>{tr("TON RYTHME", "YOUR PACE", "TU RITMO", "إيقاعك")}</span>
+667|            <span>{Math.min(100, Math.round(((completedCount * 3) / 10) * 100))}%</span>
+668|          </div>
+669|          <strong>{tr("10 minutes par jour", "10 minutes a day", "10 minutos al día", "10 دقائق يومياً")}</strong>
+670|          <div className="goal-track">
+671|            <span style={{ width: `${Math.min(100, ((completedCount * 3) / 10) * 100)}%` }} />
+672|          </div>
+673|          <button
+674|            onClick={() => showToast("Objectif quotidien : 10 minutes de pratique chaque jour.")}
+675|            className="goal-link"
+676|          >
+677|            {tr("Ajuster l’objectif", "Adjust goal", "Ajustar objetivo", "عدّل الهدف")} <ArrowRight size={14} />
+678|          </button>
+679|        </div>
+680|
+681|        <div className="sidebar-footer">
+682|          <span className="privacy-dot" />
+683|          <span>{user ? user.email?.split("@")[0] : "Mode Invité actif"}</span>
+684|          <button
+685|            aria-label="En savoir plus sur les données"
+686|            onClick={() => switchView("space")}
+687|          >
+688|            <CircleHelp size={14} />
+689|          </button>
+690|        </div>
+691|      </aside>
+692|
+693|      {mobileMenuOpen && (
+694|        <button
+695|          className="mobile-scrim"
+696|          aria-label="Fermer le menu"
+697|          onClick={() => setMobileMenuOpen(false)}
+698|        />
+699|      )}
+700|
+701|      {/* Main Area */}
+702|      <main className="main-area">
+703|        <header className="topbar">
+704|          <button
+705|            className="icon-button mobile-menu-trigger"
+706|            aria-label="Ouvrir le menu"
+707|            onClick={() => setMobileMenuOpen(true)}
+708|          >
+709|            <Menu size={21} />
+710|          </button>
+711|          <div className="breadcrumbs">
+712|            <span>KENZA</span>
+713|            <ChevronRight size={14} />
+714|            <span>{currentHeader.eyebrow.toLocaleLowerCase("fr")}</span>
+715|          </div>
+716|          <div className="topbar-actions">
+717|            {/* Sélecteur de langue bilingue */}
+718|            <div className="lang-switcher" role="group" aria-label="Sélecteur de langue">
+719|              <Globe size={13} className="lang-icon" />
+720|              <button
+721|                type="button"
+722|                onClick={() => setLanguage("fr")}
+723|                className={`lang-btn ${uiLanguage === "fr" ? "lang-btn-active" : ""}`}
+724|                aria-label="Passer en français"
+725|              >
+726|                FR
+727|              </button>
+728|              <span className="lang-sep">|</span>
+729|              <button
+730|                type="button"
+731|                onClick={() => setLanguage("en")}
+732|                className={`lang-btn ${uiLanguage === "en" ? "lang-btn-active" : ""}`}
+733|                aria-label="Switch to English"
+734|              >
+735|                EN
+736|              </button>
+737|              <span className="lang-sep">|</span>
+738|              <button
+739|                type="button"
+740|                onClick={() => setLanguage("es")}
+741|                className={`lang-btn ${uiLanguage === "es" ? "lang-btn-active" : ""}`}
+742|                aria-label="Cambiar a español"
+743|              >
+744|                ES
+745|              </button>
+746|              <span className="lang-sep">|</span>
+747|              <button
+748|                type="button"
+749|                onClick={() => setLanguage("ar")}
+750|                className={`lang-btn ${uiLanguage === "ar" ? "lang-btn-active" : ""}`}
+751|                aria-label="Passer en arabe"
+752|              >
+753|                AR
+754|              </button>
+755|            </div>
+756|
+757|            {/* Toggle Son */}
+758|            <button
+759|              className="sound-toggle"
+760|              onClick={toggleSound}
+761|              title={soundEnabled ? "Audio activé" : "Audio muet"}
+762|              aria-label={soundEnabled ? "Couper le son" : "Activer le son"}
+763|            >
+764|              <Headphones size={15} />
+765|              <span>{soundEnabled ? "Son actif" : "Son coupé"}</span>
+766|            </button>
+767|
+768|            {/* Connexion Google & Profil */}
+769|            {user ? (
+770|              <button
+771|                className="top-avatar"
+772|                aria-label="Ouvrir mon espace"
+773|                onClick={() => switchView("space")}
+774|                title={user.email || "Mon profil"}
+775|              >
+776|                {user.user_metadata?.avatar_url ? (
+777|                  <img
+778|                    src={user.user_metadata.avatar_url}
+779|                    alt={user.user_metadata?.full_name || "Profil"}
+780|                    className="w-full h-full object-cover rounded-full"
+781|                  />
+782|                ) : user.user_metadata?.full_name ? (
+783|                  user.user_metadata.full_name[0].toUpperCase()
+784|                ) : user.email ? (
+785|                  user.email[0].toUpperCase()
+786|                ) : (
+787|                  "K"
+788|                )}
+789|              </button>
+790|            ) : (
+791|              <button
+792|                type="button"
+793|                onClick={handleGoogleLogin}
+794|                className="google-login-btn"
+795|                aria-label="Se connecter avec Google"
+796|                title="Se connecter avec Google"
+797|              >
+798|                <svg className="google-icon" width="13" height="13" viewBox="0 0 24 24">
+799|                  <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+800|                  <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/>
+801|                  <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.16 0 10.02 0 12s.45 3.84 1.25 5.42l4.03-3.15z"/>
+802|                  <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+803|                </svg>
+804|                <span>{tr("Se connecter", "Sign in", "Iniciar sesión", "تسجيل الدخول")}</span>
+805|              </button>
+806|            )}
+807|          </div>
+808|        </header>
+809|
+810|        <div className="content-wrap">
+811|          <section className="page-heading">
+812|            <div>
+813|              <div className="eyebrow">
+814|                <span className="eyebrow-line" />
+815|                {currentHeader.eyebrow}
+816|              </div>
+817|              <h1>{currentHeader.title}</h1>
+818|              <p>{currentHeader.description}</p>
+819|            </div>
+820|            <div className="date-chip">
+821|              <span className="date-sun">☼</span>
+822|              <span>
+823|                {new Intl.DateTimeFormat("fr-FR", {
+824|                  weekday: "long",
+825|                  day: "numeric",
+826|                  month: "long",
+827|                }).format(new Date())}
+828|              </span>
+829|            </div>
+830|          </section>
+831|
+832|          {/* VUE 1 : AUJOURD'HUI */}
+833|          {view === "today" && (
+834|            <TodayView
+835|              completedCount={completedCount}
+836|              xp={xp}
+837|              streak={streakDays}
+838|              nextLesson={nextLesson}
+839|              onStart={startLesson}
+840|              onNavigate={switchView}
+841|              onOpenRoleplay={() => setShowScenarioSelector(true)}
+842|            />
+843|          )}
+844|
+845|          {/* VUE 2 : MON PARCOURS */}
+846|          {view === "path" && (
+847|            <PathView
+848|              completedLessons={completedLessons}
+849|              onStart={startLesson}
+850|              onOpenCheckpoint={(id, name) => setCheckpointOpen({ id, name })}
+851|              onOpenPaywall={() => setPricingSource("module_locked")}
+852|              isPremium={isPremium}
+853|            />
+854|          )}
+855|
+856|          {/* VUE 3 : CARNET DE PHRASES */}
+857|          {view === "phrases" && (
+858|            <PhrasesView
+859|              search={search}
+860|              searchInputRef={searchInputRef}
+861|              setSearch={setSearch}
+862|              category={category}
+863|              setCategory={setCategory}
+864|              categories={categories}
+865|              phrases={filteredPhrases}
+866|              favorites={safeFavorites}
+867|              favoritesOnly={favoritesOnly}
+868|              setFavoritesOnly={setFavoritesOnly}
+869|              onFavorite={toggleFavorite}
+870|              onPlay={playPhrase}
+871|              onCopy={copyPhrase}
+872|            />
+873|          )}
+874|
+875|          {/* VUE 4 : RÉVISION SRS */}
+876|          {view === "review" && (
+877|            <ReviewView
+878|              reviewIndex={reviewIndex}
+879|              cardFlipped={cardFlipped}
+880|              setCardFlipped={setCardFlipped}
+881|              onGrade={gradeReview}
+882|            />
+883|          )}
+884|
+885|          {/* VUE 5 : MON ESPACE / PASSEPORT */}
+886|          {view === "space" && (
+887|            <SpaceView
+888|              completedCount={completedCount}
+889|              xp={xp}
+890|              streak={streakDays}
+891|              user={user}
+892|              isPremium={isPremium}
+893|              onReset={resetProgress}
+894|              onOpenPaywall={() => setPricingSource("profile_upgrade")}
+895|              onToast={showToast}
+896|            />
+897|          )}
+898|
+899|          <footer className="page-footer">
+900|            <span>
+901|              KENZA <span className="footer-arabic">كنزة</span>
+902|            </span>
+903|            <span>{tr("Apprendre une langue, c’est rencontrer des gens.", "Learning a language is meeting people.", "Aprender un idioma es conocer gente.", "تعلم اللغة لقاءٌ بالناس.")}</span>
+904|            <button onClick={() => switchView("space")}>
+905|              Passeport Culturel & Données <ArrowRight size={13} />
+906|            </button>
+907|          </footer>
+908|        </div>
+909|      </main>
+910|
+911|      {/* Mobile Bottom Navigation (Visible sous 900px) */}
+912|      <nav className="mobile-bottom-nav" aria-label="Navigation mobile">
+913|        {navItems.map((item) => {
+914|          const Icon = item.icon;
+915|          return (
+916|            <button
+917|              key={item.id}
+918|              onClick={() => switchView(item.id)}
+919|              className={view === item.id ? "mobile-nav-active" : ""}
+920|              aria-label={navLabel(item.id) || item.label}
+921|              aria-current={view === item.id ? "page" : undefined}
+922|            >
+923|              <Icon size={19} />
+924|              <span>
+925|                {item.id === "today"
+926|                  ? "Accueil"
+927|                  : item.id === "path"
+928|                  ? "Parcours"
+929|                  : item.id === "phrases"
+930|                  ? "Phrases"
+931|                  : "Réviser"}
+932|              </span>
+933|            </button>
+934|          );
+935|        })}
+936|      </nav>
+937|
+938|      {/* Modale d'Exercice Manus */}
+939|      {lessonId && activeLesson && activeQuestion && (
+940|        <div
+941|          className="modal-scrim"
+942|          role="presentation"
+943|          onMouseDown={(event) => {
+944|            if (event.target === event.currentTarget) setLessonId(null);
+945|          }}
+946|        >
+947|          <section className="lesson-modal" role="dialog" aria-modal="true" aria-labelledby="lesson-title">
+948|            <div className="lesson-modal-top">
+949|              <button onClick={() => setLessonId(null)} className="icon-button" aria-label="Fermer la leçon">
+950|                <ArrowLeft size={19} />
+951|              </button>
+952|              <div className="lesson-progress-label">
+953|                <span>LEÇON · {activeLesson.length.toUpperCase()}</span>
+954|                <span>
+955|                  {questionIndex + 1} / {activeLesson.questions.length}
+956|                </span>
+957|              </div>
+958|              <button onClick={() => setLessonId(null)} className="icon-button" aria-label="Quitter">
+959|                <X size={18} />
+960|              </button>
 961|            </div>
-962|            <div className="lesson-modal-body">
-963|              <div className="lesson-kicker">
-964|                <span className="lesson-kicker-icon">
-965|                  <Languages size={16} />
-966|                </span>{" "}
-967|                {activeLesson.title}
-968|              </div>
-969|              <h2 id="lesson-title">{activeQuestion.prompt}</h2>
-970|              <p className="lesson-helper">{activeQuestion.helper}</p>
-971|              <div className="answer-list">
-972|                {activeQuestion.options.map((option, index) => {
-973|                  const isCorrect = selectedAnswer !== null && option === activeQuestion.answer;
-974|                  const isWrong = selectedAnswer === option && !isCorrect;
-975|                  const letter = String.fromCharCode(65 + index);
-976|                  return (
-977|                    <button
-978|                      key={option}
-979|                      onClick={() => {
-980|                        if (!selectedAnswer) setSelectedAnswer(option);
-981|                      }}
-982|                      disabled={Boolean(selectedAnswer)}
-983|                      className={`answer-option ${selectedAnswer === option ? "answer-selected" : ""} ${
-984|                        isCorrect ? "answer-correct" : ""
-985|                      } ${isWrong ? "answer-wrong" : ""}`}
-986|                    >
-987|                      <span className="answer-letter">{isCorrect ? <Check size={17} /> : letter}</span>
-988|                      <span>{option}</span>
-989|                      {isCorrect && <CheckCircle2 className="answer-check" size={19} />}
-990|                    </button>
-991|                  );
-992|                })}
-993|              </div>
-994|              {selectedAnswer && (
-995|                <div
-996|                  className={`answer-feedback ${
-997|                    selectedAnswer === activeQuestion.answer ? "feedback-good" : "feedback-try"
-998|                  }`}
-999|                >
-1000|                  <strong>
-1001|                    {selectedAnswer === activeQuestion.answer ? "Bien joué !" : "Presque — retiens ceci."}
-1002|                  </strong>
-1003|                  <span>{activeQuestion.note}</span>
-1004|                </div>
-1005|              )}
-1006|              <button
-1007|                className="primary-button lesson-next"
-1008|                onClick={advanceQuestion}
-1009|                disabled={!selectedAnswer}
-1010|              >
-1011|                {questionIndex === activeLesson.questions.length - 1 ? "Terminer la leçon" : "Continuer"}
-1012|                <ArrowRight size={17} />
-1013|              </button>
-1014|              <div className="local-note">
-1015|                <LockKeyhole size={13} /> Progression enregistrée en direct sur ton profil.
-1016|              </div>
-1017|            </div>
-1018|          </section>
-1019|        </div>
-1020|      )}
-1021|
-1022|      {/* Roleplay Scenario Selector */}
-1023|      {showScenarioSelector && (
-1024|        <ScenarioSelectorModal
-1025|          onClose={() => setShowScenarioSelector(false)}
-1026|          onSelectAi={(personaId) => {
-1027|            setActivePersonaId(personaId);
-1028|            setShowScenarioSelector(false);
-1029|          }}
-1030|          onRequirePremium={() => setPricingSource("roleplay_locked")}
-1031|          onStartSrs={() => {
-1032|            setShowScenarioSelector(false);
-1033|            setView("review");
-1034|          }}
-1035|        />
-1036|      )}
-1037|
-1038|      {/* Fullscreen Roleplay IA Persona View */}
-1039|      {activePersonaId && (
-1040|        <div className="fixed inset-0 z-50 bg-[#FDFCF8] flex flex-col">
-1041|          <AiRoleplayView
-1042|            personaId={activePersonaId}
-1043|            onClose={() => setActivePersonaId(null)}
-1044|          />
-1045|        </div>
-1046|      )}
-1047|
-1048|      {/* Checkpoint Modal */}
-1049|      {checkpointOpen && (
-1050|        <CheckpointModal
-1051|          levelId={checkpointOpen.id}
-1052|          levelName={checkpointOpen.name}
-1053|          onClose={() => setCheckpointOpen(null)}
-1054|        />
-1055|      )}
-1056|
-1057|      {/* Paywall Modal */}
-1058|      {pricingSource && (
-1059|        <PaywallModal
-1060|          onClose={() => setPricingSource(null)}
-1061|          source={pricingSource}
-1062|        />
-1063|      )}
-1064|
-1065|      {/* Toast Notification */}
-1066|      {toast && (
-1067|        <div className="toast-message" role="status" aria-live="polite">
-1068|          <span className="toast-check">
-1069|            <Check size={15} />
-1070|          </span>
-1071|          {toast}
-1072|          <button aria-label="Fermer" onClick={() => setToast("")}>
-1073|            <X size={15} />
-1074|          </button>
-1075|        </div>
-1076|      )}
-1077|
-1078|      <InstallPwaBanner />
-1079|    </div>
-1080|  );
-1081|}
-1082|
-1083|// -------------------------------------------------------------
-1084|// Composant 1 : TodayView
-1085|// -------------------------------------------------------------
-1086|function TodayView({
-1087|  completedCount,
-1088|  xp,
-1089|  streak,
-1090|  nextLesson,
-1091|  onStart,
-1092|  onNavigate,
-1093|  onOpenRoleplay,
-1094|}: {
-1095|  completedCount: number;
-1096|  xp: number;
-1097|  streak: number;
-1098|  nextLesson: Lesson;
-1099|  onStart: (id: string) => void;
-1100|  onNavigate: (view: View) => void;
-1101|  onOpenRoleplay: () => void;
-1102|}) {
-1103|  const totalLessons = baseLessons.length;
-1104|
-1105|  return (
-1106|    <>
-1107|      <div className="today-grid">
-1108|        <article className="hero-panel">
-1109|          <div className="hero-texture" />
-1110|          <div className="hero-copy">
-1111|            <span className="hero-kicker">
-1112|              <Sparkles size={14} /> TON PETIT MOMENT DARIJA
-1113|            </span>
-1114|            <h2>
-1115|              La darija
-1116|              <br />
-1117|              s’ouvre à toi.
-1118|            </h2>
-1119|            <p>{tr("Une phrase, une rencontre, une autre façon de voir le Maroc.", "A phrase, an encounter, another way to see Morocco.", "Una frase, un encuentro, otra forma de ver Marruecos.", "عبارة، لقاء، وطريقة أخرى لرؤية المغرب.")}</p>
-1120|            <button className="hero-button" onClick={() => onStart(nextLesson.id)}>
-1121|              Continuer à apprendre <ArrowRight size={16} />
-1122|            </button>
-1123|            <div className="hero-footnote">
-1124|              <span className="hero-foot-line" /> À ton rythme, toujours.
-1125|            </div>
-1126|          </div>
-1127|          <div className="hero-image-wrap" aria-hidden="true">
-1128|            <img
-1129|              className="hero-image"
-1130|              src="/manus-storage/kenza-hero_99e35384.jpg"
-1131|              alt="Maroc médina"
-1132|            />
-1133|            <div className="hero-image-wash" />
-1134|            <div className="hero-image-caption">
-1135|              <span>دَارِيجة</span>
-1136|              <small>darija, la langue du lien</small>
-1137|            </div>
-1138|          </div>
-1139|          <div className="hero-medallion" aria-hidden="true">
-1140|            <span>مرحبا</span>
-1141|            <small>marhba</small>
-1142|          </div>
-1143|        </article>
-1144|
-1145|        <article className="next-card">
-1146|          <div className="next-card-head">
-1147|            <span className="mini-kicker">{tr("TA PROCHAINE ÉTAPE", "YOUR NEXT STEP", "TU PRÓXIMO PASO", "خطوتك التالية")}</span>
-1148|            <span className="next-icon">
-1149|              <ArrowDownRight size={17} />
-1150|            </span>
-1151|          </div>
-1152|          <div className="lesson-number">
-1153|            0{Math.min(completedCount + 1, totalLessons)}{" "}
-1154|            <span>/ 0{totalLessons}</span>
-1155|          </div>
-1156|          <div className="next-illustration">
-1157|            <img
-1158|              className="next-photo"
-1159|              src="/manus-storage/kenza-market_a0db8277.jpg"
-1160|              alt="Thé à la menthe"
-1161|            />
-1162|            <div className="cup-shadow" />
-1163|            <div className="tea-cup">
-1164|              <span />
-1165|              <i />
-1166|            </div>
-1167|            <div className="tea-steam steam-one" />
-1168|            <div className="tea-steam steam-two" />
-1169|            <div className="tea-leaf leaf-one" />
-1170|            <div className="tea-leaf leaf-two" />
-1171|          </div>
-1172|          <div className="next-card-copy">
-1173|            <span className="lesson-pill">LEÇON SUIVANTE · {nextLesson.length}</span>
-1174|            <h3>{nextLesson.title}</h3>
-1175|            <p>{nextLesson.subtitle}</p>
-1176|          </div>
-1177|          <button className="text-link" onClick={() => onStart(nextLesson.id)}>
-1178|            C’est parti <ArrowRight size={15} />
-1179|          </button>
-1180|        </article>
-1181|      </div>
-1182|
-1183|      <div className="stat-strip">
-1184|        <div className="stat-item">
-1185|          <span className="stat-icon stat-blue">
-1186|            <BookOpen size={17} />
-1187|          </span>
-1188|          <div>
-1189|            <strong>
-1190|              {completedCount}
-1191|              <small>/{totalLessons}</small>
-1192|            </strong>
-1193|            <span>{tr("leçons terminées", "lessons completed", "lecciones completadas", "دروس مكتملة")}</span>
-1194|          </div>
-1195|        </div>
-1196|        <div className="stat-divider" />
-1197|        <div className="stat-item">
-1198|          <span className="stat-icon stat-gold">
-1199|            <Star size={17} />
-1200|          </span>
-1201|          <div>
-1202|            <strong>
-1203|              {xp}
-1204|              <small> XP</small>
-1205|            </strong>
-1206|            <span>{tr("points de pratique", "practice points", "puntos de práctica", "نقاط التدريب")}</span>
-1207|          </div>
-1208|        </div>
-1209|        <div className="stat-divider" />
-1210|        <div className="stat-item">
-1211|          <span className="stat-icon stat-orange">
-1212|            <Flame size={17} />
-1213|          </span>
-1214|          <div>
-1215|            <strong>
-1216|              {streak}
-1217|              <small> jour{streak > 1 ? "s" : ""}</small>
-1218|            </strong>
-1219|            <span>rythme régulier</span>
-1220|          </div>
-1221|        </div>
-1222|        <button className="stat-action" onClick={() => onNavigate("space")}>
-1223|          Voir mon espace <ArrowRight size={14} />
-1224|        </button>
-1225|      </div>
-1226|
-1227|      <div className="section-heading">
-1228|        <div>
-1229|          <span className="eyebrow">
-1230|            <span className="eyebrow-line" />
-1231|            POUR AUJOURD’HUI
-1232|          </span>
-1233|          <h2>{tr("À toi de choisir ton pas.", "Your pace, your choice.", "Tú eliges tu paso.", "اختر خطوتك.")}</h2>
-1234|        </div>
-1235|        <button className="plain-link" onClick={() => onNavigate("path")}>
-1236|          Voir le parcours <ArrowRight size={15} />
-1237|        </button>
-1238|      </div>
-1239|
-1240|      <div className="quick-grid">
-1241|        <button className="quick-card quick-card-phrases" onClick={() => onNavigate("phrases")}>
-1242|          <span className="quick-icon">
-1243|            <Bookmark size={18} />
-1244|          </span>
-1245|          <span className="quick-label">{tr("UN MOT À EMPORTER", "A WORD TO GO", "UNA PALABRA PARA LLEVAR", "كلمة معك")}</span>
-1246|          <strong>
-1247|            Ton carnet
-1248|            <br />
-1249|            de phrases
-1250|          </strong>
-1251|          <span className="quick-bottom">
-1252|            Vocabulaire essentiel <ArrowRight size={14} />
-1253|          </span>
-1254|        </button>
-1255|
-1256|        <button className="quick-card quick-card-review" onClick={() => onNavigate("review")}>
-1257|          <span className="quick-icon">
-1258|            <Sparkles size={18} />
-1259|          </span>
-1260|          <span className="quick-label">{tr("5 MINUTES, PAS PLUS", "5 MINUTES, NO MORE", "5 MINUTOS, NO MÁS", "5 دقائق فقط")}</span>
-1261|          <strong>
-1262|            Faire une
-1263|            <br />
-1264|            petite révision
-1265|          </strong>
-1266|          <span className="quick-bottom">
-1267|            Cartes du jour <ArrowRight size={14} />
-1268|          </span>
-1269|        </button>
-1270|
-1271|        <button className="quick-card quick-card-listen" onClick={onOpenRoleplay}>
-1272|          <span className="quick-icon">
-1273|            <MessageCircle size={18} />
-1274|          </span>
-1275|          <span className="quick-label">{tr("IMMERSION IA", "AI IMMERSION", "INMERSIÓN IA", "انغماس مع الذكاء")}</span>
-1276|          <strong>
-1277|            Mises en
-1278|            <br />
-1279|            situation
-1280|          </strong>
-1281|          <span className="quick-bottom">
-1282|            Au café, en taxi <ArrowRight size={14} />
-1283|          </span>
-1284|        </button>
-1285|      </div>
-1286|
-1287|      <div className="bottom-callout">
-1288|        <div className="callout-art">
-1289|          <div className="callout-sun" />
-1290|          <div className="callout-arch">
-1291|            <span>مرحبا</span>
-1292|          </div>
-1293|          <span className="callout-spark spark-a">✳</span>
-1294|          <span className="callout-spark spark-b">✳</span>
-1295|        </div>
-1296|        <div className="callout-copy">
-1297|          <span className="mini-kicker">{tr("UNE LANGUE, DES RENCONTRES", "A LANGUAGE, ENCOUNTERS", "UN IDIOMA, ENCUENTROS", "لغةٌ ولقاءات")}</span>
-1298|          <h3>
-1299|            Pas besoin d’être parfait·e.
-1300|            <br />
-1301|            <em>{tr("Il suffit de commencer.", "Just start.", "Solo empieza.", "ابدأ فقط.")}</em>
-1302|          </h3>
-1303|          <p>Chaque expression est une petite invitation à aller vers l’autre.</p>
-1304|        </div>
-1305|        <button onClick={() => onNavigate("path")} aria-label="Explorer le parcours">
-1306|          <ArrowRight size={20} />
-1307|        </button>
-1308|      </div>
-1309|    </>
-1310|  );
-1311|}
-1312|
-1313|// -------------------------------------------------------------
-1314|// Composant 2 : PathView
-1315|// -------------------------------------------------------------
-1316|function PathView({
-1317|  completedLessons,
-1318|  onStart,
-1319|  onOpenCheckpoint,
-1320|  onOpenPaywall,
-1321|  isPremium,
-1322|}: {
-1323|  completedLessons: string[];
-1324|  onStart: (id: string) => void;
-1325|  onOpenCheckpoint: (id: string, name: string) => void;
-1326|  onOpenPaywall: () => void;
-1327|  isPremium: boolean;
-1328|}) {
-1329|  const { hasPassedLevel } = useCheckpointProgress();
-1330|
-1331|  return (
-1332|    <div className="path-layout">
-1333|      <section className="path-main-card">
-1334|        <div className="path-banner">
-1335|          <div>
-1336|            <span className="hero-kicker">
-1337|              <Compass size={14} /> PARCOURS DÉCOUVERTE
-1338|            </span>
-1339|            <h2>
-1340|              Les premiers pas
-1341|              <br />
-1342|              en darija.
-1343|            </h2>
-1344|            <p>{tr("Trois escales pour oser dire les premiers mots.", "Three stops to dare your first words.", "Tres paradas para atreverte a hablar.", "ثلاث محطات لتبدأ كلماتك الأولى.")}</p>
-1345|          </div>
-1346|          <div className="path-stamp">
-1347|            <span>المغرب</span>
-1348|            <small>Maroc</small>
-1349|          </div>
-1350|          <div className="path-doodle" />
-1351|        </div>
-1352|
-1353|        <div className="path-progress-row">
-1354|          <div>
-1355|            <span className="mini-kicker">{tr("TON AVANCÉE", "YOUR PROGRESS", "TU AVANCE", "تقدّمك")}</span>
-1356|            <strong>
-1357|              {completedLessons.length}{" "}
-1358|              <small>
-1359|                leçon{completedLessons.length > 1 ? "s" : ""} sur {baseLessons.length}
-1360|              </small>
-1361|            </strong>
-1362|          </div>
-1363|          <div className="path-overall-track">
-1364|            <span
-1365|              style={{
-1366|                width: `${Math.round((completedLessons.length / baseLessons.length) * 100)}%`,
-1367|              }}
-1368|            />
-1369|          </div>
-1370|          <span className="path-percent">
-1371|            {Math.round((completedLessons.length / baseLessons.length) * 100)}%
-1372|          </span>
-1373|        </div>
-1374|
-1375|        <div className="lesson-roadmap">
-1376|          {baseLessons.map((lesson, index) => {
-1377|            const done = completedLessons.includes(lesson.id);
-1378|            const unlocked =
-1379|              index === 0 || completedLessons.includes(baseLessons[index - 1].id) || done;
-1380|            const isGated = lesson.isPremium && !isPremium;
-1381|            const locked = !unlocked && !isGated;
-1382|
-1383|            return (
-1384|              <div
-1385|                className={`roadmap-row ${done ? "roadmap-done" : ""} ${locked ? "roadmap-locked" : ""}`}
-1386|                key={lesson.id}
-1387|              >
-1388|                <div className="roadmap-track">
-1389|                  <div className="roadmap-line" />
-1390|                  <button
-1391|                    className={`roadmap-node ${done ? "node-done" : ""} ${
-1392|                      !locked && !done ? "node-current" : ""
-1393|                    }`}
-1394|                    disabled={locked}
-1395|                    onClick={() => (isGated ? onOpenPaywall() : onStart(lesson.id))}
-1396|                    aria-label={
-1397|                      done
-1398|                        ? `Revoir ${lesson.title}`
-1399|                        : locked
-1400|                        ? `${lesson.title}, verrouillée`
-1401|                        : `Commencer ${lesson.title}`
-1402|                    }
-1403|                  >
-1404|                    {done ? (
-1405|                      <Check size={16} />
-1406|                    ) : isGated ? (
-1407|                      <Crown size={14} className="text-[#C9A05C]" />
-1408|                    ) : locked ? (
-1409|                      <LockKeyhole size={14} />
-1410|                    ) : (
-1411|                      <span>0{index + 1}</span>
-1412|                    )}
-1413|                  </button>
-1414|                </div>
-1415|                <div className="roadmap-content">
-1416|                  <div className="roadmap-meta">
-1417|                    <span>
-1418|                      {lesson.length.toUpperCase()} ·{" "}
-1419|                      {index === 0
-1420|                        ? "LES ESSENTIELS"
-1421|                        : index === 1
-1422|                        ? "AU QUOTIDIEN"
-1423|                        : index === 2
-1424|                        ? "SE REPÉRER"
-1425|                        : "IMMERSION AVANCÉE"}
-1426|                    </span>
-1427|                    {done && (
-1428|                      <span className="done-tag">
-1429|                        <CheckCircle2 size={13} /> TERMINÉE
-1430|                      </span>
-1431|                    )}
-1432|                    {!done && !locked && !isGated && (
-1433|                      <span className="current-tag">{tr("À SUIVRE", "TO CONTINUE", "A CONTINUAR", "للمتابعة")}</span>
+962|            <div className="lesson-progress-track">
+963|              <span style={{ width: `${((questionIndex + 1) / activeLesson.questions.length) * 100}%` }} />
+964|            </div>
+965|            <div className="lesson-modal-body">
+966|              <div className="lesson-kicker">
+967|                <span className="lesson-kicker-icon">
+968|                  <Languages size={16} />
+969|                </span>{" "}
+970|                {activeLesson.title}
+971|              </div>
+972|              <h2 id="lesson-title">{activeQuestion.prompt}</h2>
+973|              <p className="lesson-helper">{activeQuestion.helper}</p>
+974|              <div className="answer-list">
+975|                {activeQuestion.options.map((option, index) => {
+976|                  const isCorrect = selectedAnswer !== null && option === activeQuestion.answer;
+977|                  const isWrong = selectedAnswer === option && !isCorrect;
+978|                  const letter = String.fromCharCode(65 + index);
+979|                  return (
+980|                    <button
+981|                      key={option}
+982|                      onClick={() => {
+983|                        if (!selectedAnswer) setSelectedAnswer(option);
+984|                      }}
+985|                      disabled={Boolean(selectedAnswer)}
+986|                      className={`answer-option ${selectedAnswer === option ? "answer-selected" : ""} ${
+987|                        isCorrect ? "answer-correct" : ""
+988|                      } ${isWrong ? "answer-wrong" : ""}`}
+989|                    >
+990|                      <span className="answer-letter">{isCorrect ? <Check size={17} /> : letter}</span>
+991|                      <span>{option}</span>
+992|                      {isCorrect && <CheckCircle2 className="answer-check" size={19} />}
+993|                    </button>
+994|                  );
+995|                })}
+996|              </div>
+997|              {selectedAnswer && (
+998|                <div
+999|                  className={`answer-feedback ${
+1000|                    selectedAnswer === activeQuestion.answer ? "feedback-good" : "feedback-try"
+1001|                  }`}
+1002|                >
+1003|                  <strong>
+1004|                    {selectedAnswer === activeQuestion.answer ? "Bien joué !" : "Presque — retiens ceci."}
+1005|                  </strong>
+1006|                  <span>{activeQuestion.note}</span>
+1007|                </div>
+1008|              )}
+1009|              <button
+1010|                className="primary-button lesson-next"
+1011|                onClick={advanceQuestion}
+1012|                disabled={!selectedAnswer}
+1013|              >
+1014|                {questionIndex === activeLesson.questions.length - 1 ? tr("Terminer la leçon", "Finish the lesson", "Terminar la lección", "أنهِ الدرس") : tr("Continuer", "Continue", "Continuar", "متابعة")}
+1015|                <ArrowRight size={17} />
+1016|              </button>
+1017|              <div className="local-note">
+1018|                <LockKeyhole size={13} /> Progression enregistrée en direct sur ton profil.
+1019|              </div>
+1020|            </div>
+1021|          </section>
+1022|        </div>
+1023|      )}
+1024|
+1025|      {/* Roleplay Scenario Selector */}
+1026|      {showScenarioSelector && (
+1027|        <ScenarioSelectorModal
+1028|          onClose={() => setShowScenarioSelector(false)}
+1029|          onSelectAi={(personaId) => {
+1030|            setActivePersonaId(personaId);
+1031|            setShowScenarioSelector(false);
+1032|          }}
+1033|          onRequirePremium={() => setPricingSource("roleplay_locked")}
+1034|          onStartSrs={() => {
+1035|            setShowScenarioSelector(false);
+1036|            setView("review");
+1037|          }}
+1038|        />
+1039|      )}
+1040|
+1041|      {/* Fullscreen Roleplay IA Persona View */}
+1042|      {activePersonaId && (
+1043|        <div className="fixed inset-0 z-50 bg-[#FDFCF8] flex flex-col">
+1044|          <AiRoleplayView
+1045|            personaId={activePersonaId}
+1046|            onClose={() => setActivePersonaId(null)}
+1047|          />
+1048|        </div>
+1049|      )}
+1050|
+1051|      {/* Checkpoint Modal */}
+1052|      {checkpointOpen && (
+1053|        <CheckpointModal
+1054|          levelId={checkpointOpen.id}
+1055|          levelName={checkpointOpen.name}
+1056|          onClose={() => setCheckpointOpen(null)}
+1057|        />
+1058|      )}
+1059|
+1060|      {/* Paywall Modal */}
+1061|      {pricingSource && (
+1062|        <PaywallModal
+1063|          onClose={() => setPricingSource(null)}
+1064|          source={pricingSource}
+1065|        />
+1066|      )}
+1067|
+1068|      {/* Toast Notification */}
+1069|      {toast && (
+1070|        <div className="toast-message" role="status" aria-live="polite">
+1071|          <span className="toast-check">
+1072|            <Check size={15} />
+1073|          </span>
+1074|          {toast}
+1075|          <button aria-label="Fermer" onClick={() => setToast("")}>
+1076|            <X size={15} />
+1077|          </button>
+1078|        </div>
+1079|      )}
+1080|
+1081|      <InstallPwaBanner />
+1082|    </div>
+1083|  );
+1084|}
+1085|
+1086|// -------------------------------------------------------------
+1087|// Composant 1 : TodayView
+1088|// -------------------------------------------------------------
+1089|function TodayView({
+1090|  completedCount,
+1091|  xp,
+1092|  streak,
+1093|  nextLesson,
+1094|  onStart,
+1095|  onNavigate,
+1096|  onOpenRoleplay,
+1097|}: {
+1098|  completedCount: number;
+1099|  xp: number;
+1100|  streak: number;
+1101|  nextLesson: Lesson;
+1102|  onStart: (id: string) => void;
+1103|  onNavigate: (view: View) => void;
+1104|  onOpenRoleplay: () => void;
+1105|}) {
+1106|  const totalLessons = baseLessons.length;
+1107|
+1108|  return (
+1109|    <>
+1110|      <div className="today-grid">
+1111|        <article className="hero-panel">
+1112|          <div className="hero-texture" />
+1113|          <div className="hero-copy">
+1114|            <span className="hero-kicker">
+1115|              <Sparkles size={14} /> {tr("TON PETIT MOMENT DARIJA", "YOUR LITTLE DARIJA MOMENT", "TU MOMENTO DARIJA", "لحظتك مع الدارجة")}
+1116|            </span>
+1117|            <h2>
+1118|              {tr("La darija", "Darija", "La darija", "الدارجة")}
+1119|              <br />
+1120|              {tr("s’ouvre à toi.", "opens up to you.", "se abre a ti.", "تنفتح عليك.")}
+1121|            </h2>
+1122|            <p>{tr("Une phrase, une rencontre, une autre façon de voir le Maroc.", "A phrase, an encounter, another way to see Morocco.", "Una frase, un encuentro, otra forma de ver Marruecos.", "عبارة، لقاء، وطريقة أخرى لرؤية المغرب.")}</p>
+1123|            <button className="hero-button" onClick={() => onStart(nextLesson.id)}>
+1124|              {tr("Continuer à apprendre", "Keep learning", "Seguir aprendiendo", "واصل التعلم")} <ArrowRight size={16} />
+1125|            </button>
+1126|            <div className="hero-footnote">
+1127|              <span className="hero-foot-line" /> {tr("À ton rythme, toujours.", "At your pace, always.", "A tu ritmo, siempre.", "على إيقاعك، دائماً.")}
+1128|            </div>
+1129|          </div>
+1130|          <div className="hero-image-wrap" aria-hidden="true">
+1131|            <img
+1132|              className="hero-image"
+1133|              src="/manus-storage/kenza-hero_99e35384.jpg"
+1134|              alt="Maroc médina"
+1135|            />
+1136|            <div className="hero-image-wash" />
+1137|            <div className="hero-image-caption">
+1138|              <span>دَارِيجة</span>
+1139|              <small>{tr("darija, la langue du lien", "darija, the language of connection", "darija, la lengua del vínculo", "الدارجة، لغة التواصل")}</small>
+1140|            </div>
+1141|          </div>
+1142|          <div className="hero-medallion" aria-hidden="true">
+1143|            <span>مرحبا</span>
+1144|            <small>marhba</small>
+1145|          </div>
+1146|        </article>
+1147|
+1148|        <article className="next-card">
+1149|          <div className="next-card-head">
+1150|            <span className="mini-kicker">{tr("TA PROCHAINE ÉTAPE", "YOUR NEXT STEP", "TU PRÓXIMO PASO", "خطوتك التالية")}</span>
+1151|            <span className="next-icon">
+1152|              <ArrowDownRight size={17} />
+1153|            </span>
+1154|          </div>
+1155|          <div className="lesson-number">
+1156|            0{Math.min(completedCount + 1, totalLessons)}{" "}
+1157|            <span>/ 0{totalLessons}</span>
+1158|          </div>
+1159|          <div className="next-illustration">
+1160|            <img
+1161|              className="next-photo"
+1162|              src="/manus-storage/kenza-market_a0db8277.jpg"
+1163|              alt="Thé à la menthe"
+1164|            />
+1165|            <div className="cup-shadow" />
+1166|            <div className="tea-cup">
+1167|              <span />
+1168|              <i />
+1169|            </div>
+1170|            <div className="tea-steam steam-one" />
+1171|            <div className="tea-steam steam-two" />
+1172|            <div className="tea-leaf leaf-one" />
+1173|            <div className="tea-leaf leaf-two" />
+1174|          </div>
+1175|          <div className="next-card-copy">
+1176|            <span className="lesson-pill">{tr("LEÇON SUIVANTE", "NEXT LESSON", "PRÓXIMA LECCIÓN", "الدرس التالي")} · {nextLesson.length}</span>
+1177|            <h3>{nextLesson.title}</h3>
+1178|            <p>{nextLesson.subtitle}</p>
+1179|          </div>
+1180|          <button className="text-link" onClick={() => onStart(nextLesson.id)}>
+1181|            {tr("C’est parti", "Let’s go", "¡Vamos!", "هيا بنا")} <ArrowRight size={15} />
+1182|          </button>
+1183|        </article>
+1184|      </div>
+1185|
+1186|      <div className="stat-strip">
+1187|        <div className="stat-item">
+1188|          <span className="stat-icon stat-blue">
+1189|            <BookOpen size={17} />
+1190|          </span>
+1191|          <div>
+1192|            <strong>
+1193|              {completedCount}
+1194|              <small>/{totalLessons}</small>
+1195|            </strong>
+1196|            <span>{tr("leçons terminées", "lessons completed", "lecciones completadas", "دروس مكتملة")}</span>
+1197|          </div>
+1198|        </div>
+1199|        <div className="stat-divider" />
+1200|        <div className="stat-item">
+1201|          <span className="stat-icon stat-gold">
+1202|            <Star size={17} />
+1203|          </span>
+1204|          <div>
+1205|            <strong>
+1206|              {xp}
+1207|              <small> XP</small>
+1208|            </strong>
+1209|            <span>{tr("points de pratique", "practice points", "puntos de práctica", "نقاط التدريب")}</span>
+1210|          </div>
+1211|        </div>
+1212|        <div className="stat-divider" />
+1213|        <div className="stat-item">
+1214|          <span className="stat-icon stat-orange">
+1215|            <Flame size={17} />
+1216|          </span>
+1217|          <div>
+1218|            <strong>
+1219|              {streak}
+1220|              <small> {tr("jour", "day", "día", "يوم")}{streak > 1 ? "s" : ""}</small>
+1221|            </strong>
+1222|            <span>{tr("rythme régulier", "steady rhythm", "ritmo constante", "إيقاع منتظم")}</span>
+1223|          </div>
+1224|        </div>
+1225|        <button className="stat-action" onClick={() => onNavigate("space")}>
+1226|          {tr("Voir mon espace", "See my space", "Ver mi espacio", "فضائي")} <ArrowRight size={14} />
+1227|        </button>
+1228|      </div>
+1229|
+1230|      <div className="section-heading">
+1231|        <div>
+1232|          <span className="eyebrow">
+1233|            <span className="eyebrow-line" />
+1234|            {tr("POUR AUJOURD’HUI", "FOR TODAY", "PARA HOY", "لهذا اليوم")}
+1235|          </span>
+1236|          <h2>{tr("À toi de choisir ton pas.", "Your pace, your choice.", "Tú eliges tu paso.", "اختر خطوتك.")}</h2>
+1237|        </div>
+1238|        <button className="plain-link" onClick={() => onNavigate("path")}>
+1239|          {tr("Voir le parcours", "View the journey", "Ver la ruta", "المسار")} <ArrowRight size={15} />
+1240|        </button>
+1241|      </div>
+1242|
+1243|      <div className="quick-grid">
+1244|        <button className="quick-card quick-card-phrases" onClick={() => onNavigate("phrases")}>
+1245|          <span className="quick-icon">
+1246|            <Bookmark size={18} />
+1247|          </span>
+1248|          <span className="quick-label">{tr("UN MOT À EMPORTER", "A WORD TO GO", "UNA PALABRA PARA LLEVAR", "كلمة معك")}</span>
+1249|          <strong>
+1250|            {tr("Ton carnet", "Your phrase", "Tu cuaderno", "دفترك")}
+1251|            <br />
+1252|            {tr("de phrases", " book", " de frases", " للعبارات")}
+1253|          </strong>
+1254|          <span className="quick-bottom">
+1255|            {tr("Vocabulaire essentiel", "Essential vocabulary", "Vocabulario esencial", "مفردات أساسية")} <ArrowRight size={14} />
+1256|          </span>
+1257|        </button>
+1258|
+1259|        <button className="quick-card quick-card-review" onClick={() => onNavigate("review")}>
+1260|          <span className="quick-icon">
+1261|            <Sparkles size={18} />
+1262|          </span>
+1263|          <span className="quick-label">{tr("5 MINUTES, PAS PLUS", "5 MINUTES, NO MORE", "5 MINUTOS, NO MÁS", "5 دقائق فقط")}</span>
+1264|          <strong>
+1265|            {tr("Faire une", "Do a quick", "Haz una", "قم بمراجعة")}
+1266|            <br />
+1267|            {tr("petite révision", "review", "revisión rápida", "سريعة")}
+1268|          </strong>
+1269|          <span className="quick-bottom">
+1270|            {tr("Cartes du jour", "Cards of the day", "Cartas del día", "بطاقات اليوم")} <ArrowRight size={14} />
+1271|          </span>
+1272|        </button>
+1273|
+1274|        <button className="quick-card quick-card-listen" onClick={onOpenRoleplay}>
+1275|          <span className="quick-icon">
+1276|            <MessageCircle size={18} />
+1277|          </span>
+1278|          <span className="quick-label">{tr("IMMERSION IA", "AI IMMERSION", "INMERSIÓN IA", "انغماس مع الذكاء")}</span>
+1279|          <strong>
+1280|            {tr("Mises en", "Real-life", "Situaciones", "مواقف")}
+1281|            <br />
+1282|            {tr("situation", "scenarios", "de la vida real", "من الحياة")}
+1283|          </strong>
+1284|          <span className="quick-bottom">
+1285|            {tr("Au café, en taxi", "At the café, in a taxi", "En el café, en taxi", "في المقهى وفي التاكسي")} <ArrowRight size={14} />
+1286|          </span>
+1287|        </button>
+1288|      </div>
+1289|
+1290|      <div className="bottom-callout">
+1291|        <div className="callout-art">
+1292|          <div className="callout-sun" />
+1293|          <div className="callout-arch">
+1294|            <span>مرحبا</span>
+1295|          </div>
+1296|          <span className="callout-spark spark-a">✳</span>
+1297|          <span className="callout-spark spark-b">✳</span>
+1298|        </div>
+1299|        <div className="callout-copy">
+1300|          <span className="mini-kicker">{tr("UNE LANGUE, DES RENCONTRES", "A LANGUAGE, ENCOUNTERS", "UN IDIOMA, ENCUENTROS", "لغةٌ ولقاءات")}</span>
+1301|          <h3>
+1302|            Pas besoin d’être parfait·e.
+1303|            <br />
+1304|            <em>{tr("Il suffit de commencer.", "Just start.", "Solo empieza.", "ابدأ فقط.")}</em>
+1305|          </h3>
+1306|          <p>Chaque expression est une petite invitation à aller vers l’autre.</p>
+1307|        </div>
+1308|        <button onClick={() => onNavigate("path")} aria-label="Explorer le parcours">
+1309|          <ArrowRight size={20} />
+1310|        </button>
+1311|      </div>
+1312|    </>
+1313|  );
+1314|}
+1315|
+1316|// -------------------------------------------------------------
+1317|// Composant 2 : PathView
+1318|// -------------------------------------------------------------
+1319|function PathView({
+1320|  completedLessons,
+1321|  onStart,
+1322|  onOpenCheckpoint,
+1323|  onOpenPaywall,
+1324|  isPremium,
+1325|}: {
+1326|  completedLessons: string[];
+1327|  onStart: (id: string) => void;
+1328|  onOpenCheckpoint: (id: string, name: string) => void;
+1329|  onOpenPaywall: () => void;
+1330|  isPremium: boolean;
+1331|}) {
+1332|  const { hasPassedLevel } = useCheckpointProgress();
+1333|
+1334|  return (
+1335|    <div className="path-layout">
+1336|      <section className="path-main-card">
+1337|        <div className="path-banner">
+1338|          <div>
+1339|            <span className="hero-kicker">
+1340|              <Compass size={14} /> PARCOURS DÉCOUVERTE
+1341|            </span>
+1342|            <h2>
+1343|              Les premiers pas
+1344|              <br />
+1345|              en darija.
+1346|            </h2>
+1347|            <p>{tr("Trois escales pour oser dire les premiers mots.", "Three stops to dare your first words.", "Tres paradas para atreverte a hablar.", "ثلاث محطات لتبدأ كلماتك الأولى.")}</p>
+1348|          </div>
+1349|          <div className="path-stamp">
+1350|            <span>المغرب</span>
+1351|            <small>Maroc</small>
+1352|          </div>
+1353|          <div className="path-doodle" />
+1354|        </div>
+1355|
+1356|        <div className="path-progress-row">
+1357|          <div>
+1358|            <span className="mini-kicker">{tr("TON AVANCÉE", "YOUR PROGRESS", "TU AVANCE", "تقدّمك")}</span>
+1359|            <strong>
+1360|              {completedLessons.length}{" "}
+1361|              <small>
+1362|                leçon{completedLessons.length > 1 ? "s" : ""} sur {baseLessons.length}
+1363|              </small>
+1364|            </strong>
+1365|          </div>
+1366|          <div className="path-overall-track">
+1367|            <span
+1368|              style={{
+1369|                width: `${Math.round((completedLessons.length / baseLessons.length) * 100)}%`,
+1370|              }}
+1371|            />
+1372|          </div>
+1373|          <span className="path-percent">
+1374|            {Math.round((completedLessons.length / baseLessons.length) * 100)}%
+1375|          </span>
+1376|        </div>
+1377|
+1378|        <div className="lesson-roadmap">
+1379|          {baseLessons.map((lesson, index) => {
+1380|            const done = completedLessons.includes(lesson.id);
+1381|            const unlocked =
+1382|              index === 0 || completedLessons.includes(baseLessons[index - 1].id) || done;
+1383|            const isGated = lesson.isPremium && !isPremium;
+1384|            const locked = !unlocked && !isGated;
+1385|
+1386|            return (
+1387|              <div
+1388|                className={`roadmap-row ${done ? "roadmap-done" : ""} ${locked ? "roadmap-locked" : ""}`}
+1389|                key={lesson.id}
+1390|              >
+1391|                <div className="roadmap-track">
+1392|                  <div className="roadmap-line" />
+1393|                  <button
+1394|                    className={`roadmap-node ${done ? "node-done" : ""} ${
+1395|                      !locked && !done ? "node-current" : ""
+1396|                    }`}
+1397|                    disabled={locked}
+1398|                    onClick={() => (isGated ? onOpenPaywall() : onStart(lesson.id))}
+1399|                    aria-label={
+1400|                      done
+1401|                        ? `Revoir ${lesson.title}`
+1402|                        : locked
+1403|                        ? `${lesson.title}, verrouillée`
+1404|                        : `Commencer ${lesson.title}`
+1405|                    }
+1406|                  >
+1407|                    {done ? (
+1408|                      <Check size={16} />
+1409|                    ) : isGated ? (
+1410|                      <Crown size={14} className="text-[#C9A05C]" />
+1411|                    ) : locked ? (
+1412|                      <LockKeyhole size={14} />
+1413|                    ) : (
+1414|                      <span>0{index + 1}</span>
+1415|                    )}
+1416|                  </button>
+1417|                </div>
+1418|                <div className="roadmap-content">
+1419|                  <div className="roadmap-meta">
+1420|                    <span>
+1421|                      {lesson.length.toUpperCase()} ·{" "}
+1422|                      {index === 0
+1423|                        ? "LES ESSENTIELS"
+1424|                        : index === 1
+1425|                        ? "AU QUOTIDIEN"
+1426|                        : index === 2
+1427|                        ? "SE REPÉRER"
+1428|                        : "IMMERSION AVANCÉE"}
+1429|                    </span>
+1430|                    {done && (
+1431|                      <span className="done-tag">
+1432|                        <CheckCircle2 size={13} /> TERMINÉE
+1433|                      </span>
 1434|                    )}
-1435|                    {isGated && (
-1436|                      <span className="current-tag" style={{ background: "#fef3c7", color: "#b45309" }}>
-1437|                        PRO
-1438|                      </span>
-1439|                    )}
-1440|                  </div>
-1441|                  <h3>{lesson.title}</h3>
-1442|                  <p>{lesson.subtitle}</p>
-1443|                  <div className="roadmap-footer">
-1444|                    <span>
-1445|                      <BookOpen size={14} /> {lesson.questions.length} exercices
-1446|                    </span>
-1447|                    {isGated ? (
-1448|                      <button onClick={onOpenPaywall} style={{ color: "#d69b47" }}>
-1449|                        Débloquer avec Pro <ArrowRight size={14} />
-1450|                      </button>
-1451|                    ) : unlocked ? (
-1452|                      <button onClick={() => onStart(lesson.id)}>
-1453|                        {done ? "Revoir" : "Commencer"}
-1454|                        <ArrowRight size={14} />
-1455|                      </button>
-1456|                    ) : (
-1457|                      <span className="locked-copy">
-1458|                        <LockKeyhole size={13} /> Finis l’étape avant
-1459|                      </span>
-1460|                    )}
-1461|                  </div>
-1462|                </div>
-1463|              </div>
-1464|            );
-1465|          })}
-1466|        </div>
-1467|      </section>
-1468|
-1469|      <aside className="path-aside">
-1470|        <div className="path-aside-card">
-1471|          <span className="aside-icon">
-1472|            <Leaf size={18} />
-1473|          </span>
-1474|          <span className="mini-kicker">{tr("PETIT CONSEIL", "QUICK TIP", "PEQUEÑO CONSEJO", "نصيحة صغيرة")}</span>
-1475|          <h3>{tr("La régularité avant la perfection.", "Consistency beats perfection.", "La constancia antes que la perfección.", "الاستمرارية قبل الإتقان.")}</h3>
-1476|          <p>
-1477|            5 minutes par jour font plus qu’une heure de temps en temps. Reviens quand tu veux.
-1478|          </p>
-1479|          <div className="aside-divider" />
-1480|          <div className="aside-stat">
-1481|            <span>{tr("Palier A1 (Fondations)", "Level A1 (Foundations)", "Nivel A1 (Fundamentos)", "المستوى A1 (الأساسيات)")}</span>
-1482|            <strong>{hasPassedLevel("1") ? "Validé ✓" : "En cours"}</strong>
-1483|          </div>
-1484|          <button
-1485|            onClick={() => onOpenCheckpoint("1", "Palier A1 — Fondations")}
-1486|          >
-1487|            Passer le Checkpoint A1 <ArrowRight size={14} />
-1488|          </button>
-1489|        </div>
-1490|
-1491|        <div className="path-aside-note">
-1492|          <span className="note-symbol">✳</span>
-1493|          <p>
-1494|            Le mot <strong>darija</strong> vient de l’arabe <span dir="rtl">الدارجة</span> — la
-1495|            langue courante, celle de tous les jours.
-1496|          </p>
-1497|        </div>
-1498|      </aside>
-1499|    </div>
-1500|  );
-1501|}
-1502|
-1503|// -------------------------------------------------------------
-1504|// Composant 3 : PhrasesView
-1505|// -------------------------------------------------------------
-1506|function PhrasesView({
-1507|  search,
-1508|  searchInputRef,
-1509|  setSearch,
-1510|  category,
-1511|  setCategory,
-1512|  categories,
-1513|  phrases: visiblePhrases,
-1514|  favorites = [],
-1515|  favoritesOnly,
-1516|  setFavoritesOnly,
-1517|  onFavorite,
-1518|  onPlay,
-1519|  onCopy,
-1520|}: {
-1521|  search: string;
-1522|  searchInputRef: RefObject<HTMLInputElement | null>;
-1523|  setSearch: (value: string) => void;
-1524|  category: string;
-1525|  setCategory: (value: string) => void;
-1526|  categories: string[];
-1527|  phrases: Phrase[];
-1528|  favorites?: string[];
-1529|  favoritesOnly: boolean;
-1530|  setFavoritesOnly: (value: boolean) => void;
-1531|  onFavorite: (id: string) => void;
-1532|  onPlay: (darija: string, arabic: string) => void;
-1533|  onCopy: (phrase: Phrase) => void;
-1534|}) {
-1535|  const safeFavorites = Array.isArray(favorites) ? favorites : [];
-1536|  const safePhrases = Array.isArray(visiblePhrases) ? visiblePhrases : [];
-1537|
-1538|  return (
-1539|    <>
-1540|      <section className="phrase-toolbar">
-1541|        <label className="phrase-search">
-1542|          <Search size={17} />
-1543|          <input
-1544|            ref={searchInputRef}
-1545|            value={search}
-1546|            onChange={(event) => setSearch(event.target.value)}
-1547|            placeholder="Chercher une expression…"
-1548|            aria-label="Chercher une expression"
-1549|          />
-1550|          <kbd>⌘ K</kbd>
-1551|        </label>
-1552|        <button
-1553|          className={`favorites-filter ${favoritesOnly ? "filter-active" : ""}`}
-1554|          onClick={() => setFavoritesOnly(!favoritesOnly)}
-1555|        >
-1556|          <Heart size={15} fill={favoritesOnly ? "currentColor" : "none"} /> Mes favoris{" "}
-1557|          <span>{safeFavorites.length}</span>
-1558|        </button>
-1559|      </section>
-1560|
-1561|      <div className="category-tabs" role="tablist" aria-label="Catégories de phrases">
-1562|        {(categories || []).map((item) => (
-1563|          <button
-1564|            role="tab"
-1565|            aria-selected={category === item}
-1566|            key={item}
-1567|            className={category === item ? "category-active" : ""}
-1568|            onClick={() => setCategory(item)}
-1569|          >
-1570|            {item}
-1571|          </button>
-1572|        ))}
-1573|      </div>
-1574|
-1575|      <div className="phrase-section-top">
-1576|        <div>
-1577|          <span className="mini-kicker">{tr("À PORTÉE DE MAIN", "AT HAND", "A MANO", "في متناول اليد")}</span>
-1578|          <h2>
-1579|            {favoritesOnly
-1580|              ? "Tes phrases favorites"
-1581|              : category === "Tout voir"
-1582|              ? "Les expressions du quotidien"
-1583|              : category}
-1584|          </h2>
-1585|        </div>
-1586|        <span className="phrase-count">
-1587|          {safePhrases.length} expression{safePhrases.length === 1 ? "" : "s"}
-1588|        </span>
-1589|      </div>
-1590|
-1591|      {safePhrases.length > 0 ? (
-1592|        <div className="phrase-grid">
-1593|          {safePhrases.map((phrase, index) => {
-1594|            const isFav = safeFavorites.includes(phrase.id);
-1595|            const darijaText = phrase.darija || "";
-1596|            const arabicText = phrase.arabic || "";
-1597|            const meaningText = phrase.meaning || "";
-1598|            const categoryText = phrase.category || "Les essentiels";
-1599|
-1600|            return (
-1601|              <article className="phrase-card" key={phrase.id}>
-1602|                <div className="phrase-card-top">
-1603|                  <span className="phrase-category">{categoryText}</span>
-1604|                  <button
-1605|                    className={`heart-button ${isFav ? "heart-active" : ""}`}
-1606|                    onClick={() => onFavorite(phrase.id)}
-1607|                    aria-label={
-1608|                      isFav ? "Retirer des favoris" : "Ajouter aux favoris"
-1609|                    }
-1610|                  >
-1611|                    <Heart size={17} fill={isFav ? "currentColor" : "none"} />
-1612|                  </button>
-1613|                </div>
-1614|                <span className="phrase-index">0{index + 1}</span>
-1615|                <h3>{darijaText}</h3>
-1616|                {arabicText ? (
-1617|                  <span className="phrase-arabic" dir="rtl">
-1618|                    {arabicText}
-1619|                  </span>
-1620|                ) : null}
-1621|                <div className="phrase-divider" />
-1622|                <p className="phrase-meaning">{meaningText}</p>
-1623|                {phrase.note ? <p className="phrase-note">{phrase.note}</p> : null}
-1624|                <div className="phrase-actions">
-1625|                  <button onClick={() => onPlay(darijaText, arabicText)}>
-1626|                    <Volume2 size={15} /> Écouter
-1627|                  </button>
-1628|                  <button onClick={() => onCopy(phrase)}>
-1629|                    <Bookmark size={14} /> Copier
+1435|                    {!done && !locked && !isGated && (
+1436|                      <span className="current-tag">{tr("À SUIVRE", "TO CONTINUE", "A CONTINUAR", "للمتابعة")}</span>
+1437|                    )}
+1438|                    {isGated && (
+1439|                      <span className="current-tag" style={{ background: "#fef3c7", color: "#b45309" }}>
+1440|                        PRO
+1441|                      </span>
+1442|                    )}
+1443|                  </div>
+1444|                  <h3>{lesson.title}</h3>
+1445|                  <p>{lesson.subtitle}</p>
+1446|                  <div className="roadmap-footer">
+1447|                    <span>
+1448|                      <BookOpen size={14} /> {lesson.questions.length} exercices
+1449|                    </span>
+1450|                    {isGated ? (
+1451|                      <button onClick={onOpenPaywall} style={{ color: "#d69b47" }}>
+1452|                        Débloquer avec Pro <ArrowRight size={14} />
+1453|                      </button>
+1454|                    ) : unlocked ? (
+1455|                      <button onClick={() => onStart(lesson.id)}>
+1456|                        {done ? "Revoir" : "Commencer"}
+1457|                        <ArrowRight size={14} />
+1458|                      </button>
+1459|                    ) : (
+1460|                      <span className="locked-copy">
+1461|                        <LockKeyhole size={13} /> Finis l’étape avant
+1462|                      </span>
+1463|                    )}
+1464|                  </div>
+1465|                </div>
+1466|              </div>
+1467|            );
+1468|          })}
+1469|        </div>
+1470|      </section>
+1471|
+1472|      <aside className="path-aside">
+1473|        <div className="path-aside-card">
+1474|          <span className="aside-icon">
+1475|            <Leaf size={18} />
+1476|          </span>
+1477|          <span className="mini-kicker">{tr("PETIT CONSEIL", "QUICK TIP", "PEQUEÑO CONSEJO", "نصيحة صغيرة")}</span>
+1478|          <h3>{tr("La régularité avant la perfection.", "Consistency beats perfection.", "La constancia antes que la perfección.", "الاستمرارية قبل الإتقان.")}</h3>
+1479|          <p>
+1480|            5 minutes par jour font plus qu’une heure de temps en temps. Reviens quand tu veux.
+1481|          </p>
+1482|          <div className="aside-divider" />
+1483|          <div className="aside-stat">
+1484|            <span>{tr("Palier A1 (Fondations)", "Level A1 (Foundations)", "Nivel A1 (Fundamentos)", "المستوى A1 (الأساسيات)")}</span>
+1485|            <strong>{hasPassedLevel("1") ? "Validé ✓" : "En cours"}</strong>
+1486|          </div>
+1487|          <button
+1488|            onClick={() => onOpenCheckpoint("1", "Palier A1 — Fondations")}
+1489|          >
+1490|            Passer le Checkpoint A1 <ArrowRight size={14} />
+1491|          </button>
+1492|        </div>
+1493|
+1494|        <div className="path-aside-note">
+1495|          <span className="note-symbol">✳</span>
+1496|          <p>
+1497|            Le mot <strong>darija</strong> vient de l’arabe <span dir="rtl">الدارجة</span> — la
+1498|            langue courante, celle de tous les jours.
+1499|          </p>
+1500|        </div>
+1501|      </aside>
+1502|    </div>
+1503|  );
+1504|}
+1505|
+1506|// -------------------------------------------------------------
+1507|// Composant 3 : PhrasesView
+1508|// -------------------------------------------------------------
+1509|function PhrasesView({
+1510|  search,
+1511|  searchInputRef,
+1512|  setSearch,
+1513|  category,
+1514|  setCategory,
+1515|  categories,
+1516|  phrases: visiblePhrases,
+1517|  favorites = [],
+1518|  favoritesOnly,
+1519|  setFavoritesOnly,
+1520|  onFavorite,
+1521|  onPlay,
+1522|  onCopy,
+1523|}: {
+1524|  search: string;
+1525|  searchInputRef: RefObject<HTMLInputElement | null>;
+1526|  setSearch: (value: string) => void;
+1527|  category: string;
+1528|  setCategory: (value: string) => void;
+1529|  categories: string[];
+1530|  phrases: Phrase[];
+1531|  favorites?: string[];
+1532|  favoritesOnly: boolean;
+1533|  setFavoritesOnly: (value: boolean) => void;
+1534|  onFavorite: (id: string) => void;
+1535|  onPlay: (darija: string, arabic: string) => void;
+1536|  onCopy: (phrase: Phrase) => void;
+1537|}) {
+1538|  const safeFavorites = Array.isArray(favorites) ? favorites : [];
+1539|  const safePhrases = Array.isArray(visiblePhrases) ? visiblePhrases : [];
+1540|
+1541|  return (
+1542|    <>
+1543|      <section className="phrase-toolbar">
+1544|        <label className="phrase-search">
+1545|          <Search size={17} />
+1546|          <input
+1547|            ref={searchInputRef}
+1548|            value={search}
+1549|            onChange={(event) => setSearch(event.target.value)}
+1550|            placeholder="Chercher une expression…"
+1551|            aria-label="Chercher une expression"
+1552|          />
+1553|          <kbd>⌘ K</kbd>
+1554|        </label>
+1555|        <button
+1556|          className={`favorites-filter ${favoritesOnly ? "filter-active" : ""}`}
+1557|          onClick={() => setFavoritesOnly(!favoritesOnly)}
+1558|        >
+1559|          <Heart size={15} fill={favoritesOnly ? "currentColor" : "none"} /> Mes favoris{" "}
+1560|          <span>{safeFavorites.length}</span>
+1561|        </button>
+1562|      </section>
+1563|
+1564|      <div className="category-tabs" role="tablist" aria-label="Catégories de phrases">
+1565|        {(categories || []).map((item) => (
+1566|          <button
+1567|            role="tab"
+1568|            aria-selected={category === item}
+1569|            key={item}
+1570|            className={category === item ? "category-active" : ""}
+1571|            onClick={() => setCategory(item)}
+1572|          >
+1573|            {item}
+1574|          </button>
+1575|        ))}
+1576|      </div>
+1577|
+1578|      <div className="phrase-section-top">
+1579|        <div>
+1580|          <span className="mini-kicker">{tr("À PORTÉE DE MAIN", "AT HAND", "A MANO", "في متناول اليد")}</span>
+1581|          <h2>
+1582|            {favoritesOnly
+1583|              ? "Tes phrases favorites"
+1584|              : category === "Tout voir"
+1585|              ? "Les expressions du quotidien"
+1586|              : category}
+1587|          </h2>
+1588|        </div>
+1589|        <span className="phrase-count">
+1590|          {safePhrases.length} expression{safePhrases.length === 1 ? "" : "s"}
+1591|        </span>
+1592|      </div>
+1593|
+1594|      {safePhrases.length > 0 ? (
+1595|        <div className="phrase-grid">
+1596|          {safePhrases.map((phrase, index) => {
+1597|            const isFav = safeFavorites.includes(phrase.id);
+1598|            const darijaText = phrase.darija || "";
+1599|            const arabicText = phrase.arabic || "";
+1600|            const meaningText = phrase.meaning || "";
+1601|            const categoryText = phrase.category || "Les essentiels";
+1602|
+1603|            return (
+1604|              <article className="phrase-card" key={phrase.id}>
+1605|                <div className="phrase-card-top">
+1606|                  <span className="phrase-category">{categoryText}</span>
+1607|                  <button
+1608|                    className={`heart-button ${isFav ? "heart-active" : ""}`}
+1609|                    onClick={() => onFavorite(phrase.id)}
+1610|                    aria-label={
+1611|                      isFav ? "Retirer des favoris" : "Ajouter aux favoris"
+1612|                    }
+1613|                  >
+1614|                    <Heart size={17} fill={isFav ? "currentColor" : "none"} />
+1615|                  </button>
+1616|                </div>
+1617|                <span className="phrase-index">0{index + 1}</span>
+1618|                <h3>{darijaText}</h3>
+1619|                {arabicText ? (
+1620|                  <span className="phrase-arabic" dir="rtl">
+1621|                    {arabicText}
+1622|                  </span>
+1623|                ) : null}
+1624|                <div className="phrase-divider" />
+1625|                <p className="phrase-meaning">{meaningText}</p>
+1626|                {phrase.note ? <p className="phrase-note">{phrase.note}</p> : null}
+1627|                <div className="phrase-actions">
+1628|                  <button onClick={() => onPlay(darijaText, arabicText)}>
+1629|                    <Volume2 size={15} /> Écouter
 1630|                  </button>
-1631|                </div>
-1632|              </article>
-1633|            );
-1634|          })}
-1635|        </div>
-1636|      ) : (
-1637|        <div className="empty-state">
-1638|          <span className="empty-symbol">
-1639|            <Search size={22} />
-1640|          </span>
-1641|          <h3>{tr("Aucune phrase trouvée", "No phrase found", "Ninguna frase encontrada", "لا توجد عبارات")}</h3>
-1642|          <p>{tr("Essaie un autre mot ou change de catégorie.", "Try another word or category.", "Prueba otra palabra o categoría.", "جرّب كلمة أو فئة أخرى.")}</p>
-1643|          <button
-1644|            className="plain-link"
-1645|            onClick={() => {
-1646|              setSearch("");
-1647|              setCategory("Tout voir");
-1648|              setFavoritesOnly(false);
-1649|            }}
-1650|          >
-1651|            Effacer les filtres <ArrowRight size={14} />
-1652|          </button>
-1653|        </div>
-1654|      )}
-1655|
-1656|      <div className="phrase-footnote">
-1657|        <span className="privacy-dot" /> Synthèse vocale naturelle haute fidélité (Edge TTS) avec
-1658|        cache hors-ligne intégré.
-1659|      </div>
-1660|    </>
-1661|  );
-1662|}
-1663|
-1664|// -------------------------------------------------------------
-1665|// Composant 4 : ReviewView (Flashcards SRS)
-1666|// -------------------------------------------------------------
-1667|function ReviewView({
-1668|  reviewIndex,
-1669|  cardFlipped,
-1670|  setCardFlipped,
-1671|  onGrade,
-1672|}: {
-1673|  reviewIndex: number;
-1674|  cardFlipped: boolean;
-1675|  setCardFlipped: (value: boolean) => void;
-1676|  onGrade: (grade: "again" | "hard" | "good" | "easy") => void;
-1677|}) {
-1678|  const cards = [
-1679|    {
-1680|      front: "Merci beaucoup",
-1681|      back: "Shukran bzaf",
-1682|      arabic: "شكرا بزاف!",
-1683|      hint: "Un petit mot chaleureux qui ouvre toutes les portes.",
-1684|    },
-1685|    {
-1686|      front: "Où est le souk ?",
-1687|      back: "Fin kayn souk?",
-1688|      arabic: "فين كاين السوق؟",
-1689|      hint: "Pour trouver ton chemin dans la médina.",
-1690|    },
-1691|    {
-1692|      front: "S’il vous plaît",
-1693|      back: "Afak",
-1694|      arabic: "عفاك",
-1695|      hint: "Un mot simple pour rendre tes demandes plus douces.",
-1696|    },
-1697|    {
-1698|      front: "Au revoir, à bientôt",
-1699|      back: "Bslama, nshawfek",
-1700|      arabic: "بسلامة، نشوفك",
-1701|      hint: "Une manière chaleureuse de se dire à bientôt.",
-1702|    },
-1703|    {
-1704|      front: "Je voudrais un thé",
-1705|      back: "Bghit wahed atay, afak",
-1706|      arabic: "بغيت واحد أتاي، عفاك",
-1707|      hint: "Pour savourer un moment au café.",
-1708|    },
-1709|  ];
-1710|
-1711|  const card = cards[reviewIndex % cards.length];
-1712|
-1713|  return (
-1714|    <div className="review-layout">
-1715|      <section className="review-main">
-1716|        <div className="review-card-top">
-1717|          <span className="mini-kicker">
-1718|            CARTE {String((reviewIndex % cards.length) + 1).padStart(2, "0")} <i>/</i> 0{cards.length}
-1719|          </span>
-1720|          <span className="review-session">
-1721|            <Sparkles size={14} /> Session tranquille
+1631|                  <button onClick={() => onCopy(phrase)}>
+1632|                    <Bookmark size={14} /> Copier
+1633|                  </button>
+1634|                </div>
+1635|              </article>
+1636|            );
+1637|          })}
+1638|        </div>
+1639|      ) : (
+1640|        <div className="empty-state">
+1641|          <span className="empty-symbol">
+1642|            <Search size={22} />
+1643|          </span>
+1644|          <h3>{tr("Aucune phrase trouvée", "No phrase found", "Ninguna frase encontrada", "لا توجد عبارات")}</h3>
+1645|          <p>{tr("Essaie un autre mot ou change de catégorie.", "Try another word or category.", "Prueba otra palabra o categoría.", "جرّب كلمة أو فئة أخرى.")}</p>
+1646|          <button
+1647|            className="plain-link"
+1648|            onClick={() => {
+1649|              setSearch("");
+1650|              setCategory("Tout voir");
+1651|              setFavoritesOnly(false);
+1652|            }}
+1653|          >
+1654|            Effacer les filtres <ArrowRight size={14} />
+1655|          </button>
+1656|        </div>
+1657|      )}
+1658|
+1659|      <div className="phrase-footnote">
+1660|        <span className="privacy-dot" /> Synthèse vocale naturelle haute fidélité (Edge TTS) avec
+1661|        cache hors-ligne intégré.
+1662|      </div>
+1663|    </>
+1664|  );
+1665|}
+1666|
+1667|// -------------------------------------------------------------
+1668|// Composant 4 : ReviewView (Flashcards SRS)
+1669|// -------------------------------------------------------------
+1670|function ReviewView({
+1671|  reviewIndex,
+1672|  cardFlipped,
+1673|  setCardFlipped,
+1674|  onGrade,
+1675|}: {
+1676|  reviewIndex: number;
+1677|  cardFlipped: boolean;
+1678|  setCardFlipped: (value: boolean) => void;
+1679|  onGrade: (grade: "again" | "hard" | "good" | "easy") => void;
+1680|}) {
+1681|  const cards = [
+1682|    {
+1683|      front: "Merci beaucoup",
+1684|      back: "Shukran bzaf",
+1685|      arabic: "شكرا بزاف!",
+1686|      hint: "Un petit mot chaleureux qui ouvre toutes les portes.",
+1687|    },
+1688|    {
+1689|      front: "Où est le souk ?",
+1690|      back: "Fin kayn souk?",
+1691|      arabic: "فين كاين السوق؟",
+1692|      hint: "Pour trouver ton chemin dans la médina.",
+1693|    },
+1694|    {
+1695|      front: "S’il vous plaît",
+1696|      back: "Afak",
+1697|      arabic: "عفاك",
+1698|      hint: "Un mot simple pour rendre tes demandes plus douces.",
+1699|    },
+1700|    {
+1701|      front: "Au revoir, à bientôt",
+1702|      back: "Bslama, nshawfek",
+1703|      arabic: "بسلامة، نشوفك",
+1704|      hint: "Une manière chaleureuse de se dire à bientôt.",
+1705|    },
+1706|    {
+1707|      front: "Je voudrais un thé",
+1708|      back: "Bghit wahed atay, afak",
+1709|      arabic: "بغيت واحد أتاي، عفاك",
+1710|      hint: "Pour savourer un moment au café.",
+1711|    },
+1712|  ];
+1713|
+1714|  const card = cards[reviewIndex % cards.length];
+1715|
+1716|  return (
+1717|    <div className="review-layout">
+1718|      <section className="review-main">
+1719|        <div className="review-card-top">
+1720|          <span className="mini-kicker">
+1721|            CARTE {String((reviewIndex % cards.length) + 1).padStart(2, "0")} <i>/</i> 0{cards.length}
 1722|          </span>
-1723|        </div>
-1724|        <button
-1725|          className={`flashcard ${cardFlipped ? "flashcard-flipped" : ""}`}
-1726|          onClick={() => setCardFlipped(!cardFlipped)}
-1727|          aria-label={cardFlipped ? "Voir la question" : "Retourner la carte"}
-1728|        >
-1729|          <span className="flashcard-decoration decor-top">✳</span>
-1730|          <span className="flashcard-label">{cardFlipped ? "EN DARIJA" : "EN FRANÇAIS"}</span>
-1731|          {cardFlipped ? (
-1732|            <>
-1733|              <strong className="flashcard-answer">{card.back}</strong>
-1734|              <span className="flashcard-arabic" dir="rtl">
-1735|                {card.arabic}
-1736|              </span>
-1737|              <p>{card.hint}</p>
-1738|            </>
-1739|          ) : (
-1740|            <>
-1741|              <strong className="flashcard-question">{card.front}</strong>
-1742|              <span className="flashcard-tap">
-1743|                <span className="rotate-symbol">↻</span> Touche pour révéler
-1744|              </span>
-1745|            </>
-1746|          )}
-1747|          <span className="flashcard-decoration decor-bottom">✳</span>
-1748|        </button>
-1749|
-1750|        <div className="review-hint">
-1751|          <CircleHelp size={15} />
-1752|          <span>{tr("Réponds dans ta tête, puis retourne la carte pour vérifier.", "Answer in your head, then flip the card.", "Responde en tu mente y gira la tarjeta.", "أجب في ذهنك ثم اقلب البطاقة.")}</span>
-1753|        </div>
-1754|
-1755|        <div className="review-ratings">
-1756|          <button className="rate-again" onClick={() => onGrade("again")}>
-1757|            <span>{tr("Encore", "Again", "Otra vez", "مرة أخرى")}</span>
-1758|            <small>+1 XP</small>
-1759|          </button>
-1760|          <button className="rate-hard" onClick={() => onGrade("hard")}>
-1761|            <span>{tr("Difficile", "Hard", "Difícil", "صعب")}</span>
-1762|            <small>+2 XP</small>
-1763|          </button>
-1764|          <button className="rate-good" onClick={() => onGrade("good")}>
-1765|            <span>{tr("Bien", "Good", "Bien", "جيد")}</span>
-1766|            <small>+3 XP</small>
-1767|          </button>
-1768|          <button className="rate-easy" onClick={() => onGrade("easy")}>
-1769|            <span>{tr("Facile", "Easy", "Fácil", "سهل")}</span>
-1770|            <small>+5 XP</small>
-1771|          </button>
-1772|        </div>
-1773|      </section>
-1774|
-1775|      <aside className="review-aside">
-1776|        <div className="review-aside-card">
-1777|          <span className="aside-icon">
-1778|            <Sparkles size={18} />
-1779|          </span>
-1780|          <span className="mini-kicker">{tr("SANS PRESSION", "NO PRESSURE", "SIN PRESIÓN", "بدون ضغط")}</span>
-1781|          <h3>{tr("Le bon rythme, c’est le tien.", "The right pace is yours.", "El buen ritmo es el tuyo.", "الإيقاع المناسب هو إيقاعك.")}</h3>
-1782|          <p>
-1783|            L'algorithme de répétition espacée (SRS) consolide ta mémoire à long terme. Chaque point
-1784|            d'XP nourrit ton passeport.
-1785|          </p>
-1786|          <div className="aside-divider" />
-1787|          <div className="review-method">
-1788|            <span className="method-dot" />
-1789|            <p>
-1790|              <strong>{tr("Petit conseil", "Quick tip", "Pequeño consejo", "نصيحة")}</strong>
-1791|              <br />
-1792|              Dis la phrase à voix haute. La mémoire aime les histoires qu’on raconte.
-1793|            </p>
-1794|          </div>
-1795|        </div>
-1796|        <div className="review-alphabet">
-1797|          <span>أ ب ت</span>
-1798|          <p>Écoute · Répète · Reviens</p>
-1799|        </div>
-1800|      </aside>
-1801|    </div>
-1802|  );
-1803|}
-1804|
-1805|// -------------------------------------------------------------
-1806|// Composant 5 : SpaceView (Mon Espace & Passeport)
-1807|// -------------------------------------------------------------
-1808|function SpaceView({
-1809|  completedCount,
-1810|  xp,
-1811|  streak,
-1812|  user,
-1813|  isPremium,
-1814|  onReset,
-1815|  onOpenPaywall,
-1816|  onToast,
-1817|}: {
-1818|  completedCount: number;
-1819|  xp: number;
-1820|  streak: number;
-1821|  user: any;
-1822|  isPremium: boolean;
-1823|  onReset: () => void;
-1824|  onOpenPaywall: () => void;
-1825|  onToast: (message: string) => void;
-1826|}) {
-1827|  const username =
-1828|    user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Invité(e)";
-1829|
-1830|  const passportData = {
-1831|    userName: username,
-1832|    levelName: xp >= 300 ? "Niveau A2 — Essentiels" : "Niveau A1 — Premiers Pas",
-1833|    score: Math.min(100, Math.round((xp / 500) * 100)),
-1834|    date: new Date().toLocaleDateString("fr-FR"),
-1835|    passportId: `KNZ-${user ? "PRO" : "DEMO"}-7421`,
-1836|  };
-1837|
-1838|  return (
-1839|    <div className="space-layout">
-1840|      <section className="space-card space-profile">
-1841|        <div className="profile-avatar">
-1842|          {username[0]?.toUpperCase() || "ك"}
-1843|        </div>
-1844|        <div className="profile-intro">
-1845|          <span className="mini-kicker">{tr("MON COIN KENZA", "MY KENZA CORNER", "MI RINCÓN KENZA", "ركني في كنزة")}</span>
-1846|          <h2>Salam, {username} !</h2>
-1847|          <p>
-1848|            {user
-1849|              ? `Connecté en tant que ${user.email}. Données sauvegardées dans le cloud.`
-1850|              : "Mode Invité actif. Ta progression est préservée localement sur cet appareil."}
-1851|          </p>
-1852|        </div>
-1853|        <span className="local-badge">
-1854|          <span className="privacy-dot" /> {isPremium ? "MEMBRE KENZA PRO" : "VERSION GRATUITE"}
-1855|        </span>
-1856|      </section>
-1857|
-1858|      <div className="space-stats">
-1859|        <article>
-1860|          <span className="space-stat-icon stat-blue">
-1861|            <BookOpen size={18} />
-1862|          </span>
-1863|          <span className="mini-kicker">{tr("LEÇONS", "LESSONS", "LECCIONES", "الدروس")}</span>
-1864|          <strong>
-1865|            {completedCount}
-1866|            <small> / {baseLessons.length}</small>
-1867|          </strong>
-1868|          <p>{tr("Chaque pas compte.", "Every step counts.", "Cada paso cuenta.", "كل خطوة تُحسب.")}</p>
-1869|        </article>
-1870|        <article>
-1871|          <span className="space-stat-icon stat-gold">
-1872|            <Star size={18} />
-1873|          </span>
-1874|          <span className="mini-kicker">{tr("POINTS", "POINTS", "PUNTOS", "النقاط")}</span>
-1875|          <strong>
-1876|            {xp}
-1877|            <small> XP</small>
-1878|          </strong>
-1879|          <p>{tr("Gagnés en pratiquant.", "Earned by practicing.", "Ganados practicando.", "تُكتسب بالتدريب.")}</p>
-1880|        </article>
-1881|        <article>
-1882|          <span className="space-stat-icon stat-orange">
-1883|            <Flame size={18} />
-1884|          </span>
-1885|          <span className="mini-kicker">{tr("RYTHME", "PACE", "RITMO", "الإيقاع")}</span>
-1886|          <strong>
-1887|            {streak}
-1888|            <small> jour{streak > 1 ? "s" : ""}</small>
-1889|          </strong>
-1890|          <p>{tr("La régularité avant tout.", "Consistency above all.", "La constancia ante todo.", "الاستمرارية أولاً.")}</p>
-1891|        </article>
-1892|      </div>
-1893|
-1894|      <div className="space-data-grid">
-1895|        <article className="data-card">
-1896|          <div className="data-card-heading">
-1897|            <span className="data-icon">
-1898|              <LockKeyhole size={18} />
-1899|            </span>
-1900|            <div>
-1901|              <span className="mini-kicker">{tr("TES DONNÉES", "YOUR DATA", "TUS DATOS", "بياناتك")}</span>
-1902|              <h3>{tr("Progression & Confidentialité", "Progress & Privacy", "Progreso y privacidad", "التقدم والخصوصية")}</h3>
-1903|            </div>
-1904|          </div>
-1905|          <p>
-1906|            La progression est sécurisée. Si tu te connectes, tes leçons, favoris et points se
-1907|            synchronisent automatiquement sur tous tes appareils.
-1908|          </p>
-1909|          <div className="data-safe-row">
-1910|            <CheckCircle2 size={15} />
-1911|            <span>PWA Hors-Ligne · Sauvegarde Hybride Local & Supabase</span>
-1912|          </div>
-1913|          {!isPremium && (
-1914|            <button className="outline-button" onClick={onOpenPaywall}>
-1915|              Passer à Kenza Pro <ArrowRight size={14} />
-1916|            </button>
-1917|          )}
-1918|        </article>
-1919|
-1920|        <article className="data-card data-card-cert">
-1921|          <div className="data-card-heading">
-1922|            <span className="data-icon certificate-icon">
-1923|              <Award size={18} />
-1924|            </span>
-1925|            <div>
-1926|              <span className="mini-kicker">{tr("CERTIFICATS", "CERTIFICATES", "CERTIFICADOS", "الشهادات")}</span>
-1927|              <h3>{tr("Passeport Culturel", "Cultural passport", "Pasaporte cultural", "الجواز الثقافي")}</h3>
-1928|            </div>
-1929|          </div>
-1930|          <p>
-1931|            Valide les examens de palier pour obtenir tes visas officiels du Passeport Darija et les
-1932|            télécharger en haute résolution.
-1933|          </p>
-1934|          <div className="py-2">
-1935|            <DarijaPassportCard data={passportData} />
-1936|          </div>
-1937|        </article>
-1938|      </div>
-1939|
-1940|      <div className="space-settings">
-1941|        <div>
-1942|          <span className="mini-kicker">{tr("GESTION DU COMPTE", "ACCOUNT", "GESTIÓN DE CUENTA", "إدارة الحساب")}</span>
-1943|          <h3>{tr("Repartir de zéro", "Start over", "Empezar de cero", "البدء من جديد")}</h3>
-1944|          <p>{tr("Réinitialise les leçons, points et favoris sur cet appareil.", "Reset lessons, points and favorites on this device.", "Reinicia lecciones, puntos y favoritos en este dispositivo.", "صفّر الدروس والنقاط والمفضلة على هذا الجهاز.")}</p>
-1945|        </div>
-1946|        <button className="outline-button danger-outline" onClick={onReset}>
-1947|          Effacer ma progression locale
-1948|        </button>
-1949|      </div>
+1723|          <span className="review-session">
+1724|            <Sparkles size={14} /> Session tranquille
+1725|          </span>
+1726|        </div>
+1727|        <button
+1728|          className={`flashcard ${cardFlipped ? "flashcard-flipped" : ""}`}
+1729|          onClick={() => setCardFlipped(!cardFlipped)}
+1730|          aria-label={cardFlipped ? "Voir la question" : "Retourner la carte"}
+1731|        >
+1732|          <span className="flashcard-decoration decor-top">✳</span>
+1733|          <span className="flashcard-label">{cardFlipped ? "EN DARIJA" : "EN FRANÇAIS"}</span>
+1734|          {cardFlipped ? (
+1735|            <>
+1736|              <strong className="flashcard-answer">{card.back}</strong>
+1737|              <span className="flashcard-arabic" dir="rtl">
+1738|                {card.arabic}
+1739|              </span>
+1740|              <p>{card.hint}</p>
+1741|            </>
+1742|          ) : (
+1743|            <>
+1744|              <strong className="flashcard-question">{card.front}</strong>
+1745|              <span className="flashcard-tap">
+1746|                <span className="rotate-symbol">↻</span> Touche pour révéler
+1747|              </span>
+1748|            </>
+1749|          )}
+1750|          <span className="flashcard-decoration decor-bottom">✳</span>
+1751|        </button>
+1752|
+1753|        <div className="review-hint">
+1754|          <CircleHelp size={15} />
+1755|          <span>{tr("Réponds dans ta tête, puis retourne la carte pour vérifier.", "Answer in your head, then flip the card.", "Responde en tu mente y gira la tarjeta.", "أجب في ذهنك ثم اقلب البطاقة.")}</span>
+1756|        </div>
+1757|
+1758|        <div className="review-ratings">
+1759|          <button className="rate-again" onClick={() => onGrade("again")}>
+1760|            <span>{tr("Encore", "Again", "Otra vez", "مرة أخرى")}</span>
+1761|            <small>+1 XP</small>
+1762|          </button>
+1763|          <button className="rate-hard" onClick={() => onGrade("hard")}>
+1764|            <span>{tr("Difficile", "Hard", "Difícil", "صعب")}</span>
+1765|            <small>+2 XP</small>
+1766|          </button>
+1767|          <button className="rate-good" onClick={() => onGrade("good")}>
+1768|            <span>{tr("Bien", "Good", "Bien", "جيد")}</span>
+1769|            <small>+3 XP</small>
+1770|          </button>
+1771|          <button className="rate-easy" onClick={() => onGrade("easy")}>
+1772|            <span>{tr("Facile", "Easy", "Fácil", "سهل")}</span>
+1773|            <small>+5 XP</small>
+1774|          </button>
+1775|        </div>
+1776|      </section>
+1777|
+1778|      <aside className="review-aside">
+1779|        <div className="review-aside-card">
+1780|          <span className="aside-icon">
+1781|            <Sparkles size={18} />
+1782|          </span>
+1783|          <span className="mini-kicker">{tr("SANS PRESSION", "NO PRESSURE", "SIN PRESIÓN", "بدون ضغط")}</span>
+1784|          <h3>{tr("Le bon rythme, c’est le tien.", "The right pace is yours.", "El buen ritmo es el tuyo.", "الإيقاع المناسب هو إيقاعك.")}</h3>
+1785|          <p>
+1786|            L'algorithme de répétition espacée (SRS) consolide ta mémoire à long terme. Chaque point
+1787|            d'XP nourrit ton passeport.
+1788|          </p>
+1789|          <div className="aside-divider" />
+1790|          <div className="review-method">
+1791|            <span className="method-dot" />
+1792|            <p>
+1793|              <strong>{tr("Petit conseil", "Quick tip", "Pequeño consejo", "نصيحة")}</strong>
+1794|              <br />
+1795|              Dis la phrase à voix haute. La mémoire aime les histoires qu’on raconte.
+1796|            </p>
+1797|          </div>
+1798|        </div>
+1799|        <div className="review-alphabet">
+1800|          <span>أ ب ت</span>
+1801|          <p>Écoute · Répète · Reviens</p>
+1802|        </div>
+1803|      </aside>
+1804|    </div>
+1805|  );
+1806|}
+1807|
+1808|// -------------------------------------------------------------
+1809|// Composant 5 : SpaceView (Mon Espace & Passeport)
+1810|// -------------------------------------------------------------
+1811|function SpaceView({
+1812|  completedCount,
+1813|  xp,
+1814|  streak,
+1815|  user,
+1816|  isPremium,
+1817|  onReset,
+1818|  onOpenPaywall,
+1819|  onToast,
+1820|}: {
+1821|  completedCount: number;
+1822|  xp: number;
+1823|  streak: number;
+1824|  user: any;
+1825|  isPremium: boolean;
+1826|  onReset: () => void;
+1827|  onOpenPaywall: () => void;
+1828|  onToast: (message: string) => void;
+1829|}) {
+1830|  const username =
+1831|    user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Invité(e)";
+1832|
+1833|  const passportData = {
+1834|    userName: username,
+1835|    levelName: xp >= 300 ? "Niveau A2 — Essentiels" : "Niveau A1 — Premiers Pas",
+1836|    score: Math.min(100, Math.round((xp / 500) * 100)),
+1837|    date: new Date().toLocaleDateString("fr-FR"),
+1838|    passportId: `KNZ-${user ? "PRO" : "DEMO"}-7421`,
+1839|  };
+1840|
+1841|  return (
+1842|    <div className="space-layout">
+1843|      <section className="space-card space-profile">
+1844|        <div className="profile-avatar">
+1845|          {username[0]?.toUpperCase() || "ك"}
+1846|        </div>
+1847|        <div className="profile-intro">
+1848|          <span className="mini-kicker">{tr("MON COIN KENZA", "MY KENZA CORNER", "MI RINCÓN KENZA", "ركني في كنزة")}</span>
+1849|          <h2>Salam, {username} !</h2>
+1850|          <p>
+1851|            {user
+1852|              ? `Connecté en tant que ${user.email}. Données sauvegardées dans le cloud.`
+1853|              : "Mode Invité actif. Ta progression est préservée localement sur cet appareil."}
+1854|          </p>
+1855|        </div>
+1856|        <span className="local-badge">
+1857|          <span className="privacy-dot" /> {isPremium ? "MEMBRE KENZA PRO" : "VERSION GRATUITE"}
+1858|        </span>
+1859|      </section>
+1860|
+1861|      <div className="space-stats">
+1862|        <article>
+1863|          <span className="space-stat-icon stat-blue">
+1864|            <BookOpen size={18} />
+1865|          </span>
+1866|          <span className="mini-kicker">{tr("LEÇONS", "LESSONS", "LECCIONES", "الدروس")}</span>
+1867|          <strong>
+1868|            {completedCount}
+1869|            <small> / {baseLessons.length}</small>
+1870|          </strong>
+1871|          <p>{tr("Chaque pas compte.", "Every step counts.", "Cada paso cuenta.", "كل خطوة تُحسب.")}</p>
+1872|        </article>
+1873|        <article>
+1874|          <span className="space-stat-icon stat-gold">
+1875|            <Star size={18} />
+1876|          </span>
+1877|          <span className="mini-kicker">{tr("POINTS", "POINTS", "PUNTOS", "النقاط")}</span>
+1878|          <strong>
+1879|            {xp}
+1880|            <small> XP</small>
+1881|          </strong>
+1882|          <p>{tr("Gagnés en pratiquant.", "Earned by practicing.", "Ganados practicando.", "تُكتسب بالتدريب.")}</p>
+1883|        </article>
+1884|        <article>
+1885|          <span className="space-stat-icon stat-orange">
+1886|            <Flame size={18} />
+1887|          </span>
+1888|          <span className="mini-kicker">{tr("RYTHME", "PACE", "RITMO", "الإيقاع")}</span>
+1889|          <strong>
+1890|            {streak}
+1891|            <small> {tr("jour", "day", "día", "يوم")}{streak > 1 ? "s" : ""}</small>
+1892|          </strong>
+1893|          <p>{tr("La régularité avant tout.", "Consistency above all.", "La constancia ante todo.", "الاستمرارية أولاً.")}</p>
+1894|        </article>
+1895|      </div>
+1896|
+1897|      <div className="space-data-grid">
+1898|        <article className="data-card">
+1899|          <div className="data-card-heading">
+1900|            <span className="data-icon">
+1901|              <LockKeyhole size={18} />
+1902|            </span>
+1903|            <div>
+1904|              <span className="mini-kicker">{tr("TES DONNÉES", "YOUR DATA", "TUS DATOS", "بياناتك")}</span>
+1905|              <h3>{tr("Progression & Confidentialité", "Progress & Privacy", "Progreso y privacidad", "التقدم والخصوصية")}</h3>
+1906|            </div>
+1907|          </div>
+1908|          <p>
+1909|            La progression est sécurisée. Si tu te connectes, tes leçons, favoris et points se
+1910|            synchronisent automatiquement sur tous tes appareils.
+1911|          </p>
+1912|          <div className="data-safe-row">
+1913|            <CheckCircle2 size={15} />
+1914|            <span>PWA Hors-Ligne · Sauvegarde Hybride Local & Supabase</span>
+1915|          </div>
+1916|          {!isPremium && (
+1917|            <button className="outline-button" onClick={onOpenPaywall}>
+1918|              Passer à Kenza Pro <ArrowRight size={14} />
+1919|            </button>
+1920|          )}
+1921|        </article>
+1922|
+1923|        <article className="data-card data-card-cert">
+1924|          <div className="data-card-heading">
+1925|            <span className="data-icon certificate-icon">
+1926|              <Award size={18} />
+1927|            </span>
+1928|            <div>
+1929|              <span className="mini-kicker">{tr("CERTIFICATS", "CERTIFICATES", "CERTIFICADOS", "الشهادات")}</span>
+1930|              <h3>{tr("Passeport Culturel", "Cultural passport", "Pasaporte cultural", "الجواز الثقافي")}</h3>
+1931|            </div>
+1932|          </div>
+1933|          <p>
+1934|            Valide les examens de palier pour obtenir tes visas officiels du Passeport Darija et les
+1935|            télécharger en haute résolution.
+1936|          </p>
+1937|          <div className="py-2">
+1938|            <DarijaPassportCard data={passportData} />
+1939|          </div>
+1940|        </article>
+1941|      </div>
+1942|
+1943|      <div className="space-settings">
+1944|        <div>
+1945|          <span className="mini-kicker">{tr("GESTION DU COMPTE", "ACCOUNT", "GESTIÓN DE CUENTA", "إدارة الحساب")}</span>
+1946|          <h3>{tr("Repartir de zéro", "Start over", "Empezar de cero", "البدء من جديد")}</h3>
+1947|          <p>{tr("Réinitialise les leçons, points et favoris sur cet appareil.", "Reset lessons, points and favorites on this device.", "Reinicia lecciones, puntos y favoritos en este dispositivo.", "صفّر الدروس والنقاط والمفضلة على هذا الجهاز.")}</p>
+1948|        </div>
+1949|        <button className="outline-button danger-outline" onClick={onReset}>
+1950|          Effacer ma progression locale
+1951|        </button>
+1952|      </div>
+1953|
+1954|      <div className="future-note">
+1955|        <span>
+1956|          <Sparkles size={16} />
+1957|        </span>
+1958|        <p>
+1959|          <strong>Kenza Pro :</strong> Accède à l'intégralité des modules B1 & B2, aux dialogues IA
+1960|          illimités et aux visas de certification culturels.
+1961|        </p>
+1962|      </div>
+1963|    </div>
+1964|  );
+1965|}
+1966|

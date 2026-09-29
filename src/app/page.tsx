@@ -85,8 +85,8 @@ export type Phrase = {
 const baseLessons: Lesson[] = [
   {
     id: "hello",
-    title: "Les premiers bonjours",
-    subtitle: "Saluer, se présenter, créer le lien",
+    title: tr("Les premiers bonjours", "The first hellos", "Los primeros saludos", "أول التحيات"),
+    subtitle: tr("Saluer, se présenter, créer le lien", "Greet, introduce yourself, connect", "Saludar, presentarse, crear el vínculo", "التحية والتعاريف وبناء الرابط"),
     length: "6 min",
     status: "current",
     questions: [
@@ -1136,7 +1136,7 @@ function TodayView({
             <div className="hero-image-wash" />
             <div className="hero-image-caption">
               <span>دَارِيجة</span>
-              <small>darija, la langue du lien</small>
+              <small>{tr("darija, la langue du lien", "darija, the language of connection", "darija, la lengua del vínculo", "الدارجة، لغة التواصل")}</small>
             </div>
           </div>
           <div className="hero-medallion" aria-hidden="true">
@@ -1173,7 +1173,7 @@ function TodayView({
             <div className="tea-leaf leaf-two" />
           </div>
           <div className="next-card-copy">
-            <span className="lesson-pill">LEÇON SUIVANTE · {nextLesson.length}</span>
+            <span className="lesson-pill">{tr("LEÇON SUIVANTE", "NEXT LESSON", "PRÓXIMA LECCIÓN", "الدرس التالي")} · {nextLesson.length}</span>
             <h3>{nextLesson.title}</h3>
             <p>{nextLesson.subtitle}</p>
           </div>
@@ -1217,13 +1217,13 @@ function TodayView({
           <div>
             <strong>
               {streak}
-              <small> jour{streak > 1 ? "s" : ""}</small>
+              <small> {tr("jour", "day", "día", "يوم")}{streak > 1 ? "s" : ""}</small>
             </strong>
-            <span>rythme régulier</span>
+            <span>{tr("rythme régulier", "steady rhythm", "ritmo constante", "إيقاع منتظم")}</span>
           </div>
         </div>
         <button className="stat-action" onClick={() => onNavigate("space")}>
-          Voir mon espace <ArrowRight size={14} />
+          {tr("Voir mon espace", "See my space", "Ver mi espacio", "فضائي")} <ArrowRight size={14} />
         </button>
       </div>
 
@@ -1231,12 +1231,12 @@ function TodayView({
         <div>
           <span className="eyebrow">
             <span className="eyebrow-line" />
-            POUR AUJOURD’HUI
+            {tr("POUR AUJOURD’HUI", "FOR TODAY", "PARA HOY", "لهذا اليوم")}
           </span>
           <h2>{tr("À toi de choisir ton pas.", "Your pace, your choice.", "Tú eliges tu paso.", "اختر خطوتك.")}</h2>
         </div>
         <button className="plain-link" onClick={() => onNavigate("path")}>
-          Voir le parcours <ArrowRight size={15} />
+          {tr("Voir le parcours", "View the journey", "Ver la ruta", "المسار")} <ArrowRight size={15} />
         </button>
       </div>
 
@@ -1247,12 +1247,12 @@ function TodayView({
           </span>
           <span className="quick-label">{tr("UN MOT À EMPORTER", "A WORD TO GO", "UNA PALABRA PARA LLEVAR", "كلمة معك")}</span>
           <strong>
-            Ton carnet
+            {tr("Ton carnet", "Your phrase", "Tu cuaderno", "دفترك")}
             <br />
-            de phrases
+            {tr("de phrases", " book", " de frases", " للعبارات")}
           </strong>
           <span className="quick-bottom">
-            Vocabulaire essentiel <ArrowRight size={14} />
+            {tr("Vocabulaire essentiel", "Essential vocabulary", "Vocabulario esencial", "مفردات أساسية")} <ArrowRight size={14} />
           </span>
         </button>
 
@@ -1262,12 +1262,12 @@ function TodayView({
           </span>
           <span className="quick-label">{tr("5 MINUTES, PAS PLUS", "5 MINUTES, NO MORE", "5 MINUTOS, NO MÁS", "5 دقائق فقط")}</span>
           <strong>
-            Faire une
+            {tr("Faire une", "Do a quick", "Haz una", "قم بمراجعة")}
             <br />
-            petite révision
+            {tr("petite révision", "review", "revisión rápida", "سريعة")}
           </strong>
           <span className="quick-bottom">
-            Cartes du jour <ArrowRight size={14} />
+            {tr("Cartes du jour", "Cards of the day", "Cartas del día", "بطاقات اليوم")} <ArrowRight size={14} />
           </span>
         </button>
 
@@ -1277,12 +1277,12 @@ function TodayView({
           </span>
           <span className="quick-label">{tr("IMMERSION IA", "AI IMMERSION", "INMERSIÓN IA", "انغماس مع الذكاء")}</span>
           <strong>
-            Mises en
+            {tr("Mises en", "Real-life", "Situaciones", "مواقف")}
             <br />
-            situation
+            {tr("situation", "scenarios", "de la vida real", "من الحياة")}
           </strong>
           <span className="quick-bottom">
-            Au café, en taxi <ArrowRight size={14} />
+            {tr("Au café, en taxi", "At the café, in a taxi", "En el café, en taxi", "في المقهى وفي التاكسي")} <ArrowRight size={14} />
           </span>
         </button>
       </div>
@@ -1888,7 +1888,7 @@ function SpaceView({
           <span className="mini-kicker">{tr("RYTHME", "PACE", "RITMO", "الإيقاع")}</span>
           <strong>
             {streak}
-            <small> jour{streak > 1 ? "s" : ""}</small>
+            <small> {tr("jour", "day", "día", "يوم")}{streak > 1 ? "s" : ""}</small>
           </strong>
           <p>{tr("La régularité avant tout.", "Consistency above all.", "La constancia ante todo.", "الاستمرارية أولاً.")}</p>
         </article>
