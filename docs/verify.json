@@ -1,10 +1,10 @@
-LINT-tts: OK
-LINT-webhook: OK
-LINT-portal: OK
-LINT-checkout: OK
-LINT-roleplay: OK
-LINT-replace-theme: OK
-LINT-fix-arabic: OK
+LINT-tts: OK (already)
+LINT-webhook: OK (already)
+LINT-portal: OK (already)
+LINT-checkout: OK (already)
+LINT-roleplay: OK (already)
+LINT-replace-theme: OK (already)
+LINT-fix-arabic: OK (already)
 UAS-setLanguage: OK (already)
 UAS-addCustomWordToSRS: OK (already)
 UAS-updateCustomWord: OK (already)
