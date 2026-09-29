@@ -20,5 +20,5 @@
   "PV-offlineHint": "OK (already)",
   "NS-daily": "OK (already)",
   "NS-blockedHint": "OK (already)",
-  "PATCHER": "v34 (i18n JSX disambiguation)"
+  "PATCHER": "v35 (eslint warn-only no-explicit-any/no-unused-vars; idempotent v34 fixes)"
 }
