@@ -1,8 +1,6 @@
-// patch-page.mjs v25 — i18n: localize hardcoded FR exercise options (module3/5/7) + ExerciseOption type
+// patch-page.mjs v26 — fix typecheck errors: ttrack->track (SaveProgressCard), missing data destructure (AuthModal), implicit any (useAppStore) + v25 i18n fixes kept idempotent
 import fs from "node:fs";
-
 const report = [];
-
 function fix(path, name, oldS, newS) {
   let s = fs.readFileSync(path, "utf8");
   if (!s.includes(oldS)) {
@@ -10,17 +8,42 @@ function fix(path, name, oldS, newS) {
     return;
   }
   const n = s.split(oldS).length - 1;
-  if (n !== 1) { report.push(name + ": AMBIGUOUS (" + n + " occurrences)"); return; }
+  if (n !== 1) { report.push(name + ": AMBIGUOUS (" + n + ")"); return; }
   s = s.replace(oldS, newS);
   fs.writeFileSync(path, s);
   report.push(name + ": OK");
 }
 
-fix("src/types/curriculum.ts", "TYPE-ExerciseOption",
-  String.raw`text: string; // Keeps Darija in text`,
-  String.raw`text: MultiLangText | string; // Darija in text, or localized meaning (MultiLangText)`)
+fix("src/components/auth/SaveProgressCard.tsx", "SPC-ttrack-viewed",
+  "ttrack('save_prompt_viewed'",
+  "track('save_prompt_viewed'")
+;
+fix("src/components/auth/SaveProgressCard.tsx", "SPC-ttrack-clicked",
+  "ttrack('save_prompt_clicked'",
+  "track('save_prompt_clicked'")
+;
+fix("src/components/auth/AuthModal.tsx", "AM-data-destructure",
+  "const { error } = await signUpWithTracking(email, password, { username: email.split('@')[0] });",
+  "const { data, error } = await signUpWithTracking(email, password, { username: email.split('@')[0] });")
+;
+fix("src/store/useAppStore.ts", "UAS-setUser",
+  "setUser: (user) => set({ user }),",
+  "setUser: (user: AppState['user']) => set({ user }),")
+;
+fix("src/store/useAppStore.ts", "UAS-completeOnboarding",
+  "completeOnboarding: (goal, minutes) => set({",
+  "completeOnboarding: (goal: AppState['userGoal'], minutes: AppState['dailyTargetMinutes']) => set({")
+;
+fix("src/store/useAppStore.ts", "UAS-setIsPremium",
+  "setIsPremium: (isPremium) => set({ isPremium }),",
+  "setIsPremium: (isPremium: boolean) => set({ isPremium }),")
 ;
 
+// v25 i18n fixes (idempotent re-check)
+fix("src/types/curriculum.ts", "TYPE-ExerciseOption",
+  "text: string; // Keeps Darija in text",
+  "text: MultiLangText | string; // Darija in text, or localized meaning (MultiLangText)")
+;
 fix("src/data/module3.ts", "M3-l1-chambre",
   "text: 'La chambre', isCorrect: false },",
   "text: { fr: 'La chambre', en: 'The bedroom', es: 'El dormitorio', ar: 'الغرفة' }, isCorrect: false },")
@@ -45,7 +68,6 @@ fix("src/data/module3.ts", "M3-l3-malade",
   "text: 'Malade', isCorrect: false }",
   "text: { fr: 'Malade', en: 'Sick', es: 'Enfermo', ar: 'مريض' }, isCorrect: false }")
 ;
-
 fix("src/data/module5.ts", "M5-agree",
   "text: 'Je suis d\\'accord', isCorrect: false },",
   "text: { fr: 'Je suis d\\'accord', en: 'I agree', es: 'Estoy de acuerdo', ar: 'أنا موافق' }, isCorrect: false },")
@@ -82,7 +104,6 @@ fix("src/data/module5.ts", "M5-petit",
   "text: 'Petit à petit', isCorrect: false }",
   "text: { fr: 'Petit à petit', en: 'Little by little', es: 'Poco a poco', ar: 'شيئاً فشيئاً' }, isCorrect: false }")
 ;
-
 fix("src/data/module7.ts", "M7-tourner",
   "right: { text: 'Tourner la page' }",
   "right: { text: { fr: 'Tourner la page', en: 'Turn the page', es: 'Pasar la página', ar: 'طوّي الصفحة' } }")
@@ -96,7 +117,6 @@ fix("src/data/module7.ts", "M7-courir",
   "right: { text: { fr: 'Rien ne sert de courir', en: 'No point in rushing', es: 'No sirve de nada correr', ar: 'لا فائدة من الاستعجال' } }")
 ;
 
-// ---- dumps (keep) ----
 const DUMP_MODE = (process.env.DUMP_MODE || "on") === "on";
 report.push("DUMP_MODE: " + (DUMP_MODE ? "on" : "off"));
 if (DUMP_MODE) {
