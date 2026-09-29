@@ -1,4 +1,4 @@
-// patch-page.mjs v29 — typecheck wave 4: last untyped setters (setLanguage, custom-word SRS actions) + v27/v26/v25 kept idempotent
+// patch-page.mjs v30 — typecheck wave 4: last untyped setters (setLanguage, custom-word SRS actions) + v27/v26/v25 kept idempotent
 import fs from "node:fs";
 const report = [];
 function fix(path, name, oldS, newS) {
@@ -15,8 +15,8 @@ function fix(path, name, oldS, newS) {
 }
 
 fix("src/store/useAppStore.ts", "UAS-setLanguage",
-  "setLanguage: (lang: UILanguage) => set({ uiLanguage: (lang || 'fr').toLowerCase() as any }),",
-  "setLanguage: (lang: UILanguage) => set({ uiLanguage: lang }),")
+  "setLanguage: (lang) => set({ uiLanguage: (lang || 'fr').toLowerCase() as any }),",
+  "setLanguage: (lang: UILanguage) => set({ uiLanguage: (lang || 'fr').toLowerCase() as any }),")
 ;
 fix("src/store/useAppStore.ts", "UAS-addCustomWordToSRS",
   "addCustomWordToSRS: (word: any) => set((state) => {",
