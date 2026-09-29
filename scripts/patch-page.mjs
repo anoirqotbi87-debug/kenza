@@ -1,4 +1,4 @@
-// patch-page.mjs v28 — typecheck wave 4: last untyped setters (setLanguage, custom-word SRS actions) + v27/v26/v25 kept idempotent
+// patch-page.mjs v29 — typecheck wave 4: last untyped setters (setLanguage, custom-word SRS actions) + v27/v26/v25 kept idempotent
 import fs from "node:fs";
 const report = [];
 function fix(path, name, oldS, newS) {
@@ -15,7 +15,7 @@ function fix(path, name, oldS, newS) {
 }
 
 fix("src/store/useAppStore.ts", "UAS-setLanguage",
-  "setLanguage: (lang) => set({ uiLanguage: lang }),",
+  "setLanguage: (lang: UILanguage) => set({ uiLanguage: (lang || 'fr').toLowerCase() as any }),",
   "setLanguage: (lang: UILanguage) => set({ uiLanguage: lang }),")
 ;
 fix("src/store/useAppStore.ts", "UAS-addCustomWordToSRS",
@@ -42,7 +42,8 @@ fix("src/store/useAppStore.ts", "UAS-addXp",
   "addXp: (amount) => set((state) => {",
   "addXp: (amount: number) => set((state: AppState) => {")
 ;
-fix("src/store/useAppStore.ts", "UAS-completeLesson",
+fix("src/store/useAppSto
+re.ts", "UAS-completeLesson",
   "completeLesson: (lessonId) => set((state) => {",
   "completeLesson: (lessonId: string) => set((state: AppState) => {")
 ;
@@ -87,7 +88,8 @@ fix("src/components/auth/SaveProgressCard.tsx", "SPC-ttrack-clicked",
   "track('save_prompt_clicked'")
 ;
 fix("src/components/auth/AuthModal.tsx", "AM-data-destructure",
-  "const { error } = await signUpWithTracking(email, password, { username: email.split('@')[0] });",
+  "const { error } = await signUpWithTracking(email,
+ password, { username: email.split('@')[0] });",
   "const { data, error } = await signUpWithTracking(email, password, { username: email.split('@')[0] });")
 ;
 fix("src/store/useAppStore.ts", "UAS-setUser",
@@ -130,7 +132,8 @@ fix("src/data/module3.ts", "M3-l3-malade",
   "text: 'Malade', isCorrect: false }",
   "text: { fr: 'Malade', en: 'Sick', es: 'Enfermo', ar: 'مريض' }, isCorrect: false }")
 ;
-fix("src/data/module5.ts", "M5-agree",
+fix("src/data/module5.ts", "M5-a
+gree",
   "text: 'Je suis d\\'accord', isCorrect: false },",
   "text: { fr: 'Je suis d\\'accord', en: 'I agree', es: 'Estoy de acuerdo', ar: 'أنا موافق' }, isCorrect: false },")
 ;
@@ -168,7 +171,8 @@ fix("src/data/module5.ts", "M5-petit",
 ;
 fix("src/data/module7.ts", "M7-tourner",
   "right: { text: 'Tourner la page' }",
-  "right: { text: { fr: 'Tourner la page', en: 'Turn the page', es: 'Pasar la página', ar: 'طوّي الصفحة' } }")
+  "right: { text: { fr: 'Tourner 
+la page', en: 'Turn the page', es: 'Pasar la página', ar: 'طوّي الصفحة' } }")
 ;
 fix("src/data/module7.ts", "M7-patience",
   "right: { text: 'Patience et régularité' }",
