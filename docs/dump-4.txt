@@ -186,7 +186,7 @@
 1686|      hint: tr("Un petit mot chaleureux qui ouvre toutes les portes.", "A warm little word that opens every door.", "Una palabra cálida que abre todas las puertas.", "كلمة دافئة تفتح كل الأبواب."),
 1687|    },
 1688|    {
-1689|      front: tr("Où est le souk ?", "Where is the souk?", "¿Dónde está el souk?", "أين السوق؟"),
+1689|      front: tr(tr("Où est le souk ?", "Where is the souk?", "¿dónde está el souk?", "أين السوق؟"), "Where is the souk?", "¿Dónde está el souk?", "أين السوق؟"),
 1690|      back: "Fin kayn souk?",
 1691|      arabic: "فين كاين السوق؟",
 1692|      hint: tr("Pour trouver ton chemin dans la médina.", "To find your way in the medina.", "Para encontrar tu camino en la medina.", "لتجد طريقك في المدينة القديمة."),

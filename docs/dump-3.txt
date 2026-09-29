@@ -15,7 +15,7 @@
 1015|                <ArrowRight size={17} />
 1016|              </button>
 1017|              <div className="local-note">
-1018|                <LockKeyhole size={13} /> Progression enregistrée en direct sur ton profil.
+1018|                <LockKeyhole size={13} /> {tr("Progression enregistrée en direct sur ton profil.", "Progress saved live to your profile.", "Progreso guardado en directo en tu perfil.", "تقدمك يُحفظ مباشرة في ملفك.")}
 1019|              </div>
 1020|            </div>
 1021|          </section>
@@ -458,7 +458,7 @@
 1458|                      </button>
 1459|                    ) : (
 1460|                      <span className="locked-copy">
-1461|                        <LockKeyhole size={13} /> Finis l’étape avant
+1461|                        <LockKeyhole size={13} /> {tr("Finis l’étape avant", "Finish the previous step first", "Termina el paso anterior primero", "أكمل الخطوة السابقة أولاً")}
 1462|                      </span>
 1463|                    )}
 1464|                  </div>

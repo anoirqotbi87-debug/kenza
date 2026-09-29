@@ -1,7 +1,7 @@
 {
-  "ts": "2026-09-29T00:27:30.616Z",
-  "appliedThisRun": 64,
-  "already": 120,
+  "ts": "2026-09-29T00:29:44.203Z",
+  "appliedThisRun": 6,
+  "already": 181,
   "missing": [
     "Cartes du jour",
     "Au café, en taxi",
@@ -35,24 +35,13 @@
     "Palier A1 — Fondations",
     "Effacer ma progression locale",
     "« Bchhal hada? » permet de demander le prix de n’importe que",
-    "Baisse un peu s’il te plaît",
-    "C’est trop beau",
-    "À Tanger, comment dit-on « Qu’est-ce que tu veux ? »",
     "Progression enregistrée en direct sur ton profil.",
     "« Wahed » = un, « atay » = thé, « afak » = s’il vous plaît."
   ],
-  "trCallCount": 207,
+  "trCallCount": 214,
   "checks": [
     {
       "s": "tr(\"Comment dit-on « bonjour » en darija ?\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"Choisis la formule la plus naturelle.\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"Comment demander un thé, s’il vous plaît",
       "ok": true
     },
     {
@@ -60,27 +49,11 @@
       "ok": true
     },
     {
-      "s": "tr(\"Que signifie « yallah » ?\"",
+      "s": "tr(\"À Tanger, comment dit-on « Qu'est-ce que",
       "ok": true
     },
     {
-      "s": "tr(\"Baisse un peu s’il te plaît\"",
-      "ok": false
-    },
-    {
-      "s": "tr(\"Au café du coin\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"Négocier au souk de Marrakech\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"Voyage à Tanger (Chamali)\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"LEÇON\", \"LESSON\"",
+      "s": "tr(\"Baisse un peu s'il te plaît\"",
       "ok": true
     },
     {
@@ -88,11 +61,11 @@
       "ok": false
     },
     {
-      "s": "tr(\"Merci beaucoup !\", \"Thank you very much!",
+      "s": "tr(\"Finis l’étape avant\"",
       "ok": true
     },
     {
-      "s": "tr(\"Au café\", \"At the café\"",
+      "s": "tr(\"LEÇON\", \"LESSON\"",
       "ok": true
     }
   ]
