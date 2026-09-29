@@ -1,500 +1,500 @@
-501|        ? `Bravo ! Leçon terminée · +${activeLesson.questions.length * 10} XP`
-502|        : "Leçon revue avec succès."
-503|    );
-504|  };
-505|
-506|  const toggleFavorite = (id: string) => {
-507|    const current = Array.isArray(favorites) ? favorites : [];
-508|    const updated = current.includes(id)
-509|      ? current.filter((item) => item !== id)
-510|      : [...current, id];
-511|    saveFavorites(updated);
-512|  };
-513|
-514|  const playPhrase = (darija: string, arabic: string) => {
-515|    if (!darija && !arabic) return;
-516|    playAudio(darija || "", arabic || "", true);
-517|    showToast("Prononciation audio de la phrase.");
+501|      setSelectedAnswer(null);
+502|      return;
+503|    }
+504|
+505|    const firstCompletion = !completedLessons.includes(activeLesson.id);
+506|    if (firstCompletion) {
+507|      completeLesson(activeLesson.id);
+508|      addXp(activeLesson.questions.length * 10);
+509|    }
+510|
+511|    setLessonId(null);
+512|    setSelectedAnswer(null);
+513|    showToast(
+514|      firstCompletion
+515|        ? tr(lang, `Bravo ! Leçon terminée · +${activeLesson.questions.length * 10} XP`, `Well done! Lesson complete · +${activeLesson.questions.length * 10} XP`, `¡Bravo! Lección completada · +${activeLesson.questions.length * 10} XP`, `أحسنت! أكملت الدرس · +${activeLesson.questions.length * 10} XP`)
+516|        : tr(lang, "Leçon revue avec succès.", "Lesson reviewed successfully.", "Lección repasada con éxito.", "تمت مراجعة الدرس بنجاح.")
+517|    );
 518|  };
 519|
-520|  const copyPhrase = async (phrase: Phrase) => {
-521|    try {
-522|      const text = `${phrase.darija || ""} ${phrase.arabic ? `(${phrase.arabic})` : ""} — ${phrase.meaning || ""}`.trim();
-523|      await navigator.clipboard.writeText(text);
-524|      showToast("Phrase copiée dans le presse-papiers.");
-525|    } catch {
-526|      showToast("Copie indisponible.");
-527|    }
-528|  };
-529|
-530|  const gradeReview = (grade: "again" | "hard" | "good" | "easy") => {
-531|    const award = grade === "easy" ? 5 : grade === "good" ? 3 : grade === "hard" ? 2 : 1;
-532|    addXp(award);
-533|    setCardFlipped(false);
-534|    setReviewIndex((current) => current + 1);
-535|    showToast(
-536|      `Noté : ${grade === "again" ? "à revoir" : grade === "hard" ? "difficile" : grade === "good" ? "bien" : "facile"} · +${award} XP`
-537|    );
-538|  };
-539|
-540|  const resetProgress = () => {
-541|    const confirmed = window.confirm("Effacer la progression locale sur cet appareil ?");
-542|    if (!confirmed) return;
-543|    resetData();
-544|    localStorage.removeItem("kenza_favorites");
-545|    setFavorites([]);
-546|    showToast("Progression locale réinitialisée.");
-547|  };
-548|
-549|  const switchView = (next: View) => {
-550|    setView(next);
-551|    setMobileMenuOpen(false);
+520|  const toggleFavorite = (id: string) => {
+521|    const current = Array.isArray(favorites) ? favorites : [];
+522|    const updated = current.includes(id)
+523|      ? current.filter((item) => item !== id)
+524|      : [...current, id];
+525|    saveFavorites(updated);
+526|  };
+527|
+528|  const playPhrase = (darija: string, arabic: string) => {
+529|    if (!darija && !arabic) return;
+530|    playAudio(darija || "", arabic || "", true);
+531|    showToast("Prononciation audio de la phrase.");
+532|  };
+533|
+534|  const copyPhrase = async (phrase: Phrase) => {
+535|    try {
+536|      const text = `${phrase.darija || ""} ${phrase.arabic ? `(${phrase.arabic})` : ""} — ${phrase.meaning || ""}`.trim();
+537|      await navigator.clipboard.writeText(text);
+538|      showToast("Phrase copiée dans le presse-papiers.");
+539|    } catch {
+540|      showToast("Copie indisponible.");
+541|    }
+542|  };
+543|
+544|  const gradeReview = (grade: "again" | "hard" | "good" | "easy") => {
+545|    const award = grade === "easy" ? 5 : grade === "good" ? 3 : grade === "hard" ? 2 : 1;
+546|    addXp(award);
+547|    setCardFlipped(false);
+548|    setReviewIndex((current) => current + 1);
+549|    showToast(
+550|      `${t.modules.home.graded.replace("{grade}", grade === "again" ? t.modules.home.gradeAgain : grade === "hard" ? t.modules.home.gradeHard : grade === "good" ? t.modules.home.gradeGood : t.modules.home.gradeEasy)} · +${award} XP`
+551|    );
 552|  };
 553|
-554|  const headerTitle: Record<View, { eyebrow: string; title: string; description: string }> = {
-555|    today: {
-556|      eyebrow: tr("TON ESPACE D’APPRENTISSAGE", "YOUR LEARNING SPACE", "TU ESPACIO DE APRENDIZAJE", "فضاء تعلمك"),
-557|      title: tr("Salam, on s’y remet ?", "Salam, shall we get going?", "Salam, ¿retomamos?", "سلام، نكمل؟"),
-558|      description: tr("Un petit pas en darija aujourd’hui, une grande porte ouverte demain.", "A small step in darija today, a big door open tomorrow.", "Un pequeño paso en darija hoy, una gran puerta abierta mañana.", "خطوة صغيرة في الدارجة اليوم، وباب كبير مفتوح غداً."),
-559|    },
-560|    path: {
-561|      eyebrow: tr("LE CHEMIN SE FAIT EN PARLANT", "THE PATH IS MADE BY SPEAKING", "EL CAMINO SE HACE HABLANDO", "الطريق يُصنع بالكلام"),
-562|      title: tr("Ton parcours", "Your journey", "Tu recorrido", "مسارك"),
-563|      description: tr("Des premiers mots aux conversations qui te ressemblent.", "From first words to conversations that feel like you.", "De las primeras palabras a conversaciones que te representen.", "من الكلمات الأولى إلى أحاديث تشبهك."),
-564|    },
-565|    phrases: {
-566|      eyebrow: tr("LES MOTS QUI RAPPROCHENT", "WORDS THAT BRING US CLOSER", "PALABRAS QUE ACERCAN", "كلمات تُقرّب"),
-567|      title: tr("Ton carnet de phrases", "Your phrase book", "Tu cuaderno de frases", "دفتر عباراتك"),
-568|      description: tr("Des expressions utiles, vivantes, prêtes à t’accompagner.", "Useful, lively expressions, ready to go with you.", "Expresiones útiles y vivas, listas para acompañarte.", "عبارات مفيدة حيّة، جاهزة لمرافقتك."),
-569|    },
-570|    review: {
-571|      eyebrow: tr("ANCRER, SANS SE PRESSER", "ANCHOR IN, NO RUSH", "ANCLAR, SIN PRISA", "ترسيخ، بلا استعجال"),
-572|      title: tr("Révision du jour", "Today’s review", "Revisión del día", "مراجعة اليوم"),
-573|      description: tr("Quelques cartes bien choisies pour laisser les mots s’installer.", "A few well-chosen cards to let the words settle.", "Algunas cartas bien elegidas para que las palabras se asienten.", "بعض البطاقات المنتقاة لتستقر الكلمات."),
-574|    },
-575|    space: {
-576|      eyebrow: tr("UN ESPACE À TOI", "A SPACE OF YOUR OWN", "UN ESPACIO PARA TI", "فضاء لك"),
-577|      title: "Mon espace & Passeport",
-578|      description: "Ta progression et tes visas officiels, sous ton contrôle.",
-579|    },
-580|  };
-581|
-582|  const currentHeader = headerTitle[view];
-583|
-584|  return (
-585|    <div className="app-shell">
-586|      {/* Sidebar Desktop & Mobile Slideout */}
-587|      <aside className={`sidebar ${mobileMenuOpen ? "sidebar-open" : ""}`}>
-588|        <div className="brand-lockup">
-589|          <div className="brand-mark" aria-hidden="true">
-590|            <span>ك</span>
-591|            <i />
-592|          </div>
-593|          <div>
-594|            <span className="brand-name">KENZA</span>
-595|            <span className="brand-tagline">{tr("la darija, en chemin", "darija, one step at a time", "la darija, paso a paso", "الدارجة، على الطريق")}</span>
-596|          </div>
-597|          <button
-598|            className="icon-button mobile-close"
-599|            aria-label="Fermer le menu"
-600|            onClick={() => setMobileMenuOpen(false)}
-601|          >
-602|            <X size={19} />
-603|          </button>
-604|        </div>
-605|
-606|        <div className="sidebar-label">{(t as any).side?.learn || "APPRENDRE"}</div>
-607|        <nav className="side-nav" aria-label="Navigation principale">
-608|          {navItems.map((item) => {
-609|            const Icon = item.icon;
-610|            return (
-611|              <button
-612|                key={item.id}
-613|                onClick={() => switchView(item.id)}
-614|                className={`nav-item ${view === item.id ? "nav-item-active" : ""}`}
-615|                aria-current={view === item.id ? "page" : undefined}
-616|              >
-617|                <Icon size={19} strokeWidth={1.8} /> <span>{navLabel(item.id) || item.label}</span>
-618|                {item.id === "review" && <span className="nav-count">4</span>}
-619|              </button>
-620|            );
-621|          })}
-622|        </nav>
-623|
-624|        <div className="sidebar-label">{tr("EXPLORER", "EXPLORE", "EXPLORAR", "استكشف")}</div>
-625|        <nav className="side-nav" aria-label="Ressources d'étude">
-626|          <a href="/etudier" className="nav-item">
-627|            <span>Étudier — Modules complets</span>
-628|          </a>
-629|          <a href="/grammaire" className="nav-item">
-630|            <span>{tr("Grammaire active", "Active grammar", "Gramática activa", "القواعد النشطة")}</span>
-631|          </a>
-632|          <a href="/parler" className="nav-item">
-633|            <span>{tr("Pratique orale", "Speaking practice", "Práctica oral", "تدريب النطق")}</span>
-634|          </a>
-635|          <a href="/revisions" className="nav-item">
-636|            <span>{tr("Révisions SRS", "SRS review", "Repaso SRS", "مراجعة SRS")}</span>
-637|          </a>
-638|        </nav>
-639|
-640|        <div className="sidebar-label sidebar-label-spaced">{(t as any).side?.oral || "PRATIQUE ORALE & IA"}</div>
-641|        <button
-642|          onClick={() => setShowScenarioSelector(true)}
-643|          className="nav-item"
-644|        >
-645|          <MessageCircle size={19} strokeWidth={1.8} />
-646|          <span>{tr("Roleplay IA", "AI roleplay", "Roleplay IA", "حوار مع الذكاء الاصطناعي")}</span>
-647|        </button>
-648|
-649|        <div className="sidebar-label sidebar-label-spaced">{(t as any).side?.space || "TON ESPACE"}</div>
-650|        <button
-651|          onClick={() => switchView("space")}
-652|          className={`nav-item ${view === "space" ? "nav-item-active" : ""}`}
-653|          aria-current={view === "space" ? "page" : undefined}
-654|        >
-655|          <Award size={19} strokeWidth={1.8} />
-656|          <span>{tr("Mon Passeport", "My passport", "Mi pasaporte", "جوازي")}</span>
-657|        </button>
-658|
-659|        <div className="sidebar-spacer" />
-660|
-661|        <div className="daily-goal-card">
-662|          <div className="goal-orbit">
-663|            <Target size={17} />
-664|          </div>
-665|          <div className="goal-topline">
-666|            <span>{tr("TON RYTHME", "YOUR PACE", "TU RITMO", "إيقاعك")}</span>
-667|            <span>{Math.min(100, Math.round(((completedCount * 3) / 10) * 100))}%</span>
-668|          </div>
-669|          <strong>{tr("10 minutes par jour", "10 minutes a day", "10 minutos al día", "10 دقائق يومياً")}</strong>
-670|          <div className="goal-track">
-671|            <span style={{ width: `${Math.min(100, ((completedCount * 3) / 10) * 100)}%` }} />
-672|          </div>
-673|          <button
-674|            onClick={() => showToast("Objectif quotidien : 10 minutes de pratique chaque jour.")}
-675|            className="goal-link"
-676|          >
-677|            {tr("Ajuster l’objectif", "Adjust goal", "Ajustar objetivo", "عدّل الهدف")} <ArrowRight size={14} />
-678|          </button>
-679|        </div>
-680|
-681|        <div className="sidebar-footer">
-682|          <span className="privacy-dot" />
-683|          <span>{user ? user.email?.split("@")[0] : "Mode Invité actif"}</span>
-684|          <button
-685|            aria-label="En savoir plus sur les données"
-686|            onClick={() => switchView("space")}
-687|          >
-688|            <CircleHelp size={14} />
-689|          </button>
-690|        </div>
-691|      </aside>
-692|
-693|      {mobileMenuOpen && (
-694|        <button
-695|          className="mobile-scrim"
-696|          aria-label="Fermer le menu"
-697|          onClick={() => setMobileMenuOpen(false)}
-698|        />
-699|      )}
-700|
-701|      {/* Main Area */}
-702|      <main className="main-area">
-703|        <header className="topbar">
-704|          <button
-705|            className="icon-button mobile-menu-trigger"
-706|            aria-label="Ouvrir le menu"
-707|            onClick={() => setMobileMenuOpen(true)}
-708|          >
-709|            <Menu size={21} />
-710|          </button>
-711|          <div className="breadcrumbs">
-712|            <span>KENZA</span>
-713|            <ChevronRight size={14} />
-714|            <span>{currentHeader.eyebrow.toLocaleLowerCase("fr")}</span>
-715|          </div>
-716|          <div className="topbar-actions">
-717|            {/* Sélecteur de langue bilingue */}
-718|            <div className="lang-switcher" role="group" aria-label="Sélecteur de langue">
-719|              <Globe size={13} className="lang-icon" />
-720|              <button
-721|                type="button"
-722|                onClick={() => setLanguage("fr")}
-723|                className={`lang-btn ${uiLanguage === "fr" ? "lang-btn-active" : ""}`}
-724|                aria-label="Passer en français"
-725|              >
-726|                FR
-727|              </button>
-728|              <span className="lang-sep">|</span>
-729|              <button
-730|                type="button"
-731|                onClick={() => setLanguage("en")}
-732|                className={`lang-btn ${uiLanguage === "en" ? "lang-btn-active" : ""}`}
-733|                aria-label="Switch to English"
-734|              >
-735|                EN
-736|              </button>
-737|              <span className="lang-sep">|</span>
-738|              <button
-739|                type="button"
-740|                onClick={() => setLanguage("es")}
-741|                className={`lang-btn ${uiLanguage === "es" ? "lang-btn-active" : ""}`}
-742|                aria-label="Cambiar a español"
-743|              >
-744|                ES
-745|              </button>
-746|              <span className="lang-sep">|</span>
-747|              <button
-748|                type="button"
-749|                onClick={() => setLanguage("ar")}
-750|                className={`lang-btn ${uiLanguage === "ar" ? "lang-btn-active" : ""}`}
-751|                aria-label="Passer en arabe"
-752|              >
-753|                AR
-754|              </button>
-755|            </div>
-756|
-757|            {/* Toggle Son */}
-758|            <button
-759|              className="sound-toggle"
-760|              onClick={toggleSound}
-761|              title={soundEnabled ? "Audio activé" : "Audio muet"}
-762|              aria-label={soundEnabled ? "Couper le son" : "Activer le son"}
-763|            >
-764|              <Headphones size={15} />
-765|              <span>{soundEnabled ? "Son actif" : "Son coupé"}</span>
-766|            </button>
-767|
-768|            {/* Connexion Google & Profil */}
-769|            {user ? (
-770|              <button
-771|                className="top-avatar"
-772|                aria-label="Ouvrir mon espace"
-773|                onClick={() => switchView("space")}
-774|                title={user.email || "Mon profil"}
-775|              >
-776|                {user.user_metadata?.avatar_url ? (
-777|                  <img
-778|                    src={user.user_metadata.avatar_url}
-779|                    alt={user.user_metadata?.full_name || "Profil"}
-780|                    className="w-full h-full object-cover rounded-full"
-781|                  />
-782|                ) : user.user_metadata?.full_name ? (
-783|                  user.user_metadata.full_name[0].toUpperCase()
-784|                ) : user.email ? (
-785|                  user.email[0].toUpperCase()
-786|                ) : (
-787|                  "K"
-788|                )}
-789|              </button>
-790|            ) : (
-791|              <button
-792|                type="button"
-793|                onClick={handleGoogleLogin}
-794|                className="google-login-btn"
-795|                aria-label="Se connecter avec Google"
-796|                title="Se connecter avec Google"
-797|              >
-798|                <svg className="google-icon" width="13" height="13" viewBox="0 0 24 24">
-799|                  <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
-800|                  <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/>
-801|                  <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.16 0 10.02 0 12s.45 3.84 1.25 5.42l4.03-3.15z"/>
-802|                  <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-803|                </svg>
-804|                <span>{tr("Se connecter", "Sign in", "Iniciar sesión", "تسجيل الدخول")}</span>
-805|              </button>
-806|            )}
-807|          </div>
-808|        </header>
-809|
-810|        <div className="content-wrap">
-811|          <section className="page-heading">
-812|            <div>
-813|              <div className="eyebrow">
-814|                <span className="eyebrow-line" />
-815|                {currentHeader.eyebrow}
-816|              </div>
-817|              <h1>{currentHeader.title}</h1>
-818|              <p>{currentHeader.description}</p>
-819|            </div>
-820|            <div className="date-chip">
-821|              <span className="date-sun">☼</span>
-822|              <span>
-823|                {new Intl.DateTimeFormat("fr-FR", {
-824|                  weekday: "long",
-825|                  day: "numeric",
-826|                  month: "long",
-827|                }).format(new Date())}
-828|              </span>
-829|            </div>
-830|          </section>
-831|
-832|          {/* VUE 1 : AUJOURD'HUI */}
-833|          {view === "today" && (
-834|            <TodayView
-835|              completedCount={completedCount}
-836|              xp={xp}
-837|              streak={streakDays}
-838|              nextLesson={nextLesson}
-839|              onStart={startLesson}
-840|              onNavigate={switchView}
-841|              onOpenRoleplay={() => setShowScenarioSelector(true)}
-842|            />
-843|          )}
-844|
-845|          {/* VUE 2 : MON PARCOURS */}
-846|          {view === "path" && (
-847|            <PathView
-848|              completedLessons={completedLessons}
-849|              onStart={startLesson}
-850|              onOpenCheckpoint={(id, name) => setCheckpointOpen({ id, name })}
-851|              onOpenPaywall={() => setPricingSource("module_locked")}
-852|              isPremium={isPremium}
-853|            />
-854|          )}
-855|
-856|          {/* VUE 3 : CARNET DE PHRASES */}
-857|          {view === "phrases" && (
-858|            <PhrasesView
-859|              search={search}
-860|              searchInputRef={searchInputRef}
-861|              setSearch={setSearch}
-862|              category={category}
-863|              setCategory={setCategory}
-864|              categories={categories}
-865|              phrases={filteredPhrases}
-866|              favorites={safeFavorites}
-867|              favoritesOnly={favoritesOnly}
-868|              setFavoritesOnly={setFavoritesOnly}
-869|              onFavorite={toggleFavorite}
-870|              onPlay={playPhrase}
-871|              onCopy={copyPhrase}
-872|            />
-873|          )}
-874|
-875|          {/* VUE 4 : RÉVISION SRS */}
-876|          {view === "review" && (
-877|            <ReviewView
-878|              reviewIndex={reviewIndex}
-879|              cardFlipped={cardFlipped}
-880|              setCardFlipped={setCardFlipped}
-881|              onGrade={gradeReview}
-882|            />
-883|          )}
-884|
-885|          {/* VUE 5 : MON ESPACE / PASSEPORT */}
-886|          {view === "space" && (
-887|            <SpaceView
-888|              completedCount={completedCount}
-889|              xp={xp}
-890|              streak={streakDays}
-891|              user={user}
-892|              isPremium={isPremium}
-893|              onReset={resetProgress}
-894|              onOpenPaywall={() => setPricingSource("profile_upgrade")}
-895|              onToast={showToast}
+554|  const resetProgress = () => {
+555|    const confirmed = window.confirm(t.modules.home.resetConfirm);
+556|    if (!confirmed) return;
+557|    resetData();
+558|    localStorage.removeItem("kenza_favorites");
+559|    setFavorites([]);
+560|    showToast(t.modules.home.resetDone);
+561|  };
+562|
+563|  const switchView = (next: View) => {
+564|    setView(next);
+565|    setMobileMenuOpen(false);
+566|  };
+567|
+568|  const headerTitle: Record<View, { eyebrow: string; title: string; description: string }> = {
+569|    today: {
+570|      eyebrow: tr(lang, tr("TON ESPACE D’APPRENTISSAGE", "YOUR LEARNING SPACE", "TU ESPACIO DE APRENDIZAJE", "فضاء تعلمك"), "YOUR LEARNING SPACE", "TU ESPACIO DE APRENDIZAJE", "فضاء تعلمك"),
+571|      title: tr(lang, tr("Salam, on s’y remet ?", "Salam, shall we get going?", "Salam, ¿retomamos?", "سلام، نكمل؟"), "Salam, shall we get going?", "Salam, ¿retomamos?", "سلام، نكمل؟"),
+572|      description: tr(lang, tr("Un petit pas en darija aujourd’hui, une grande porte ouverte demain.", "A small step in darija today, a big door open tomorrow.", "Un pequeño paso en darija hoy, una gran puerta abierta mañana.", "خطوة صغيرة في الدارجة اليوم، وباب كبير مفتوح غداً."), "A small step in darija today, a big door open tomorrow.", "Un pequeño paso en darija hoy, una gran puerta abierta mañana.", "خطوة صغيرة في الدارجة اليوم، وباب كبير مفتوح غداً."),
+573|    },
+574|    path: {
+575|      eyebrow: tr(lang, tr("LE CHEMIN SE FAIT EN PARLANT", "THE PATH IS MADE BY SPEAKING", "EL CAMINO SE HACE HABLANDO", "الطريق يُصنع بالكلام"), "THE PATH IS MADE BY SPEAKING", "EL CAMINO SE HACE HABLANDO", "الطريق يُصنع بالكلام"),
+576|      title: tr(lang, tr("Ton parcours", "Your journey", "Tu recorrido", "مسارك"), "Your journey", "Tu recorrido", "مسارك"),
+577|      description: tr(lang, tr("Des premiers mots aux conversations qui te ressemblent.", "From first words to conversations that feel like you.", "De las primeras palabras a conversaciones que te representen.", "من الكلمات الأولى إلى أحاديث تشبهك."), "From first words to conversations that feel like you.", "De las primeras palabras a conversaciones que te representen.", "من الكلمات الأولى إلى أحاديث تشبهك."),
+578|    },
+579|    phrases: {
+580|      eyebrow: tr(lang, tr("LES MOTS QUI RAPPROCHENT", "WORDS THAT BRING US CLOSER", "PALABRAS QUE ACERCAN", "كلمات تُقرّب"), "WORDS THAT BRING US CLOSER", "PALABRAS QUE ACERCAN", "كلمات تُقرّب"),
+581|      title: tr(lang, tr("Ton carnet de phrases", "Your phrase book", "Tu cuaderno de frases", "دفتر عباراتك"), "Your phrase book", "Tu cuaderno de frases", "دفتر عباراتك"),
+582|      description: tr(lang, tr("Des expressions utiles, vivantes, prêtes à t’accompagner.", "Useful, lively expressions, ready to go with you.", "Expresiones útiles y vivas, listas para acompañarte.", "عبارات مفيدة حيّة، جاهزة لمرافقتك."), "Useful, lively expressions, ready to go with you.", "Expresiones útiles y vivas, listas para acompañarte.", "عبارات مفيدة حيّة، جاهزة لمرافقتك."),
+583|    },
+584|    review: {
+585|      eyebrow: tr(lang, tr("ANCRER, SANS SE PRESSER", "ANCHOR IN, NO RUSH", "ANCLAR, SIN PRISA", "ترسيخ، بلا استعجال"), "ANCHOR IN, NO RUSH", "ANCLAR, SIN PRISA", "ترسيخ، بلا استعجال"),
+586|      title: tr(lang, tr("Révision du jour", "Today’s review", "Revisión del día", "مراجعة اليوم"), "Today’s review", "Revisión del día", "مراجعة اليوم"),
+587|      description: tr(lang, tr("Quelques cartes bien choisies pour laisser les mots s’installer.", "A few well-chosen cards to let the words settle.", "Algunas cartas bien elegidas para que las palabras se asienten.", "بعض البطاقات المنتقاة لتستقر الكلمات."), "A few well-chosen cards to let the words settle.", "Algunas cartas bien elegidas para que las palabras se asienten.", "بعض البطاقات المنتقاة لتستقر الكلمات."),
+588|    },
+589|    space: {
+590|      eyebrow: tr(lang, tr("UN ESPACE À TOI", "A SPACE OF YOUR OWN", "UN ESPACIO PARA TI", "فضاء لك"), "A SPACE OF YOUR OWN", "UN ESPACIO PARA TI", "فضاء لك"),
+591|      title: tr(lang, "Mon espace & Passeport", "My space & Passport", "Mi espacio y Pasaporte", "مساحتي وجواز السفر"),
+592|      description: tr(lang, "Ta progression et tes visas officiels, sous ton contrôle.", "Your progress and official visas, under your control.", "Tu progreso y tus visados oficiales, bajo tu control.", "تقدمك وتأشيراتك الرسمية، تحت سيطرتك."),
+593|    },
+594|  };
+595|
+596|  const currentHeader = headerTitle[view];
+597|
+598|  return (
+599|    <div className="app-shell">
+600|      {/* Sidebar Desktop & Mobile Slideout */}
+601|      <aside className={`sidebar ${mobileMenuOpen ? "sidebar-open" : ""}`}>
+602|        <div className="brand-lockup">
+603|          <div className="brand-mark" aria-hidden="true">
+604|            <span>ك</span>
+605|            <i />
+606|          </div>
+607|          <div>
+608|            <span className="brand-name">KENZA</span>
+609|            <span className="brand-tagline">{tr(lang, "la darija, en chemin", "darija, one step at a time", "la darija, paso a paso", "الدارجة، على الطريق")}</span>
+610|          </div>
+611|          <button
+612|            className="icon-button mobile-close"
+613|            aria-label="Fermer le menu"
+614|            onClick={() => setMobileMenuOpen(false)}
+615|          >
+616|            <X size={19} />
+617|          </button>
+618|        </div>
+619|
+620|        <div className="sidebar-label">{(t as any).side?.learn || "APPRENDRE"}</div>
+621|        <nav className="side-nav" aria-label="Navigation principale">
+622|          {navItems.map((item) => {
+623|            const Icon = item.icon;
+624|            return (
+625|              <button
+626|                key={item.id}
+627|                onClick={() => switchView(item.id)}
+628|                className={`nav-item ${view === item.id ? "nav-item-active" : ""}`}
+629|                aria-current={view === item.id ? "page" : undefined}
+630|              >
+631|                <Icon size={19} strokeWidth={1.8} /> <span>{navLabel(item.id) || item.label}</span>
+632|                {item.id === "review" && <span className="nav-count">4</span>}
+633|              </button>
+634|            );
+635|          })}
+636|        </nav>
+637|
+638|        <div className="sidebar-label">{tr(lang, "EXPLORER", "EXPLORE", "EXPLORAR", "استكشف")}</div>
+639|        <nav className="side-nav" aria-label={tr(lang, "Ressources d'étude", "Study resources", "Recursos de estudio", "موارد الدراسة")}>
+640|          <a href="/etudier" className="nav-item">
+641|            <span>{tr(lang, "Étudier — Modules complets", "Study — Full modules", "Estudiar — Módulos completos", "الدراسة — الوحدات الكاملة")}</span>
+642|          </a>
+643|          <a href="/grammaire" className="nav-item">
+644|            <span>{tr(lang, "Grammaire active", "Active grammar", "Gramática activa", "القواعد النشطة")}</span>
+645|          </a>
+646|          <a href="/parler" className="nav-item">
+647|            <span>{tr(lang, "Pratique orale", "Speaking practice", "Práctica oral", "تدريب النطق")}</span>
+648|          </a>
+649|          <a href="/revisions" className="nav-item">
+650|            <span>{tr(lang, "Révisions SRS", "SRS review", "Repaso SRS", "مراجعة SRS")}</span>
+651|          </a>
+652|        </nav>
+653|
+654|        <div className="sidebar-label sidebar-label-spaced">{(t as any).side?.oral || "PRATIQUE ORALE & IA"}</div>
+655|        <button
+656|          onClick={() => setShowScenarioSelector(true)}
+657|          className="nav-item"
+658|        >
+659|          <MessageCircle size={19} strokeWidth={1.8} />
+660|          <span>{tr(lang, "Roleplay IA", "AI roleplay", "Roleplay IA", "حوار مع الذكاء الاصطناعي")}</span>
+661|        </button>
+662|
+663|        <div className="sidebar-label sidebar-label-spaced">{(t as any).side?.space || "TON ESPACE"}</div>
+664|        <button
+665|          onClick={() => switchView("space")}
+666|          className={`nav-item ${view === "space" ? "nav-item-active" : ""}`}
+667|          aria-current={view === "space" ? "page" : undefined}
+668|        >
+669|          <Award size={19} strokeWidth={1.8} />
+670|          <span>{tr(lang, "Mon Passeport", "My passport", "Mi pasaporte", "جوازي")}</span>
+671|        </button>
+672|
+673|        <div className="sidebar-spacer" />
+674|
+675|        <div className="daily-goal-card">
+676|          <div className="goal-orbit">
+677|            <Target size={17} />
+678|          </div>
+679|          <div className="goal-topline">
+680|            <span>{tr(lang, "TON RYTHME", "YOUR PACE", "TU RITMO", "إيقاعك")}</span>
+681|            <span>{Math.min(100, Math.round(((completedCount * 3) / 10) * 100))}%</span>
+682|          </div>
+683|          <strong>{tr(lang, "10 minutes par jour", "10 minutes a day", "10 minutos al día", "10 دقائق يومياً")}</strong>
+684|          <div className="goal-track">
+685|            <span style={{ width: `${Math.min(100, ((completedCount * 3) / 10) * 100)}%` }} />
+686|          </div>
+687|          <button
+688|            onClick={() => showToast(t.modules.home.dailyGoal)}
+689|            className="goal-link"
+690|          >
+691|            {tr(lang, tr("Ajuster l’objectif", "Adjust goal", "Ajustar objetivo", "عدّل الهدف"), "Adjust goal", "Ajustar objetivo", "عدّل الهدف")} <ArrowRight size={14} />
+692|          </button>
+693|        </div>
+694|
+695|        <div className="sidebar-footer">
+696|          <span className="privacy-dot" />
+697|          <span>{user ? user.email?.split("@")[0] : tr(lang, "Mode Invité actif", "Guest mode active", "Modo invitado activo", "وضع الضيف مُفعّل")}</span>
+698|          <button
+699|            aria-label={tr(lang, "En savoir plus sur les données", "Learn more about data", "Más información sobre los datos", "اعرف المزيد عن البيانات")}
+700|            onClick={() => switchView("space")}
+701|          >
+702|            <CircleHelp size={14} />
+703|          </button>
+704|        </div>
+705|      </aside>
+706|
+707|      {mobileMenuOpen && (
+708|        <button
+709|          className="mobile-scrim"
+710|          aria-label="Fermer le menu"
+711|          onClick={() => setMobileMenuOpen(false)}
+712|        />
+713|      )}
+714|
+715|      {/* Main Area */}
+716|      <main className="main-area">
+717|        <header className="topbar">
+718|          <button
+719|            className="icon-button mobile-menu-trigger"
+720|            aria-label="Ouvrir le menu"
+721|            onClick={() => setMobileMenuOpen(true)}
+722|          >
+723|            <Menu size={21} />
+724|          </button>
+725|          <div className="breadcrumbs">
+726|            <span>KENZA</span>
+727|            <ChevronRight size={14} />
+728|            <span>{currentHeader.eyebrow.toLocaleLowerCase(lang)}</span>
+729|          </div>
+730|          <div className="topbar-actions">
+731|            {/* Sélecteur de langue bilingue */}
+732|            <div className="lang-switcher" role="group" aria-label="Sélecteur de langue">
+733|              <Globe size={13} className="lang-icon" />
+734|              <button
+735|                type="button"
+736|                onClick={() => setLanguage("fr")}
+737|                className={`lang-btn ${uiLanguage === "fr" ? "lang-btn-active" : ""}`}
+738|                aria-label="Passer en français"
+739|              >
+740|                FR
+741|              </button>
+742|              <span className="lang-sep">|</span>
+743|              <button
+744|                type="button"
+745|                onClick={() => setLanguage("en")}
+746|                className={`lang-btn ${uiLanguage === "en" ? "lang-btn-active" : ""}`}
+747|                aria-label="Switch to English"
+748|              >
+749|                EN
+750|              </button>
+751|              <span className="lang-sep">|</span>
+752|              <button
+753|                type="button"
+754|                onClick={() => setLanguage("es")}
+755|                className={`lang-btn ${uiLanguage === "es" ? "lang-btn-active" : ""}`}
+756|                aria-label="Cambiar a español"
+757|              >
+758|                ES
+759|              </button>
+760|              <span className="lang-sep">|</span>
+761|              <button
+762|                type="button"
+763|                onClick={() => setLanguage("ar")}
+764|                className={`lang-btn ${uiLanguage === "ar" ? "lang-btn-active" : ""}`}
+765|                aria-label="Passer en arabe"
+766|              >
+767|                AR
+768|              </button>
+769|            </div>
+770|
+771|            {/* Toggle Son */}
+772|            <button
+773|              className="sound-toggle"
+774|              onClick={toggleSound}
+775|              title={soundEnabled ? tr(lang, "Audio activé", "Audio on", "Audio activado", "الصوت مُفعّل") : tr(lang, "Audio muet", "Audio muted", "Audio silenciado", "الصوت مكتوم")}
+776|              aria-label={soundEnabled ? tr(lang, "Couper le son", "Mute sound", "Silenciar", "كتم الصوت") : tr(lang, "Activer le son", "Enable sound", "Activar sonido", "تفعيل الصوت")}
+777|            >
+778|              <Headphones size={15} />
+779|              <span>{soundEnabled ? tr(lang, "Son actif", "Sound on", "Sonido activo", "الصوت مُفعّل") : tr(lang, "Son coupé", "Sound off", "Sonido apagado", "الصوت مُغلق")}</span>
+780|            </button>
+781|
+782|            {/* Connexion Google & Profil */}
+783|            {user ? (
+784|              <button
+785|                className="top-avatar"
+786|                aria-label={t.modules.home.openSpace}
+787|                onClick={() => switchView("space")}
+788|                title={user.email || t.nav.profile}
+789|              >
+790|                {user.user_metadata?.avatar_url ? (
+791|                  <img
+792|                    src={user.user_metadata.avatar_url}
+793|                    alt={user.user_metadata?.full_name || tr(lang, "Profil", "Profile", "Perfil", "الملف الشخصي")}
+794|                    className="w-full h-full object-cover rounded-full"
+795|                  />
+796|                ) : user.user_metadata?.full_name ? (
+797|                  user.user_metadata.full_name[0].toUpperCase()
+798|                ) : user.email ? (
+799|                  user.email[0].toUpperCase()
+800|                ) : (
+801|                  "K"
+802|                )}
+803|              </button>
+804|            ) : (
+805|              <button
+806|                type="button"
+807|                onClick={handleGoogleLogin}
+808|                className="google-login-btn"
+809|                aria-label={tr(lang, "Se connecter avec Google", "Sign in with Google", "Iniciar sesión con Google", "تسجيل الدخول عبر Google")}
+810|                title={tr(lang, "Se connecter avec Google", "Sign in with Google", "Iniciar sesión con Google", "تسجيل الدخول عبر Google")}
+811|              >
+812|                <svg className="google-icon" width="13" height="13" viewBox="0 0 24 24">
+813|                  <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+814|                  <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/>
+815|                  <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.16 0 10.02 0 12s.45 3.84 1.25 5.42l4.03-3.15z"/>
+816|                  <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+817|                </svg>
+818|                <span>{tr(lang, "Se connecter", "Sign in", "Iniciar sesión", "تسجيل الدخول")}</span>
+819|              </button>
+820|            )}
+821|          </div>
+822|        </header>
+823|
+824|        <div className="content-wrap">
+825|          <section className="page-heading">
+826|            <div>
+827|              <div className="eyebrow">
+828|                <span className="eyebrow-line" />
+829|                {currentHeader.eyebrow}
+830|              </div>
+831|              <h1>{currentHeader.title}</h1>
+832|              <p>{currentHeader.description}</p>
+833|            </div>
+834|            <div className="date-chip">
+835|              <span className="date-sun">☼</span>
+836|              <span>
+837|                {new Intl.DateTimeFormat(getDateLocale(lang), {
+838|                  weekday: "long",
+839|                  day: "numeric",
+840|                  month: "long",
+841|                }).format(new Date())}
+842|              </span>
+843|            </div>
+844|          </section>
+845|
+846|          {/* VUE 1 : AUJOURD'HUI */}
+847|          {view === "today" && (
+848|            <TodayView
+849|              completedCount={completedCount}
+850|              xp={xp}
+851|              streak={streakDays}
+852|              nextLesson={nextLesson}
+853|              onStart={startLesson}
+854|              onNavigate={switchView}
+855|              onOpenRoleplay={() => setShowScenarioSelector(true)}
+856|            />
+857|          )}
+858|
+859|          {/* VUE 2 : MON PARCOURS */}
+860|          {view === "path" && (
+861|            <PathView
+862|              completedLessons={completedLessons}
+863|              onStart={startLesson}
+864|              onOpenCheckpoint={(id, name) => setCheckpointOpen({ id, name })}
+865|              onOpenPaywall={() => setPricingSource("module_locked")}
+866|              isPremium={isPremium}
+867|            />
+868|          )}
+869|
+870|          {/* VUE 3 : CARNET DE PHRASES */}
+871|          {view === "phrases" && (
+872|            <PhrasesView
+873|              search={search}
+874|              searchInputRef={searchInputRef}
+875|              setSearch={setSearch}
+876|              category={category}
+877|              setCategory={setCategory}
+878|              categories={categories}
+879|              phrases={filteredPhrases}
+880|              favorites={safeFavorites}
+881|              favoritesOnly={favoritesOnly}
+882|              setFavoritesOnly={setFavoritesOnly}
+883|              onFavorite={toggleFavorite}
+884|              onPlay={playPhrase}
+885|              onCopy={copyPhrase}
+886|            />
+887|          )}
+888|
+889|          {/* VUE 4 : RÉVISION SRS */}
+890|          {view === "review" && (
+891|            <ReviewView
+892|              reviewIndex={reviewIndex}
+893|              cardFlipped={cardFlipped}
+894|              setCardFlipped={setCardFlipped}
+895|              onGrade={gradeReview}
 896|            />
 897|          )}
 898|
-899|          <footer className="page-footer">
-900|            <span>
-901|              KENZA <span className="footer-arabic">كنزة</span>
-902|            </span>
-903|            <span>{tr("Apprendre une langue, c’est rencontrer des gens.", "Learning a language is meeting people.", "Aprender un idioma es conocer gente.", "تعلم اللغة لقاءٌ بالناس.")}</span>
-904|            <button onClick={() => switchView("space")}>
-905|              {tr("Passeport Culturel & Données", "Cultural passport & data", "Pasaporte cultural y datos", "الجواز الثقافي والبيانات")} <ArrowRight size={13} />
-906|            </button>
-907|          </footer>
-908|        </div>
-909|      </main>
-910|
-911|      {/* Mobile Bottom Navigation (Visible sous 900px) */}
-912|      <nav className="mobile-bottom-nav" aria-label="Navigation mobile">
-913|        {navItems.map((item) => {
-914|          const Icon = item.icon;
-915|          return (
-916|            <button
-917|              key={item.id}
-918|              onClick={() => switchView(item.id)}
-919|              className={view === item.id ? "mobile-nav-active" : ""}
-920|              aria-label={navLabel(item.id) || item.label}
-921|              aria-current={view === item.id ? "page" : undefined}
-922|            >
-923|              <Icon size={19} />
-924|              <span>
-925|                {item.id === "today"
-926|                  ? tr("Accueil", "Home", "Inicio", "الرئيسية")
-927|                  : item.id === "path"
-928|                  ? tr("Parcours", "Journey", "Recorrido", "المسار")
-929|                  : item.id === "phrases"
-930|                  ? tr("Phrases", "Phrases", "Frases", "العبارات")
-931|                  : tr("Réviser", "Review", "Repasar", "مراجعة")}
-932|              </span>
-933|            </button>
-934|          );
-935|        })}
-936|      </nav>
-937|
-938|      {/* Modale d'Exercice Manus */}
-939|      {lessonId && activeLesson && activeQuestion && (
-940|        <div
-941|          className="modal-scrim"
-942|          role="presentation"
-943|          onMouseDown={(event) => {
-944|            if (event.target === event.currentTarget) setLessonId(null);
-945|          }}
-946|        >
-947|          <section className="lesson-modal" role="dialog" aria-modal="true" aria-labelledby="lesson-title">
-948|            <div className="lesson-modal-top">
-949|              <button onClick={() => setLessonId(null)} className="icon-button" aria-label="Fermer la leçon">
-950|                <ArrowLeft size={19} />
-951|              </button>
-952|              <div className="lesson-progress-label">
-953|                <span>{tr("LEÇON", "LESSON", "LECCIÓN", "درس")} · {activeLesson.length.toUpperCase()}</span>
-954|                <span>
-955|                  {questionIndex + 1} / {activeLesson.questions.length}
-956|                </span>
-957|              </div>
-958|              <button onClick={() => setLessonId(null)} className="icon-button" aria-label="Quitter">
-959|                <X size={18} />
-960|              </button>
-961|            </div>
-962|            <div className="lesson-progress-track">
-963|              <span style={{ width: `${((questionIndex + 1) / activeLesson.questions.length) * 100}%` }} />
-964|            </div>
-965|            <div className="lesson-modal-body">
-966|              <div className="lesson-kicker">
-967|                <span className="lesson-kicker-icon">
-968|                  <Languages size={16} />
-969|                </span>{" "}
-970|                {activeLesson.title}
+899|          {/* VUE 5 : MON ESPACE / PASSEPORT */}
+900|          {view === "space" && (
+901|            <SpaceView
+902|              completedCount={completedCount}
+903|              xp={xp}
+904|              streak={streakDays}
+905|              user={user}
+906|              isPremium={isPremium}
+907|              onReset={resetProgress}
+908|              onOpenPaywall={() => setPricingSource("profile_upgrade")}
+909|              onToast={showToast}
+910|            />
+911|          )}
+912|
+913|          <footer className="page-footer">
+914|            <span>
+915|              KENZA <span className="footer-arabic">كنزة</span>
+916|            </span>
+917|            <span>{tr(lang, "Apprendre une langue, c’est rencontrer des gens.", "Learning a language is meeting people.", "Aprender un idioma es conocer gente.", "تعلم اللغة لقاءٌ بالناس.")}</span>
+918|            <button onClick={() => switchView("space")}>
+919|              {tr(lang, "Passeport Culturel & Données", "Cultural passport & data", "Pasaporte cultural y datos", "الجواز الثقافي والبيانات")} <ArrowRight size={13} />
+920|            </button>
+921|          </footer>
+922|        </div>
+923|      </main>
+924|
+925|      {/* Mobile Bottom Navigation (Visible sous 900px) */}
+926|      <nav className="mobile-bottom-nav" aria-label="Navigation mobile">
+927|        {navItems.map((item) => {
+928|          const Icon = item.icon;
+929|          return (
+930|            <button
+931|              key={item.id}
+932|              onClick={() => switchView(item.id)}
+933|              className={view === item.id ? "mobile-nav-active" : ""}
+934|              aria-label={navLabel(item.id) || item.label}
+935|              aria-current={view === item.id ? "page" : undefined}
+936|            >
+937|              <Icon size={19} />
+938|              <span>
+939|                {item.id === "today"
+940|                  ? tr(lang, "Accueil", "Home", "Inicio", "الرئيسية")
+941|                  : item.id === "path"
+942|                  ? tr(lang, "Parcours", "Journey", "Recorrido", "المسار")
+943|                  : item.id === "phrases"
+944|                  ? tr(lang, "Phrases", "Phrases", "Frases", "العبارات")
+945|                  : tr(lang, "Réviser", "Review", "Repasar", "مراجعة")}
+946|              </span>
+947|            </button>
+948|          );
+949|        })}
+950|      </nav>
+951|
+952|      {/* Modale d'Exercice Manus */}
+953|      {lessonId && activeLesson && activeQuestion && (
+954|        <div
+955|          className="modal-scrim"
+956|          role="presentation"
+957|          onMouseDown={(event) => {
+958|            if (event.target === event.currentTarget) setLessonId(null);
+959|          }}
+960|        >
+961|          <section className="lesson-modal" role="dialog" aria-modal="true" aria-labelledby="lesson-title">
+962|            <div className="lesson-modal-top">
+963|              <button onClick={() => setLessonId(null)} className="icon-button" aria-label={t.modules.home.closeLesson}>
+964|                <ArrowLeft size={19} />
+965|              </button>
+966|              <div className="lesson-progress-label">
+967|                <span>{tr(lang, "LEÇON", "LESSON", "LECCIÓN", "درس")} · {activeLesson.length.toUpperCase()}</span>
+968|                <span>
+969|                  {questionIndex + 1} / {activeLesson.questions.length}
+970|                </span>
 971|              </div>
-972|              <h2 id="lesson-title">{activeQuestion.prompt}</h2>
-973|              <p className="lesson-helper">{activeQuestion.helper}</p>
-974|              <div className="answer-list">
-975|                {activeQuestion.options.map((option, index) => {
-976|                  const isCorrect = selectedAnswer !== null && option === activeQuestion.answer;
-977|                  const isWrong = selectedAnswer === option && !isCorrect;
-978|                  const letter = String.fromCharCode(65 + index);
-979|                  return (
-980|                    <button
-981|                      key={option}
-982|                      onClick={() => {
-983|                        if (!selectedAnswer) setSelectedAnswer(option);
-984|                      }}
-985|                      disabled={Boolean(selectedAnswer)}
-986|                      className={`answer-option ${selectedAnswer === option ? "answer-selected" : ""} ${
-987|                        isCorrect ? "answer-correct" : ""
-988|                      } ${isWrong ? "answer-wrong" : ""}`}
-989|                    >
-990|                      <span className="answer-letter">{isCorrect ? <Check size={17} /> : letter}</span>
-991|                      <span>{option}</span>
-992|                      {isCorrect && <CheckCircle2 className="answer-check" size={19} />}
-993|                    </button>
-994|                  );
-995|                })}
-996|              </div>
-997|              {selectedAnswer && (
-998|                <div
-999|                  className={`answer-feedback ${
-1000|                    selectedAnswer === activeQuestion.answer ? "feedback-good" : "feedback-try"
+972|              <button onClick={() => setLessonId(null)} className="icon-button" aria-label="Quitter">
+973|                <X size={18} />
+974|              </button>
+975|            </div>
+976|            <div className="lesson-progress-track">
+977|              <span style={{ width: `${((questionIndex + 1) / activeLesson.questions.length) * 100}%` }} />
+978|            </div>
+979|            <div className="lesson-modal-body">
+980|              <div className="lesson-kicker">
+981|                <span className="lesson-kicker-icon">
+982|                  <Languages size={16} />
+983|                </span>{" "}
+984|                {activeLesson.title}
+985|              </div>
+986|              <h2 id="lesson-title">{activeQuestion.prompt}</h2>
+987|              <p className="lesson-helper">{activeQuestion.helper}</p>
+988|              <div className="answer-list">
+989|                {activeQuestion.options.map((option, index) => {
+990|                  const isCorrect = selectedAnswer !== null && option === activeQuestion.answer;
+991|                  const isWrong = selectedAnswer === option && !isCorrect;
+992|                  const letter = String.fromCharCode(65 + index);
+993|                  return (
+994|                    <button
+995|                      key={option}
+996|                      onClick={() => {
+997|                        if (!selectedAnswer) setSelectedAnswer(option);
+998|                      }}
+999|                      disabled={Boolean(selectedAnswer)}
+1000|                      className={`answer-option ${selectedAnswer === option ? "answer-selected" : ""} ${

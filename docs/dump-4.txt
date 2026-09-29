@@ -1,465 +1,489 @@
-1501|      </aside>
-1502|    </div>
-1503|  );
-1504|}
-1505|
-1506|// -------------------------------------------------------------
-1507|// Composant 3 : PhrasesView
-1508|// -------------------------------------------------------------
-1509|function PhrasesView({
-1510|  search,
-1511|  searchInputRef,
-1512|  setSearch,
-1513|  category,
-1514|  setCategory,
-1515|  categories,
-1516|  phrases: visiblePhrases,
-1517|  favorites = [],
-1518|  favoritesOnly,
-1519|  setFavoritesOnly,
-1520|  onFavorite,
-1521|  onPlay,
-1522|  onCopy,
-1523|}: {
-1524|  search: string;
-1525|  searchInputRef: RefObject<HTMLInputElement | null>;
-1526|  setSearch: (value: string) => void;
-1527|  category: string;
-1528|  setCategory: (value: string) => void;
-1529|  categories: string[];
-1530|  phrases: Phrase[];
-1531|  favorites?: string[];
-1532|  favoritesOnly: boolean;
-1533|  setFavoritesOnly: (value: boolean) => void;
-1534|  onFavorite: (id: string) => void;
-1535|  onPlay: (darija: string, arabic: string) => void;
-1536|  onCopy: (phrase: Phrase) => void;
-1537|}) {
-1538|  const safeFavorites = Array.isArray(favorites) ? favorites : [];
-1539|  const safePhrases = Array.isArray(visiblePhrases) ? visiblePhrases : [];
-1540|
-1541|  return (
-1542|    <>
-1543|      <section className="phrase-toolbar">
-1544|        <label className="phrase-search">
-1545|          <Search size={17} />
-1546|          <input
-1547|            ref={searchInputRef}
-1548|            value={search}
-1549|            onChange={(event) => setSearch(event.target.value)}
-1550|            placeholder="Chercher une expression…"
-1551|            aria-label="Chercher une expression"
-1552|          />
-1553|          <kbd>⌘ K</kbd>
-1554|        </label>
-1555|        <button
-1556|          className={`favorites-filter ${favoritesOnly ? "filter-active" : ""}`}
-1557|          onClick={() => setFavoritesOnly(!favoritesOnly)}
-1558|        >
-1559|          <Heart size={15} fill={favoritesOnly ? "currentColor" : "none"} /> Mes favoris{" "}
-1560|          <span>{safeFavorites.length}</span>
-1561|        </button>
-1562|      </section>
-1563|
-1564|      <div className="category-tabs" role="tablist" aria-label="Catégories de phrases">
-1565|        {(categories || []).map((item) => (
-1566|          <button
-1567|            role="tab"
-1568|            aria-selected={category === item}
-1569|            key={item}
-1570|            className={category === item ? "category-active" : ""}
-1571|            onClick={() => setCategory(item)}
-1572|          >
-1573|            {item}
-1574|          </button>
-1575|        ))}
-1576|      </div>
-1577|
-1578|      <div className="phrase-section-top">
-1579|        <div>
-1580|          <span className="mini-kicker">{tr("À PORTÉE DE MAIN", "AT HAND", "A MANO", "في متناول اليد")}</span>
-1581|          <h2>
-1582|            {favoritesOnly
-1583|              ? "Tes phrases favorites"
-1584|              : category === "Tout voir"
-1585|              ? "Les expressions du quotidien"
-1586|              : category}
-1587|          </h2>
-1588|        </div>
-1589|        <span className="phrase-count">
-1590|          {safePhrases.length} expression{safePhrases.length === 1 ? "" : "s"}
-1591|        </span>
-1592|      </div>
-1593|
-1594|      {safePhrases.length > 0 ? (
-1595|        <div className="phrase-grid">
-1596|          {safePhrases.map((phrase, index) => {
-1597|            const isFav = safeFavorites.includes(phrase.id);
-1598|            const darijaText = phrase.darija || "";
-1599|            const arabicText = phrase.arabic || "";
-1600|            const meaningText = phrase.meaning || "";
-1601|            const categoryText = phrase.category || tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات");
-1602|
-1603|            return (
-1604|              <article className="phrase-card" key={phrase.id}>
-1605|                <div className="phrase-card-top">
-1606|                  <span className="phrase-category">{categoryText}</span>
-1607|                  <button
-1608|                    className={`heart-button ${isFav ? "heart-active" : ""}`}
-1609|                    onClick={() => onFavorite(phrase.id)}
-1610|                    aria-label={
-1611|                      isFav ? "Retirer des favoris" : "Ajouter aux favoris"
-1612|                    }
-1613|                  >
-1614|                    <Heart size={17} fill={isFav ? "currentColor" : "none"} />
-1615|                  </button>
-1616|                </div>
-1617|                <span className="phrase-index">0{index + 1}</span>
-1618|                <h3>{darijaText}</h3>
-1619|                {arabicText ? (
-1620|                  <span className="phrase-arabic" dir="rtl">
-1621|                    {arabicText}
-1622|                  </span>
-1623|                ) : null}
-1624|                <div className="phrase-divider" />
-1625|                <p className="phrase-meaning">{meaningText}</p>
-1626|                {phrase.note ? <p className="phrase-note">{phrase.note}</p> : null}
-1627|                <div className="phrase-actions">
-1628|                  <button onClick={() => onPlay(darijaText, arabicText)}>
-1629|                    <Volume2 size={15} /> Écouter
-1630|                  </button>
-1631|                  <button onClick={() => onCopy(phrase)}>
-1632|                    <Bookmark size={14} /> Copier
-1633|                  </button>
-1634|                </div>
-1635|              </article>
-1636|            );
-1637|          })}
-1638|        </div>
-1639|      ) : (
-1640|        <div className="empty-state">
-1641|          <span className="empty-symbol">
-1642|            <Search size={22} />
-1643|          </span>
-1644|          <h3>{tr("Aucune phrase trouvée", "No phrase found", "Ninguna frase encontrada", "لا توجد عبارات")}</h3>
-1645|          <p>{tr("Essaie un autre mot ou change de catégorie.", "Try another word or category.", "Prueba otra palabra o categoría.", "جرّب كلمة أو فئة أخرى.")}</p>
-1646|          <button
-1647|            className="plain-link"
-1648|            onClick={() => {
-1649|              setSearch("");
-1650|              setCategory("Tout voir");
-1651|              setFavoritesOnly(false);
-1652|            }}
-1653|          >
-1654|            {tr("Effacer les filtres", "Clear filters", "Borrar filtros", "مسح المرشحات")} <ArrowRight size={14} />
-1655|          </button>
-1656|        </div>
-1657|      )}
-1658|
-1659|      <div className="phrase-footnote">
-1660|        <span className="privacy-dot" /> Synthèse vocale naturelle haute fidélité (Edge TTS) avec
-1661|        cache hors-ligne intégré.
-1662|      </div>
-1663|    </>
-1664|  );
-1665|}
-1666|
-1667|// -------------------------------------------------------------
-1668|// Composant 4 : ReviewView (Flashcards SRS)
-1669|// -------------------------------------------------------------
-1670|function ReviewView({
-1671|  reviewIndex,
-1672|  cardFlipped,
-1673|  setCardFlipped,
-1674|  onGrade,
-1675|}: {
-1676|  reviewIndex: number;
-1677|  cardFlipped: boolean;
-1678|  setCardFlipped: (value: boolean) => void;
-1679|  onGrade: (grade: "again" | "hard" | "good" | "easy") => void;
-1680|}) {
-1681|  const cards = [
-1682|    {
-1683|      front: tr("Merci beaucoup", "Thank you so much", "Muchas gracias", "شكراً جزيلاً"),
-1684|      back: "Shukran bzaf",
-1685|      arabic: "شكرا بزاف!",
-1686|      hint: tr("Un petit mot chaleureux qui ouvre toutes les portes.", "A warm little word that opens every door.", "Una palabra cálida que abre todas las puertas.", "كلمة دافئة تفتح كل الأبواب."),
-1687|    },
-1688|    {
-1689|      front: tr(tr("Où est le souk ?", "Where is the souk?", "¿dónde está el souk?", "أين السوق؟"), "Where is the souk?", "¿Dónde está el souk?", "أين السوق؟"),
-1690|      back: "Fin kayn souk?",
-1691|      arabic: "فين كاين السوق؟",
-1692|      hint: tr("Pour trouver ton chemin dans la médina.", "To find your way in the medina.", "Para encontrar tu camino en la medina.", "لتجد طريقك في المدينة القديمة."),
-1693|    },
-1694|    {
-1695|      front: tr("S’il vous plaît", "Please", "Por favor", "من فضلك"),
-1696|      back: "Afak",
-1697|      arabic: "عفاك",
-1698|      hint: tr("Un mot simple pour rendre tes demandes plus douces.", "A simple word that softens your requests.", "Una palabra simple para suavizar tus peticiones.", "كلمة بسيطة تجعل طلباتك ألطف."),
-1699|    },
-1700|    {
-1701|      front: tr("Au revoir, à bientôt", "Goodbye, see you soon", "Adiós, hasta pronto", "إلى اللقاء، أراك قريباً"),
-1702|      back: "Bslama, nshawfek",
-1703|      arabic: "بسلامة، نشوفك",
-1704|      hint: tr("Une manière chaleureuse de se dire à bientôt.", "A warm way to say see you soon.", "Una manera cálida de decir hasta pronto.", "طريقة دافئة للقول أراك قريباً."),
-1705|    },
-1706|    {
-1707|      front: tr("Je voudrais un thé", "I’d like a tea", "Quisiera un té", "أريد شاياً"),
-1708|      back: "Bghit wahed atay, afak",
-1709|      arabic: "بغيت واحد أتاي، عفاك",
-1710|      hint: tr("Pour savourer un moment au café.", "To savor a moment at the café.", "Para saborear un momento en el café.", "للاستمتاع بلحظة في المقهى."),
-1711|    },
-1712|  ];
-1713|
-1714|  const card = cards[reviewIndex % cards.length];
-1715|
-1716|  return (
-1717|    <div className="review-layout">
-1718|      <section className="review-main">
-1719|        <div className="review-card-top">
-1720|          <span className="mini-kicker">
-1721|            {tr("CARTE", "CARD", "TARJETA", "بطاقة")} {String((reviewIndex % cards.length) + 1).padStart(2, "0")} <i>/</i> 0{cards.length}
-1722|          </span>
-1723|          <span className="review-session">
-1724|            <Sparkles size={14} /> {tr("Session tranquille", "Quiet session", "Sesión tranquila", "جلسة هادئة")}
-1725|          </span>
-1726|        </div>
-1727|        <button
-1728|          className={`flashcard ${cardFlipped ? "flashcard-flipped" : ""}`}
-1729|          onClick={() => setCardFlipped(!cardFlipped)}
-1730|          aria-label={cardFlipped ? tr("Voir la question", "See the question", "Ver la pregunta", "شاهد السؤال") : tr("Retourner la carte", "Flip the card", "Girar la tarjeta", "اقلب البطاقة")}
-1731|        >
-1732|          <span className="flashcard-decoration decor-top">✳</span>
-1733|          <span className="flashcard-label">{cardFlipped ? tr("EN DARIJA", "IN DARIJA", "EN DARIJA", "بالدارجة") : tr("EN FRANÇAIS", "IN ENGLISH", "EN ESPAÑOL", "بالعربية")}</span>
-1734|          {cardFlipped ? (
-1735|            <>
-1736|              <strong className="flashcard-answer">{card.back}</strong>
-1737|              <span className="flashcard-arabic" dir="rtl">
-1738|                {card.arabic}
-1739|              </span>
-1740|              <p>{card.hint}</p>
-1741|            </>
-1742|          ) : (
-1743|            <>
-1744|              <strong className="flashcard-question">{card.front}</strong>
-1745|              <span className="flashcard-tap">
-1746|                <span className="rotate-symbol">↻</span> {tr("Touche pour révéler", "Tap to reveal", "Toca para revelar", "المس للكشف")}
-1747|              </span>
-1748|            </>
-1749|          )}
-1750|          <span className="flashcard-decoration decor-bottom">✳</span>
-1751|        </button>
-1752|
-1753|        <div className="review-hint">
-1754|          <CircleHelp size={15} />
-1755|          <span>{tr("Réponds dans ta tête, puis retourne la carte pour vérifier.", "Answer in your head, then flip the card.", "Responde en tu mente y gira la tarjeta.", "أجب في ذهنك ثم اقلب البطاقة.")}</span>
-1756|        </div>
-1757|
-1758|        <div className="review-ratings">
-1759|          <button className="rate-again" onClick={() => onGrade("again")}>
-1760|            <span>{tr("Encore", "Again", "Otra vez", "مرة أخرى")}</span>
-1761|            <small>+1 XP</small>
-1762|          </button>
-1763|          <button className="rate-hard" onClick={() => onGrade("hard")}>
-1764|            <span>{tr("Difficile", "Hard", "Difícil", "صعب")}</span>
-1765|            <small>+2 XP</small>
-1766|          </button>
-1767|          <button className="rate-good" onClick={() => onGrade("good")}>
-1768|            <span>{tr("Bien", "Good", "Bien", "جيد")}</span>
-1769|            <small>+3 XP</small>
-1770|          </button>
-1771|          <button className="rate-easy" onClick={() => onGrade("easy")}>
-1772|            <span>{tr("Facile", "Easy", "Fácil", "سهل")}</span>
-1773|            <small>+5 XP</small>
-1774|          </button>
-1775|        </div>
-1776|      </section>
+1501|          <div className="aside-stat">
+1502|            <span>{tr(lang, "Palier A1 (Fondations)", "Level A1 (Foundations)", "Nivel A1 (Fundamentos)", "المستوى A1 (الأساسيات)")}</span>
+1503|            <strong>{hasPassedLevel("1") ? "Validé ✓" : "En cours"}</strong>
+1504|          </div>
+1505|          <button
+1506|            onClick={() => onOpenCheckpoint("1", tr(lang, tr("Palier A1 — Fondations", "Level A1 — Foundations", "Nivel A1 — Fundamentos", "المستوى A1 — الأساسيات"), "Level A1 — Foundations", "Nivel A1 — Fundamentos", "المستوى A1 — الأساسيات"))}
+1507|          >
+1508|            {tr(lang, "Passer le Checkpoint A1", "Take Checkpoint A1", "Pasar el Checkpoint A1", "اجتز نقطة A1")} <ArrowRight size={14} />
+1509|          </button>
+1510|        </div>
+1511|
+1512|        <div className="path-aside-note">
+1513|          <span className="note-symbol">✳</span>
+1514|          <p>
+1515|            Le mot <strong>darija</strong> vient de l’arabe <span dir="rtl">الدارجة</span> — la
+1516|            langue courante, celle de tous les jours.
+1517|          </p>
+1518|        </div>
+1519|      </aside>
+1520|    </div>
+1521|  );
+1522|}
+1523|
+1524|// -------------------------------------------------------------
+1525|// Composant 3 : PhrasesView
+1526|// -------------------------------------------------------------
+1527|function PhrasesView({
+1528|  search,
+1529|  searchInputRef,
+1530|  setSearch,
+1531|  category,
+1532|  setCategory,
+1533|  categories,
+1534|  phrases: visiblePhrases,
+1535|  favorites = [],
+1536|  favoritesOnly,
+1537|  setFavoritesOnly,
+1538|  onFavorite,
+1539|  onPlay,
+1540|  onCopy,
+1541|}: {
+1542|  search: string;
+1543|  searchInputRef: RefObject<HTMLInputElement | null>;
+1544|  setSearch: (value: string) => void;
+1545|  category: string;
+1546|  setCategory: (value: string) => void;
+1547|  categories: string[];
+1548|  phrases: Phrase[];
+1549|  favorites?: string[];
+1550|  favoritesOnly: boolean;
+1551|  setFavoritesOnly: (value: boolean) => void;
+1552|  onFavorite: (id: string) => void;
+1553|  onPlay: (darija: string, arabic: string) => void;
+1554|  onCopy: (phrase: Phrase) => void;
+1555|}) {
+1556|  const { lang } = useLocalizedContent();
+1557|  const safeFavorites = Array.isArray(favorites) ? favorites : [];
+1558|  const safePhrases = Array.isArray(visiblePhrases) ? visiblePhrases : [];
+1559|
+1560|  return (
+1561|    <>
+1562|      <section className="phrase-toolbar">
+1563|        <label className="phrase-search">
+1564|          <Search size={17} />
+1565|          <input
+1566|            ref={searchInputRef}
+1567|            value={search}
+1568|            onChange={(event) => setSearch(event.target.value)}
+1569|            placeholder={tr(lang, "Chercher une expression…", "Search a phrase…", "Buscar una frase…", "ابحث عن عبارة…")}
+1570|            aria-label={tr(lang, "Chercher une expression", "Search a phrase", "Buscar una frase", "ابحث عن عبارة")}
+1571|          />
+1572|          <kbd>⌘ K</kbd>
+1573|        </label>
+1574|        <button
+1575|          className={`favorites-filter ${favoritesOnly ? "filter-active" : ""}`}
+1576|          onClick={() => setFavoritesOnly(!favoritesOnly)}
+1577|        >
+1578|          <Heart size={15} fill={favoritesOnly ? "currentColor" : "none"} /> {tr(lang, "Mes favoris", "My favorites", "Mis favoritos", "مفضلاتي")}{" "}
+1579|          <span>{safeFavorites.length}</span>
+1580|        </button>
+1581|      </section>
+1582|
+1583|      <div className="category-tabs" role="tablist" aria-label={tr(lang, "Catégories de phrases", "Phrase categories", "Categorías de frases", "فئات العبارات")}>
+1584|        {(categories || []).map((item) => (
+1585|          <button
+1586|            role="tab"
+1587|            aria-selected={category === item}
+1588|            key={item}
+1589|            className={category === item ? "category-active" : ""}
+1590|            onClick={() => setCategory(item)}
+1591|          >
+1592|            {item === "__all__" ? tr(lang, "Tout voir", "See all", "Ver todo", "عرض الكل") : item}
+1593|          </button>
+1594|        ))}
+1595|      </div>
+1596|
+1597|      <div className="phrase-section-top">
+1598|        <div>
+1599|          <span className="mini-kicker">{tr(lang, "À PORTÉE DE MAIN", "AT HAND", "A MANO", "في متناول اليد")}</span>
+1600|          <h2>
+1601|            {favoritesOnly
+1602|              ? tr(lang, "Tes phrases favorites", "Your favorite phrases", "Tus frases favoritas", "عباراتك المفضلة")
+1603|              : category === "Tout voir"
+1604|              ? tr(lang, "Les expressions du quotidien", "Everyday expressions", "Expresiones cotidianas", "التعابير اليومية")
+1605|              : category}
+1606|          </h2>
+1607|        </div>
+1608|        <span className="phrase-count">
+1609|          {safePhrases.length} expression{safePhrases.length === 1 ? "" : "s"}
+1610|        </span>
+1611|      </div>
+1612|
+1613|      {safePhrases.length > 0 ? (
+1614|        <div className="phrase-grid">
+1615|          {safePhrases.map((phrase, index) => {
+1616|            const isFav = safeFavorites.includes(phrase.id);
+1617|            const darijaText = phrase.darija || "";
+1618|            const arabicText = phrase.arabic || "";
+1619|            const meaningText = phrase.meaning || "";
+1620|            const categoryText = phrase.category || tr(lang, tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات"), "Essentials", "Lo esencial", "الأساسيات");
+1621|
+1622|            return (
+1623|              <article className="phrase-card" key={phrase.id}>
+1624|                <div className="phrase-card-top">
+1625|                  <span className="phrase-category">{categoryText}</span>
+1626|                  <button
+1627|                    className={`heart-button ${isFav ? "heart-active" : ""}`}
+1628|                    onClick={() => onFavorite(phrase.id)}
+1629|                    aria-label={
+1630|                      isFav ? "Retirer des favoris" : "Ajouter aux favoris"
+1631|                    }
+1632|                  >
+1633|                    <Heart size={17} fill={isFav ? "currentColor" : "none"} />
+1634|                  </button>
+1635|                </div>
+1636|                <span className="phrase-index">0{index + 1}</span>
+1637|                <h3>{darijaText}</h3>
+1638|                {arabicText ? (
+1639|                  <span className="phrase-arabic" dir="rtl">
+1640|                    {arabicText}
+1641|                  </span>
+1642|                ) : null}
+1643|                <div className="phrase-divider" />
+1644|                <p className="phrase-meaning">{meaningText}</p>
+1645|                {phrase.note ? <p className="phrase-note">{phrase.note}</p> : null}
+1646|                <div className="phrase-actions">
+1647|                  <button onClick={() => onPlay(darijaText, arabicText)}>
+1648|                    <Volume2 size={15} /> Écouter
+1649|                  </button>
+1650|                  <button onClick={() => onCopy(phrase)}>
+1651|                    <Bookmark size={14} /> Copier
+1652|                  </button>
+1653|                </div>
+1654|              </article>
+1655|            );
+1656|          })}
+1657|        </div>
+1658|      ) : (
+1659|        <div className="empty-state">
+1660|          <span className="empty-symbol">
+1661|            <Search size={22} />
+1662|          </span>
+1663|          <h3>{tr(lang, "Aucune phrase trouvée", "No phrase found", "Ninguna frase encontrada", "لا توجد عبارات")}</h3>
+1664|          <p>{tr(lang, "Essaie un autre mot ou change de catégorie.", "Try another word or category.", "Prueba otra palabra o categoría.", "جرّب كلمة أو فئة أخرى.")}</p>
+1665|          <button
+1666|            className="plain-link"
+1667|            onClick={() => {
+1668|              setSearch("");
+1669|              setCategory("Tout voir");
+1670|              setFavoritesOnly(false);
+1671|            }}
+1672|          >
+1673|            {tr(lang, "Effacer les filtres", "Clear filters", "Borrar filtros", "مسح المرشحات")} <ArrowRight size={14} />
+1674|          </button>
+1675|        </div>
+1676|      )}
+1677|
+1678|      <div className="phrase-footnote">
+1679|        <span className="privacy-dot" /> Synthèse vocale naturelle haute fidélité (Edge TTS) avec
+1680|        cache hors-ligne intégré.
+1681|      </div>
+1682|    </>
+1683|  );
+1684|}
+1685|
+1686|// -------------------------------------------------------------
+1687|// Composant 4 : ReviewView (Flashcards SRS)
+1688|// -------------------------------------------------------------
+1689|function ReviewView({
+1690|  reviewIndex,
+1691|  cardFlipped,
+1692|  setCardFlipped,
+1693|  onGrade,
+1694|}: {
+1695|  reviewIndex: number;
+1696|  cardFlipped: boolean;
+1697|  setCardFlipped: (value: boolean) => void;
+1698|  onGrade: (grade: "again" | "hard" | "good" | "easy") => void;
+1699|}) {
+1700|  const { lang } = useLocalizedContent();
+1701|  const cards = [
+1702|    {
+1703|      front: tr(lang, "Merci beaucoup", "Thank you so much", "Muchas gracias", "شكراً جزيلاً"),
+1704|      back: "Shukran bzaf",
+1705|      arabic: "شكرا بزاف!",
+1706|      hint: tr(lang, "Un petit mot chaleureux qui ouvre toutes les portes.", "A warm little word that opens every door.", "Una palabra cálida que abre todas las puertas.", "كلمة دافئة تفتح كل الأبواب."),
+1707|    },
+1708|    {
+1709|      front: tr(lang, tr("Où est le souk ?", "Where is the souk?", "¿dónde está el souk?", "أين السوق؟"), "Where is the souk?", "¿Dónde está el souk?", "أين السوق؟"),
+1710|      back: "Fin kayn souk?",
+1711|      arabic: "فين كاين السوق؟",
+1712|      hint: tr(lang, "Pour trouver ton chemin dans la médina.", "To find your way in the medina.", "Para encontrar tu camino en la medina.", "لتجد طريقك في المدينة القديمة."),
+1713|    },
+1714|    {
+1715|      front: tr(lang, "S’il vous plaît", "Please", "Por favor", "من فضلك"),
+1716|      back: "Afak",
+1717|      arabic: "عفاك",
+1718|      hint: tr(lang, "Un mot simple pour rendre tes demandes plus douces.", "A simple word that softens your requests.", "Una palabra simple para suavizar tus peticiones.", "كلمة بسيطة تجعل طلباتك ألطف."),
+1719|    },
+1720|    {
+1721|      front: tr(lang, "Au revoir, à bientôt", "Goodbye, see you soon", "Adiós, hasta pronto", "إلى اللقاء، أراك قريباً"),
+1722|      back: "Bslama, nshawfek",
+1723|      arabic: "بسلامة، نشوفك",
+1724|      hint: tr(lang, "Une manière chaleureuse de se dire à bientôt.", "A warm way to say see you soon.", "Una manera cálida de decir hasta pronto.", "طريقة دافئة للقول أراك قريباً."),
+1725|    },
+1726|    {
+1727|      front: tr(lang, "Je voudrais un thé", "I’d like a tea", "Quisiera un té", "أريد شاياً"),
+1728|      back: "Bghit wahed atay, afak",
+1729|      arabic: "بغيت واحد أتاي، عفاك",
+1730|      hint: tr(lang, "Pour savourer un moment au café.", "To savor a moment at the café.", "Para saborear un momento en el café.", "للاستمتاع بلحظة في المقهى."),
+1731|    },
+1732|  ];
+1733|
+1734|  const card = cards[reviewIndex % cards.length];
+1735|
+1736|  return (
+1737|    <div className="review-layout">
+1738|      <section className="review-main">
+1739|        <div className="review-card-top">
+1740|          <span className="mini-kicker">
+1741|            {tr(lang, "CARTE", "CARD", "TARJETA", "بطاقة")} {String((reviewIndex % cards.length) + 1).padStart(2, "0")} <i>/</i> 0{cards.length}
+1742|          </span>
+1743|          <span className="review-session">
+1744|            <Sparkles size={14} /> {tr(lang, "Session tranquille", "Quiet session", "Sesión tranquila", "جلسة هادئة")}
+1745|          </span>
+1746|        </div>
+1747|        <button
+1748|          className={`flashcard ${cardFlipped ? "flashcard-flipped" : ""}`}
+1749|          onClick={() => setCardFlipped(!cardFlipped)}
+1750|          aria-label={cardFlipped ? tr(lang, "Voir la question", "See the question", "Ver la pregunta", "شاهد السؤال") : tr(lang, "Retourner la carte", "Flip the card", "Girar la tarjeta", "اقلب البطاقة")}
+1751|        >
+1752|          <span className="flashcard-decoration decor-top">✳</span>
+1753|          <span className="flashcard-label">{cardFlipped ? tr(lang, "EN DARIJA", "IN DARIJA", "EN DARIJA", "بالدارجة") : tr(lang, "EN FRANÇAIS", "IN ENGLISH", "EN ESPAÑOL", "بالعربية")}</span>
+1754|          {cardFlipped ? (
+1755|            <>
+1756|              <strong className="flashcard-answer">{card.back}</strong>
+1757|              <span className="flashcard-arabic" dir="rtl">
+1758|                {card.arabic}
+1759|              </span>
+1760|              <p>{card.hint}</p>
+1761|            </>
+1762|          ) : (
+1763|            <>
+1764|              <strong className="flashcard-question">{card.front}</strong>
+1765|              <span className="flashcard-tap">
+1766|                <span className="rotate-symbol">↻</span> {tr(lang, "Touche pour révéler", "Tap to reveal", "Toca para revelar", "المس للكشف")}
+1767|              </span>
+1768|            </>
+1769|          )}
+1770|          <span className="flashcard-decoration decor-bottom">✳</span>
+1771|        </button>
+1772|
+1773|        <div className="review-hint">
+1774|          <CircleHelp size={15} />
+1775|          <span>{tr(lang, "Réponds dans ta tête, puis retourne la carte pour vérifier.", "Answer in your head, then flip the card.", "Responde en tu mente y gira la tarjeta.", "أجب في ذهنك ثم اقلب البطاقة.")}</span>
+1776|        </div>
 1777|
-1778|      <aside className="review-aside">
-1779|        <div className="review-aside-card">
-1780|          <span className="aside-icon">
-1781|            <Sparkles size={18} />
-1782|          </span>
-1783|          <span className="mini-kicker">{tr("SANS PRESSION", "NO PRESSURE", "SIN PRESIÓN", "بدون ضغط")}</span>
-1784|          <h3>{tr("Le bon rythme, c’est le tien.", "The right pace is yours.", "El buen ritmo es el tuyo.", "الإيقاع المناسب هو إيقاعك.")}</h3>
-1785|          <p>
-1786|            {tr("L'algorithme de répétition espacée (SRS) consolide ta mémoire à long terme. Chaque point d'XP nourrit ton passeport.", "The spaced-repetition (SRS) algorithm consolidates your long-term memory. Every XP point feeds your passport.", "El algoritmo de repetición espaciada (SRS) consolida tu memoria a largo plazo. Cada punto de XP alimenta tu pasaporte.", "خوارزمية التكرار المتباعد (SRS) ترسّخ ذاكرتك طويلة المدى. كل نقطة XP تغذي جوازك.")}
-1787|          </p>
-1788|          <div className="aside-divider" />
-1789|          <div className="review-method">
-1790|            <span className="method-dot" />
-1791|            <p>
-1792|              <strong>{tr("Petit conseil", "Quick tip", "Pequeño consejo", "نصيحة")}</strong>
-1793|              <br />
-1794|              {tr("Dis la phrase à voix haute. La mémoire aime la répétition.", "Say the phrase out loud. Memory loves repetition.", "Di la frase en voz alta. La memoria ama la repetición.", "قل العبارة بصوت عالٍ. الذاكرة تحب التكرار.")} les histoires qu’on raconte.
-1795|            </p>
-1796|          </div>
-1797|        </div>
-1798|        <div className="review-alphabet">
-1799|          <span>أ ب ت</span>
-1800|          <p>{tr("Écoute · Répète · Reviens", "Listen · Repeat · Come back", "Escucha · Repite · Vuelve", "استمع · كرر · عد")}</p>
-1801|        </div>
-1802|      </aside>
-1803|    </div>
-1804|  );
-1805|}
-1806|
-1807|// -------------------------------------------------------------
-1808|// Composant 5 : SpaceView (Mon Espace & Passeport)
-1809|// -------------------------------------------------------------
-1810|function SpaceView({
-1811|  completedCount,
-1812|  xp,
-1813|  streak,
-1814|  user,
-1815|  isPremium,
-1816|  onReset,
-1817|  onOpenPaywall,
-1818|  onToast,
-1819|}: {
-1820|  completedCount: number;
-1821|  xp: number;
-1822|  streak: number;
-1823|  user: any;
-1824|  isPremium: boolean;
-1825|  onReset: () => void;
-1826|  onOpenPaywall: () => void;
-1827|  onToast: (message: string) => void;
-1828|}) {
-1829|  const username =
-1830|    user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Invité(e)";
-1831|
-1832|  const passportData = {
-1833|    userName: username,
-1834|    levelName: xp >= 300 ? "Niveau A2 — Essentiels" : "Niveau A1 — Premiers Pas",
-1835|    score: Math.min(100, Math.round((xp / 500) * 100)),
-1836|    date: new Date().toLocaleDateString("fr-FR"),
-1837|    passportId: `KNZ-${user ? "PRO" : "DEMO"}-7421`,
-1838|  };
-1839|
-1840|  return (
-1841|    <div className="space-layout">
-1842|      <section className="space-card space-profile">
-1843|        <div className="profile-avatar">
-1844|          {username[0]?.toUpperCase() || "ك"}
-1845|        </div>
-1846|        <div className="profile-intro">
-1847|          <span className="mini-kicker">{tr("MON COIN KENZA", "MY KENZA CORNER", "MI RINCÓN KENZA", "ركني في كنزة")}</span>
-1848|          <h2>Salam, {username} !</h2>
-1849|          <p>
-1850|            {user
-1851|              ? `Connecté en tant que ${user.email}. Données sauvegardées dans le cloud.`
-1852|              : "Mode Invité actif. Ta progression est préservée localement sur cet appareil."}
-1853|          </p>
-1854|        </div>
-1855|        <span className="local-badge">
-1856|          <span className="privacy-dot" /> {isPremium ? "MEMBRE KENZA PRO" : "VERSION GRATUITE"}
-1857|        </span>
-1858|      </section>
-1859|
-1860|      <div className="space-stats">
-1861|        <article>
-1862|          <span className="space-stat-icon stat-blue">
-1863|            <BookOpen size={18} />
-1864|          </span>
-1865|          <span className="mini-kicker">{tr("LEÇONS", "LESSONS", "LECCIONES", "الدروس")}</span>
-1866|          <strong>
-1867|            {completedCount}
-1868|            <small> / {baseLessons.length}</small>
-1869|          </strong>
-1870|          <p>{tr("Chaque pas compte.", "Every step counts.", "Cada paso cuenta.", "كل خطوة تُحسب.")}</p>
-1871|        </article>
-1872|        <article>
-1873|          <span className="space-stat-icon stat-gold">
-1874|            <Star size={18} />
-1875|          </span>
-1876|          <span className="mini-kicker">{tr("POINTS", "POINTS", "PUNTOS", "النقاط")}</span>
-1877|          <strong>
-1878|            {xp}
-1879|            <small> XP</small>
-1880|          </strong>
-1881|          <p>{tr("Gagnés en pratiquant.", "Earned by practicing.", "Ganados practicando.", "تُكتسب بالتدريب.")}</p>
-1882|        </article>
-1883|        <article>
-1884|          <span className="space-stat-icon stat-orange">
-1885|            <Flame size={18} />
-1886|          </span>
-1887|          <span className="mini-kicker">{tr("RYTHME", "PACE", "RITMO", "الإيقاع")}</span>
-1888|          <strong>
-1889|            {streak}
-1890|            <small> {tr("jour", "day", "día", "يوم")}{streak > 1 ? "s" : ""}</small>
-1891|          </strong>
-1892|          <p>{tr("La régularité avant tout.", "Consistency above all.", "La constancia ante todo.", "الاستمرارية أولاً.")}</p>
-1893|        </article>
-1894|      </div>
-1895|
-1896|      <div className="space-data-grid">
-1897|        <article className="data-card">
-1898|          <div className="data-card-heading">
-1899|            <span className="data-icon">
-1900|              <LockKeyhole size={18} />
-1901|            </span>
-1902|            <div>
-1903|              <span className="mini-kicker">{tr("TES DONNÉES", "YOUR DATA", "TUS DATOS", "بياناتك")}</span>
-1904|              <h3>{tr("Progression & Confidentialité", "Progress & Privacy", "Progreso y privacidad", "التقدم والخصوصية")}</h3>
-1905|            </div>
-1906|          </div>
-1907|          <p>
-1908|            La progression est sécurisée. Si tu te connectes, tes leçons, favoris et points se
-1909|            synchronisent automatiquement sur tous tes appareils.
-1910|          </p>
-1911|          <div className="data-safe-row">
-1912|            <CheckCircle2 size={15} />
-1913|            <span>PWA Hors-Ligne · Sauvegarde Hybride Local & Supabase</span>
-1914|          </div>
-1915|          {!isPremium && (
-1916|            <button className="outline-button" onClick={onOpenPaywall}>
-1917|              {tr("Passer à Kenza Pro", "Go Kenza Pro", "Pasar a Kenza Pro", "انتقل إلى كنزة برو")} <ArrowRight size={14} />
-1918|            </button>
-1919|          )}
-1920|        </article>
-1921|
-1922|        <article className="data-card data-card-cert">
-1923|          <div className="data-card-heading">
-1924|            <span className="data-icon certificate-icon">
-1925|              <Award size={18} />
-1926|            </span>
-1927|            <div>
-1928|              <span className="mini-kicker">{tr("CERTIFICATS", "CERTIFICATES", "CERTIFICADOS", "الشهادات")}</span>
-1929|              <h3>{tr("Passeport Culturel", "Cultural passport", "Pasaporte cultural", "الجواز الثقافي")}</h3>
-1930|            </div>
-1931|          </div>
-1932|          <p>
-1933|            Valide les examens de palier pour obtenir tes visas officiels du Passeport Darija et les
-1934|            télécharger en haute résolution.
-1935|          </p>
-1936|          <div className="py-2">
-1937|            <DarijaPassportCard data={passportData} />
+1778|        <div className="review-ratings">
+1779|          <button className="rate-again" onClick={() => onGrade("again")}>
+1780|            <span>{tr(lang, "Encore", "Again", "Otra vez", "مرة أخرى")}</span>
+1781|            <small>+1 XP</small>
+1782|          </button>
+1783|          <button className="rate-hard" onClick={() => onGrade("hard")}>
+1784|            <span>{tr(lang, "Difficile", "Hard", "Difícil", "صعب")}</span>
+1785|            <small>+2 XP</small>
+1786|          </button>
+1787|          <button className="rate-good" onClick={() => onGrade("good")}>
+1788|            <span>{tr(lang, "Bien", "Good", "Bien", "جيد")}</span>
+1789|            <small>+3 XP</small>
+1790|          </button>
+1791|          <button className="rate-easy" onClick={() => onGrade("easy")}>
+1792|            <span>{tr(lang, "Facile", "Easy", "Fácil", "سهل")}</span>
+1793|            <small>+5 XP</small>
+1794|          </button>
+1795|        </div>
+1796|      </section>
+1797|
+1798|      <aside className="review-aside">
+1799|        <div className="review-aside-card">
+1800|          <span className="aside-icon">
+1801|            <Sparkles size={18} />
+1802|          </span>
+1803|          <span className="mini-kicker">{tr(lang, "SANS PRESSION", "NO PRESSURE", "SIN PRESIÓN", "بدون ضغط")}</span>
+1804|          <h3>{tr(lang, "Le bon rythme, c’est le tien.", "The right pace is yours.", "El buen ritmo es el tuyo.", "الإيقاع المناسب هو إيقاعك.")}</h3>
+1805|          <p>
+1806|            {tr(lang, "L'algorithme de répétition espacée (SRS) consolide ta mémoire à long terme. Chaque point d'XP nourrit ton passeport.", "The spaced-repetition (SRS) algorithm consolidates your long-term memory. Every XP point feeds your passport.", "El algoritmo de repetición espaciada (SRS) consolida tu memoria a largo plazo. Cada punto de XP alimenta tu pasaporte.", "خوارزمية التكرار المتباعد (SRS) ترسّخ ذاكرتك طويلة المدى. كل نقطة XP تغذي جوازك.")}
+1807|          </p>
+1808|          <div className="aside-divider" />
+1809|          <div className="review-method">
+1810|            <span className="method-dot" />
+1811|            <p>
+1812|              <strong>{tr(lang, "Petit conseil", "Quick tip", "Pequeño consejo", "نصيحة")}</strong>
+1813|              <br />
+1814|              {tr(lang, "{tr("Dis la phrase à voix haute. La mémoire aime la répétition.", "Say the phrase out loud. Memory loves repetition.", "Di la frase en voz alta. La memoria ama la repetición.", "قل العبارة بصوت عالٍ. الذاكرة تحب التكرار.")} la répétition.", "Say the phrase out loud. Memory loves repetition.", "Di la frase en voz alta. La memoria ama la repetición.", "قل العبارة بصوت عالٍ. الذاكرة تحب التكرار.")} les histoires qu’on raconte.
+1815|            </p>
+1816|          </div>
+1817|        </div>
+1818|        <div className="review-alphabet">
+1819|          <span>أ ب ت</span>
+1820|          <p>{tr(lang, "Écoute · Répète · Reviens", "Listen · Repeat · Come back", "Escucha · Repite · Vuelve", "استمع · كرر · عد")}</p>
+1821|        </div>
+1822|      </aside>
+1823|    </div>
+1824|  );
+1825|}
+1826|
+1827|// -------------------------------------------------------------
+1828|// Composant 5 : SpaceView (Mon Espace & Passeport)
+1829|// -------------------------------------------------------------
+1830|function SpaceView({
+1831|  completedCount,
+1832|  xp,
+1833|  streak,
+1834|  user,
+1835|  isPremium,
+1836|  onReset,
+1837|  onOpenPaywall,
+1838|  onToast,
+1839|}: {
+1840|  completedCount: number;
+1841|  xp: number;
+1842|  streak: number;
+1843|  user: any;
+1844|  isPremium: boolean;
+1845|  onReset: () => void;
+1846|  onOpenPaywall: () => void;
+1847|  onToast: (message: string) => void;
+1848|}) {
+1849|  const { t } = useTranslation();
+1850|  const { lang, lessons } = useLocalizedContent();
+1851|  const username =
+1852|    user?.user_metadata?.full_name || user?.email?.split("@")[0] || t.common.guest;
+1853|
+1854|  const passportData = {
+1855|    userName: username,
+1856|    levelName: xp >= 300
+1857|      ? tr(lang, "Niveau A2 — Essentiels", "Level A2 — Essentials", "Nivel A2 — Esenciales", "المستوى A2 — الأساسيات")
+1858|      : tr(lang, "Niveau A1 — Premiers Pas", "Level A1 — First Steps", "Nivel A1 — Primeros Pasos", "المستوى A1 — الخطوات الأولى"),
+1859|    score: Math.min(100, Math.round((xp / 500) * 100)),
+1860|    date: new Date().toLocaleDateString(getDateLocale(lang)),
+1861|    passportId: `KNZ-${user ? "PRO" : "DEMO"}-7421`,
+1862|  };
+1863|
+1864|  return (
+1865|    <div className="space-layout">
+1866|      <section className="space-card space-profile">
+1867|        <div className="profile-avatar">
+1868|          {username[0]?.toUpperCase() || "ك"}
+1869|        </div>
+1870|        <div className="profile-intro">
+1871|          <span className="mini-kicker">{tr(lang, "MON COIN KENZA", "MY KENZA CORNER", "MI RINCÓN KENZA", "ركني في كنزة")}</span>
+1872|          <h2>Salam, {username} !</h2>
+1873|          <p>
+1874|            {user
+1875|              ? tr(lang, `Connecté en tant que ${user.email}. Données sauvegardées dans le cloud.`, `Signed in as ${user.email}. Data saved to the cloud.`, `Conectado como ${user.email}. Datos guardados en la nube.`, `متصل بصفة ${user.email}. البيانات محفوظة في السحابة.`)
+1876|              : tr(lang, "Mode Invité actif. Ta progression est préservée localement sur cet appareil.", "Guest mode active. Your progress is kept locally on this device.", "Modo invitado activo. Tu progreso se guarda localmente en este dispositivo.", "وضع الضيف مُفعّل. يتم حفظ تقدمك محليًا على هذا الجهاز.")}
+1877|          </p>
+1878|        </div>
+1879|        <span className="local-badge">
+1880|          <span className="privacy-dot" /> {isPremium ? tr(lang, "MEMBRE KENZA PRO", "KENZA PRO MEMBER", "MIEMBRO KENZA PRO", "عضو كَنزة برو") : tr(lang, "VERSION GRATUITE", "FREE VERSION", "VERSIÓN GRATUITA", "النسخة المجانية")}
+1881|        </span>
+1882|      </section>
+1883|
+1884|      <div className="space-stats">
+1885|        <article>
+1886|          <span className="space-stat-icon stat-blue">
+1887|            <BookOpen size={18} />
+1888|          </span>
+1889|          <span className="mini-kicker">{tr(lang, "LEÇONS", "LESSONS", "LECCIONES", "الدروس")}</span>
+1890|          <strong>
+1891|            {completedCount}
+1892|            <small> / {lessons.length}</small>
+1893|          </strong>
+1894|          <p>{tr(lang, "Chaque pas compte.", "Every step counts.", "Cada paso cuenta.", "كل خطوة تُحسب.")}</p>
+1895|        </article>
+1896|        <article>
+1897|          <span className="space-stat-icon stat-gold">
+1898|            <Star size={18} />
+1899|          </span>
+1900|          <span className="mini-kicker">{tr(lang, "POINTS", "POINTS", "PUNTOS", "النقاط")}</span>
+1901|          <strong>
+1902|            {xp}
+1903|            <small> XP</small>
+1904|          </strong>
+1905|          <p>{tr(lang, "Gagnés en pratiquant.", "Earned by practicing.", "Ganados practicando.", "تُكتسب بالتدريب.")}</p>
+1906|        </article>
+1907|        <article>
+1908|          <span className="space-stat-icon stat-orange">
+1909|            <Flame size={18} />
+1910|          </span>
+1911|          <span className="mini-kicker">{tr(lang, "RYTHME", "PACE", "RITMO", "الإيقاع")}</span>
+1912|          <strong>
+1913|            {streak}
+1914|            <small> {tr(lang, "jour", "day", "día", "يوم")}{streak > 1 ? "s" : ""}</small>
+1915|          </strong>
+1916|          <p>{tr(lang, "La régularité avant tout.", "Consistency above all.", "La constancia ante todo.", "الاستمرارية أولاً.")}</p>
+1917|        </article>
+1918|      </div>
+1919|
+1920|      <div className="space-data-grid">
+1921|        <article className="data-card">
+1922|          <div className="data-card-heading">
+1923|            <span className="data-icon">
+1924|              <LockKeyhole size={18} />
+1925|            </span>
+1926|            <div>
+1927|              <span className="mini-kicker">{tr(lang, "TES DONNÉES", "YOUR DATA", "TUS DATOS", "بياناتك")}</span>
+1928|              <h3>{tr(lang, "Progression & Confidentialité", "Progress & Privacy", "Progreso y privacidad", "التقدم والخصوصية")}</h3>
+1929|            </div>
+1930|          </div>
+1931|          <p>
+1932|            La progression est sécurisée. Si tu te connectes, tes leçons, favoris et points se
+1933|            synchronisent automatiquement sur tous tes appareils.
+1934|          </p>
+1935|          <div className="data-safe-row">
+1936|            <CheckCircle2 size={15} />
+1937|            <span>PWA Hors-Ligne · Sauvegarde Hybride Local & Supabase</span>
 1938|          </div>
-1939|        </article>
-1940|      </div>
-1941|
-1942|      <div className="space-settings">
-1943|        <div>
-1944|          <span className="mini-kicker">{tr("GESTION DU COMPTE", "ACCOUNT", "GESTIÓN DE CUENTA", "إدارة الحساب")}</span>
-1945|          <h3>{tr("Repartir de zéro", "Start over", "Empezar de cero", "البدء من جديد")}</h3>
-1946|          <p>{tr("Réinitialise les leçons, points et favoris sur cet appareil.", "Reset lessons, points and favorites on this device.", "Reinicia lecciones, puntos y favoritos en este dispositivo.", "صفّر الدروس والنقاط والمفضلة على هذا الجهاز.")}</p>
-1947|        </div>
-1948|        <button className="outline-button danger-outline" onClick={onReset}>
-1949|          Effacer ma progression locale
-1950|        </button>
-1951|      </div>
-1952|
-1953|      <div className="future-note">
-1954|        <span>
-1955|          <Sparkles size={16} />
-1956|        </span>
-1957|        <p>
-1958|          <strong>Kenza Pro :</strong> Accède à l'intégralité des modules B1 & B2, aux dialogues IA
-1959|          illimités et aux visas de certification culturels.
-1960|        </p>
-1961|      </div>
-1962|    </div>
-1963|  );
-1964|}
+1939|          {!isPremium && (
+1940|            <button className="outline-button" onClick={onOpenPaywall}>
+1941|              {tr(lang, "Passer à Kenza Pro", "Go Kenza Pro", "Pasar a Kenza Pro", "انتقل إلى كنزة برو")} <ArrowRight size={14} />
+1942|            </button>
+1943|          )}
+1944|        </article>
+1945|
+1946|        <article className="data-card data-card-cert">
+1947|          <div className="data-card-heading">
+1948|            <span className="data-icon certificate-icon">
+1949|              <Award size={18} />
+1950|            </span>
+1951|            <div>
+1952|              <span className="mini-kicker">{tr(lang, "CERTIFICATS", "CERTIFICATES", "CERTIFICADOS", "الشهادات")}</span>
+1953|              <h3>{tr(lang, "Passeport Culturel", "Cultural passport", "Pasaporte cultural", "الجواز الثقافي")}</h3>
+1954|            </div>
+1955|          </div>
+1956|          <p>
+1957|            Valide les examens de palier pour obtenir tes visas officiels du Passeport Darija et les
+1958|            télécharger en haute résolution.
+1959|          </p>
+1960|          <div className="py-2">
+1961|            <DarijaPassportCard data={passportData} />
+1962|          </div>
+1963|        </article>
+1964|      </div>
 1965|
+1966|      <div className="space-settings">
+1967|        <div>
+1968|          <span className="mini-kicker">{tr(lang, "GESTION DU COMPTE", "ACCOUNT", "GESTIÓN DE CUENTA", "إدارة الحساب")}</span>
+1969|          <h3>{tr(lang, "Repartir de zéro", "Start over", "Empezar de cero", "البدء من جديد")}</h3>
+1970|          <p>{tr(lang, "Réinitialise les leçons, points et favoris sur cet appareil.", "Reset lessons, points and favorites on this device.", "Reinicia lecciones, puntos y favoritos en este dispositivo.", "صفّر الدروس والنقاط والمفضلة على هذا الجهاز.")}</p>
+1971|        </div>
+1972|        <button className="outline-button danger-outline" onClick={onReset}>
+1973|          Effacer ma progression locale
+1974|        </button>
+1975|      </div>
+1976|
+1977|      <div className="future-note">
+1978|        <span>
+1979|          <Sparkles size={16} />
+1980|        </span>
+1981|        <p>
+1982|          <strong>Kenza Pro :</strong> Accède à l'intégralité des modules B1 & B2, aux dialogues IA
+1983|          illimités et aux visas de certification culturels.
+1984|        </p>
+1985|      </div>
+1986|    </div>
+1987|  );
+1988|}
+1989|
