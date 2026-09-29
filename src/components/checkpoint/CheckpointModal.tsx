@@ -3,10 +3,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { X, Check, ArrowRight, Volume2 } from 'lucide-react';
 import { srsVocabulary } from '../../data/srs-deck';
+import { checkpointA2 } from '../../data/checkpoints/checkpointA2';
+import { checkpointB1 } from '../../data/checkpoints/checkpointB1';
+import { checkpointB2 } from '../../data/checkpoints/checkpointB2';
 import { useTranslation, useAppStore } from '../../store/useAppStore';
 import { playAudio } from '../../lib/audio';
 import { getVariantForWord } from '../../data/regionalVariants';
 import CheckpointResult from './CheckpointResult';
+import { shuffle } from '../../lib/shuffle';
 
 interface CheckpointModalProps {
   levelId: string;
@@ -28,53 +32,50 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
   // Generate 12 random questions from vocabulary
   const questions = useMemo(() => {
     if (levelId === '3') {
-      return require('../../data/checkpoints/checkpointA2').checkpointA2.questions.map((q: any) => ({
+      return shuffle(checkpointA2.questions.map((q: any) => ({
         id: q.id,
         prompt: q.prompt,
         answerId: q.answerId,
         arabizi: q.arabizi,
         arabic: q.arabic,
         options: q.options
-      })).sort(() => 0.5 - Math.random()).slice(0, 12);
+      }))).slice(0, 12);
     }
 
     if (levelId === '4') {
-      return require('../../data/checkpoints/checkpointB1').checkpointB1.questions.map((q: any) => ({
+      return shuffle(checkpointB1.questions.map((q: any) => ({
         id: q.id,
         prompt: q.prompt,
         answerId: q.answerId,
         arabizi: q.arabizi,
         arabic: q.arabic,
         options: q.options
-      })).sort(() => 0.5 - Math.random()).slice(0, 12);
+      }))).slice(0, 12);
     }
 
     if (levelId === '5') {
-      return require('../../data/checkpoints/checkpointB2').checkpointB2.questions.map((q: any) => ({
+      return shuffle(checkpointB2.questions.map((q: any) => ({
         id: q.id,
         prompt: q.prompt,
         answerId: q.answerId,
         arabizi: q.arabizi,
         arabic: q.arabic,
         options: q.options
-      })).sort(() => 0.5 - Math.random()).slice(0, 12);
+      }))).slice(0, 12);
     }
 
     // Shuffle all words
-    const shuffled = [...srsVocabulary].sort(() => 0.5 - Math.random());
+    const shuffled = shuffle(srsVocabulary);
     const selected = shuffled.slice(0, 12);
     
     return selected.map(word => {
       // Pick 3 random distractors
-      const distractors = [...srsVocabulary]
-        .filter(w => w.id !== word.id)
-        .sort(() => 0.5 - Math.random())
-        .slice(0, 3);
+      const distractors = shuffle(srsVocabulary.filter(w => w.id !== word.id)).slice(0, 3);
       
-      const options = [
+      const options = shuffle([
         { id: word.id, arabizi: word.arabizi, arabic: word.arabic },
         ...distractors.map(d => ({ id: d.id, arabizi: d.arabizi, arabic: d.arabic }))
-      ].sort(() => 0.5 - Math.random());
+      ]);
 
       const tMap: any = (word as any).translations || (word as any).translation || { fr: '' };
       const prompt = typeof tMap === 'string' ? tMap : tMap[lang] || tMap.fr;

@@ -87,42 +87,7 @@ export default function SpeechTrainer() {
     stopListening 
   } = useVoiceRecognition('ar-MA');
 
-  useEffect(() => {
-    if (transcript && !isListening) {
-      evaluateSpeech(transcript);
-    }
-  }, [transcript, isListening]);
-
-  // STATE ROLEPLAY
-  const [activeScenarioId, setActiveScenarioId] = useState<string>('taxi');
-  const activeScenario = rpScenarios.find(s => s.id === activeScenarioId) || rpScenarios[0];
-  const [chatHistory, setChatHistory] = useState<{ sender: 'npc' | 'user'; textArabizi: string; textArabic: string; translation: string }[]>([]);
-  const [showTranslations, setShowTranslations] = useState<Record<number, boolean>>({});
-  const [roleplayComplete, setRoleplayComplete] = useState(false);
-
-  // Init Roleplay
-  useEffect(() => {
-    setChatHistory([
-      {
-        sender: 'npc',
-        textArabizi: activeScenario.npcFirstLine.arabizi,
-        textArabic: activeScenario.npcFirstLine.arabic,
-        translation: activeScenario.npcFirstLine.translation
-      }
-    ]);
-    setShowTranslations({});
-    setRoleplayComplete(false);
-  }, [activeScenarioId]);
-
-  // ÉLOCUTION METHODS
-  const toggleListening = () => {
-    if (isListening) {
-      stopListening();
-    } else {
-      setEvaluation(null);
-      startListening();
-    }
-  };
+  const evaluateSpeechRef = useRef<(text: string) => void>(() => {});
 
   const evaluateSpeech = (spokenText: string) => {
     const evalResult = calculateSimilarity(spokenText, currentExercise.arabizi, currentExercise.arabic);
@@ -142,6 +107,56 @@ export default function SpeechTrainer() {
     if (score >= 60) {
       addXp(10);
       trackEvent('speech_practice_success', { score });
+    }
+  };
+
+  useEffect(() => {
+    evaluateSpeechRef.current = evaluateSpeech;
+  });
+
+  useEffect(() => {
+    if (transcript && !isListening) {
+      evaluateSpeechRef.current(transcript);
+    }
+  }, [transcript, isListening]);
+
+  // STATE ROLEPLAY
+  const [activeScenarioId, setActiveScenarioId] = useState<string>('taxi');
+  const activeScenario = rpScenarios.find(s => s.id === activeScenarioId) || rpScenarios[0];
+  const [chatHistory, setChatHistory] = useState<{ sender: 'npc' | 'user'; textArabizi: string; textArabic: string; translation: string }[]>(() => [
+    {
+      sender: 'npc',
+      textArabizi: activeScenario.npcFirstLine.arabizi,
+      textArabic: activeScenario.npcFirstLine.arabic,
+      translation: activeScenario.npcFirstLine.translation
+    }
+  ]);
+  const [showTranslations, setShowTranslations] = useState<Record<number, boolean>>({});
+  const [roleplayComplete, setRoleplayComplete] = useState(false);
+
+  // Init Roleplay — reset during render when the scenario changes.
+  const [prevScenarioId, setPrevScenarioId] = useState(activeScenarioId);
+  if (prevScenarioId !== activeScenarioId) {
+    setPrevScenarioId(activeScenarioId);
+    setChatHistory([
+      {
+        sender: 'npc',
+        textArabizi: activeScenario.npcFirstLine.arabizi,
+        textArabic: activeScenario.npcFirstLine.arabic,
+        translation: activeScenario.npcFirstLine.translation
+      }
+    ]);
+    setShowTranslations({});
+    setRoleplayComplete(false);
+  }
+
+  // ÉLOCUTION METHODS
+  const toggleListening = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      setEvaluation(null);
+      startListening();
     }
   };
 

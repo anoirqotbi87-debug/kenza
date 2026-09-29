@@ -249,11 +249,26 @@ export default function Home() {
   const [lessonJustDone, setLessonJustDone] = useState(false);
   const [category, setCategory] = useState("__all__");
   const [favoritesOnly, setFavoritesOnly] = useState(false);
-  const [favorites, setFavorites] = useState<string[]>([]);
+  const [favorites, setFavorites] = useState<string[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const stored = localStorage.getItem("kenza_favorites");
+      const parsed = stored ? JSON.parse(stored) : null;
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
   const [reviewIndex, setReviewIndex] = useState(0);
   const [cardFlipped, setCardFlipped] = useState(false);
   const [toast, setToast] = useState("");
+  const showToast = (message: string) => setToast(message);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [prevView, setPrevView] = useState<View>(view);
+  if (prevView !== view) {
+    setPrevView(view);
+    setMobileMenuOpen(false);
+  }
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Zustand Store Integration
@@ -306,21 +321,6 @@ export default function Home() {
   const [activePersonaId, setActivePersonaId] = useState<PersonaId | null>(null);
   const [pricingSource, setPricingSource] = useState<string | null>(null);
 
-  // 1. Sécurisation absolue de favorites (Null-Safety)
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem("kenza_favorites");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed)) {
-          setFavorites(parsed);
-          return;
-        }
-      }
-    } catch {}
-    setFavorites([]);
-  }, []);
-
   const saveFavorites = (next: string[]) => {
     const safeNext = Array.isArray(next) ? next : [];
     setFavorites(safeNext);
@@ -358,13 +358,14 @@ export default function Home() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     const searchParams = new URLSearchParams(window.location.search);
-    const upgradeStatus = searchParams.get("upgrade");
-    if (upgradeStatus === "success") {
+    if (searchParams.get("upgrade") !== "success") return;
+    const timer = window.setTimeout(() => {
       setIsPremium(true);
       showToast(t.modules.home.proActivated);
       window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  }, [setIsPremium]);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [setIsPremium, showToast, t]);
 
   useEffect(() => {
     if (!toast) return;
@@ -385,7 +386,6 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    setMobileMenuOpen(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [view]);
 
@@ -431,7 +431,7 @@ export default function Home() {
       }
     }
 
-    return combined.map((p) => {
+    return combined.map((p, idx) => {
       let meaningStr = tr("Expression en darija", "Darija expression", "Expresión en darija", "عبارة بالدارجة");
       if (typeof p.meaning === "string") {
         meaningStr = p.meaning;
@@ -446,7 +446,7 @@ export default function Home() {
       }
 
       return {
-        id: String(p.id || Math.random()),
+        id: String(p.id || `phrase_${idx}`),
         category: String(p.category || trL(lang, tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات"), "Essentials", "Lo esencial", "الأساسيات")),
         darija: String(p.darija || p.front || p.arabizi || ""),
         arabic: String(p.arabic || ""),
@@ -480,7 +480,6 @@ export default function Home() {
     });
   }, [category, search, favoritesOnly, safeFavorites, allPhrases]);
 
-  const showToast = (message: string) => setToast(message);
 
   const startLesson = (id: string) => {
     const lesson = lessons.find((item) => item.id === id);

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Exercise, Notation } from '../../../types/curriculum';
 
 import { getExerciseText } from '../../../lib/i18n/utils';
@@ -16,10 +16,6 @@ interface FillBlankExerciseProps {
 export default function FillBlankExercise({ exercise, preferredNotation, onUpdate, isAnswerChecked }: FillBlankExerciseProps) {
   const [selectedWordId, setSelectedWordId] = useState<string | null>(null);
   const { lang } = useTranslation();
-
-  useEffect(() => {
-    setSelectedWordId(null);
-  }, [exercise]);
 
   const handleSelect = (id: string) => {
     if (isAnswerChecked) return;

@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Exercise, Notation } from '../../../types/curriculum';
+import { shuffle } from '../../../lib/shuffle';
 
 const getWordText = (item: any): string => {
   if (!item) return '';
@@ -30,9 +31,6 @@ interface ReorderExerciseProps {
 }
 
 export default function ReorderExercise({ exercise, preferredNotation, onUpdate, isAnswerChecked }: ReorderExerciseProps) {
-  const [orderedWords, setOrderedWords] = useState<any[]>([]);
-  const [availableWords, setAvailableWords] = useState<any[]>([]);
-
   const getTextForNotation = (item: any, notation: Notation) => {
     if (typeof item === 'string') return item;
     if (notation === 'arabizi' && item.arabizi) return item.arabizi;
@@ -47,19 +45,17 @@ export default function ReorderExercise({ exercise, preferredNotation, onUpdate,
     return getWordText(item);
   };
 
-  useEffect(() => {
-    if (exercise.options) {
-      const words = exercise.options.map((opt: any) => ({
-        ...opt,
-        id: opt.id || getWordText(opt),
-        displayText: getTextForNotation(opt, preferredNotation)
-      }));
-      setAvailableWords(words.sort(() => Math.random() - 0.5));
-      setOrderedWords([]);
-      onUpdate([]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [exercise, preferredNotation]);
+  const [orderedWords, setOrderedWords] = useState<any[]>([]);
+  const [availableWords, setAvailableWords] = useState<any[]>(() => {
+    if (!exercise.options) return [];
+    const words = exercise.options.map((opt: any) => ({
+      ...opt,
+      id: opt.id || getWordText(opt),
+      displayText: getTextForNotation(opt, preferredNotation)
+    }));
+    return shuffle(words);
+  });
+
 
   const handleAdd = (word: any) => {
     if (isAnswerChecked) return;

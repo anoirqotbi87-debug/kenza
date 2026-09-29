@@ -6,6 +6,7 @@ import { SRSCard, ReviewGrade } from '../types/srs';
 import { UILanguage, translations } from '../lib/i18n/translations';
 import { getLocalTodayDateString, getDaysDifference } from '../utils/dateUtils';
 
+import { srsService } from '../services/srsService';
 interface AppState {
   // User Progress
   user: any;
@@ -249,7 +250,6 @@ export const useAppStore = create<AppState>()(
         if (!card) return state;
 
         // Use srsService to calculate next review based on the 5-box system
-        const { srsService } = require('../services/srsService');
         const updatedCard = srsService.calculateNextReview(card, grade);
 
         const newDeck = {
@@ -263,7 +263,6 @@ export const useAppStore = create<AppState>()(
       
       getDueCards: () => {
         const deck = get().srsDeck;
-        const { srsService } = require('../services/srsService');
         return srsService.getDueCards(deck);
       }
     }),

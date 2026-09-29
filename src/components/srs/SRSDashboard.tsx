@@ -11,7 +11,7 @@ export default function SRSDashboard() {
   const { getDueCards, addCardsToSRS, srsDeck } = useAppStore();
   const { t } = useTranslation();
   const [isReviewing, setIsReviewing] = useState(false);
-  const [dueCards, setDueCards] = useState<SRSCard[]>([]);
+  const [dueCards, setDueCards] = useState<SRSCard[]>(() => getDueCards());
 
   // Init SRS with all words if empty
   useEffect(() => {
@@ -20,12 +20,14 @@ export default function SRSDashboard() {
     }
   }, [srsDeck, addCardsToSRS]);
 
-  // Update due cards when returning to dashboard
-  useEffect(() => {
+  // Refresh the due list when returning to the dashboard (not when opening it).
+  const [prevIsReviewing, setPrevIsReviewing] = useState(isReviewing);
+  if (prevIsReviewing !== isReviewing) {
+    setPrevIsReviewing(isReviewing);
     if (!isReviewing) {
       setDueCards(getDueCards());
     }
-  }, [isReviewing, getDueCards, srsDeck]);
+  }
 
   if (isReviewing && dueCards.length > 0) {
     return (

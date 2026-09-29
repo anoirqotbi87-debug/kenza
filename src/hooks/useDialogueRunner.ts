@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { DialogueScenario, DialogueTurn } from '../types/dialogue';
 import { useVoiceRecognition } from './useVoiceRecognition';
 import { calculateSimilarity } from '../utils/phonemeMatcher';
@@ -39,7 +39,8 @@ export function useDialogueRunner(scenario: DialogueScenario, soundEnabled: bool
   useEffect(() => {
     if (state.isCompleted) return;
     if (!currentTurn) {
-      setState(s => ({ ...s, isCompleted: true }));
+      const timer = setTimeout(() => setState(s => ({ ...s, isCompleted: true })), 0);
+      return () => clearTimeout(timer);
       return;
     }
 
@@ -67,7 +68,8 @@ export function useDialogueRunner(scenario: DialogueScenario, soundEnabled: bool
       runBotTurn();
     } else if (currentTurn.speaker === 'user' && !state.userWaiting) {
       // It's user's turn, wait for action
-      setState(s => ({ ...s, userWaiting: true, validationError: null }));
+      const timer = setTimeout(() => setState(s => ({ ...s, userWaiting: true, validationError: null })), 0);
+      return () => clearTimeout(timer);
       
       // Add to history so it shows up as a pending bubble (or wait until spoken)
       // We will add it to history as an empty bubble waiting for input, or just show the expected text in the input area.
@@ -75,12 +77,7 @@ export function useDialogueRunner(scenario: DialogueScenario, soundEnabled: bool
     }
   }, [state.currentTurnIndex, currentTurn, state.isCompleted, soundEnabled, state.isBotSpeaking, state.userWaiting]);
 
-  // Voice Evaluation
-  useEffect(() => {
-    if (!isListening && transcript && state.userWaiting && currentTurn?.speaker === 'user') {
-      validateUserInput(transcript);
-    }
-  }, [isListening, transcript, state.userWaiting]);
+  const validateUserInputRef = useRef<(input: string) => void>(() => {});
 
   const validateUserInput = (input: string) => {
     if (!currentTurn?.expectedPhrases) return;
@@ -128,6 +125,17 @@ export function useDialogueRunner(scenario: DialogueScenario, soundEnabled: bool
       if (typeof resetTranscript === 'function') resetTranscript();
     }
   };
+
+  useEffect(() => {
+    validateUserInputRef.current = validateUserInput;
+  });
+
+  // Voice Evaluation
+  useEffect(() => {
+    if (!isListening && transcript && state.userWaiting && currentTurn?.speaker === 'user') {
+      validateUserInputRef.current(transcript);
+    }
+  }, [isListening, transcript, state.userWaiting]);
 
   const skipUserTurn = () => {
     if (!currentTurn) return;

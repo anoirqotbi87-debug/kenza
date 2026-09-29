@@ -11,41 +11,35 @@ declare global {
 }
 
 export function useVoiceRecognition(lang = 'ar-MA', timeoutMs = 5000) {
-  const [isSupported, setIsSupported] = useState(false);
+  const [isSupported] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+  });
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [error, setError] = useState<string | null>(null);
-  
+
   const recognitionRef = useRef<any>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Ref mirrors isListening so stopListening can stay referentially stable
+  // while still reading the current value.
+  const isListeningRef = useRef(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (SpeechRecognition) {
-        setIsSupported(true);
-        recognitionRef.current = new SpeechRecognition();
-        recognitionRef.current.continuous = false; // Stop after a pause
-        recognitionRef.current.interimResults = true; // Real-time feedback
-      }
-    }
-
-    return () => {
-      stopListening();
-    };
-  }, []);
+    isListeningRef.current = isListening;
+  }, [isListening]);
 
   const stopListening = useCallback(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-    if (recognitionRef.current && isListening) {
+    if (recognitionRef.current && isListeningRef.current) {
       try {
         recognitionRef.current.stop();
       } catch(e) {}
     }
     setIsListening(false);
-  }, [isListening]);
+  }, []);
 
   const startListening = useCallback(() => {
     if (!recognitionRef.current) {
@@ -56,7 +50,7 @@ export function useVoiceRecognition(lang = 'ar-MA', timeoutMs = 5000) {
     setError(null);
     setTranscript('');
     setIsListening(true);
-    
+
     recognitionRef.current.lang = lang;
 
     recognitionRef.current.onstart = () => {
@@ -108,6 +102,22 @@ export function useVoiceRecognition(lang = 'ar-MA', timeoutMs = 5000) {
       }
     }
   }, [lang, timeoutMs, stopListening]);
+
+  // Initialize the recognition API once, and stop on unmount.
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = false; // Stop after a pause
+        recognitionRef.current.interimResults = true; // Real-time feedback
+      }
+    }
+
+    return () => {
+      stopListening();
+    };
+  }, [stopListening]);
 
   const resetTranscript = useCallback(() => setTranscript(''), []);
 

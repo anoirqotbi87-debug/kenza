@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Lesson, Notation } from '../types/curriculum';
+import React, { useState } from 'react';
+import { Lesson } from '../types/curriculum';
 import { useAppStore, useTranslation } from '../store/useAppStore';
 import { X, Check, Volume2, Info, ArrowRight, Heart, HeartCrack, Trophy } from 'lucide-react';
 import McqExercise from './lessons/exercises/McqExercise';
@@ -267,6 +267,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
 
           {step.exercise.type === 'reorder' && (
             <ReorderExercise 
+              key={step.exercise.id}
               exercise={step.exercise} 
               preferredNotation={preferredNotation}
               onUpdate={setOrderedWords}
@@ -276,6 +277,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
 
           {step.exercise.type === 'fill-blank' && (
             <FillBlankExercise 
+              key={step.exercise.id}
               exercise={step.exercise} 
               preferredNotation={preferredNotation}
               onUpdate={setSelectedBlankId}
@@ -285,8 +287,8 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
 
           {(step.exercise.type === 'matching' || step.exercise.type === 'match') && (
             <MatchingExercise 
+              key={step.exercise.id}
               exercise={step.exercise} 
-              preferredNotation={preferredNotation}
               onUpdate={setMatches}
               isAnswerChecked={isAnswerChecked}
             />

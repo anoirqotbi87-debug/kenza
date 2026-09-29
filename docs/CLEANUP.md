@@ -30,3 +30,18 @@
 - Protéger main : Settings → Branches → rule (require CI vert).
 - Vercel : inspecter le déploiement en échec via le dashboard.
 - Supabase Preview : « Remote migration versions not found ».
+
+---
+
+## Vague 2 — CI bloquante + nettoyage (2026-09-29)
+
+- **ESLint : 0 erreur** (212 → 136 warnings après suppression du code mort).
+  - La seule erreur restante venait de `public/sw.js` (service worker **généré** par Serwist, déjà git-ignoré) → ajouté à `globalIgnores` dans `eslint.config.mjs`.
+  - Script `lint` redevenu **bloquant** : `"lint": "eslint"` (l'ancien `eslint || echo …` masquait les erreurs).
+  - Corrections `react-hooks` : `set-state-in-effect`, `purity`, `immutability`, `preserve-manual-memoization` (state lazy-init, ajustement pendant le rendu, `useRef` pour les callbacks appelés avant déclaration, `src/lib/shuffle.ts`).
+- **Versions épinglées** : toutes les dépendances en version exacte (plus de `^`), `package-lock.json` resynchronisé ; `npm ci` vérifié.
+- **Fichiers orphelins supprimés** (21 modules `src/` inatteignables depuis les entrées Next.js, plus artefacts) :
+  - Composants : `Dashboard`, `ErrorBoundary`, `Header`, `Navigation`, `AudioWalkModal`, `DailyReviewCard`, `HeroBanner`, `PricingModal`, `OnboardingModal`, `PlacementTestModal`, `NotificationSettings`, `PassportShareCard`, `ProfilePassportView`, `ProfileView`, `SmartReviewSession`, `PhrasebookView`.
+  - Hooks : `useAudioWalkPlayer`, `useMediaSession`, `useNetworkStatus`, `useNotifications`, `usePassportShare`.
+  - Docs/scripts : `docs/CI-MARKER.md`, `docs/dump-*.txt`, `docs/literals-page.txt`, `docs/scope-page.txt`, `docs/tr-dump-*.txt`, `docs/verify.json`, `scripts/find-hardcoded.py`, `scripts/fix-arabic.js`, `scripts/patch-page-hook.py`, `scripts/patch-page-i18n.py`, `scripts/patch-paywall-keys.py`, `scripts/patch-ui-home-keys.py`, `scripts/replace-theme.js`, `scripts/verify-fixes.py`, `supabase/archive/`.
+- **CI finale** : `npm ci` ✓ · `typecheck` ✓ · `lint` ✓ (0 erreur) · `build` ✓.

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { X, Award, RotateCcw, AlertTriangle } from 'lucide-react';
 import DarijaPassportCard from '../certificate/DarijaPassportCard';
 import { PassportData } from '../../utils/certificateGenerator';
@@ -35,8 +35,13 @@ export default function CheckpointResult({ levelId, levelName, score, totalQuest
     '7': 'C1'
   };
   const codeLevel = levelCodeMap[levelId] || levelId.toUpperCase();
-  const passportId = `KNZ-${codeLevel}-${Math.floor(Math.random() * 9000) + 1000}`;
-  const dateStr = new Date().toLocaleDateString(getDateLocale(uiLanguage));
+  const passportId = useMemo(() => {
+    const seed = `${codeLevel}-${score}-${totalQuestions}`;
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) hash = (hash * 31 + seed.charCodeAt(i)) % 9000;
+    return `KNZ-${codeLevel}-${String(1000 + hash)}`;
+  }, [codeLevel, score, totalQuestions]);
+  const dateStr = useMemo(() => new Date().toLocaleDateString(getDateLocale(uiLanguage)), [uiLanguage]);
 
   const passportData: PassportData = {
     userName: user?.user_metadata?.username || user?.email?.split('@')[0] || 'INVITÉ',

@@ -88,19 +88,6 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
     }
   });
 
-  useEffect(() => {
-    if (error) {
-      if (
-        error.message?.includes('QUOTA') || 
-        error.message?.includes('403') || 
-        error.message?.includes('quota') || 
-        error.message?.includes('UNAUTHORIZED')
-      ) {
-        setShowPaywall(true);
-      }
-    }
-  }, [error]);
-
   const { isSupported, isListening, transcript, startListening, stopListening } = useVoiceRecognition('ar-MA', 10000);
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);

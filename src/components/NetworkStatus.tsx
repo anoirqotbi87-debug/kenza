@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { WifiOff, Wifi } from 'lucide-react';
 import { useNetwork } from '../hooks/useNetwork';
 import { useAppStore, useTranslation } from '../store/useAppStore';
@@ -8,30 +8,34 @@ import { useAppStore, useTranslation } from '../store/useAppStore';
 export default function NetworkStatus() {
   const isOnline = useNetwork();
   const [showOnlineAlert, setShowOnlineAlert] = useState(false);
-  const [hasMounted, setHasMounted] = useState(false);
-  const [wasOffline, setWasOffline] = useState(false);
-  
+  // True only after hydration, so the banner never renders during SSR.
+  const hasMounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+  const wasOfflineRef = useRef(false);
+
   const { t } = useTranslation();
   const rawLang = useAppStore((state) => state.uiLanguage || 'fr');
   const lang = String(rawLang).toLowerCase();
   const isAr = lang === 'ar' || lang.startsWith('ar');
 
   useEffect(() => {
-    setHasMounted(true);
-  }, []);
-
-  useEffect(() => {
     if (!isOnline) {
-      setWasOffline(true);
-    } else if (isOnline && wasOffline) {
-      setShowOnlineAlert(true);
-      const timer = setTimeout(() => {
-        setShowOnlineAlert(false);
-        setWasOffline(false);
-      }, 3000);
-      return () => clearTimeout(timer);
+      wasOfflineRef.current = true;
+      return;
     }
-  }, [isOnline, wasOffline]);
+    if (wasOfflineRef.current) {
+      wasOfflineRef.current = false;
+      const showTimer = setTimeout(() => setShowOnlineAlert(true), 0);
+      const hideTimer = setTimeout(() => setShowOnlineAlert(false), 3000);
+      return () => {
+        clearTimeout(showTimer);
+        clearTimeout(hideTimer);
+      };
+    }
+  }, [isOnline]);
 
   if (!hasMounted) return null;
 

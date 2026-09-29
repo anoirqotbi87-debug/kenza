@@ -8,32 +8,26 @@ export default function InstallPwaBanner() {
   const { t } = useTranslation();
   const inst = t.modules.install;
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [isIOS, setIsIOS] = useState(false);
-  const [isStandalone, setIsStandalone] = useState(true); // Default true so it doesn't flash
-  const [dismissed, setDismissed] = useState(true);
+  // Initialise synchronously from the browser so no state is set from an effect.
+  const [isIOS] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const ua = window.navigator.userAgent;
+    return (!!ua.match(/iPad/i) || !!ua.match(/iPhone/i)) && !!ua.match(/WebKit/i) && !ua.match(/CriOS/i);
+  });
+  const [isStandalone] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone === true;
+  });
+  const [dismissed, setDismissed] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    const lastDismissed = localStorage.getItem('pwaBannerDismissed');
+    if (!lastDismissed) return false;
+    const daysSince = (Date.now() - parseInt(lastDismissed, 10)) / (1000 * 60 * 60 * 24);
+    return daysSince < 14;
+  });
 
   useEffect(() => {
-    // Check local storage for dismissal
-    const lastDismissed = localStorage.getItem('pwaBannerDismissed');
-    if (lastDismissed) {
-      const daysSince = (Date.now() - parseInt(lastDismissed, 10)) / (1000 * 60 * 60 * 24);
-      if (daysSince < 14) {
-        return; // Still dismissed
-      }
-    }
-    setDismissed(false);
-
-    // Detect iOS
-    const ua = window.navigator.userAgent;
-    const webkit = !!ua.match(/WebKit/i);
-    const isIOSDevice = !!ua.match(/iPad/i) || !!ua.match(/iPhone/i);
-    setIsIOS(isIOSDevice && webkit && !ua.match(/CriOS/i));
-
-    // Detect Standalone (installed)
-    const isStand = window.matchMedia('(display-mode: standalone)').matches || 
-                   (window.navigator as any).standalone === true;
-    setIsStandalone(isStand);
-
     // Listen for beforeinstallprompt (Android / Chrome)
     const handleBeforeInstallPrompt = (e: any) => {
       e.preventDefault();

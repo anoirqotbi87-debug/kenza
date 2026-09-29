@@ -25,14 +25,16 @@ export default function CustomCardEditor({ isOpen, onClose, cardToEdit }: Custom
   const modalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Initialize fields on open
-  useEffect(() => {
+  // Re-initialise the fields when the editor opens or the target card changes.
+  // Adjusting state during render is React's recommended pattern for this.
+  const [prevInit, setPrevInit] = useState<{ isOpen: boolean; cardToEdit?: VocabularySRSData | null }>({ isOpen, cardToEdit });
+  if (prevInit.isOpen !== isOpen || prevInit.cardToEdit !== cardToEdit) {
+    setPrevInit({ isOpen, cardToEdit });
     if (isOpen) {
       if (cardToEdit) {
         setArabizi(cardToEdit.arabizi || '');
         setArabic(cardToEdit.arabic || '');
-        
-        // Handle translation which might be an object or string
+
         let transText = '';
         if (typeof cardToEdit.translation === 'string') {
           transText = cardToEdit.translation;
@@ -47,13 +49,18 @@ export default function CustomCardEditor({ isOpen, onClose, cardToEdit }: Custom
         setArabic('');
         setNotes('');
       }
-      
-      // Auto-focus the first input after a short delay for transition
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 100);
     }
-  }, [isOpen, cardToEdit]);
+  }
+
+  // Auto-focus the first input after the open transition
+  useEffect(() => {
+    if (!isOpen) return;
+    const timer = setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [isOpen]);
+
 
   // Handle escape key
   useEffect(() => {

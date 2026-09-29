@@ -1,38 +1,36 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Exercise, Notation } from '../../../types/curriculum';
+import React, { useState } from 'react';
+import { Exercise } from '../../../types/curriculum';
 import { useTranslation } from '../../../store/useAppStore';
 import { getExerciseText } from '../../../lib/i18n/utils';
+import { shuffle } from '../../../lib/shuffle';
 
 interface MatchingExerciseProps {
   exercise: Exercise;
-  preferredNotation: Notation;
   onUpdate: (matches: Record<string, string>) => void;
   isAnswerChecked: boolean;
 }
 
-export default function MatchingExercise({ exercise, preferredNotation, onUpdate, isAnswerChecked }: MatchingExerciseProps) {
-  const [leftItems, setLeftItems] = useState<{id: string, text: string}[]>([]);
-  const [rightItems, setRightItems] = useState<{id: string, text: string}[]>([]);
+export default function MatchingExercise({ exercise, onUpdate, isAnswerChecked }: MatchingExerciseProps) {
   const { lang } = useTranslation();
-  
+
+  // The parent remounts this component via `key` when the exercise changes,
+  // so the shuffled columns can be derived once at mount.
+  const [leftItems] = useState<{id: string, text: string}[]>(() =>
+    exercise.pairs
+      ? shuffle(exercise.pairs.map(p => ({ id: p.id, text: getExerciseText(p.left, lang) })))
+      : []
+  );
+  const [rightItems] = useState<{id: string, text: string}[]>(() =>
+    exercise.pairs
+      ? shuffle(exercise.pairs.map(p => ({ id: p.id, text: getExerciseText(p.right, lang) })))
+      : []
+  );
+
   const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
   const [selectedRight, setSelectedRight] = useState<string | null>(null);
   const [matches, setMatches] = useState<Record<string, string>>({}); // rightId -> leftId
-
-  useEffect(() => {
-    if (exercise.pairs) {
-      const lefts = exercise.pairs.map(p => ({ id: p.id, text: getExerciseText(p.left, lang) })).sort(() => Math.random() - 0.5);
-      const rights = exercise.pairs.map(p => ({ id: p.id, text: getExerciseText(p.right, lang) })).sort(() => Math.random() - 0.5);
-      setLeftItems(lefts);
-      setRightItems(rights);
-      setMatches({});
-      setSelectedLeft(null);
-      setSelectedRight(null);
-      onUpdate({});
-    }
-  }, [exercise, onUpdate, lang]);
 
   const handleLeftClick = (id: string) => {
     if (isAnswerChecked) return;
@@ -66,9 +64,11 @@ export default function MatchingExercise({ exercise, preferredNotation, onUpdate
 
   const checkMatch = (leftId: string | null, rightId: string | null) => {
     if (leftId && rightId) {
-      const newMatches = { ...matches, [rightId]: leftId };
-      setMatches(newMatches);
-      onUpdate(newMatches);
+      setMatches(prev => {
+        const newMatches = { ...prev, [rightId]: leftId };
+        onUpdate(newMatches);
+        return newMatches;
+      });
       setSelectedLeft(null);
       setSelectedRight(null);
     }

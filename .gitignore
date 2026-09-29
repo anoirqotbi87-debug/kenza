@@ -43,3 +43,6 @@ public/sw.js
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# OpenHands agent memory (local, not for VCS)
+/.openhands/

@@ -12,20 +12,20 @@ export interface CheckpointResultData {
 }
 
 export function useCheckpointProgress() {
-  const [results, setResults] = useState<Record<string, CheckpointResultData>>({});
-  const { user } = useAppStore();
-
-  // Load from local storage initially, then sync with cloud if logged in
-  useEffect(() => {
+  const [results, setResults] = useState<Record<string, CheckpointResultData>>(() => {
+    if (typeof window === 'undefined') return {};
     try {
       const stored = localStorage.getItem('kenza_checkpoints');
-      if (stored) {
-        setResults(JSON.parse(stored));
-      }
+      return stored ? JSON.parse(stored) : {};
     } catch (e) {
       console.error('Failed to load checkpoint progress', e);
+      return {};
     }
+  });
+  const { user } = useAppStore();
 
+  // Sync with cloud when logged in (local state is hydrated lazily above)
+  useEffect(() => {
     if (user) {
       checkpointService.fetchCloudResults(user.id).then(async (cloudData) => {
         try {
