@@ -73,9 +73,9 @@ export const module5Lessons: Lesson[] = [
           type: 'mcq',
           prompt: { fr: 'Que signifie "Machi b daroura" ?', en: 'What does "Machi b daroura" mean?', es: '¿Qué significa "Machi b daroura"?', ar: 'ماذا يعني "ماشي بالضرورة"؟' },
           options: [
-            { id: 'o1', text: 'Je suis d\'accord', isCorrect: false },
-            { id: 'o2', text: 'Pas forcément', isCorrect: true },
-            { id: 'o3', text: 'Tu as tort', isCorrect: false }
+            { id: 'o1', text: { fr: 'Je suis d\'accord', en: 'I agree', es: 'Estoy de acuerdo', ar: 'أنا موافق' }, isCorrect: false },
+            { id: 'o2', text: { fr: 'Pas forcément', en: 'Not necessarily', es: 'No necesariamente', ar: 'ليس بالضرورة' }, isCorrect: true },
+            { id: 'o3', text: { fr: 'Tu as tort', en: 'You are wrong', es: 'Estás equivocado', ar: 'أنت مخطئ' }, isCorrect: false }
           ],
           answer: 'o2',
           explanation: { fr: 'Daroura signifie "nécessité", donc machi b daroura = pas par nécessité (pas forcément).', en: 'Daroura means necessity.', es: 'Daroura significa necesidad.', ar: 'ضرورة تعني الحاجة.' }
@@ -221,9 +221,9 @@ export const module5Lessons: Lesson[] = [
           type: 'mcq',
           prompt: { fr: 'Que signifie "Mochrou3" ?', en: 'What does "Mochrou3" mean?', es: '¿Qué significa "Mochrou3"?', ar: 'ماذا يعني "مشروع"؟' },
           options: [
-            { id: 'o1', text: 'Employé', isCorrect: false },
-            { id: 'o2', text: 'Rendez-vous', isCorrect: false },
-            { id: 'o3', text: 'Projet', isCorrect: true }
+            { id: 'o1', text: { fr: 'Employé', en: 'Employee', es: 'Empleado', ar: 'موظف' }, isCorrect: false },
+            { id: 'o2', text: { fr: 'Rendez-vous', en: 'Appointment', es: 'Cita', ar: 'موعد' }, isCorrect: false },
+            { id: 'o3', text: { fr: 'Projet', en: 'Project', es: 'Proyecto', ar: 'مشروع' }, isCorrect: true }
           ],
           answer: 'o3',
           explanation: { fr: 'Mochrou3 = Projet.', en: 'Mochrou3 = Project.', es: 'Mochrou3 = Proyecto.', ar: 'مشروع = مشروع.' }
@@ -430,9 +430,9 @@ export const module5Lessons: Lesson[] = [
           type: 'mcq',
           prompt: { fr: 'Que signifie "Khelli l-bir b ghettah" ?', en: 'What does "Khelli l-bir b ghettah" mean?', es: '¿Qué significa "Khelli l-bir b ghettah"?', ar: 'ماذا يعني "خلي البير بغطاه"؟' },
           options: [
-            { id: 'o1', text: 'Garde le secret / N\'en parle pas', isCorrect: true },
-            { id: 'o2', text: 'Ce qui est passé est passé', isCorrect: false },
-            { id: 'o3', text: 'Petit à petit', isCorrect: false }
+            { id: 'o1', text: { fr: 'Garde le secret / N\'en parle pas', en: 'Keep it secret / Don\'t talk about it', es: 'Guárdalo en secreto / No lo menciones', ar: 'احفظ السر / لا تتحدث عنه' }, isCorrect: true },
+            { id: 'o2', text: { fr: 'Ce qui est passé est passé', en: 'What\'s done is done', es: 'Lo pasado, pasado está', ar: 'ما فات مات' }, isCorrect: false },
+            { id: 'o3', text: { fr: 'Petit à petit', en: 'Little by little', es: 'Poco a poco', ar: 'شيئاً فشيئاً' }, isCorrect: false }
           ],
           answer: 'o1'
         }

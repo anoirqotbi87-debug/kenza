@@ -1,2 +1,20 @@
-T4-ar-saveprompt: OK (already present)
+TYPE-ExerciseOption: OK
+M3-l1-chambre: OK
+M3-l1-cle: OK
+M3-l1-lit: OK
+M3-l3-medecin: OK
+M3-l3-medicament: OK
+M3-l3-malade: OK
+M5-agree: OK
+M5-pasforce: OK
+M5-tort: OK
+M5-employe: OK
+M5-rdv: OK
+M5-projet: OK
+M5-secret: OK
+M5-passe: OK
+M5-petit: OK
+M7-tourner: OK
+M7-patience: OK
+M7-courir: OK
 DUMP_MODE: on

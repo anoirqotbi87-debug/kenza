@@ -45,7 +45,7 @@ export interface LessonStep {
 
 export interface ExerciseOption {
   id: string;
-  text: string; // Keeps Darija in text
+  text: MultiLangText | string; // Darija in text, or localized meaning (MultiLangText)
   isCorrect: boolean;
 }
 

@@ -121,9 +121,9 @@ export const module7Lessons: Lesson[] = [
           type: 'matching',
           prompt: { fr: 'Associez chaque proverbe à son sens profond :', en: 'Match each proverb with its deep meaning:', es: 'Empareja cada proverbio con su significado profundo:', ar: 'اربط كل مثل بمعناه العميق:' },
           pairs: [
-            { id: 'p1', left: { text: 'Lli fat mat' }, right: { text: 'Tourner la page' } },
-            { id: 'p2', left: { text: 'Drba b drba' }, right: { text: 'Patience et régularité' } },
-            { id: 'p3', left: { text: 'Zrbat matat' }, right: { text: 'Rien ne sert de courir' } }
+            { id: 'p1', left: { text: 'Lli fat mat' }, right: { text: { fr: 'Tourner la page', en: 'Turn the page', es: 'Pasar la página', ar: 'طوّي الصفحة' } } },
+            { id: 'p2', left: { text: 'Drba b drba' }, right: { text: { fr: 'Patience et régularité', en: 'Patience and consistency', es: 'Paciencia y constancia', ar: 'الصبر والانتظام' } } },
+            { id: 'p3', left: { text: 'Zrbat matat' }, right: { text: { fr: 'Rien ne sert de courir', en: 'No point in rushing', es: 'No sirve de nada correr', ar: 'لا فائدة من الاستعجال' } } }
           ],
           answer: "all",
           explanation: {

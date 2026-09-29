@@ -46,9 +46,9 @@ export const module3Lessons: Lesson[] = [
           type: 'mcq',
           prompt: { fr: 'Que signifie "s-sarout" ?', en: 'What does "s-sarout" mean?', es: '¿Qué significa "s-sarout"?', ar: 'ماذا تعني "s-sarout"؟' },
           options: [
-            { id: 'o1', text: 'La chambre', isCorrect: false },
-            { id: 'o2', text: 'La clé', isCorrect: true },
-            { id: 'o3', text: 'Le lit', isCorrect: false }
+            { id: 'o1', text: { fr: 'La chambre', en: 'The bedroom', es: 'El dormitorio', ar: 'الغرفة' }, isCorrect: false },
+            { id: 'o2', text: { fr: 'La clé', en: 'The key', es: 'La llave', ar: 'المفتاح' }, isCorrect: true },
+            { id: 'o3', text: { fr: 'Le lit', en: 'The bed', es: 'La cama', ar: 'السرير' }, isCorrect: false }
           ],
           answer: 'o2',
           explanation: { fr: 'La clé se dit "sarout" et la chambre "bit".', en: 'The key is "sarout".', es: 'La llave es "sarout".', ar: 'المفتاح هو "ساروت".' }
@@ -246,9 +246,9 @@ export const module3Lessons: Lesson[] = [
           type: 'mcq',
           prompt: { fr: 'Que veut dire "Dwa" ?', en: 'What does "Dwa" mean?', es: '¿Qué significa "Dwa"?', ar: 'ماذا تعني "دوا"؟' },
           options: [
-            { id: 'o1', text: 'Médecin', isCorrect: false },
-            { id: 'o2', text: 'Médicament', isCorrect: true },
-            { id: 'o3', text: 'Malade', isCorrect: false }
+            { id: 'o1', text: { fr: 'Médecin', en: 'Doctor', es: 'Médico', ar: 'طبيب' }, isCorrect: false },
+            { id: 'o2', text: { fr: 'Médicament', en: 'Medicine', es: 'Medicamento', ar: 'دواء' }, isCorrect: true },
+            { id: 'o3', text: { fr: 'Malade', en: 'Sick', es: 'Enfermo', ar: 'مريض' }, isCorrect: false }
           ],
           answer: 'o2',
           explanation: { fr: 'Dwa = Médicament. Tbib = Médecin. Mrid = Malade.', en: 'Dwa = Medicine.', es: 'Dwa = Medicina.', ar: 'دوا = دواء.' }
