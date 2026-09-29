@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { track } from '../lib/tracking';
 import { Lesson, Notation } from '../types/curriculum';
 import { useAppStore, useTranslation } from '../store/useAppStore';
 import { X, Check, Volume2, Info, ArrowRight, Heart, HeartCrack, Trophy } from 'lucide-react';
@@ -11,37 +10,22 @@ import MatchingExercise from './lessons/exercises/MatchingExercise';
 import FillBlankExercise from './lessons/exercises/FillBlankExercise';
 import ScenarioDialogue from './dialogue/ScenarioDialogue';
 import { playAudio } from '../lib/audio';
+import { track } from '../lib/tracking';
 import ConjugationTable from './grammar/ConjugationTable';
 import { getLocalizedText } from '../lib/i18n/utils';
 import { renderArabiziWithBadges } from './ui/PhoneticBadge';
+import confetti from 'canvas-confetti';
 
 interface ExerciseRunnerProps {
   lesson: Lesson;
   onComplete: () => void;
   onClose: () => void;
-  /** Contenu optionnel affiché sur l'écran de félicitations (ex. invitation à sauvegarder). */
+  /** Contenu optionnel affiche sur l'ecran de felicitations (ex. invitation a sauvegarder). */
   finishExtra?: React.ReactNode;
 }
 
 export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtra }: ExerciseRunnerProps) {
-  if (!lesson || !lesson.steps || lesson.steps.length === 0) {
-    console.error("[ExerciseRunner Crash Guard] Leçon manquante ou sans steps :", lesson);
-    return (
-      <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl p-6 max-w-md w-full text-center shadow-xl">
-          <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">⚠️</div>
-          <h3 className="text-lg font-bold text-slate-800 mb-2">Leçon indisponible</h3>
-          <p className="text-sm text-slate-500 mb-4">
-            La leçon demandée ({lesson?.id || 'ID inconnu'}) n'a pas pu être chargée ou ne contient aucune étape.
-          </p>
-          <button onClick={onClose} className="w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl hover:bg-blue-700">
-            Retour au Dashboard
-          </button>
-        </div>
-      </div>
-    );
-  }
-
+  // --- Tous les hooks sont appelés inconditionnellement (règles des Hooks React) ---
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isAnswerChecked, setIsAnswerChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -59,6 +43,24 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
   const [isLessonFinished, setIsLessonFinished] = useState(false);
 
   const { preferredNotation, addXp, soundEnabled, audioSpeed, setAudioSpeed } = useAppStore();
+
+  // --- Crash guard placé APRÈS tous les hooks (règles des Hooks React) ---
+  if (!lesson || !Array.isArray(lesson.steps) || lesson.steps.length === 0) {
+    console.error("[ExerciseRunner Crash Guard] Leçon manquante ou sans steps :", lesson);
+    return (
+      <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl p-6 max-w-md w-full text-center shadow-xl">
+          <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">⚠️</div>
+          <h3 className="text-lg font-bold text-slate-800 mb-2">{t.lessons.unavailable}</h3>
+          <p className="text-sm text-slate-500 mb-4">{t.lessons.unavailableDesc}</p>
+          <button onClick={onClose} className="w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl hover:bg-blue-700">
+            {t.lessons.backToDashboard}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const step = lesson.steps[currentStepIndex];
   const progress = ((currentStepIndex) / lesson.steps.length) * 100;
 
@@ -126,6 +128,13 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
     } else {
       setIsLessonFinished(true);
       addXp(xpGained);
+      
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#047857', '#dc2626', '#fbbf24', '#2563eb'] // Moroccan colors (Green, Red, Gold, Blue)
+      });
     }
   };
 
@@ -201,24 +210,24 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
       }
       return (
         <div className="flex flex-col items-center justify-center h-full space-y-8 text-center animate-in fade-in zoom-in duration-300">
-          <h2 className="text-3xl font-bold text-slate-800">{getLocalizedText(step.content.title, lang)}</h2>
+          <h2 className="font-serif text-3xl font-bold text-[#1B2A4A]">{getLocalizedText(step.content.title, lang)}</h2>
           
-          <div className="bg-blue-50 p-8 rounded-3xl w-full max-w-md shadow-sm border border-blue-100 relative">
+          <div className="bg-[#FDFCF8] p-8 rounded-3xl w-full max-w-md shadow-md border border-[#E8E2D5] relative">
             {(step.content.arabic || step.content.audioUrl) && (
               <button 
                 onClick={() => handlePlayAudio(step.content?.arabic || '', step.content?.audioUrl)}
-                className="absolute -top-4 -right-4 bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-full shadow-lg transition-transform hover:scale-110"
+                className="absolute -top-4 -right-4 bg-[#1B2A4A] hover:bg-[#1B2A4A]/90 text-[#FDFCF8] p-4 rounded-full shadow-md transition-transform hover:scale-105"
               >
-                <Volume2 className="w-6 h-6" />
+                <Volume2 className="w-6 h-6 text-[#C9A05C]" />
               </button>
             )}
             
-            <div className="text-5xl font-extrabold text-blue-600 mb-4 font-arabic flex items-center justify-center flex-wrap">
+            <div className="text-5xl font-extrabold text-[#1B2A4A] mb-4 font-arabic flex items-center justify-center flex-wrap">
               {preferredNotation === 'arabic' 
                 ? step.content.arabic 
                 : renderArabiziWithBadges(step.content.arabizi || '')}
             </div>
-            <div className="text-xl text-slate-600 font-medium">{getLocalizedText(step.content.translation, lang)}</div>
+            <div className="text-xl text-[#7A7670] font-medium">{getLocalizedText(step.content.translation, lang)}</div>
           </div>
           
           <p className="text-lg text-slate-600 max-w-lg">{getLocalizedText(step.content.description, lang)}</p>
@@ -316,9 +325,9 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
   };
 
   return (
-    <div className="fixed inset-0 bg-white z-50 flex flex-col">
+    <div className="fixed inset-0 bg-[#F7F3EA] text-[#1B2A4A] z-50 flex flex-col">
       {/* Header */}
-      <header className="p-4 flex items-center gap-6 max-w-5xl mx-auto w-full">
+      <header className="p-4 bg-[#FDFCF8] border-b border-[#E8E2D5] flex items-center gap-6 max-w-5xl mx-auto w-full shadow-xs">
         <button
           onClick={() => {
             track('lesson_abandoned', {
@@ -329,26 +338,26 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
             }, '/lesson');
             onClose();
           }}
-          className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors">
-          <X className="w-6 h-6" />
+          className="p-2 text-[#7A7670] hover:text-[#1B2A4A] rounded-full hover:bg-[#E8E2D5]/50 transition-colors">
+          <X className="w-5 h-5" />
         </button>
-        <div className="flex-1 h-4 bg-slate-100 rounded-full overflow-hidden">
+        <div className="flex-1 h-3 bg-[#E8E2D5] rounded-full overflow-hidden">
           <div 
-            className="h-full bg-green-500 transition-all duration-500 ease-out rounded-full"
+            className="h-full bg-[#7A9174] transition-all duration-500 ease-out rounded-full"
             style={{ width: `${progress}%` }}
           />
         </div>
         <div className="flex gap-4 items-center">
           <button 
             onClick={() => setAudioSpeed(audioSpeed === 1.0 ? 0.75 : 1.0)}
-            className="text-slate-400 hover:text-slate-700 font-bold bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded-full text-sm transition-colors"
-            title="Vitesse de lecture"
+            className="text-[#7A7670] hover:text-[#1B2A4A] font-bold bg-[#F7F3EA] hover:bg-[#E8E2D5]/70 border border-[#E8E2D5] px-3 py-1 rounded-full text-xs transition-colors"
+            title={t.modules.ui.readingSpeed}
           >
             {audioSpeed}x
           </button>
           <div className="flex gap-1 items-center">
             {Array.from({ length: 3 }).map((_, i) => (
-              <Heart key={i} className={`w-6 h-6 transition-all ${i < lives ? 'fill-red-500 text-red-500' : 'text-red-200'}`} />
+              <Heart key={i} className={`w-5 h-5 transition-all ${i < lives ? 'fill-red-500 text-red-500' : 'text-red-200'}`} />
             ))}
           </div>
         </div>
@@ -361,21 +370,21 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
 
       {/* Bottom Action Bar */}
       <div className={`
-        border-t-2 p-4 md:p-6 transition-colors duration-300
-        ${isAnswerChecked ? (isCorrect ? 'bg-green-100 border-green-200' : 'bg-red-100 border-red-200') : 'bg-white border-slate-100'}
+        border-t p-4 md:p-6 transition-colors duration-300
+        ${isAnswerChecked ? (isCorrect ? 'bg-[#7A9174]/15 border-[#7A9174]/40' : 'bg-red-50 border-red-200') : 'bg-[#FDFCF8] border-[#E8E2D5]'}
       `}>
         <div className="max-w-5xl mx-auto w-full flex justify-between items-center min-h-[64px]">
           
           <div className="flex-1">
             {isAnswerChecked && (
-              <div className={`flex items-center gap-4 ${isCorrect ? 'text-green-700' : 'text-red-700'}`}>
-                <div className={`p-3 rounded-full ${isCorrect ? 'bg-green-200' : 'bg-red-200'}`}>
-                  {isCorrect ? <Check className="w-8 h-8" /> : <X className="w-8 h-8" />}
+              <div className={`flex items-center gap-4 ${isCorrect ? 'text-[#7A9174]' : 'text-red-700'}`}>
+                <div className={`p-3 rounded-full ${isCorrect ? 'bg-[#7A9174]/20' : 'bg-red-100'}`}>
+                  {isCorrect ? <Check className="w-6 h-6 stroke-[2.5]" /> : <X className="w-6 h-6" />}
                 </div>
                 <div>
-                  <h3 className="font-bold text-2xl">{isCorrect ? t.lessons.excellent : t.lessons.oops}</h3>
+                  <h3 className="font-serif font-bold text-2xl">{isCorrect ? t.lessons.excellent : t.lessons.oops}</h3>
                   {step.type === 'exercise' && step.exercise?.explanation && (
-                    <p className="text-base font-medium opacity-90 mt-1">{getLocalizedText(step.exercise.explanation, lang)}</p>
+                    <p className="text-sm font-medium opacity-90 mt-1">{getLocalizedText(step.exercise.explanation, lang)}</p>
                   )}
                 </div>
               </div>
@@ -387,20 +396,21 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
               <button 
                 onClick={handleCheckAnswer}
                 disabled={isCheckDisabled()}
-                className="px-10 py-4 bg-green-500 hover:bg-green-600 disabled:bg-slate-200 disabled:text-slate-400 text-white rounded-2xl font-bold text-lg shadow-sm transition-all active:scale-95"
+                className="px-10 py-3.5 bg-[#C9A05C] hover:bg-[#b88f4b] disabled:bg-[#E8E2D5] disabled:text-[#7A7670] text-[#1B2A4A] rounded-full font-bold text-base shadow-md transition-all active:scale-95"
               >
                 {t.lessons.check}
               </button>
             ) : (
               <button 
                 onClick={handleNext}
-                className={`px-10 py-4 rounded-2xl font-bold text-lg shadow-sm transition-all flex items-center gap-2 active:scale-95
-                  ${isAnswerChecked && isCorrect ? 'bg-green-500 text-white hover:bg-green-600' : ''}
-                  ${isAnswerChecked && !isCorrect ? 'bg-red-500 text-white hover:bg-red-600' : ''}
-                  ${!isAnswerChecked && step.type === 'learning' ? 'bg-green-500 text-white hover:bg-green-600' : ''}
+                className={`px-10 py-3.5 rounded-full font-bold text-base shadow-md transition-all flex items-center gap-2 active:scale-95
+                  ${isAnswerChecked && isCorrect ? 'bg-[#7A9174] hover:bg-[#687e63] text-white' : ''}
+                  ${isAnswerChecked && !isCorrect ? 'bg-red-600 hover:bg-red-700 text-white' : ''}
+                  ${!isAnswerChecked && step.type === 'learning' ? 'bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A]' : ''}
                 `}
               >
-                {t.lessons.continue} <ArrowRight className="w-5 h-5" />
+                <span>{t.lessons.continue}</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
             )}
           </div>

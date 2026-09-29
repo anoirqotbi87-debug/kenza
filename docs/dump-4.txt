@@ -1,0 +1,400 @@
+1201|
+1202|      <div className="stat-strip">
+1203|        <div className="stat-item">
+1204|          <span className="stat-icon stat-blue">
+1205|            <BookOpen size={17} />
+1206|          </span>
+1207|          <div>
+1208|            <strong>
+1209|              {completedCount}
+1210|              <small>/{totalLessons}</small>
+1211|            </strong>
+1212|            <span>{trL(lang, "leçons terminées", "lessons completed", "lecciones completadas", "دروس مكتملة")}</span>
+1213|          </div>
+1214|        </div>
+1215|        <div className="stat-divider" />
+1216|        <div className="stat-item">
+1217|          <span className="stat-icon stat-gold">
+1218|            <Star size={17} />
+1219|          </span>
+1220|          <div>
+1221|            <strong>
+1222|              {xp}
+1223|              <small> XP</small>
+1224|            </strong>
+1225|            <span>{trL(lang, "points de pratique", "practice points", "puntos de práctica", "نقاط التدريب")}</span>
+1226|          </div>
+1227|        </div>
+1228|        <div className="stat-divider" />
+1229|        <div className="stat-item">
+1230|          <span className="stat-icon stat-orange">
+1231|            <Flame size={17} />
+1232|          </span>
+1233|          <div>
+1234|            <strong>
+1235|              {streak}
+1236|              <small> {trL(lang, "jour", "day", "día", "يوم")}{streak > 1 ? tr("s", "s", "s", "") : ""}</small>
+1237|            </strong>
+1238|            <span>{trL(lang, "rythme régulier", "steady rhythm", "ritmo constante", "إيقاع منتظم")}</span>
+1239|          </div>
+1240|        </div>
+1241|        <button className="stat-action" onClick={() => onNavigate("space")}>
+1242|          {trL(lang, "Voir mon espace", "See my space", "Ver mi espacio", "فضائي")} <ArrowRight size={14} />
+1243|        </button>
+1244|      </div>
+1245|
+1246|      <div className="section-heading">
+1247|        <div>
+1248|          <span className="eyebrow">
+1249|            <span className="eyebrow-line" />
+1250|            {trL(lang, "POUR AUJOURD’HUI", "FOR TODAY", "PARA HOY", "لهذا اليوم")}
+1251|          </span>
+1252|          <h2>{trL(lang, "À toi de choisir ton pas.", "Your pace, your choice.", "Tú eliges tu paso.", "اختر خطوتك.")}</h2>
+1253|        </div>
+1254|        <button className="plain-link" onClick={() => onNavigate("path")}>
+1255|          {trL(lang, "Voir le parcours", "View the journey", "Ver la ruta", "المسار")} <ArrowRight size={15} />
+1256|        </button>
+1257|      </div>
+1258|
+1259|      <div className="quick-grid">
+1260|        <button className="quick-card quick-card-phrases" onClick={() => onNavigate("phrases")}>
+1261|          <span className="quick-icon">
+1262|            <Bookmark size={18} />
+1263|          </span>
+1264|          <span className="quick-label">{trL(lang, "UN MOT À EMPORTER", "A WORD TO GO", "UNA PALABRA PARA LLEVAR", "كلمة معك")}</span>
+1265|          <strong>
+1266|            {trL(lang, "Ton carnet", "Your phrase", "Tu cuaderno", "دفترك")}
+1267|            <br />
+1268|            {trL(lang, "de phrases", " book", " de frases", " للعبارات")}
+1269|          </strong>
+1270|          <span className="quick-bottom">
+1271|            {trL(lang, "Vocabulaire essentiel", "Essential vocabulary", "Vocabulario esencial", "مفردات أساسية")} <ArrowRight size={14} />
+1272|          </span>
+1273|        </button>
+1274|
+1275|        <button className="quick-card quick-card-review" onClick={() => onNavigate("review")}>
+1276|          <span className="quick-icon">
+1277|            <Sparkles size={18} />
+1278|          </span>
+1279|          <span className="quick-label">{trL(lang, "5 MINUTES, PAS PLUS", "5 MINUTES, NO MORE", "5 MINUTOS, NO MÁS", "5 دقائق فقط")}</span>
+1280|          <strong>
+1281|            {trL(lang, "Faire une", "Do a quick", "Haz una", "قم بمراجعة")}
+1282|            <br />
+1283|            {trL(lang, "petite révision", "review", "revisión rápida", "سريعة")}
+1284|          </strong>
+1285|          <span className="quick-bottom">
+1286|            {trL(lang, "Cartes du jour", "Cards of the day", "Cartas del día", "بطاقات اليوم")} <ArrowRight size={14} />
+1287|          </span>
+1288|        </button>
+1289|
+1290|        <button className="quick-card quick-card-listen" onClick={onOpenRoleplay}>
+1291|          <span className="quick-icon">
+1292|            <MessageCircle size={18} />
+1293|          </span>
+1294|          <span className="quick-label">{trL(lang, "IMMERSION IA", "AI IMMERSION", "INMERSIÓN IA", "انغماس مع الذكاء")}</span>
+1295|          <strong>
+1296|            {trL(lang, "Mises en", "Real-life", "Situaciones", "مواقف")}
+1297|            <br />
+1298|            {trL(lang, "situation", "scenarios", "de la vida real", "من الحياة")}
+1299|          </strong>
+1300|          <span className="quick-bottom">
+1301|            {trL(lang, "Au café, en taxi", "At the café, in a taxi", "En el café, en taxi", "في المقهى وفي التاكسي")} <ArrowRight size={14} />
+1302|          </span>
+1303|        </button>
+1304|      </div>
+1305|
+1306|      <div className="bottom-callout">
+1307|        <div className="callout-art">
+1308|          <div className="callout-sun" />
+1309|          <div className="callout-arch">
+1310|            <span>مرحبا</span>
+1311|          </div>
+1312|          <span className="callout-spark spark-a">✳</span>
+1313|          <span className="callout-spark spark-b">✳</span>
+1314|        </div>
+1315|        <div className="callout-copy">
+1316|          <span className="mini-kicker">{trL(lang, "UNE LANGUE, DES RENCONTRES", "A LANGUAGE, ENCOUNTERS", "UN IDIOMA, ENCUENTROS", "لغةٌ ولقاءات")}</span>
+1317|          <h3>
+1318|            {trL(lang, "Pas besoin d’être parfait·e.", "No need to be perfect.", "No hace falta ser perfecto.", "لا داعي للكمال.")}
+1319|            <br />
+1320|            <em>{trL(lang, "Il suffit de commencer.", "Just start.", "Solo empieza.", "ابدأ فقط.")}</em>
+1321|          </h3>
+1322|          <p>{trL(lang, "Chaque expression est une petite invitation à aller vers l’autre.", "Every phrase is a small invitation to reach out to others.", "Cada expresión es una pequeña invitación a acercarse al otro.", "كل عبارة دعوة صغيرة للتقرب من الآخر.")}</p>
+1323|        </div>
+1324|        <button onClick={() => onNavigate("path")} aria-label={t.modules.home.explorePath}>
+1325|          <ArrowRight size={20} />
+1326|        </button>
+1327|      </div>
+1328|    </>
+1329|  );
+1330|}
+1331|
+1332|// -------------------------------------------------------------
+1333|// Composant 2 : PathView
+1334|// -------------------------------------------------------------
+1335|function PathView({
+1336|  completedLessons,
+1337|  onStart,
+1338|  onOpenCheckpoint,
+1339|  onOpenPaywall,
+1340|  isPremium,
+1341|}: {
+1342|  completedLessons: string[];
+1343|  onStart: (id: string) => void;
+1344|  onOpenCheckpoint: (id: string, name: string) => void;
+1345|  onOpenPaywall: () => void;
+1346|  isPremium: boolean;
+1347|}) {
+1348|  const { t } = useTranslation();
+1349|  const { lang, lessons } = useLocalizedContent();
+1350|  const { hasPassedLevel } = useCheckpointProgress();
+1351|
+1352|  return (
+1353|    <div className="path-layout">
+1354|      <section className="path-main-card">
+1355|        <div className="path-banner">
+1356|          <div>
+1357|            <span className="hero-kicker">
+1358|              <Compass size={14} /> {trL(lang, "PARCOURS DÉCOUVERTE", "DISCOVERY JOURNEY", "RUTA DE DESCUBRIMIENTO", "مسار الاستكشاف")}
+1359|            </span>
+1360|            <h2>
+1361|              {trL(lang, "Les premiers pas", "The first steps", "Los primeros pasos", "الخطوات الأولى")}
+1362|              <br />
+1363|              {trL(lang, "en darija.", "in darija.", "en darija.", "في الدارجة.")}
+1364|            </h2>
+1365|            <p>{trL(lang, "Trois escales pour oser dire les premiers mots.", "Three stops to dare your first words.", "Tres paradas para atreverte a hablar.", "ثلاث محطات لتبدأ كلماتك الأولى.")}</p>
+1366|          </div>
+1367|          <div className="path-stamp">
+1368|            <span>المغرب</span>
+1369|            <small>Maroc</small>
+1370|          </div>
+1371|          <div className="path-doodle" />
+1372|        </div>
+1373|
+1374|        <div className="path-progress-row">
+1375|          <div>
+1376|            <span className="mini-kicker">{trL(lang, "TON AVANCÉE", "YOUR PROGRESS", "TU AVANCE", "تقدّمك")}</span>
+1377|            <strong>
+1378|              {completedLessons.length}{" "}
+1379|              <small>
+1380|                {tr("leçon", "lesson", "lección", "درس")}{completedLessons.length > 1 ? tr("s", "s", "s", "") : ""}{tr(" sur ", " of ", " de ", " من ")}{lessons.length}
+1381|              </small>
+1382|            </strong>
+1383|          </div>
+1384|          <div className="path-overall-track">
+1385|            <span
+1386|              style={{
+1387|                width: `${Math.round((completedLessons.length / lessons.length) * 100)}%`,
+1388|              }}
+1389|            />
+1390|          </div>
+1391|          <span className="path-percent">
+1392|            {Math.round((completedLessons.length / lessons.length) * 100)}%
+1393|          </span>
+1394|        </div>
+1395|
+1396|        <div className="lesson-roadmap">
+1397|          {lessons.map((lesson, index) => {
+1398|            const done = completedLessons.includes(lesson.id);
+1399|            const unlocked =
+1400|              index === 0 || completedLessons.includes(lessons[index - 1].id) || done;
+1401|            const isGated = lesson.isPremium && !isPremium;
+1402|            const locked = !unlocked && !isGated;
+1403|
+1404|            return (
+1405|              <div
+1406|                className={`roadmap-row ${done ? "roadmap-done" : ""} ${locked ? "roadmap-locked" : ""}`}
+1407|                key={lesson.id}
+1408|              >
+1409|                <div className="roadmap-track">
+1410|                  <div className="roadmap-line" />
+1411|                  <button
+1412|                    className={`roadmap-node ${done ? "node-done" : ""} ${
+1413|                      !locked && !done ? "node-current" : ""
+1414|                    }`}
+1415|                    disabled={locked}
+1416|                    onClick={() => (isGated ? onOpenPaywall() : onStart(lesson.id))}
+1417|                    aria-label={
+1418|                      done
+1419|                        ? t.modules.home.reviewLesson.replace("{title}", lesson.title)
+1420|                        : locked
+1421|                        ? t.modules.home.lessonLocked.replace("{title}", lesson.title)
+1422|                        : t.modules.home.startLesson.replace("{title}", lesson.title)
+1423|                    }
+1424|                  >
+1425|                    {done ? (
+1426|                      <Check size={16} />
+1427|                    ) : isGated ? (
+1428|                      <Crown size={14} className="text-[#C9A05C]" />
+1429|                    ) : locked ? (
+1430|                      <LockKeyhole size={14} />
+1431|                    ) : (
+1432|                      <span>0{index + 1}</span>
+1433|                    )}
+1434|                  </button>
+1435|                </div>
+1436|                <div className="roadmap-content">
+1437|                  <div className="roadmap-meta">
+1438|                    <span>
+1439|                      {lesson.length.toUpperCase()} ·{" "}
+1440|                      {index === 0
+1441|                        ? tr("LES ESSENTIELS", "THE ESSENTIALS", "LO ESENCIAL", "الأساسيات")
+1442|                        : index === 1
+1443|                        ? tr("AU QUOTIDIEN", "EVERYDAY LIFE", "LO COTIDIANO", "الحياة اليومية")
+1444|                        : index === 2
+1445|                        ? tr("SE REPÉRER", "FINDING YOUR WAY", "ORIENTARSE", "الاستدلال")
+1446|                        : tr("IMMERSION AVANCÉE", "ADVANCED IMMERSION", "INMERSIÓN AVANZADA", "انغماس متقدم")}
+1447|                    </span>
+1448|                    {done && (
+1449|                      <span className="done-tag">
+1450|                        <CheckCircle2 size={13} /> {tr("TERMINÉE", "COMPLETED", "COMPLETADA", "مكتملة")}
+1451|                      </span>
+1452|                    )}
+1453|                    {!done && !locked && !isGated && (
+1454|                      <span className="current-tag">{trL(lang, "À SUIVRE", "TO CONTINUE", "A CONTINUAR", "للمتابعة")}</span>
+1455|                    )}
+1456|                    {isGated && (
+1457|                      <span className="current-tag" style={{ background: "#fef3c7", color: "#b45309" }}>
+1458|                        PRO
+1459|                      </span>
+1460|                    )}
+1461|                  </div>
+1462|                  <h3>{lesson.title}</h3>
+1463|                  <p>{lesson.subtitle}</p>
+1464|                  <div className="roadmap-footer">
+1465|                    <span>
+1466|                      <BookOpen size={14} /> {lesson.questions.length} {tr("exercices", "exercises", "ejercicios", "تمارين")}
+1467|                    </span>
+1468|                    {isGated ? (
+1469|                      <button onClick={onOpenPaywall} style={{ color: "#d69b47" }}>
+1470|                        {trL(lang, "Débloquer avec Pro", "Unlock with Pro", "Desbloquear con Pro", "افتح مع برو")} <ArrowRight size={14} />
+1471|                      </button>
+1472|                    ) : unlocked ? (
+1473|                      <button onClick={() => onStart(lesson.id)}>
+1474|                        {done ? trL(lang, "Revoir", "Review", "Repasar", "مراجعة") : trL(lang, "Commencer", "Start", "Empezar", "ابدأ")}
+1475|                        <ArrowRight size={14} />
+1476|                      </button>
+1477|                    ) : (
+1478|                      <span className="locked-copy">
+1479|                        <LockKeyhole size={13} /> {trL(lang, "Finis l’étape avant", "Finish the previous step first", "Termina el paso anterior primero", "أكمل الخطوة السابقة أولاً")}
+1480|                      </span>
+1481|                    )}
+1482|                  </div>
+1483|                </div>
+1484|              </div>
+1485|            );
+1486|          })}
+1487|        </div>
+1488|      </section>
+1489|
+1490|      <aside className="path-aside">
+1491|        <div className="path-aside-card">
+1492|          <span className="aside-icon">
+1493|            <Leaf size={18} />
+1494|          </span>
+1495|          <span className="mini-kicker">{trL(lang, "PETIT CONSEIL", "QUICK TIP", "PEQUEÑO CONSEJO", "نصيحة صغيرة")}</span>
+1496|          <h3>{trL(lang, "La régularité avant la perfection.", "Consistency beats perfection.", "La constancia antes que la perfección.", "الاستمرارية قبل الإتقان.")}</h3>
+1497|          <p>
+1498|            {tr("5 minutes par jour font plus qu’une heure de temps en temps. Reviens quand tu veux.", "5 minutes a day beats an hour once in a while. Come back whenever you want.", "5 minutos al día hacen más que una hora de vez en cuando. Vuelve cuando quieras.", "5 دقائق يومياً تنفع أكثر من ساعة بين الحين والآخر. عُد متى شئت.")}
+1499|          </p>
+1500|          <div className="aside-divider" />
+1501|          <div className="aside-stat">
+1502|            <span>{trL(lang, "Palier A1 (Fondations)", "Level A1 (Foundations)", "Nivel A1 (Fundamentos)", "المستوى A1 (الأساسيات)")}</span>
+1503|            <strong>{hasPassedLevel("1") ? tr("Validé ✓", "Passed ✓", "Aprobado ✓", "ناجح ✓") : tr("En cours", "In progress", "En curso", "قيد التقدم")}</strong>
+1504|          </div>
+1505|          <button
+1506|            onClick={() => onOpenCheckpoint("1", trL(lang, tr("Palier A1 — Fondations", "Level A1 — Foundations", "Nivel A1 — Fundamentos", "المستوى A1 — الأساسيات"), "Level A1 — Foundations", "Nivel A1 — Fundamentos", "المستوى A1 — الأساسيات"))}
+1507|          >
+1508|            {trL(lang, "Passer le Checkpoint A1", "Take Checkpoint A1", "Pasar el Checkpoint A1", "اجتز نقطة A1")} <ArrowRight size={14} />
+1509|          </button>
+1510|        </div>
+1511|
+1512|        <div className="path-aside-note">
+1513|          <span className="note-symbol">✳</span>
+1514|          <p>
+1515|            {tr("Le mot ", "The word ", "La palabra ", "كلمة ")}<strong>darija</strong>{tr(" vient de l’arabe ", " comes from Arabic ", " viene del árabe ", " أصله من العربية ")}<span dir="rtl">الدارجة</span>{tr(" — la langue courante, celle de tous les jours.", " — the everyday language.", " — la lengua corriente, la de todos los días.", " — اللغة الدارجة، لغة كل يوم.")}
+1516|          </p>
+1517|        </div>
+1518|      </aside>
+1519|    </div>
+1520|  );
+1521|}
+1522|
+1523|// -------------------------------------------------------------
+1524|// Composant 3 : PhrasesView
+1525|// -------------------------------------------------------------
+1526|function PhrasesView({
+1527|  search,
+1528|  searchInputRef,
+1529|  setSearch,
+1530|  category,
+1531|  setCategory,
+1532|  categories,
+1533|  phrases: visiblePhrases,
+1534|  favorites = [],
+1535|  favoritesOnly,
+1536|  setFavoritesOnly,
+1537|  onFavorite,
+1538|  onPlay,
+1539|  onCopy,
+1540|}: {
+1541|  search: string;
+1542|  searchInputRef: RefObject<HTMLInputElement | null>;
+1543|  setSearch: (value: string) => void;
+1544|  category: string;
+1545|  setCategory: (value: string) => void;
+1546|  categories: string[];
+1547|  phrases: Phrase[];
+1548|  favorites?: string[];
+1549|  favoritesOnly: boolean;
+1550|  setFavoritesOnly: (value: boolean) => void;
+1551|  onFavorite: (id: string) => void;
+1552|  onPlay: (darija: string, arabic: string) => void;
+1553|  onCopy: (phrase: Phrase) => void;
+1554|}) {
+1555|  const { lang } = useLocalizedContent();
+1556|  const safeFavorites = Array.isArray(favorites) ? favorites : [];
+1557|  const safePhrases = Array.isArray(visiblePhrases) ? visiblePhrases : [];
+1558|
+1559|  return (
+1560|    <>
+1561|      <section className="phrase-toolbar">
+1562|        <label className="phrase-search">
+1563|          <Search size={17} />
+1564|          <input
+1565|            ref={searchInputRef}
+1566|            value={search}
+1567|            onChange={(event) => setSearch(event.target.value)}
+1568|            placeholder={trL(lang, "Chercher une expression…", "Search a phrase…", "Buscar una frase…", "ابحث عن عبارة…")}
+1569|            aria-label={trL(lang, "Chercher une expression", "Search a phrase", "Buscar una frase", "ابحث عن عبارة")}
+1570|          />
+1571|          <kbd>⌘ K</kbd>
+1572|        </label>
+1573|        <button
+1574|          className={`favorites-filter ${favoritesOnly ? "filter-active" : ""}`}
+1575|          onClick={() => setFavoritesOnly(!favoritesOnly)}
+1576|        >
+1577|          <Heart size={15} fill={favoritesOnly ? "currentColor" : "none"} /> {trL(lang, "Mes favoris", "My favorites", "Mis favoritos", "مفضلاتي")}{" "}
+1578|          <span>{safeFavorites.length}</span>
+1579|        </button>
+1580|      </section>
+1581|
+1582|      <div className="category-tabs" role="tablist" aria-label={trL(lang, "Catégories de phrases", "Phrase categories", "Categorías de frases", "فئات العبارات")}>
+1583|        {(categories || []).map((item) => (
+1584|          <button
+1585|            role="tab"
+1586|            aria-selected={category === item}
+1587|            key={item}
+1588|            className={category === item ? "category-active" : ""}
+1589|            onClick={() => setCategory(item)}
+1590|          >
+1591|            {item === "__all__" ? trL(lang, "Tout voir", "See all", "Ver todo", "عرض الكل") : item}
+1592|          </button>
+1593|        ))}
+1594|      </div>
+1595|
+1596|      <div className="phrase-section-top">
+1597|        <div>
+1598|          <span className="mini-kicker">{trL(lang, "À PORTÉE DE MAIN", "AT HAND", "A MANO", "في متناول اليد")}</span>
+1599|          <h2>
+1600|            {favoritesOnly

@@ -4,9 +4,12 @@ import { Notation } from '../types/curriculum';
 import { SRSCard, ReviewGrade } from '../types/srs';
 
 import { UILanguage, translations } from '../lib/i18n/translations';
+import { getLocalTodayDateString, getDaysDifference } from '../utils/dateUtils';
 
 interface AppState {
   // User Progress
+  user: any;
+  setUser: (user: any) => void;
   xp: number;
   streakDays: number;
   streakFreezes: number;
@@ -17,12 +20,14 @@ interface AppState {
   
   // SRS State
   srsDeck: Record<string, SRSCard>; // Map of wordId to SRSCard
+  customVocabulary: Record<string, any>;
   
   // Settings
   preferredNotation: Notation;
   soundEnabled: boolean;
   audioSpeed: number;
   uiLanguage: UILanguage;
+  regionalVariant: 'chamal' | 'casablanca' | 'fes';
   
   // Actions
   addXp: (amount: number) => void;
@@ -34,21 +39,35 @@ interface AppState {
   toggleSound: () => void;
   setAudioSpeed: (speed: number) => void;
   setLanguage: (lang: UILanguage) => void;
+  setRegionalVariant: (variant: 'chamal' | 'casablanca' | 'fes') => void;
   
   // SRS Actions
   addCardsToSRS: (wordIds: string[]) => void;
+  addCustomWordToSRS: (word: any) => void;
+  updateCustomWord: (wordId: string, updates: any) => void;
+  deleteCustomWord: (wordId: string) => void;
   reviewCard: (wordId: string, grade: ReviewGrade) => void;
   getDueCards: () => SRSCard[];
   
   devUnlockAll: boolean;
   toggleDevUnlockAll: () => void;
+  resetData: () => void;
+  
+  // Onboarding & Premium
+  hasCompletedOnboarding: boolean;
+  userGoal: string | null;
+  dailyTargetMinutes: number | null;
+  isPremium: boolean;
+  
+  completeOnboarding: (goal: string, minutes: number) => void;
+  setIsPremium: (isPremium: boolean) => void;
 }
-
-const DEV_UNLOCK_ALL = process.env.NEXT_PUBLIC_DEV_UNLOCK_ALL === 'true';
 
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
+      user: null,
+      setUser: (user) => set({ user }),
       xp: 0,
       streakDays: 1,
       streakFreezes: 1,
@@ -57,14 +76,40 @@ export const useAppStore = create<AppState>()(
       currentLevel: 1,
       completedLessons: [],
       srsDeck: {},
+      customVocabulary: {},
       preferredNotation: 'arabizi',
       soundEnabled: true,
       audioSpeed: 1.0,
       uiLanguage: 'fr',
-      // Désactivé en production. Pour tout débloquer en local : NEXT_PUBLIC_DEV_UNLOCK_ALL=true dans .env.local
-      devUnlockAll: DEV_UNLOCK_ALL,
+      regionalVariant: 'casablanca',
+      devUnlockAll: process.env.NEXT_PUBLIC_DEV_UNLOCK_ALL === 'true', // Prod : verrouille ; en local : NEXT_PUBLIC_DEV_UNLOCK_ALL=true
+      
+      hasCompletedOnboarding: false,
+      userGoal: null,
+      dailyTargetMinutes: null,
+      isPremium: false,
+      
+      completeOnboarding: (goal, minutes) => set({
+        hasCompletedOnboarding: true,
+        userGoal: goal,
+        dailyTargetMinutes: minutes
+      }),
+      setIsPremium: (isPremium) => set({ isPremium }),
       
       toggleDevUnlockAll: () => set((state) => ({ devUnlockAll: !state.devUnlockAll })),
+      setRegionalVariant: (variant) => set({ regionalVariant: variant }),
+      
+      resetData: () => set({
+        user: null,
+        xp: 0,
+        streakDays: 1,
+        streakFreezes: 1,
+        activityDates: [],
+        unlockedBadges: [],
+        currentLevel: 1,
+        completedLessons: [],
+        srsDeck: {}
+      }),
       
       addXp: (amount) => set((state) => {
         const newXp = state.xp + amount;
@@ -102,14 +147,36 @@ export const useAppStore = create<AppState>()(
       })),
 
       recordActivity: () => set((state) => {
-        const today = new Date().toISOString().split('T')[0];
-        if (state.activityDates.includes(today)) return state;
+        const today = getLocalTodayDateString();
         
-        // Simple streak logic: if yesterday is not in activityDates, check if streak freeze was used
-        // For simplicity in this demo, just add the date. Real app would calculate gap.
+        if (state.activityDates.includes(today)) {
+          // Already recorded today
+          return state;
+        }
+
+        const newActivityDates = [...state.activityDates, today];
+        let newStreak = state.streakDays;
+
+        if (state.activityDates.length === 0) {
+          newStreak = 1;
+        } else {
+          // Sort dates to find the last activity date safely
+          const sortedDates = [...state.activityDates].sort();
+          const lastActivity = sortedDates[sortedDates.length - 1];
+          const diffDays = getDaysDifference(today, lastActivity);
+
+          if (diffDays === 1) {
+            // Consecutive day
+            newStreak += 1;
+          } else if (diffDays > 1) {
+            // Gap > 1 day, streak breaks (streak freezes logic would go here if fully implemented)
+            newStreak = 1;
+          }
+        }
+
         return { 
-          activityDates: [...state.activityDates, today],
-          streakDays: state.activityDates.length === 0 ? 1 : state.streakDays + 1
+          activityDates: newActivityDates,
+          streakDays: newStreak
         };
       }),
       
@@ -119,7 +186,7 @@ export const useAppStore = create<AppState>()(
 
       setAudioSpeed: (speed) => set({ audioSpeed: speed }),
       
-      setLanguage: (lang) => set({ uiLanguage: lang }),
+      setLanguage: (lang) => set({ uiLanguage: (lang || 'fr').toLowerCase() as any }),
       
       addCardsToSRS: (wordIds) => set((state) => {
         const newDeck = { ...state.srsDeck };
@@ -142,46 +209,52 @@ export const useAppStore = create<AppState>()(
         return { srsDeck: newDeck };
       }),
       
+      addCustomWordToSRS: (word: any) => set((state) => {
+        const newVocab = { ...state.customVocabulary, [word.id]: word };
+        const newDeck = { ...state.srsDeck };
+        const now = new Date().toISOString();
+        if (!newDeck[word.id]) {
+          newDeck[word.id] = {
+            id: `card_${word.id}`,
+            wordId: word.id,
+            interval: 0,
+            repetition: 0,
+            easeFactor: 2.5,
+            dueDate: now,
+            state: 'new' as const
+          };
+        }
+        return { customVocabulary: newVocab, srsDeck: newDeck };
+      }),
+
+      updateCustomWord: (wordId: string, updates: any) => set((state) => {
+        if (!state.customVocabulary[wordId]) return state;
+        const newVocab = { 
+          ...state.customVocabulary, 
+          [wordId]: { ...state.customVocabulary[wordId], ...updates } 
+        };
+        return { customVocabulary: newVocab };
+      }),
+
+      deleteCustomWord: (wordId: string) => set((state) => {
+        const newVocab = { ...state.customVocabulary };
+        delete newVocab[wordId];
+        const newDeck = { ...state.srsDeck };
+        delete newDeck[wordId];
+        return { customVocabulary: newVocab, srsDeck: newDeck };
+      }),
+      
       reviewCard: (wordId, grade) => set((state) => {
         const card = state.srsDeck[wordId];
         if (!card) return state;
 
-        let { interval, repetition, easeFactor } = card;
-
-        if (grade === 'again') {
-          repetition = 0;
-          interval = 1;
-        } else {
-          if (grade === 'hard') {
-            easeFactor = Math.max(1.3, easeFactor - 0.15);
-          } else if (grade === 'easy') {
-            easeFactor += 0.15;
-          }
-          
-          if (repetition === 0) {
-            interval = 1;
-          } else if (repetition === 1) {
-            interval = 6;
-          } else {
-            interval = Math.round(interval * easeFactor);
-          }
-          
-          repetition += 1;
-        }
-
-        const nextDate = new Date();
-        nextDate.setDate(nextDate.getDate() + interval);
+        // Use srsService to calculate next review based on the 5-box system
+        const { srsService } = require('../services/srsService');
+        const updatedCard = srsService.calculateNextReview(card, grade);
 
         const newDeck = {
           ...state.srsDeck,
-          [wordId]: {
-            ...card,
-            interval,
-            repetition,
-            easeFactor,
-            dueDate: nextDate.toISOString(),
-            state: 'review' as const
-          }
+          [wordId]: updatedCard
         };
 
         // Add 5 XP for reviewing a card
@@ -190,17 +263,15 @@ export const useAppStore = create<AppState>()(
       
       getDueCards: () => {
         const deck = get().srsDeck;
-        const now = new Date().getTime();
-        return Object.values(deck).filter(card => {
-          return new Date(card.dueDate).getTime() <= now;
-        });
+        const { srsService } = require('../services/srsService');
+        return srsService.getDueCards(deck);
       }
     }),
     {
       name: 'darija-quest-storage',
       version: 3,
-      // devUnlockAll n'est plus sauvegardé : il dépend uniquement de la variable d'environnement
-      partialize: (state) => {
+      // devUnlockAll n'est plus sauvegarde : il depend uniquement de la variable d'environnement
+      partialize: (state: any) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { devUnlockAll, ...rest } = state;
         return rest;
@@ -218,7 +289,7 @@ export const useAppStore = create<AppState>()(
           }
         }
         if (version < 3 && persistedState) {
-          // Les navigateurs ayant reçu devUnlockAll: true ne gardent pas les leçons débloquées
+          // Les navigateurs ayant recu devUnlockAll: true ne gardent pas les lecons debloquees
           delete persistedState.devUnlockAll;
         }
         return persistedState;
@@ -228,6 +299,7 @@ export const useAppStore = create<AppState>()(
 );
 
 export function useTranslation() {
-  const uiLanguage = useAppStore((state) => state.uiLanguage);
-  return { t: translations[uiLanguage], lang: uiLanguage };
+  const uiLanguage = useAppStore((state) => state.uiLanguage || 'fr');
+  const lang = String(uiLanguage).toLowerCase() as UILanguage;
+  return { t: translations[lang] || translations['fr'], lang };
 }

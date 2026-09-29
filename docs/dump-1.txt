@@ -1,0 +1,400 @@
+0001|'use client';
+0002|
+0003|import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
+0004|import {
+0005|  ArrowDownRight,
+0006|  ArrowLeft,
+0007|  ArrowRight,
+0008|  Award,
+0009|  Bookmark,
+0010|  BookOpen,
+0011|  Check,
+0012|  CheckCircle2,
+0013|  ChevronRight,
+0014|  CircleHelp,
+0015|  Compass,
+0016|  Flame,
+0017|  Globe,
+0018|  Headphones,
+0019|  Heart,
+0020|  Home as HomeIcon,
+0021|  Languages,
+0022|  Leaf,
+0023|  LockKeyhole,
+0024|  Menu,
+0025|  MessageCircle,
+0026|  RotateCcw,
+0027|  Search,
+0028|  Sparkles,
+0029|  Star,
+0030|  Target,
+0031|  Volume2,
+0032|  X,
+0033|  Crown,
+0034|  Lock,
+0035|} from "lucide-react";
+0036|import type { LucideIcon } from "lucide-react";
+0037|import { useAppStore, useTranslation } from "@/store/useAppStore";
+0038|
+0039|const tr = (fr: string, en: string, es: string, ar: string) => {
+0040|  const lang = useAppStore.getState().uiLanguage;
+0041|  return lang === "en" ? en : lang === "es" ? es : lang === "ar" ? ar : fr;
+0042|};
+0043|
+0044|const trL = (lang: string, fr: string, en: string, es: string, ar: string) =>
+0045|  lang === "en" ? en : lang === "es" ? es : lang === "ar" ? ar : fr;
+0046|import { playAudio } from "@/lib/audio";
+0047|import { getDateLocale } from "@/lib/i18n/utils";
+0048|import { supabase } from "@/lib/supabase";
+0049|import { syncService } from "@/lib/syncService";
+0050|import { useCheckpointProgress } from "@/hooks/useCheckpointProgress";
+0051|import CheckpointModal from "@/components/checkpoint/CheckpointModal";
+0052|import ScenarioSelectorModal from "@/components/dialogue/ScenarioSelectorModal";
+0053|import AiRoleplayView from "@/components/dialogue/AiRoleplayView";
+0054|import PaywallModal from "@/components/monetization/PaywallModal";
+0055|import InstallPwaBanner from "@/components/pwa/InstallPwaBanner";
+0056|import DarijaPassportCard from "@/components/certificate/DarijaPassportCard";
+0057|import { PersonaId } from "@/lib/ai/prompts";
+0058|import { srsVocabulary } from "@/data/srs-deck";
+0059|
+0060|export type View = "today" | "path" | "phrases" | "review" | "space";
+0061|
+0062|export type Question = {
+0063|  prompt: string;
+0064|  helper: string;
+0065|  options: string[];
+0066|  answer: string;
+0067|  note: string;
+0068|};
+0069|
+0070|export type Lesson = {
+0071|  id: string;
+0072|  title: string;
+0073|  subtitle: string;
+0074|  length: string;
+0075|  status: "done" | "current" | "locked";
+0076|  isPremium?: boolean;
+0077|  questions: Question[];
+0078|};
+0079|
+0080|export type Phrase = {
+0081|  id: string;
+0082|  category: string;
+0083|  darija: string;
+0084|  arabic: string;
+0085|  meaning: string;
+0086|  note: string;
+0087|};
+0088|
+0089|const buildLessons = (lang: string): Lesson[] => [
+0090|  {
+0091|    id: "hello",
+0092|    title: trL(lang, tr("Les premiers bonjours", "The first hellos", "Los primeros saludos", "أول التحيات"), "The first hellos", "Los primeros saludos", "أول التحيات"),
+0093|    subtitle: trL(lang, tr("Saluer, se présenter, créer le lien", "Greet, introduce yourself, connect", "Saludar, presentarse, crear el vínculo", "التحية والتعاريف وبناء الرابط"), "Greet, introduce yourself, connect", "Saludar, presentarse, crear el vínculo", "التحية والتعاريف وبناء الرابط"),
+0094|    length: "6 min",
+0095|    status: "current",
+0096|    questions: [
+0097|      {
+0098|        prompt: trL(lang, tr("Comment dit-on « bonjour » en darija ?", "How do you say « hello » in darija?", "¿Cómo se dice «hola» en darija?", "كيف نقول «مرحبا» بالدارجة؟"), "How do you say « hello » in darija?", "¿Cómo se dice «hola» en darija?", "كيف نقول «مرحبا» بالدارجة؟"),
+0099|        helper: trL(lang, tr("Choisis la formule la plus naturelle.", "Choose the most natural phrase.", "Elige la fórmula más natural.", "اختر الصيغة الأكثر طبيعية."), "Choose the most natural phrase.", "Elige la fórmula más natural.", "اختر الصيغة الأكثر طبيعية."),
+0100|        options: ["Salam", "Shukran", "Bslama"],
+0101|        answer: "Salam",
+0102|        note: trL(lang, tr("« Salam » veut dire paix. C’est le bonjour simple, chaleureux et passe-partout.", "« Salam » means peace. The simple, warm, all-purpose hello.", "« Salam » significa paz. Es el saludo simple, cálido y universal.", "«سلام» تعني السلام. تحية بسيطة دافئة تصلح لكل مناسبة."), "« Salam » means peace. The simple, warm, all-purpose hello.", "« Salam » significa paz. Es el saludo simple, cálido y universal.", "«سلام» تعني السلام. تحية بسيطة دافئة تصلح لكل مناسبة."),
+0103|      },
+0104|      {
+0105|        prompt: trL(lang, tr("Tu rencontres quelqu’un pour la première fois. Que dis-tu ?", "You meet someone for the first time. What do you say?", "Conoces a alguien por primera vez. ¿Qué dices?", "تقابل شخصاً لأول مرة. ماذا تقول؟"), "You meet someone for the first time. What do you say?", "Conoces a alguien por primera vez. ¿Qué dices?", "تقابل شخصاً لأول مرة. ماذا تقول؟"),
+0106|        helper: trL(lang, tr("Pense à une formule de bienvenue.", "Think of a welcoming phrase.", "Piensa en una fórmula de bienvenida.", "فكر في صيغة ترحيب."), "Think of a welcoming phrase.", "Piensa en una fórmula de bienvenida.", "فكر في صيغة ترحيب."),
+0107|        options: ["Labas?", "Tsharrafna", "Afak"],
+0108|        answer: "Tsharrafna",
+0109|        note: trL(lang, tr("« Tsharrafna » signifie littéralement « enchanté·e ». Une belle façon de faire connaissance.", "« Tsharrafna » literally means « delighted to meet you ». A lovely way to connect.", "« Tsharrafna » significa literalmente «encantado». Una bonita forma de conocerse.", "«تشرفنا» تعني حرفياً «تشرّفت بلقائك». طريقة جميلة للتعارف."), "« Tsharrafna » literally means « delighted to meet you ». A lovely way to connect.", "« Tsharrafna » significa literalmente «encantado». Una bonita forma de conocerse.", "«تشرفنا» تعني حرفياً «تشرّفت بلقائك». طريقة جميلة للتعارف."),
+0110|      },
+0111|      {
+0112|        prompt: trL(lang, tr("Que signifie « labas? »", "What does « labas? » mean?", "¿Qué significa « labas? »?", "ماذا تعني «لاباس؟»"), "What does « labas? » mean?", "¿Qué significa « labas? »?", "ماذا تعني «لاباس؟»"),
+0113|        helper: trL(lang, tr("Une question qu’on entend partout.", "A question you hear everywhere.", "Una pregunta que se oye por todas partes.", "سؤال تسمعه في كل مكان."), "A question you hear everywhere.", "Una pregunta que se oye por todas partes.", "سؤال تسمعه في كل مكان."),
+0114|        options: [trL(lang, tr("Où vas-tu ?", "Where are you going?", "¿Adónde vas?", "إلى أين تذهب؟"), "Where are you going?", "¿Adónde vas?", "إلى أين تذهب؟")],
+0115|        answer: trL(lang, tr("Ça va ?", "How are you?", "¿Qué tal?", "كيف حالك؟"), "How are you?", "¿Qué tal?", "كيف حالك؟"),
+0116|        note: trL(lang, tr("« Labas? » est le petit « ça va ? » du quotidien. On répond souvent « labas, hamdullah ».", "« Labas? » is the everyday « how are you? ». People often reply « labas, hamdullah ».", "« Labas? » es el «¿qué tal?» del día a día. Suele responderse «labas, hamdullah».", "«لاباس؟» هي «كيف حالك؟» اليومية. غالباً يُجاب «لاباس، الحمد لله»."), "« Labas? » is the everyday « how are you? ». People often reply « labas, hamdullah ».", "« Labas? » es el «¿qué tal?» del día a día. Suele responderse «labas, hamdullah».", "«لاباس؟» هي «كيف حالك؟» اليومية. غالباً يُجاب «لاباس، الحمد لله»."),
+0117|      },
+0118|    ],
+0119|  },
+0120|  {
+0121|    id: "cafe",
+0122|    title: trL(lang, tr("Au café du coin", "At the corner café", "En el café de la esquina", "في مقهى الحي"), "At the corner café", "En el café de la esquina", "في مقهى الحي"),
+0123|    subtitle: trL(lang, tr("Commander un thé à la menthe", "Ordering a mint tea", "Pedir un té a la menta", "طلب شاي بالنعناع"), "Ordering a mint tea", "Pedir un té a la menta", "طلب شاي بالنعناع"),
+0124|    length: "8 min",
+0125|    status: "locked",
+0126|    questions: [
+0127|      {
+0128|        prompt: trL(lang, tr("Comment demander un thé, s’il vous plaît ?", "How do you ask for a tea, please?", "¿Cómo pedir un té, por favor?", "كيف تطلب شاياً، من فضلك؟"), "How do you ask for a tea, please?", "¿Cómo pedir un té, por favor?", "كيف تطلب شاياً، من فضلك؟"),
+0129|        helper: trL(lang, tr("Une formule utile au café.", "A handy phrase at the café.", "Una fórmula útil en el café.", "صيغة مفيدة في المقهى."), "A handy phrase at the café.", "Una fórmula útil en el café.", "صيغة مفيدة في المقهى."),
+0130|        options: ["Atay, afak", "Fin ghadi?", "Smah liya"],
+0131|        answer: "Atay, afak",
+0132|        note: trL(lang, tr("« Atay, afak » : un thé, s’il vous plaît. « Afak » ajoute la politesse.", "« Atay, afak »: a tea, please. « Afak » adds politeness.", "« Atay, afak »: un té, por favor. « Afak » añade cortesía.", "«أتاي، عفاك»: شاي من فضلك. «عفاك» تضيف اللطف."), "« Atay, afak »: a tea, please. « Afak » adds politeness.", "« Atay, afak »: un té, por favor. « Afak » añade cortesía.", "«أتاي، عفاك»: شاي من فضلك. «عفاك» تضيف اللطف."),
+0133|      },
+0134|      {
+0135|        prompt: trL(lang, tr("Qu’est-ce que « bghit » veut dire ?", "What does « bghit » mean?", "¿Qué significa « bghit »?", "ماذا تعني «بغيت»؟"), "What does « bghit » mean?", "¿Qué significa « bghit »?", "ماذا تعني «بغيت»؟"),
+0136|        helper: trL(lang, tr("Un mot très pratique pour commander.", "A very handy word for ordering.", "Una palabra muy práctica para pedir.", "كلمة عملية جداً للطلب."), "A very handy word for ordering.", "Una palabra muy práctica para pedir.", "كلمة عملية جداً للطلب."),
+0137|        options: [trL(lang, tr("Je voudrais", "I would like", "Quisiera", "أريد"), "I would like", "Quisiera", "أريد")],
+0138|        answer: trL(lang, tr("Je voudrais", "I would like", "Quisiera", "أريد"), "I would like", "Quisiera", "أريد"),
+0139|        note: trL(lang, tr("« Bghit » veut dire « je veux » ou « je voudrais », selon le contexte.", "« Bghit » means « I want » or « I would like », depending on context.", "« Bghit » significa «quiero» o «quisiera», según el contexto.", "«بغيت» تعني «أريد» حسب السياق."), "« Bghit » means « I want » or « I would like », depending on context.", "« Bghit » significa «quiero» o «quisiera», según el contexto.", "«بغيت» تعني «أريد» حسب السياق."),
+0140|      },
+0141|    ],
+0142|  },
+0143|  {
+0144|    id: "medina",
+0145|    title: trL(lang, tr("Se repérer dans la médina", "Finding your way in the medina", "Orientarse en la medina", "التعرف على طريقك في المدينة القديمة"), "Finding your way in the medina", "Orientarse en la medina", "التعرف على طريقك في المدينة القديمة"),
+0146|    subtitle: trL(lang, tr("Demander son chemin sans stress", "Asking for directions, stress-free", "Preguntar el camino sin estrés", "اسأل عن الطريق بلا توتر"), "Asking for directions, stress-free", "Preguntar el camino sin estrés", "اسأل عن الطريق بلا توتر"),
+0147|    length: "7 min",
+0148|    status: "locked",
+0149|    questions: [
+0150|      {
+0151|        prompt: trL(lang, tr("Comment demander « où est… ? »", "How to ask « where is…? »", "Cómo preguntar «¿dónde está…?»", "كيف تسأل «أين يوجد…؟»"), "How to ask « where is…? »", "Cómo preguntar «¿dónde está…?»", "كيف تسأل «أين يوجد…؟»"),
+0152|        helper: trL(lang, tr("La phrase qui débloque une promenade.", "The phrase that unlocks a stroll.", "La frase que desbloquea un paseo.", "العبارة التي تفتح لك التنزه."), "The phrase that unlocks a stroll.", "La frase que desbloquea un paseo.", "العبارة التي تفتح لك التنزه."),
+0153|        options: ["Fin kayn…?", "Chhal hadi?", "Mumkin…?"],
+0154|        answer: "Fin kayn…?",
+0155|        note: trL(lang, tr("« Fin kayn…? » signifie « où se trouve… ? ». Ajoute le lieu que tu cherches.", "« Fin kayn…? » means « where is…? ». Add the place you’re looking for.", "« Fin kayn…? » significa «¿dónde está…?». Añade el lugar que buscas.", "«فين كاين…؟» تعني «أين يوجد…؟». أضف المكان الذي تبحث عنه."), "« Fin kayn…? » means « where is…? ». Add the place you’re looking for.", "« Fin kayn…? » significa «¿dónde está…?». Añade el lugar que buscas.", "«فين كاين…؟» تعني «أين يوجد…؟». أضف المكان الذي تبحث عنه."),
+0156|      },
+0157|      {
+0158|        prompt: trL(lang, tr("Que signifie « yallah » ?", "What does « yallah » mean?", "¿Qué significa « yallah »?", "ماذا تعني «يللاه»؟"), "What does « yallah » mean?", "¿Qué significa « yallah »?", "ماذا تعني «يللاه»؟"),
+0159|        helper: trL(lang, tr("Un mot qu’on entend souvent.", "A word you hear often.", "Una palabra que se oye a menudo.", "كلمة تُسمع كثيراً."), "A word you hear often.", "Una palabra que se oye a menudo.", "كلمة تُسمع كثيراً."),
+0160|        options: [trL(lang, tr("Allons-y", "Let’s go", "Vamos", "هيا بنا"), "Let’s go", "Vamos", "هيا بنا"), "Merci beaucoup"],
+0161|        answer: trL(lang, tr("Allons-y", "Let’s go", "Vamos", "هيا بنا"), "Let’s go", "Vamos", "هيا بنا"),
+0162|        note: trL(lang, tr("« Yallah » invite à partir, à avancer, ou simplement à se lancer.", "« Yallah » invites you to leave, move, or simply dive in.", "« Yallah » invita a partir, avanzar o simplemente lanzarse.", "«يللاه» دعوة للانطلاق والتقدم أو البدء."), "« Yallah » invites you to leave, move, or simply dive in.", "« Yallah » invita a partir, avanzar o simplemente lanzarse.", "«يللاه» دعوة للانطلاق والتقدم أو البدء."),
+0163|      },
+0164|    ],
+0165|  },
+0166|  {
+0167|    id: "marrakech",
+0168|    title: trL(lang, tr("Négocier au souk de Marrakech", "Bargaining at the Marrakech souk", "Regatear en el souk de Marrakech", "المفاوضة في سوق مراكش"), "Bargaining at the Marrakech souk", "Regatear en el souk de Marrakech", "المفاوضة في سوق مراكش"),
+0169|    subtitle: trL(lang, tr("Les nombres et les prix (Niveau A2)", "Numbers and prices (Level A2)", "Números y precios (Nivel A2)", "الأرقام والأسعار (مستوى A2)"), "Numbers and prices (Level A2)", "Números y precios (Nivel A2)", "الأرقام والأسعار (مستوى A2)"),
+0170|    length: "9 min",
+0171|    status: "locked",
+0172|    isPremium: true,
+0173|    questions: [
+0174|      {
+0175|        prompt: trL(lang, tr("Comment demander « Combien coûte ceci ? »", "How to ask « How much is this? »", "Cómo preguntar «¿Cuánto cuesta esto?»", "كيف تسأل «بشحال هادا؟»"), "How to ask « How much is this? »", "Cómo preguntar «¿Cuánto cuesta esto?»", "كيف تسأل «بشحال هادا؟»"),
+0176|        helper: trL(lang, tr("Expression clé pour entamer la discussion.", "Key phrase to start the conversation.", "Expresión clave para entablar la conversación.", "عبارة مفتاحية لبدء الحوار."), "Key phrase to start the conversation.", "Expresión clave para entablar la conversación.", "عبارة مفتاحية لبدء الحوار."),
+0177|        options: ["Bchhal hada?", "Fin mchiti?", "Labas 3lik?"],
+0178|        answer: "Bchhal hada?",
+0179|        note: tr("« Bchhal hada? » permet de demander le prix de n'importe quel article.", "« Bchhal hada? » lets you ask the price of any item.", "« Bchhal hada? » permite preguntar el precio de cualquier artículo.", "«بشحال هادا؟» تمكنك من السؤال عن سعر أي سلعة."),
+0180|      },
+0181|      {
+0182|        prompt: trL(lang, tr("Que veut dire « Naqas chwiya 3afak » ?", "What does « Naqas chwiya 3afak » mean?", "¿Qué significa « Naqas chwiya 3afak »?", "ماذا تعني «نقّص شوية عفاك»؟"), "What does « Naqas chwiya 3afak » mean?", "¿Qué significa « Naqas chwiya 3afak »?", "ماذا تعني «نقّص شوية عفاك»؟"),
+0183|        helper: trL(lang, tr("La formule cordiale de marchandage.", "The friendly way to bargain.", "La fórmula cordial del regateo.", "الصيغة الودية للمساومة."), "The friendly way to bargain.", "La fórmula cordial del regateo.", "الصيغة الودية للمساومة."),
+0184|        options: [trL(lang, tr("Baisse un peu s'il te plaît", "Lower it a bit, please", "Baja un poco, por favor", "خفّض قليلاً من فضلك"), "Lower it a bit, please", "Baja un poco, por favor", "خفّض قليلاً من فضلك")],
+0185|        answer: trL(lang, tr("Baisse un peu s'il te plaît", "Lower it a bit, please", "Baja un poco, por favor", "خفّض قليلاً من فضلك"), "Lower it a bit, please", "Baja un poco, por favor", "خفّض قليلاً من فضلك"),
+0186|        note: trL(lang, tr("« Naqas chwiya » = réduis un peu. Utilisé avec le sourire !", "« Naqas chwiya » = cut it down a bit. Used with a smile!", "« Naqas chwiya » = reduce un poco. ¡Se usa con una sonrisa!", "«نقّص شوية» = خفّض قليلاً. تُقال بابتسامة!"), "« Naqas chwiya » = cut it down a bit. Used with a smile!", "« Naqas chwiya » = reduce un poco. ¡Se usa con una sonrisa!", "«نقّص شوية» = خفّض قليلاً. تُقال بابتسامة!"),
+0187|      },
+0188|    ],
+0189|  },
+0190|  {
+0191|    id: "tanger",
+0192|    title: trL(lang, tr("Voyage à Tanger (Chamali)", "Trip to Tangier (Chamali)", "Viaje a Tánger (Chamali)", "رحلة إلى طنجة (الشمالي)"), "Trip to Tangier (Chamali)", "Viaje a Tánger (Chamali)", "رحلة إلى طنجة (الشمالي)"),
+0193|    subtitle: trL(lang, tr("Les subtilités régionales (Niveau B2)", "Regional subtleties (Level B2)", "Sutilezas regionales (Nivel B2)", "الفروق الإقليمية (مستوى B2)"), "Regional subtleties (Level B2)", "Sutilezas regionales (Nivel B2)", "الفروق الإقليمية (مستوى B2)"),
+0194|    length: "10 min",
+0195|    status: "locked",
+0196|    isPremium: true,
+0197|    questions: [
+0198|      {
+0199|        prompt: trL(lang, tr("À Tanger, comment dit-on « Qu'est-ce que tu veux ? »", "In Tangier, how do you say « What do you want? »", "En Tánger, ¿cómo se dice «¿Qué quieres?»", "في طنجة، كيف تقول «ماذا تريد؟»"), "In Tangier, how do you say « What do you want? »", "En Tánger, ¿cómo se dice «¿Qué quieres?»", "في طنجة، كيف تقول «ماذا تريد؟»"),
+0200|        helper: trL(lang, tr("Remplace le standard « Chno bghiti ».", "Replaces the standard « Chno bghiti ».", "Sustituye al estándar « Chno bghiti ».", "تعوض الصيغة القياسية «شنو بغيتي»."), "Replaces the standard « Chno bghiti ».", "Sustituye al estándar « Chno bghiti ».", "تعوض الصيغة القياسية «شنو بغيتي»."),
+0201|        options: ["Chni katchof?", "Chni katsaksi?", "Chni khassek?"],
+0202|        answer: "Chni khassek?",
+0203|        note: trL(lang, tr("Dans le nord (Chamali), on utilise « Chni » au lieu de « Chno ».", "In the north (Chamali), people use « Chni » instead of « Chno ».", "En el norte (Chamali), se usa « Chni » en lugar de « Chno ».", "في الشمال (الشمالي) يُستخدم «شني» بدل «شنو»."), "In the north (Chamali), people use « Chni » instead of « Chno ».", "En el norte (Chamali), se usa « Chni » en lugar de « Chno ».", "في الشمال (الشمالي) يُستخدم «شني» بدل «شنو»."),
+0204|      },
+0205|    ],
+0206|  },
+0207|];
+0208|
+0209|const buildPhrases = (lang: string): Phrase[] => [
+0210|  { id: "salam", category: trL(lang, tr("Saluer", "Greeting", "Saludar", "التحية"), "Greeting", "Saludar", "التحية"), darija: "Salam, labas?", arabic: "سلام، لاباس؟", meaning: trL(lang, tr("Salut, ça va ?", "Hi, how are you?", "Hola, ¿qué tal?", "مرحبا، كيف حالك؟"), "Hi, how are you?", "Hola, ¿qué tal?", "مرحبا، كيف حالك؟"), note: trL(lang, tr("La formule la plus simple pour ouvrir une conversation.", "The simplest way to open a conversation.", "La fórmula más simple para abrir una conversación.", "أبسط صيغة لبدء أي حديث."), "The simplest way to open a conversation.", "La fórmula más simple para abrir una conversación.", "أبسط صيغة لبدء أي حديث.") },
+0211|  { id: "bikhir", category: trL(lang, tr("Saluer", "Greeting", "Saludar", "التحية"), "Greeting", "Saludar", "التحية"), darija: "Labas, hamdullah.", arabic: "لاباس، الحمد لله.", meaning: trL(lang, tr("Ça va, merci / Dieu merci.", "Fine, thanks / Thank God.", "Bien, gracias / Gracias a Dios.", "بخير، الحمد لله."), "Fine, thanks / Thank God.", "Bien, gracias / Gracias a Dios.", "بخير، الحمد لله."), note: trL(lang, tr("La réponse classique à « labas? ».", "The classic reply to « labas? ».", "La respuesta clásica a « labas? ».", "الرد المألوف على «لاباس؟»."), "The classic reply to « labas? ».", "La respuesta clásica a « labas? ».", "الرد المألوف على «لاباس؟».") },
+0212|  { id: "afak", category: trL(lang, tr("Au café", "At the café", "En el café", "في المقهى"), "At the café", "En el café", "في المقهى"), darija: "Wahed atay, afak.", arabic: "واحد أتاي، عفاك.", meaning: trL(lang, tr("Un thé, s’il vous plaît.", "A tea, please.", "Un té, por favor.", "شاي من فضلك."), "A tea, please.", "Un té, por favor.", "شاي من فضلك."), note: tr("« Wahed » = un, « atay » = thé, « afak » = s’il te plaît.", "« Wahed » = one, « atay » = tea, « afak » = please.", "« Wahed » = uno, « atay » = té, « afak » = por favor.", "«واحد» = واحد، «أتاي» = شاي، «عفاك» = من فضلك.") },
+0213|  { id: "bghit", category: trL(lang, tr("Au café", "At the café", "En el café", "في المقهى"), "At the café", "En el café", "في المقهى"), darija: "Bghit lma, afak.", arabic: "بغيت الما، عفاك.", meaning: trL(lang, tr("Je voudrais de l’eau, s’il vous plaît.", "I’d like some water, please.", "Quisiera agua, por favor.", "أريد ماءً، من فضلك."), "I’d like some water, please.", "Quisiera agua, por favor.", "أريد ماءً، من فضلك."), note: trL(lang, tr("Remplace « lma » par ce que tu aimerais commander.", "Replace « lma » with whatever you’d like to order.", "Sustituye « lma » por lo que quieras pedir.", "استبدل «لما» بما تود طلبه."), "Replace « lma » with whatever you’d like to order.", "Sustituye « lma » por lo que quieras pedir.", "استبدل «لما» بما تود طلبه.") },
+0214|  { id: "fin", category: trL(lang, tr("Se déplacer", "Getting around", "Desplazarse", "التنقل"), "Getting around", "Desplazarse", "التنقل"), darija: "Fin kayn souk?", arabic: "فين كاين السوق؟", meaning: trL(lang, tr("Où est le souk ?", "Where is the souk?", "¿dónde está el souk?", "أين السوق؟"), "Where is the souk?", "¿dónde está el souk?", "أين السوق؟"), note: trL(lang, tr("Utilise cette structure pour demander un lieu.", "Use this structure to ask for a place.", "Usa esta estructura para preguntar por un lugar.", "استخدم هذه الصيغة لسؤال عن مكان."), "Use this structure to ask for a place.", "Usa esta estructura para preguntar por un lugar.", "استخدم هذه الصيغة لسؤال عن مكان.") },
+0215|  { id: "shukran", category: trL(lang, tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات"), "Essentials", "Lo esencial", "الأساسيات"), darija: "Shukran bzaf!", arabic: "شكرا بزاف!", meaning: trL(lang, tr("Merci beaucoup !", "Thank you very much!", "¡Muchas gracias!", "شكراً جزيلاً!"), "Thank you very much!", "¡Muchas gracias!", "شكراً جزيلاً!"), note: trL(lang, tr("« Bzaf » signifie beaucoup — un mot qui sert partout.", "« Bzaf » means a lot — a word useful everywhere.", "« Bzaf » significa mucho — una palabra útil en todo.", "«بزاف» تعني كثيراً — كلمة تفيد في كل مكان."), "« Bzaf » means a lot — a word useful everywhere.", "« Bzaf » significa mucho — una palabra útil en todo.", "«بزاف» تعني كثيراً — كلمة تفيد في كل مكان.") },
+0216|  { id: "smah", category: trL(lang, tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات"), "Essentials", "Lo esencial", "الأساسيات"), darija: "Smah liya.", arabic: "سمح ليا.", meaning: trL(lang, tr("Excuse-moi / pardon.", "Excuse me / sorry.", "Disculpa / perdón.", "المامعة / عفواً."), "Excuse me / sorry.", "Disculpa / perdón.", "المامعة / عفواً."), note: trL(lang, tr("Pour attirer l’attention ou demander pardon, avec douceur.", "To catch attention or apologize, gently.", "Para llamar la atención o pedir perdón, con dulzura.", "للتنبيه أو طلب العفو، بلطف."), "To catch attention or apologize, gently.", "Para llamar la atención o pedir perdón, con dulzura.", "للتنبيه أو طلب العفو، بلطف.") },
+0217|  { id: "bslama", category: trL(lang, tr("Saluer", "Greeting", "Saludar", "التحية"), "Greeting", "Saludar", "التحية"), darija: "Bslama, nshawfek.", arabic: "بسلامة، نشوفك.", meaning: tr("Au revoir, à bientôt.", "Goodbye, see you soon.", "Adiós, hasta pronto.", "إلى اللقاء، أراك قريباً."), note: trL(lang, tr("Une façon amicale de prendre congé.", "A friendly way to say goodbye.", "Una manera amable de despedirse.", "طريقة ودية للوداع."), "A friendly way to say goodbye.", "Una manera amable de despedirse.", "طريقة ودية للوداع.") },
+0218|];
+0219|
+0220|const buildNavItems = (lang: string): { id: View; label: string; icon: LucideIcon }[] => [
+0221|  { id: "today", label: trL(lang, "Aujourd’hui", "Today", "Hoy", "اليوم"), icon: HomeIcon },
+0222|  { id: "path", label: trL(lang, "Mon parcours", "My journey", "Mi ruta", "مساري"), icon: Compass },
+0223|  { id: "phrases", label: trL(lang, "Carnet de phrases", "Phrasebook", "Mis frases", "دفتر العبارات"), icon: Bookmark },
+0224|  { id: "review", label: trL(lang, tr("Révision du jour", "Today’s review", "Revisión del día", "مراجعة اليوم"), "Today’s review", "Revisión del día", "مراجعة اليوم"), icon: Sparkles },
+0225|];
+0226|
+0227|function useLocalizedContent() {
+0228|  const uiLanguage = useAppStore((s) => s.uiLanguage);
+0229|  const lang = uiLanguage || "fr";
+0230|  const lessons = useMemo(() => buildLessons(lang), [lang]);
+0231|  const phrases = useMemo(() => buildPhrases(lang), [lang]);
+0232|  const navItems = useMemo(() => buildNavItems(lang), [lang]);
+0233|  return { lang, lessons, phrases, navItems };
+0234|}
+0235|
+0236|export default function Home() {
+0237|  const [view, setView] = useState<View>("today");
+0238|  const [lessonId, setLessonId] = useState<string | null>(null);
+0239|  const [questionIndex, setQuestionIndex] = useState(0);
+0240|  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+0241|  const [search, setSearch] = useState("");
+0242|  const [category, setCategory] = useState("__all__");
+0243|  const [favoritesOnly, setFavoritesOnly] = useState(false);
+0244|  const [favorites, setFavorites] = useState<string[]>([]);
+0245|  const [reviewIndex, setReviewIndex] = useState(0);
+0246|  const [cardFlipped, setCardFlipped] = useState(false);
+0247|  const [toast, setToast] = useState("");
+0248|  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+0249|  const searchInputRef = useRef<HTMLInputElement>(null);
+0250|
+0251|  // Zustand Store Integration
+0252|  const {
+0253|    xp,
+0254|    streakDays,
+0255|    completedLessons,
+0256|    addXp,
+0257|    completeLesson,
+0258|    user,
+0259|    setUser,
+0260|    resetData,
+0261|    soundEnabled,
+0262|    toggleSound,
+0263|    isPremium,
+0264|    setIsPremium,
+0265|    uiLanguage,
+0266|    setLanguage,
+0267|  } = useAppStore();
+0268|
+0269|  const { t } = useTranslation();
+0270|  const { lang, lessons, phrases, navItems } = useLocalizedContent();
+0271|  const navLabel = (id: string) => {
+0272|    const key =
+0273|      id === "today" ? "home"
+0274|      : id === "path" ? "parcours"
+0275|      : id === "phrases" ? "phrasebook"
+0276|      : id === "review" ? "review"
+0277|      : null;
+0278|    return key ? ((t as any).side?.[key] as string | undefined) : undefined;
+0279|  };
+0280|
+0281|  const handleGoogleLogin = async () => {
+0282|    try {
+0283|      const { error } = await supabase.auth.signInWithOAuth({
+0284|        provider: "google",
+0285|        options: {
+0286|          redirectTo: typeof window !== "undefined" ? window.location.origin : undefined,
+0287|        },
+0288|      });
+0289|      if (error) throw error;
+0290|    } catch {
+0291|      showToast(t.modules.home.googleError);
+0292|    }
+0293|  };
+0294|
+0295|  const [checkpointOpen, setCheckpointOpen] = useState<{ id: string; name: string } | null>(null);
+0296|  const [showScenarioSelector, setShowScenarioSelector] = useState(false);
+0297|  const [activePersonaId, setActivePersonaId] = useState<PersonaId | null>(null);
+0298|  const [pricingSource, setPricingSource] = useState<string | null>(null);
+0299|
+0300|  // 1. Sécurisation absolue de favorites (Null-Safety)
+0301|  useEffect(() => {
+0302|    try {
+0303|      const stored = localStorage.getItem("kenza_favorites");
+0304|      if (stored) {
+0305|        const parsed = JSON.parse(stored);
+0306|        if (Array.isArray(parsed)) {
+0307|          setFavorites(parsed);
+0308|          return;
+0309|        }
+0310|      }
+0311|    } catch {}
+0312|    setFavorites([]);
+0313|  }, []);
+0314|
+0315|  const saveFavorites = (next: string[]) => {
+0316|    const safeNext = Array.isArray(next) ? next : [];
+0317|    setFavorites(safeNext);
+0318|    try {
+0319|      localStorage.setItem("kenza_favorites", JSON.stringify(safeNext));
+0320|    } catch {}
+0321|  };
+0322|
+0323|  const safeFavorites = useMemo(() => {
+0324|    return Array.isArray(favorites) ? favorites : [];
+0325|  }, [favorites]);
+0326|
+0327|  // Auth sync
+0328|  useEffect(() => {
+0329|    supabase.auth.getSession().then(({ data: { session } }) => {
+0330|      if (session?.user) setUser(session.user);
+0331|    });
+0332|
+0333|    const {
+0334|      data: { subscription },
+0335|    } = supabase.auth.onAuthStateChange(async (event, session) => {
+0336|      if (event === "SIGNED_IN" && session?.user) {
+0337|        setUser(session.user);
+0338|        await syncService.syncCloudToLocal(session.user.id);
+0339|      } else if (event === "SIGNED_OUT") {
+0340|        setUser(null);
+0341|        resetData();
+0342|      }
+0343|    });
+0344|
+0345|    return () => subscription.unsubscribe();
+0346|  }, [setUser, resetData]);
+0347|
+0348|  // Check URL params (e.g. Stripe callback)
+0349|  useEffect(() => {
+0350|    if (typeof window === "undefined") return;
+0351|    const searchParams = new URLSearchParams(window.location.search);
+0352|    const upgradeStatus = searchParams.get("upgrade");
+0353|    if (upgradeStatus === "success") {
+0354|      setIsPremium(true);
+0355|      showToast(t.modules.home.proActivated);
+0356|      window.history.replaceState({}, document.title, window.location.pathname);
+0357|    }
+0358|  }, [setIsPremium]);
+0359|
+0360|  useEffect(() => {
+0361|    if (!toast) return;
+0362|    const timer = window.setTimeout(() => setToast(""), 3500);
+0363|    return () => window.clearTimeout(timer);
+0364|  }, [toast]);
+0365|
+0366|  useEffect(() => {
+0367|    const handleShortcut = (event: KeyboardEvent) => {
+0368|      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+0369|        event.preventDefault();
+0370|        setView("phrases");
+0371|        window.setTimeout(() => searchInputRef.current?.focus(), 60);
+0372|      }
+0373|    };
+0374|    window.addEventListener("keydown", handleShortcut);
+0375|    return () => window.removeEventListener("keydown", handleShortcut);
+0376|  }, []);
+0377|
+0378|  useEffect(() => {
+0379|    setMobileMenuOpen(false);
+0380|    window.scrollTo({ top: 0, behavior: "smooth" });
+0381|  }, [view]);
+0382|
+0383|  // 2. Adaptateur universel pour les phrases (Format Manus ↔ Format KENZA)
+0384|  const allPhrases: Phrase[] = useMemo(() => {
+0385|    const rawVocabulary = (srsVocabulary || []).slice(0, 40).map((w, idx) => {
+0386|      let meaningText = tr("Expression en darija", "Darija expression", "Expresión en darija", "عبارة بالدارجة");
+0387|      if (typeof (w as any).translation === "string") {
+0388|        meaningText = (w as any).translation;
+0389|      } else if ((w as any).translation && typeof (w as any).translation === "object") {
+0390|        meaningText = (w as any).translation.fr || (w as any).translation.en || tr("Expression en darija", "Darija expression", "Expresión en darija", "عبارة بالدارجة");
+0391|      } else if ((w as any).translations?.fr) {
+0392|        meaningText = (w as any).translations.fr;
+0393|      } else if (typeof (w as any).back === "string") {
+0394|        meaningText = (w as any).back;
+0395|      }
+0396|
+0397|      let cat = trL(lang, tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات"), "Essentials", "Lo esencial", "الأساسيات");
+0398|      if (w.category === "polite_social") cat = trL(lang, tr("Saluer", "Greeting", "Saludar", "التحية"), "Greeting", "Saludar", "التحية");
+0399|      else if (w.category === "food_drink") cat = trL(lang, tr("Au café", "At the café", "En el café", "في المقهى"), "At the café", "En el café", "في المقهى");
+0400|      else if (w.category === "directions") cat = trL(lang, tr("Se déplacer", "Getting around", "Desplazarse", "التنقل"), "Getting around", "Desplazarse", "التنقل");
