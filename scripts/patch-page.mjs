@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 
-// ---------- Patch 15.1: same table + verification report ----------
+// ---------- Patch 16: same table + 500-line chunk dumps ----------
 const p = 'src/app/page.tsx';
 let src = readFileSync(p, 'utf8');
 const count = (s, sub) => s.split(sub).length - 1;
@@ -47,38 +47,20 @@ for (const r of TABLE) {
 }
 console.log('translated ' + applied + ', already ' + already + ', missing ' + missing);
 
-// ---------- verification report ----------
 const EXPECTED = [
-  'tr("Salam, on s’y remet ?"',
-  'tr("La darija", "Darija"',
-  'tr("TON PETIT MOMENT DARIJA"',
-  'tr("Continuer à apprendre"',
-  'tr("C’est parti"',
-  'tr("Terminer la leçon"',
-  'tr("Voir mon espace"',
-  'tr("Voir le parcours"',
-  'tr("Vocabulaire essentiel"',
-  'tr("Cartes du jour"',
-  'tr("Au café, en taxi"',
-  'tr("rythme régulier"',
-  'tr("jour", "day"',
-  'tr("darija, la langue du lien"',
-  'tr("POUR AUJOURD’HUI"',
-  'tr("LEÇON SUIVANTE"',
-  'tr("Ton carnet", "Your phrase"',
-  'tr("Faire une", "Do a quick"',
-  'tr("Mises en", "Real-life"',
-  'tr("Les premiers bonjours"',
-  'tr("Saluer, se présenter, créer le lien"'
+  'tr("Salam, on s’y remet ?"', 'tr("La darija", "Darija"', 'tr("TON PETIT MOMENT DARIJA"',
+  'tr("Voir mon espace"', 'tr("Voir le parcours"', 'tr("rythme régulier"',
+  'tr("POUR AUJOURD’HUI"', 'tr("LEÇON SUIVANTE"', 'tr("Les premiers bonjours"'
 ];
-const report = {
-  ts: new Date().toISOString(),
-  appliedThisRun: applied,
-  already: already,
-  missing: missingList,
-  trCallCount: count(src, 'tr("'),
-  checks: EXPECTED.map(s => ({ s: s.slice(0, 44), ok: src.includes(s) }))
-};
+const report = { ts: new Date().toISOString(), appliedThisRun: applied, already: already, missing: missingList, trCallCount: count(src, 'tr("'), checks: EXPECTED.map(s => ({ s: s.slice(0, 44), ok: src.includes(s) })) };
 writeFileSync('docs/verify.json', JSON.stringify(report, null, 2));
+
+const all = src.split('\n');
+writeFileSync('docs/scope-page.txt', all.map((l, i) => String(i + 1) + '|' + l).join('\n'));
+for (let k = 0; k * 500 < all.length; k++) {
+  const chunk = all.slice(k * 500, (k + 1) * 500).map((l, i) => String(k * 500 + i + 1) + '|' + l).join('\n');
+  writeFileSync('docs/dump-' + (k + 1) + '.txt', chunk);
+}
+console.log('dumps ' + all.length + ' lines');
 
 if (applied > 0 || dirty) writeFileSync(p, src);
