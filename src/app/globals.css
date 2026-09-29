@@ -148,7 +148,12 @@ button:focus-visible, input:focus-visible { outline: 3px solid rgba(214, 155, 71
   line-height: 1;
 }
 .lang-btn {
-  padding: 2px 4px;
+  padding: 6px 8px;
+  min-width: 30px;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 0;
   border-radius: 6px;
   background: transparent;
@@ -557,6 +562,14 @@ button:focus-visible, input:focus-visible { outline: 3px solid rgba(214, 155, 71
   .sidebar-open {
     transform: translateX(0);
     box-shadow: 15px 0 45px rgba(17,32,47,.15);
+  }
+  /* RTL : la sidebar est ancrée à DROITE → l'état fermé doit glisser vers la DROITE */
+  [dir="rtl"] .sidebar {
+    transform: translateX(103%);
+  }
+  [dir="rtl"] .sidebar-open {
+    transform: translateX(0);
+    box-shadow: -15px 0 45px rgba(17,32,47,.15);
   }
   .mobile-close { display: grid !important; margin-left: auto; }
   .mobile-scrim { position: fixed; z-index: 70; inset: 0; display: block !important; border: 0; background: rgba(20,36,51,.28); cursor: pointer; }

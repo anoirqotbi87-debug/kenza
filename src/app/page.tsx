@@ -717,7 +717,7 @@ export default function Home() {
         <header className="topbar">
           <button
             className="icon-button mobile-menu-trigger"
-            aria-label="Ouvrir le menu"
+            aria-label={t.modules.home.langSwitcher}
             onClick={() => setMobileMenuOpen(true)}
           >
             <Menu size={21} />
@@ -735,7 +735,7 @@ export default function Home() {
                 type="button"
                 onClick={() => setLanguage("fr")}
                 className={`lang-btn ${uiLanguage === "fr" ? "lang-btn-active" : ""}`}
-                aria-label="Passer en français"
+                aria-label={t.modules.home.switchToFr}
               >
                 FR
               </button>
@@ -744,7 +744,7 @@ export default function Home() {
                 type="button"
                 onClick={() => setLanguage("en")}
                 className={`lang-btn ${uiLanguage === "en" ? "lang-btn-active" : ""}`}
-                aria-label="Switch to English"
+                aria-label={t.modules.home.switchToEn}
               >
                 EN
               </button>
@@ -753,7 +753,7 @@ export default function Home() {
                 type="button"
                 onClick={() => setLanguage("es")}
                 className={`lang-btn ${uiLanguage === "es" ? "lang-btn-active" : ""}`}
-                aria-label="Cambiar a español"
+                aria-label={t.modules.home.switchToEs}
               >
                 ES
               </button>
@@ -762,7 +762,7 @@ export default function Home() {
                 type="button"
                 onClick={() => setLanguage("ar")}
                 className={`lang-btn ${uiLanguage === "ar" ? "lang-btn-active" : ""}`}
-                aria-label="Passer en arabe"
+                aria-label={t.modules.home.switchToAr}
               >
                 AR
               </button>

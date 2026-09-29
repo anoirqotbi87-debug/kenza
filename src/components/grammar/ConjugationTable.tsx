@@ -124,12 +124,12 @@ export default function ConjugationTable() {
         <p className="text-slate-600">{t.lessons.grammarDesc}</p>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto pb-4 mb-6 justify-center">
+      <div className="flex gap-2 overflow-x-auto pb-4 mb-6 justify-start sm:justify-center">
         {(Object.keys(rules) as GrammarRule[]).map(rule => (
           <button
             key={rule}
             onClick={() => setActiveRule(rule)}
-            className={`px-6 py-3 rounded-full font-bold whitespace-nowrap transition-all ${activeRule === rule ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+            className={`px-4 sm:px-6 py-3 rounded-full font-bold whitespace-nowrap transition-all ${activeRule === rule ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
           >
             {getLocalizedText(rules[rule].title, lang)}
           </button>
