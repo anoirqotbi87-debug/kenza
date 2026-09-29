@@ -16,6 +16,20 @@ export function getLocalizedText(
   return text[lang] || text[fallback] || Object.values(text)[0] || '';
 }
 
+/**
+ * Retourne la locale BCP-47 correspondant à la langue d'interface,
+ * afin d'éviter les dates codées en dur (ex : 'fr-FR').
+ */
+export function getDateLocale(lang: string | undefined): string {
+  switch (lang) {
+    case 'en': return 'en-US';
+    case 'es': return 'es-ES';
+    case 'ar': return 'ar-MA';
+    case 'fr':
+    default: return 'fr-FR';
+  }
+}
+
 export function getExerciseText(item: any, lang: string = 'fr'): string {
   if (item === null || item === undefined) return '';
   if (typeof item === 'string') return item;

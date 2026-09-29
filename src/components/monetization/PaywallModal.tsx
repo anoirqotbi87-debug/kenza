@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { X, Check, Crown, Sparkles, BookOpen, Headphones, Award, ArrowRight, ShieldCheck, Loader2 } from 'lucide-react';
-import { useAppStore } from '../../store/useAppStore';
+import { useAppStore, useTranslation } from '../../store/useAppStore';
 import { trackEvent } from '../../utils/analytics';
 import { supabase } from '../../lib/supabase';
 
@@ -13,6 +13,8 @@ interface PaywallModalProps {
 
 export default function PaywallModal({ onClose, source = 'direct' }: PaywallModalProps) {
   const { setIsPremium } = useAppStore();
+  const { t } = useTranslation();
+  const pw = t.modules.paywall;
   const [billingCycle, setBillingCycle] = useState<'yearly' | 'monthly'>('yearly');
   const [currency, setCurrency] = useState<'EUR' | 'MAD'>('EUR');
   const [loading, setLoading] = useState(false);
@@ -65,7 +67,7 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Erreur lors de l’initialisation du paiement');
+        throw new Error(data.error || pw.errorInit);
       }
 
       if (data.url) {
@@ -77,12 +79,12 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
       if (data.simulated) {
         // Simulation en local ou sans clé secrète Stripe renseignée
         setIsPremium(true);
-        alert('Compte mis à niveau avec succès vers Kenza Pro (Mode Démo) !');
+        alert(pw.upgradeSuccess);
         onClose();
       }
     } catch (err: any) {
       console.error('[Paywall Checkout Error]:', err);
-      setErrorMessage(err.message || 'Impossible d’initialiser le paiement. Veuillez réessayer.');
+      setErrorMessage(err.message || pw.errorRetry);
     } finally {
       setLoading(false);
     }
@@ -92,22 +94,22 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
   const getContextualContent = () => {
     if (source.includes('module') || source === 'module_locked') {
       return {
-        kicker: '— PARCOURS AVANCÉ',
-        title: 'Débloquez les Modules B1 & B2',
-        subtitle: 'Poursuivez votre voyage vers Tanger et approfondissez les subtilités du dialecte marocain.',
+        kicker: `— ${pw.advancedPath}`,
+        title: pw.unlockB1B2,
+        subtitle: pw.advancedDesc,
       };
     }
     if (source.includes('ai') || source.includes('roleplay') || source === 'ai_quota_exceeded') {
       return {
-        kicker: '— IMMERSION IA SANS LIMITE',
-        title: 'Conversations IA Illimitées',
-        subtitle: 'Vous avez terminé votre session IA gratuite du jour. Passez à Kenza Pro pour échanger librement avec tous les personas.',
+        kicker: `— ${pw.aiImmersion}`,
+        title: pw.unlimitedAi,
+        subtitle: pw.aiSubtitle,
       };
     }
     return {
-      kicker: '— PASSEPORT CULTUREL',
-      title: 'Maîtrisez la Darija sans limites',
-      subtitle: 'Libérez tout le potentiel de votre apprentissage de la Darija avec l’accès complet à l’écosystème Kenza.',
+      kicker: `— ${pw.culturalKicker}`,
+      title: pw.masterDarija,
+      subtitle: pw.culturalSubtitle,
     };
   };
 
@@ -124,7 +126,7 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
         <button 
           onClick={onClose}
           className="sticky top-3.5 right-3.5 z-50 self-end -mb-10 mr-3.5 p-2 rounded-full bg-[#F7F3EA] hover:bg-[#E8E2D5] text-[#1B2A4A] transition-colors border border-[#E8E2D5] shadow-md md:absolute md:top-3.5 md:right-3.5 md:m-0"
-          aria-label="Fermer la modale"
+          aria-label={pw.closeLabel}
         >
           <X className="w-5 h-5" />
         </button>
@@ -161,10 +163,10 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
             {/* Avantages exclusifs */}
             <ul className="space-y-3 pt-2 text-xs sm:text-sm">
               {[
-                { icon: BookOpen, text: 'Accès intégral aux Modules 3, 4 et 5 (Niveaux B1 & B2)' },
-                { icon: Sparkles, text: 'Roleplay IA illimité (Tous les personas et scénarios sans quota)' },
-                { icon: Headphones, text: 'Synthèse vocale (TTS) naturelle & mode 100% hors-ligne' },
-                { icon: Award, text: 'Visas officiels du Passeport Culturel & suivi de maîtrise' },
+                { icon: BookOpen, text: pw.benefit1 },
+                { icon: Sparkles, text: pw.benefit2 },
+                { icon: Headphones, text: pw.benefit3 },
+                { icon: Award, text: pw.benefit4 },
               ].map((benefit, idx) => (
                 <li key={idx} className="flex items-start gap-3">
                   <div className="mt-0.5 w-5 h-5 rounded-full bg-[#7A9174]/25 text-[#7A9174] flex items-center justify-center shrink-0">
@@ -179,7 +181,7 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
           {/* Micro-badge de confiance en bas du volet gauche (desktop uniquement) */}
           <div className="relative z-10 hidden md:flex items-center gap-2 pt-6 text-[11px] text-[#E8E2D5]/60 border-t border-white/10 mt-6">
             <ShieldCheck className="w-4 h-4 text-[#C9A05C]" />
-            <span>Apprentissage certifié — Garanti sans engagement</span>
+            <span>{pw.certified}</span>
           </div>
         </div>
 
@@ -190,7 +192,7 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
           <div>
             <div className="flex items-center justify-between gap-4 mb-2">
               <span className="text-xs font-bold tracking-[0.2em] uppercase text-[#C9A05C]">
-                — Formules Kenza Pro
+                — {pw.plansTitle}
               </span>
 
               {/* Toggle de devises EUR / MAD */}
@@ -221,10 +223,10 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
             </div>
 
             <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#1B2A4A]">
-              Choisissez votre cadence
+              {pw.chooseCadence}
             </h3>
             <p className="text-xs text-[#7A7670] mt-0.5">
-              Investissez dans votre aisance orale. Modifiable à tout instant.
+              {pw.cadenceDesc}
             </p>
           </div>
 
@@ -241,7 +243,7 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
             >
               {/* Badge réduction dorée */}
               <div className="absolute -top-2.5 right-4 bg-[#C9A05C] text-[#1B2A4A] text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
-                -40% · Meilleure offre
+                {pw.bestOffer}
               </div>
 
               <div className="flex items-center justify-between gap-4">
@@ -252,8 +254,8 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
                     {billingCycle === 'yearly' && <div className="w-2 h-2 rounded-full bg-[#1B2A4A]" />}
                   </div>
                   <div>
-                    <h4 className="font-serif text-base font-bold text-[#1B2A4A]">Abonnement Annuel</h4>
-                    <p className="text-xs text-[#7A7670]">Facturé {currentPricing.yearlyTotal}</p>
+                    <h4 className="font-serif text-base font-bold text-[#1B2A4A]">{pw.yearly}</h4>
+                    <p className="text-xs text-[#7A7670]">{pw.billed.replace('{total}', currentPricing.yearlyTotal)}</p>
                   </div>
                 </div>
 
@@ -261,7 +263,7 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
                   <div className="font-serif text-xl sm:text-2xl font-bold text-[#1B2A4A]">
                     {currentPricing.yearlyPerMonth}
                   </div>
-                  <div className="text-[10px] uppercase tracking-wider text-[#7A7670] font-semibold">/ mois</div>
+                  <div className="text-[10px] uppercase tracking-wider text-[#7A7670] font-semibold">{pw.perMonth}</div>
                 </div>
               </div>
             </div>
@@ -283,8 +285,8 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
                     {billingCycle === 'monthly' && <div className="w-2 h-2 rounded-full bg-[#1B2A4A]" />}
                   </div>
                   <div>
-                    <h4 className="font-serif text-base font-bold text-[#1B2A4A]">Abonnement Mensuel</h4>
-                    <p className="text-xs text-[#7A7670]">Liberté totale, sans engagement</p>
+                    <h4 className="font-serif text-base font-bold text-[#1B2A4A]">{pw.monthly}</h4>
+                    <p className="text-xs text-[#7A7670]">{pw.monthlyDesc}</p>
                   </div>
                 </div>
 
@@ -292,7 +294,7 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
                   <div className="font-serif text-xl sm:text-2xl font-bold text-[#1B2A4A]">
                     {currentPricing.monthlyPrice}
                   </div>
-                  <div className="text-[10px] uppercase tracking-wider text-[#7A7670] font-semibold">/ mois</div>
+                  <div className="text-[10px] uppercase tracking-wider text-[#7A7670] font-semibold">{pw.perMonth}</div>
                 </div>
               </div>
             </div>
@@ -308,11 +310,11 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
               {loading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Préparation du paiement...</span>
+                  <span>{pw.preparing}</span>
                 </>
               ) : (
                 <>
-                  <span>Débloquer Kenza Pro</span>
+                  <span>{pw.unlockCta}</span>
                   <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
                 </>
               )}
@@ -325,7 +327,7 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
             )}
 
             <p className="text-[11px] text-center text-[#7A7670] leading-snug">
-              Paiement chiffré et sécurisé · Annulation en 1 clic à tout moment.
+              {pw.securePayment}
             </p>
           </div>
 

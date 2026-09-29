@@ -7,6 +7,7 @@ interface DialogueBubbleProps {
 }
 
 export default function DialogueBubble({ turn }: DialogueBubbleProps) {
+  const { t } = useTranslation();
   const isBot = turn.speaker === 'bot';
   const { preferredNotation } = useAppStore();
   const [showTranslation, setShowTranslation] = useState(false);
@@ -44,7 +45,7 @@ export default function DialogueBubble({ turn }: DialogueBubbleProps) {
           onClick={() => setShowTranslation(!showTranslation)}
           className={`text-xs mt-3 underline decoration-dotted transition-opacity ${isBot ? 'text-slate-400 hover:text-slate-600' : 'text-blue-300 hover:text-white'}`}
         >
-          {showTranslation ? 'Masquer la traduction' : 'Voir la traduction'}
+          {showTranslation ? t.modules.ui.hideTranslation : t.modules.ui.showTranslation}
         </button>
 
         {showTranslation && (

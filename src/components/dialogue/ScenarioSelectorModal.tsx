@@ -5,7 +5,7 @@ import { ALL_SCENARIOS } from '../../data/scenarios';
 import type { DialogueScenario } from '../../types/dialogue';
 import DialogueView from './DialogueView';
 import Link from 'next/link';
-import { useAppStore } from '../../store/useAppStore';
+import { useAppStore, useTranslation } from '../../store/useAppStore';
 import { useNetwork } from '../../hooks/useNetwork';
 
 interface ScenarioSelectorModalProps {
@@ -17,6 +17,8 @@ interface ScenarioSelectorModalProps {
 
 export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePremium, onStartSrs }: ScenarioSelectorModalProps) {
   const { isPremium } = useAppStore();
+  const { t } = useTranslation();
+  const sc = t.modules.scenario;
   const rawLang = useAppStore((state) => state.uiLanguage || 'fr');
   const lang = String(rawLang).toLowerCase();
   const isAr = lang === 'ar' || lang.startsWith('ar');
@@ -34,14 +36,14 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
     }
   };
 
-  const modalTitle = isAr ? 'المواقف والمحادثات مع الذكاء الاصطناعي' : lang === 'en' ? 'AI Roleplay Situations' : 'Mises en situation IA';
-  const modalDesc = isAr ? 'تدرّب مع شخصيات تفاعلية' : lang === 'en' ? 'Practice with interactive AI characters' : 'Pratiquez avec des personnages marocains immersifs';
+  const modalTitle = sc.modalTitle;
+  const modalDesc = sc.subtitle;
 
   const aiPersonasList = Object.values(personas);
 
-  const dialoguesTitle = isAr ? 'حوارات مُعدّة (وضعيات حقيقية)' : lang === 'en' ? 'Scripted Dialogues (Real Situations)' : 'Dialogues scénarisés (Situations réelles)';
-  const dialoguesDesc = isAr ? 'تدرّب على مواقف يومية حقيقية مع تصحيح تلقائي' : lang === 'en' ? 'Practice real everyday situations with automatic correction' : 'Entraîne-toi sur des situations réelles avec correction automatique';
-  const exploreTitle = isAr ? 'استكشف المزيد' : lang === 'en' ? 'Explore More' : 'Explorer plus';
+  const dialoguesTitle = sc.dialoguesTitle;
+  const dialoguesDesc = sc.dialoguesDesc;
+  const exploreTitle = sc.exploreMore;
 
   const scenarioCategoryIcon = (category: string) => {
     switch (category) {
@@ -63,10 +65,10 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
   };
 
   const explorerLinks = [
-    { href: '/etudier', icon: GraduationCap, label: isAr ? 'المسار الكامل (7 وحدات)' : lang === 'en' ? 'Full Curriculum (7 modules)' : 'Parcours complet (7 modules)' },
-    { href: '/grammaire', icon: Table2, label: isAr ? 'القواعد والتصريف' : lang === 'en' ? 'Grammar & Conjugation' : 'Grammaire & Conjugaison' },
-    { href: '/parler', icon: Mic, label: isAr ? 'تدريب النطق' : lang === 'en' ? 'Pronunciation Trainer' : 'Entraînement de prononciation' },
-    { href: '/revisions', icon: Layers, label: isAr ? 'المراجعات والبطاقات' : lang === 'en' ? 'Reviews & Card Decks' : 'Révisions & Paquets de cartes' },
+    { href: '/etudier', icon: GraduationCap, label: sc.fullPath },
+    { href: '/grammaire', icon: Table2, label: sc.grammar },
+    { href: '/parler', icon: Mic, label: sc.pronunciation },
+    { href: '/revisions', icon: Layers, label: sc.revisions },
   ];
 
   return (
@@ -106,7 +108,7 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
                 <WifiOff className="w-8 h-8" />
               </div>
               <h3 className="font-serif text-xl font-bold text-[#1B2A4A] mb-2">
-                {isAr ? 'يلزم الاتصال بالإنترنت' : lang === 'en' ? 'Internet Connection Required' : 'Connexion Internet Requise'}
+                {sc.internetRequired}
               </h3>
               <p className="text-xs text-[#7A7670] mb-6 max-w-md leading-relaxed">
                 {isAr 
@@ -120,7 +122,7 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
                   onClick={() => setOfflineAlertPersona(null)}
                   className="px-5 py-2.5 rounded-full text-xs font-bold text-[#7A7670] bg-[#FDFCF8] border border-[#E8E2D5] hover:bg-[#E8E2D5]/50 transition-colors"
                 >
-                  {isAr ? 'رجوع' : lang === 'en' ? 'Back' : 'Retour'}
+                  {sc.back}
                 </button>
                 {onStartSrs && (
                   <button 
@@ -131,7 +133,7 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
                     className="px-5 py-2.5 rounded-full text-xs font-bold text-[#1B2A4A] bg-[#C9A05C] hover:bg-[#b88f4b] transition-colors flex items-center gap-2 shadow-xs"
                   >
                     <BookOpen className="w-4 h-4" />
-                    <span>{isAr ? 'بدء المراجعة' : lang === 'en' ? 'Start SRS Review' : 'Lancer une révision SRS'}</span>
+                    <span>{sc.launchSrs}</span>
                   </button>
                 )}
               </div>

@@ -58,7 +58,7 @@ export default function SRSDashboard() {
       {/* Kicker */}
       <div className="flex items-center gap-2 text-[#C9A05C] text-xs font-bold tracking-[0.25em] uppercase mb-2">
         <span>—</span>
-        <span>Répétition Espacée</span>
+        <span>{t.modules.srs.spacedRepetition}</span>
       </div>
 
       {/* Title */}

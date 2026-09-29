@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { DialogueTurn } from '../../types/dialogue';
 import { Mic, Square, MessageSquareText } from 'lucide-react';
-import { useAppStore } from '../../store/useAppStore';
+import { useAppStore, useTranslation } from '../../store/useAppStore';
 
 interface DialogueUserInputProps {
   turn: DialogueTurn;
@@ -20,6 +20,7 @@ export default function DialogueUserInput({
   skipTurn, 
   validationError 
 }: DialogueUserInputProps) {
+  const { t } = useTranslation();
   const { preferredNotation } = useAppStore();
   const [showHelper, setShowHelper] = useState(false);
 
@@ -69,7 +70,7 @@ export default function DialogueUserInput({
         </button>
 
         <p className={`text-sm font-medium ${isListening ? 'text-red-500 animate-pulse' : 'text-slate-500'}`}>
-          {isListening ? 'Écoute en cours...' : 'Maintenez ou touchez pour parler'}
+          {isListening ? t.modules.ui.listeningNow : t.modules.ui.holdToTalk}
         </p>
 
         <button 

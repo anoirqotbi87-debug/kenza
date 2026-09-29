@@ -128,9 +128,9 @@ export default function SpeechTrainer() {
     const evalResult = calculateSimilarity(spokenText, currentExercise.arabizi, currentExercise.arabic);
     const score = evalResult.score;
     
-    let feedback = 'Continuez à vous entraîner !';
-    if (score > 80) feedback = 'Excellente prononciation !';
-    else if (score > 50) feedback = 'Très compréhensible, bien joué !';
+    let feedback: string = t.modules.speech.keepPracticing;
+    if (score > 80) feedback = t.modules.speech.excellent;
+    else if (score > 50) feedback = t.modules.speech.veryClear;
 
     setEvaluation({
       score,
@@ -223,7 +223,7 @@ export default function SpeechTrainer() {
               <button 
                 onClick={() => playAudio(currentExercise.arabizi, currentExercise.arabic, soundEnabled)}
                 className="mt-6 mx-auto w-11 h-11 bg-[#1B2A4A] text-[#FDFCF8] rounded-full flex items-center justify-center shadow-md hover:bg-[#1B2A4A]/90 hover:scale-105 transition-all"
-                title="Écouter le modèle"
+                title={t.modules.speech.listenModel}
               >
                 <Volume2 className="w-5 h-5 text-[#C9A05C]" />
               </button>
@@ -242,12 +242,12 @@ export default function SpeechTrainer() {
               </button>
               
               <div className="text-xs font-bold text-[#7A7670]">
-                {isListening ? 'Écoute en cours...' : 'Appuyez sur le micro pour parler'}
+                {isListening ? t.modules.speech.listening : t.modules.speech.pressMic}
               </div>
 
               {transcript && (
                 <div className="mt-3 p-4 bg-[#F7F3EA] rounded-2xl max-w-md w-full text-center border border-[#E8E2D5]">
-                  <div className="text-xs text-[#7A7670] mb-1">Reconnaissance vocale :</div>
+                  <div className="text-xs text-[#7A7670] mb-1">{t.modules.speech.speechRecognition}</div>
                   <div className="font-arabic text-xl text-[#1B2A4A]">{transcript}</div>
                 </div>
               )}

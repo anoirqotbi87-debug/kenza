@@ -5,7 +5,7 @@ import { useChat, Message } from 'ai/react';
 import { PersonaId, personas } from '@/lib/ai/prompts';
 import { useVoiceRecognition } from '@/hooks/useVoiceRecognition';
 import { Send, Mic, MicOff, Save, Loader2, RefreshCw } from 'lucide-react';
-import { useAppStore } from '@/store/useAppStore';
+import { useAppStore, useTranslation } from '@/store/useAppStore';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/lib/supabase';
 import PaywallModal from '@/components/monetization/PaywallModal';
@@ -65,6 +65,8 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
   }, []);
   const persona = personas[personaId];
   const { addCustomWordToSRS } = useAppStore();
+  const { t } = useTranslation();
+  const rp = t.modules.roleplay;
   const [showImmersion, setShowImmersion] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -133,7 +135,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
       illustration: { iconName: personaId === 'taxi' ? 'Car' : personaId === 'cafe' ? 'Coffee' : 'ShoppingBag' }
     });
     
-    setToastMessage("Expression ajoutée au carnet SRS !");
+    setToastMessage(rp.addedToSrs);
     setTimeout(() => setToastMessage(null), 3000);
   };
 
@@ -224,7 +226,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
                     <button 
                       onClick={() => handleSaveToSRS(ar, arz, fr)}
                       className="absolute -right-3 -top-3 bg-[#FDFCF8] border border-[#E8E2D5] text-[#C9A05C] rounded-full p-1.5 shadow-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity hover:bg-[#C9A05C]/15 hover:scale-110"
-                      title="Sauvegarder dans mon carnet (SRS)"
+                      title={rp.saveToSrs}
                     >
                       <Save className="w-4 h-4" />
                     </button>
@@ -249,7 +251,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
         
         {messages.length >= 8 ? (
           <div className="flex flex-col items-center gap-3">
-            <p className="text-sm font-bold text-[#7A9174]">Mission accomplie ! Vous avez tenu la conversation.</p>
+            <p className="text-sm font-bold text-[#7A9174]">{rp.missionComplete}</p>
             <button
               onClick={() => {
                 useAppStore.getState().addXp(25);
@@ -257,7 +259,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
               }}
               className="w-full max-w-sm py-3.5 bg-[#7A9174] hover:bg-[#687f63] text-white rounded-full font-bold transition-colors shadow-xs"
             >
-              Récupérer mes +25 XP et Quitter
+              {rp.claimXp}
             </button>
           </div>
         ) : (
@@ -281,7 +283,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
               className="flex-1 bg-[#F7F3EA] border border-[#E8E2D5] rounded-full px-5 py-3 text-sm text-[#1B2A4A] placeholder-[#7A7670]/60 focus:outline-none focus:ring-2 focus:ring-[#C9A05C] transition-colors"
               value={input}
               onChange={handleInputChange}
-              placeholder={isListening ? "Écoute en cours (parlez)..." : "Votre message en Darija ou Français..."}
+              placeholder={isListening ? rp.listeningSpeak : rp.inputPlaceholder}
               disabled={isLoading && !isListening}
             />
             

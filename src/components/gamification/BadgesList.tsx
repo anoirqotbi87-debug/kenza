@@ -3,10 +3,10 @@ import { useAppStore, useTranslation } from '../../store/useAppStore';
 import { Coffee, CarFront, Store, Globe2 } from 'lucide-react';
 
 const availableBadges = [
-  { id: 'cafe_master', nameKey: 'badgeCafeMaster', description: 'Terminer la leçon du café', icon: Coffee, color: 'text-amber-600', bg: 'bg-amber-100' },
-  { id: 'taxi_ace', nameKey: 'badgeTaxiAce', description: 'Gérer le petit taxi avec succès', icon: CarFront, color: 'text-blue-600', bg: 'bg-blue-100' },
-  { id: 'souk_nego', nameKey: 'badgeSoukNego', description: 'Maîtriser le marchandage', icon: Store, color: 'text-green-600', bg: 'bg-green-100' },
-  { id: 'polyglot', nameKey: 'badgePolyglot', description: 'Gagner 500 XP', icon: Globe2, color: 'text-purple-600', bg: 'bg-purple-100' },
+  { id: 'cafe_master', nameKey: 'badgeCafeMaster', descKey: 'cafeLesson', icon: Coffee, color: 'text-amber-600', bg: 'bg-amber-100' },
+  { id: 'taxi_ace', nameKey: 'badgeTaxiAce', descKey: 'taxi', icon: CarFront, color: 'text-blue-600', bg: 'bg-blue-100' },
+  { id: 'souk_nego', nameKey: 'badgeSoukNego', descKey: 'souk', icon: Store, color: 'text-green-600', bg: 'bg-green-100' },
+  { id: 'polyglot', nameKey: 'badgePolyglot', descKey: 'earnXp', icon: Globe2, color: 'text-purple-600', bg: 'bg-purple-100' },
 ];
 
 export default function BadgesList() {
@@ -27,7 +27,7 @@ export default function BadgesList() {
             <div 
               key={badge.id}
               className={`flex flex-col items-center text-center p-4 rounded-2xl border transition-all ${isUnlocked ? 'border-slate-200 bg-slate-50' : 'border-dashed border-slate-200 opacity-50 grayscale'}`}
-              title={badge.description}
+              title={t.modules.badges[badge.descKey as keyof typeof t.modules.badges]}
             >
               <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-3 ${isUnlocked ? badge.bg : 'bg-slate-100'}`}>
                 <Icon className={`w-8 h-8 ${isUnlocked ? badge.color : 'text-slate-400'}`} />

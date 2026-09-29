@@ -22,24 +22,7 @@ interface ExerciseRunnerProps {
 }
 
 export default function ExerciseRunner({ lesson, onComplete, onClose }: ExerciseRunnerProps) {
-  if (!lesson || !lesson.steps || lesson.steps.length === 0) {
-    console.error("[ExerciseRunner Crash Guard] Leçon manquante ou sans steps :", lesson);
-    return (
-      <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl p-6 max-w-md w-full text-center shadow-xl">
-          <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">⚠️</div>
-          <h3 className="text-lg font-bold text-slate-800 mb-2">Leçon indisponible</h3>
-          <p className="text-sm text-slate-500 mb-4">
-            La leçon demandée ({lesson?.id || 'ID inconnu'}) n'a pas pu être chargée ou ne contient aucune étape.
-          </p>
-          <button onClick={onClose} className="w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl hover:bg-blue-700">
-            Retour au Dashboard
-          </button>
-        </div>
-      </div>
-    );
-  }
-
+  // --- Tous les hooks sont appelés inconditionnellement (règles des Hooks React) ---
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isAnswerChecked, setIsAnswerChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -57,6 +40,24 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
   const [isLessonFinished, setIsLessonFinished] = useState(false);
 
   const { preferredNotation, addXp, soundEnabled, audioSpeed, setAudioSpeed } = useAppStore();
+
+  // --- Crash guard placé APRÈS tous les hooks (règles des Hooks React) ---
+  if (!lesson || !Array.isArray(lesson.steps) || lesson.steps.length === 0) {
+    console.error("[ExerciseRunner Crash Guard] Leçon manquante ou sans steps :", lesson);
+    return (
+      <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl p-6 max-w-md w-full text-center shadow-xl">
+          <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">⚠️</div>
+          <h3 className="text-lg font-bold text-slate-800 mb-2">{t.lessons.unavailable}</h3>
+          <p className="text-sm text-slate-500 mb-4">{t.lessons.unavailableDesc}</p>
+          <button onClick={onClose} className="w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl hover:bg-blue-700">
+            {t.lessons.backToDashboard}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const step = lesson.steps[currentStepIndex];
   const progress = ((currentStepIndex) / lesson.steps.length) * 100;
 
@@ -324,7 +325,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose }: Exercise
           <button 
             onClick={() => setAudioSpeed(audioSpeed === 1.0 ? 0.75 : 1.0)}
             className="text-[#7A7670] hover:text-[#1B2A4A] font-bold bg-[#F7F3EA] hover:bg-[#E8E2D5]/70 border border-[#E8E2D5] px-3 py-1 rounded-full text-xs transition-colors"
-            title="Vitesse de lecture"
+            title={t.modules.ui.readingSpeed}
           >
             {audioSpeed}x
           </button>

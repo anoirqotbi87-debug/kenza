@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { useAppStore } from '../../store/useAppStore';
+import { useAppStore, useTranslation } from '../../store/useAppStore';
 import { getWordFromDictionary } from '../../data/srs-deck';
 import { getLocalizedText } from '../../lib/i18n/utils';
 import { Search, Plus, BookOpen, BrainCircuit, CheckCircle, Trash2, Edit2, Play, Mic, MessageCircle, Book } from 'lucide-react';
@@ -10,9 +10,11 @@ import CustomCardEditor from './CustomCardEditor';
 
 export default function DeckManagerView() {
   const { srsDeck, customVocabulary, deleteCustomWord, uiLanguage } = useAppStore();
+  const { t } = useTranslation();
   const rawLang = uiLanguage || 'fr';
   const lang = String(rawLang).toLowerCase() as any;
   const isAr = lang === 'ar' || lang.startsWith('ar');
+  const dk = t.modules.decks;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<'all' | 'due' | 'learning' | 'mastered'>('all');
@@ -92,7 +94,7 @@ export default function DeckManagerView() {
   }, [processedCards, activeFilter, searchQuery]);
 
   const handleDelete = (wordId: string) => {
-    if (confirm(isAr ? 'هل أنت متأكد أنك تريد حذف هذه البطاقة؟' : 'Voulez-vous vraiment supprimer cette carte ?')) {
+    if (confirm(dk.deleteConfirm)) {
       deleteCustomWord(wordId);
     }
   };
@@ -129,9 +131,9 @@ export default function DeckManagerView() {
 
   const getSourceLabel = (source: string) => {
     switch (source) {
-      case 'roleplay': return isAr ? 'محادثة' : 'Roleplay';
-      case 'manual': return isAr ? 'يدوي' : 'Manuel';
-      default: return isAr ? 'المنهج' : 'Module';
+      case 'roleplay': return dk.roleplay;
+      case 'manual': return dk.manual;
+      default: return dk.module;
     }
   };
 
@@ -144,10 +146,10 @@ export default function DeckManagerView() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
             <div>
               <h1 className="text-2xl font-bold text-slate-800">
-                {isAr ? 'مدير البطاقات' : 'Gestionnaire de Decks'}
+                {dk.title}
               </h1>
               <p className="text-slate-500 text-sm mt-1">
-                {processedCards.length} {isAr ? 'بطاقة في مجموعتك' : 'cartes dans votre collection'}
+                {processedCards.length} {dk.cardsInCollection}
               </p>
             </div>
             <button 
@@ -158,7 +160,7 @@ export default function DeckManagerView() {
               className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-xl shadow-md transition-all flex items-center gap-2"
             >
               <Plus className="w-5 h-5" />
-              {isAr ? 'كلمة جديدة' : 'Nouveau mot'}
+              {dk.newWord}
             </button>
           </div>
 
@@ -169,7 +171,7 @@ export default function DeckManagerView() {
             <input
               type="text"
               className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              placeholder={isAr ? 'ابحث عن كلمة...' : 'Rechercher un mot, une traduction...'}
+              placeholder={dk.searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -179,10 +181,10 @@ export default function DeckManagerView() {
         {/* Filters */}
         <div className="flex overflow-x-auto pb-4 mb-2 gap-2 hide-scrollbar">
           {[
-            { id: 'all', label: isAr ? 'الكل' : 'Tous', icon: BookOpen },
-            { id: 'due', label: isAr ? 'للمراجعة اليوم' : 'À réviser', icon: Clock },
-            { id: 'learning', label: isAr ? 'في طور التعلم' : 'En apprentissage', icon: BrainCircuit },
-            { id: 'mastered', label: isAr ? 'مكتسب' : 'Acquis', icon: CheckCircle }
+            { id: 'all', label: dk.all, icon: BookOpen },
+            { id: 'due', label: dk.toReview, icon: Clock },
+            { id: 'learning', label: dk.learning, icon: BrainCircuit },
+            { id: 'mastered', label: dk.mastered, icon: CheckCircle }
           ].map(filter => {
             const Icon = filter.icon;
             const isActive = activeFilter === filter.id;
@@ -246,7 +248,7 @@ export default function DeckManagerView() {
                             ? 'text-slate-300 cursor-not-allowed'
                             : 'text-slate-400 hover:text-blue-600 hover:bg-blue-50'
                       }`}
-                      title={isOffline && !card.dictWord?.audioUrl ? (isAr ? 'الصوت غير متوفر بدون إنترنت' : 'Audio non disponible hors-ligne') : ''}
+                      title={isOffline && !card.dictWord?.audioUrl ? dk.audioOffline : ''}
                     >
                       <Play className="w-4 h-4" />
                     </button>
@@ -285,12 +287,12 @@ export default function DeckManagerView() {
               <Search className="w-8 h-8 text-slate-300" />
             </div>
             <h3 className="text-lg font-bold text-slate-700 mb-2">
-              {isAr ? 'لم يتم العثور على أي بطاقة' : 'Aucune carte trouvée'}
+              {dk.noCards}
             </h3>
             <p className="text-slate-500 max-w-sm mx-auto text-sm">
               {isAr 
                 ? 'جرب البحث بكلمة أخرى أو قم بتغيير الفلاتر.' 
-                : 'Essayez un autre mot-clé ou modifiez vos filtres de recherche.'}
+                : dk.noCardsDesc}
             </p>
           </div>
         )}

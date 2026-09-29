@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
-import { useAppStore } from '../../store/useAppStore';
+import { useAppStore, useTranslation } from '../../store/useAppStore';
 
 import { VocabularySRSData } from '../../types/srs';
 
@@ -11,6 +11,7 @@ interface CustomCardEditorProps {
 }
 
 export default function CustomCardEditor({ isOpen, onClose, cardToEdit }: CustomCardEditorProps) {
+  const { t } = useTranslation();
   const { addCustomWordToSRS, updateCustomWord, uiLanguage } = useAppStore();
   const rawLang = uiLanguage || 'fr';
   const lang = String(rawLang).toLowerCase();
@@ -150,7 +151,7 @@ export default function CustomCardEditor({ isOpen, onClose, cardToEdit }: Custom
             {/* Translation Field */}
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-1">
-                {isAr ? 'الترجمة' : 'Traduction'} <span className="text-red-500">*</span>
+                {t.modules.ui.translationLabel} <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -179,11 +180,11 @@ export default function CustomCardEditor({ isOpen, onClose, cardToEdit }: Custom
             {/* Notes Field */}
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-1">
-                {isAr ? 'ملاحظات / سياق (اختياري)' : 'Notes / Contexte (optionnel)'}
+                {t.modules.ui.notesContext}
               </label>
               <textarea
                 className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none h-20"
-                placeholder={isAr ? 'مثال: سمعتها في المقهى...' : 'ex. Entendu au café, utile pour prendre congé.'}
+                placeholder={t.modules.ui.notePlaceholder}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
               />
@@ -197,7 +198,7 @@ export default function CustomCardEditor({ isOpen, onClose, cardToEdit }: Custom
               onClick={onClose}
               className="flex-1 px-4 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 transition-colors"
             >
-              {isAr ? 'إلغاء' : 'Annuler'}
+              {t.common.cancel}
             </button>
             <button
               type="submit"
@@ -205,8 +206,8 @@ export default function CustomCardEditor({ isOpen, onClose, cardToEdit }: Custom
               className="flex-1 px-4 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isEditMode 
-                ? (isAr ? 'حفظ التعديلات' : 'Enregistrer') 
-                : (isAr ? 'أضف للمراجعة' : 'Ajouter à mes révisions')}
+                ? t.common.save
+                : t.modules.ui.addToReviews}
             </button>
           </div>
 

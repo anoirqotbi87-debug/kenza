@@ -3,6 +3,7 @@
 import React from 'react';
 import { VoiceEvaluationResult } from '../../utils/phonemeMatcher';
 import { Trophy, AlertCircle, RefreshCw, Volume2 } from 'lucide-react';
+import { useTranslation } from '../../store/useAppStore';
 
 interface VoiceFeedbackCardProps {
   evaluation: VoiceEvaluationResult | null;
@@ -11,6 +12,7 @@ interface VoiceFeedbackCardProps {
 }
 
 export default function VoiceFeedbackCard({ evaluation, onRetry, onListenModel }: VoiceFeedbackCardProps) {
+  const { t } = useTranslation();
   if (!evaluation) return null;
 
   const { score, targetPhonemes, transcript } = evaluation;
@@ -41,7 +43,7 @@ export default function VoiceFeedbackCard({ evaluation, onRetry, onListenModel }
           <Icon className="w-6 h-6 shrink-0" />
           <div>
             <div className="font-bold">{message}</div>
-            <div className="text-sm opacity-80">Précision : {score}%</div>
+            <div className="text-sm opacity-80">{t.modules.ui.accuracy} : {score}%</div>
           </div>
         </div>
         <div className="relative w-12 h-12">

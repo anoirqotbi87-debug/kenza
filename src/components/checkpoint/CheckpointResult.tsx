@@ -7,6 +7,7 @@ import { PassportData } from '../../utils/certificateGenerator';
 import { useCheckpointProgress } from '../../hooks/useCheckpointProgress';
 import { useAppStore } from '../../store/useAppStore';
 import { trackEvent } from '../../utils/analytics';
+import { getDateLocale } from '../../lib/i18n/utils';
 
 interface CheckpointResultProps {
   levelId: string;
@@ -21,7 +22,7 @@ export default function CheckpointResult({ levelId, levelName, score, totalQuest
   const percentage = Math.round((score / totalQuestions) * 100);
   const passed = percentage >= 80;
   
-  const { user } = useAppStore();
+  const { user, uiLanguage } = useAppStore();
   const { saveResult } = useCheckpointProgress();
 
   const levelCodeMap: Record<string, string> = {
@@ -35,7 +36,7 @@ export default function CheckpointResult({ levelId, levelName, score, totalQuest
   };
   const codeLevel = levelCodeMap[levelId] || levelId.toUpperCase();
   const passportId = `KNZ-${codeLevel}-${Math.floor(Math.random() * 9000) + 1000}`;
-  const dateStr = new Date().toLocaleDateString('fr-FR');
+  const dateStr = new Date().toLocaleDateString(getDateLocale(uiLanguage));
 
   const passportData: PassportData = {
     userName: user?.user_metadata?.username || user?.email?.split('@')[0] || 'INVITÉ',

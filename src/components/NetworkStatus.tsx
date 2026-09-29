@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { WifiOff, Wifi } from 'lucide-react';
 import { useNetwork } from '../hooks/useNetwork';
-import { useAppStore } from '../store/useAppStore';
+import { useAppStore, useTranslation } from '../store/useAppStore';
 
 export default function NetworkStatus() {
   const isOnline = useNetwork();
@@ -11,6 +11,7 @@ export default function NetworkStatus() {
   const [hasMounted, setHasMounted] = useState(false);
   const [wasOffline, setWasOffline] = useState(false);
   
+  const { t } = useTranslation();
   const rawLang = useAppStore((state) => state.uiLanguage || 'fr');
   const lang = String(rawLang).toLowerCase();
   const isAr = lang === 'ar' || lang.startsWith('ar');
@@ -34,17 +35,8 @@ export default function NetworkStatus() {
 
   if (!hasMounted) return null;
 
-  const offlineText = isAr 
-    ? 'وضع عدم الاتصال نشط — الوحدات والمراجعات متاحة بدون اتصال'
-    : lang === 'en' 
-      ? 'Offline Mode Active — Modules and SRS reviews available offline'
-      : 'Mode Hors-Ligne actif — Modules et révisions SRS disponibles sans connexion';
-
-  const onlineText = isAr 
-    ? 'تم استعادة الاتصال'
-    : lang === 'en'
-      ? 'Connection restored'
-      : 'Connexion rétablie';
+  const offlineText = t.modules.ui.offlineActive;
+  const onlineText = t.modules.ui.onlineRestored;
 
   if (!isOnline) {
     return (

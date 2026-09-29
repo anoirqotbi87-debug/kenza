@@ -36,6 +36,23 @@ export default function ConjugationTable() {
 
   const { lang } = useTranslation();
 
+  const gm = t.modules.grammar;
+  const localizePerson = (p: string) => {
+    const map: Record<string, string> = {
+      "Positif": gm.positive, "Négatif": gm.negative,
+      "À moi": gm.toMe, "À toi": gm.toYou, "À lui": gm.toHim,
+    };
+    return map[p] || p;
+  };
+  const localizeTranslation = (tr: string) => {
+    const map: Record<string, string> = {
+      "J'ai compris": gm.understood, "Je n'ai pas compris": gm.notUnderstood,
+      "Je mange": gm.iEat, "Je ne mange pas": gm.iDontEat,
+      "Je vais partir": gm.iWillGo, "Tu vas partir": gm.youWillGo,
+    };
+    return map[tr] || tr;
+  };
+
   const rules: Record<GrammarRule, RuleData> = {
     present: {
       title: { fr: "Le présent", en: "Present", es: "Presente", ar: "المضارع" },
@@ -127,7 +144,7 @@ export default function ConjugationTable() {
           {currentRule.examples.map((ex, idx) => (
             <div key={idx} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-orange-200 transition-colors">
               <div className="flex-1">
-                <div className="text-sm font-bold text-slate-400 mb-1">{ex.person}</div>
+                <div className="text-sm font-bold text-slate-400 mb-1">{localizePerson(ex.person)}</div>
                 <div className="flex flex-col">
                   {/* Arabizi logic with highlighting */}
                   {(preferredNotation === 'arabizi' || preferredNotation === 'duo') && (
@@ -144,7 +161,7 @@ export default function ConjugationTable() {
                     </div>
                   )}
                   {ex.translation && (
-                    <div className="text-slate-500 text-sm italic mt-1">{ex.translation}</div>
+                    <div className="text-slate-500 text-sm italic mt-1">{localizeTranslation(ex.translation)}</div>
                   )}
                 </div>
               </div>

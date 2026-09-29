@@ -166,7 +166,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
             <button 
               onClick={handlePlayAudio}
               className="absolute top-5 right-5 w-10 h-10 rounded-full bg-[#1B2A4A] text-[#FDFCF8] hover:bg-[#1B2A4A]/90 flex items-center justify-center shadow-xs transition-colors z-20"
-              title="Réécouter"
+              title={t.modules.srs.relisten}
             >
               <Volume2 className="w-4 h-4 text-[#C9A05C]" />
             </button>

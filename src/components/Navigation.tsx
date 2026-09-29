@@ -34,7 +34,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentTab, onTabChange 
     { 
       id: 'review', 
       aliases: ['review'],
-      label: (t as any).nav?.review || 'Réviser', 
+      label: (t as any).nav?.review || (t as any).modules?.ui?.navReview || 'Review', 
       icon: RotateCcw 
     },
   ] as const;

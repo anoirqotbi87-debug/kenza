@@ -15,7 +15,7 @@ interface CheckpointModalProps {
 }
 
 export default function CheckpointModal({ levelId, levelName, onClose }: CheckpointModalProps) {
-  const { lang } = useTranslation();
+  const { t, lang } = useTranslation();
   const { soundEnabled, preferredNotation, regionalVariant } = useAppStore();
   
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -245,7 +245,7 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
                 'bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] shadow-lg'}
             `}
           >
-            <span>{isAnswerChecked ? 'Continuer' : 'Vérifier'}</span>
+            <span>{isAnswerChecked ? t.common.continue : t.modules.ui.verify}</span>
             {isAnswerChecked && <ArrowRight className="w-4 h-4" />}
           </button>
         </div>

@@ -1,5 +1,7 @@
 import { supabase, withSessionRefresh } from '../lib/supabase';
 import { CheckpointResultData } from '../hooks/useCheckpointProgress';
+import { useAppStore } from '../store/useAppStore';
+import { getDateLocale } from '../lib/i18n/utils';
 
 /**
  * Service to handle synchronization of checkpoints to Supabase.
@@ -52,7 +54,7 @@ export const checkpointService = {
           levelName: `Palier ${row.checkpoint_id}`, // In real app, we'd map this properly
           score: row.score,
           passed: true,
-          date: new Date(row.passed_at).toLocaleDateString('fr-FR'),
+          date: new Date(row.passed_at).toLocaleDateString(getDateLocale(useAppStore.getState().uiLanguage)),
           passportId: row.certificate_code
         };
       });
