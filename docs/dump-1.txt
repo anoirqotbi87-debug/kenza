@@ -1,0 +1,500 @@
+1|'use client';
+2|
+3|import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
+4|import {
+5|  ArrowDownRight,
+6|  ArrowLeft,
+7|  ArrowRight,
+8|  Award,
+9|  Bookmark,
+10|  BookOpen,
+11|  Check,
+12|  CheckCircle2,
+13|  ChevronRight,
+14|  CircleHelp,
+15|  Compass,
+16|  Flame,
+17|  Globe,
+18|  Headphones,
+19|  Heart,
+20|  Home as HomeIcon,
+21|  Languages,
+22|  Leaf,
+23|  LockKeyhole,
+24|  Menu,
+25|  MessageCircle,
+26|  RotateCcw,
+27|  Search,
+28|  Sparkles,
+29|  Star,
+30|  Target,
+31|  Volume2,
+32|  X,
+33|  Crown,
+34|  Lock,
+35|} from "lucide-react";
+36|import type { LucideIcon } from "lucide-react";
+37|import { useAppStore, useTranslation } from "@/store/useAppStore";
+38|
+39|const tr = (fr: string, en: string, es: string, ar: string) => {
+40|  const lang = useAppStore.getState().uiLanguage;
+41|  return lang === "en" ? en : lang === "es" ? es : lang === "ar" ? ar : fr;
+42|};
+43|import { playAudio } from "@/lib/audio";
+44|import { supabase } from "@/lib/supabase";
+45|import { syncService } from "@/lib/syncService";
+46|import { useCheckpointProgress } from "@/hooks/useCheckpointProgress";
+47|import CheckpointModal from "@/components/checkpoint/CheckpointModal";
+48|import ScenarioSelectorModal from "@/components/dialogue/ScenarioSelectorModal";
+49|import AiRoleplayView from "@/components/dialogue/AiRoleplayView";
+50|import PaywallModal from "@/components/monetization/PaywallModal";
+51|import InstallPwaBanner from "@/components/pwa/InstallPwaBanner";
+52|import DarijaPassportCard from "@/components/certificate/DarijaPassportCard";
+53|import { PersonaId } from "@/lib/ai/prompts";
+54|import { srsVocabulary } from "@/data/srs-deck";
+55|
+56|export type View = "today" | "path" | "phrases" | "review" | "space";
+57|
+58|export type Question = {
+59|  prompt: string;
+60|  helper: string;
+61|  options: string[];
+62|  answer: string;
+63|  note: string;
+64|};
+65|
+66|export type Lesson = {
+67|  id: string;
+68|  title: string;
+69|  subtitle: string;
+70|  length: string;
+71|  status: "done" | "current" | "locked";
+72|  isPremium?: boolean;
+73|  questions: Question[];
+74|};
+75|
+76|export type Phrase = {
+77|  id: string;
+78|  category: string;
+79|  darija: string;
+80|  arabic: string;
+81|  meaning: string;
+82|  note: string;
+83|};
+84|
+85|const baseLessons: Lesson[] = [
+86|  {
+87|    id: "hello",
+88|    title: tr("Les premiers bonjours", "The first hellos", "Los primeros saludos", "أول التحيات"),
+89|    subtitle: tr("Saluer, se présenter, créer le lien", "Greet, introduce yourself, connect", "Saludar, presentarse, crear el vínculo", "التحية والتعاريف وبناء الرابط"),
+90|    length: "6 min",
+91|    status: "current",
+92|    questions: [
+93|      {
+94|        prompt: "Comment dit-on « bonjour » en darija ?",
+95|        helper: "Choisis la formule la plus naturelle.",
+96|        options: ["Salam", "Shukran", "Bslama"],
+97|        answer: "Salam",
+98|        note: "« Salam » veut dire paix. C’est le bonjour simple, chaleureux et passe-partout.",
+99|      },
+100|      {
+101|        prompt: "Tu rencontres quelqu’un pour la première fois. Que dis-tu ?",
+102|        helper: "Pense à une formule de bienvenue.",
+103|        options: ["Labas?", "Tsharrafna", "Afak"],
+104|        answer: "Tsharrafna",
+105|        note: "« Tsharrafna » signifie littéralement « enchanté·e ». Une belle façon de faire connaissance.",
+106|      },
+107|      {
+108|        prompt: "Que signifie « labas? »",
+109|        helper: "Une question qu’on entend partout.",
+110|        options: ["Où vas-tu ?", "Ça va ?", "À demain"],
+111|        answer: "Ça va ?",
+112|        note: "« Labas? » est le petit « ça va ? » du quotidien. On répond souvent « labas, hamdullah ».",
+113|      },
+114|    ],
+115|  },
+116|  {
+117|    id: "cafe",
+118|    title: "Au café du coin",
+119|    subtitle: "Commander un thé à la menthe",
+120|    length: "8 min",
+121|    status: "locked",
+122|    questions: [
+123|      {
+124|        prompt: "Comment demander un thé, s’il vous plaît ?",
+125|        helper: "Une formule utile au café.",
+126|        options: ["Atay, afak", "Fin ghadi?", "Smah liya"],
+127|        answer: "Atay, afak",
+128|        note: "« Atay, afak » : un thé, s’il vous plaît. « Afak » ajoute la politesse.",
+129|      },
+130|      {
+131|        prompt: "Qu’est-ce que « bghit » veut dire ?",
+132|        helper: "Un mot très pratique pour commander.",
+133|        options: ["Je voudrais", "J’ai faim", "C’est loin"],
+134|        answer: "Je voudrais",
+135|        note: "« Bghit » veut dire « je veux » ou « je voudrais », selon le contexte.",
+136|      },
+137|    ],
+138|  },
+139|  {
+140|    id: "medina",
+141|    title: "Se repérer dans la médina",
+142|    subtitle: "Demander son chemin sans stress",
+143|    length: "7 min",
+144|    status: "locked",
+145|    questions: [
+146|      {
+147|        prompt: "Comment demander « où est… ? »",
+148|        helper: "La phrase qui débloque une promenade.",
+149|        options: ["Fin kayn…?", "Chhal hadi?", "Mumkin…?"],
+150|        answer: "Fin kayn…?",
+151|        note: "« Fin kayn…? » signifie « où se trouve… ? ». Ajoute le lieu que tu cherches.",
+152|      },
+153|      {
+154|        prompt: "Que signifie « yallah » ?",
+155|        helper: "Un mot qu’on entend souvent.",
+156|        options: ["Allons-y", "Peut-être", "Merci beaucoup"],
+157|        answer: "Allons-y",
+158|        note: "« Yallah » invite à partir, à avancer, ou simplement à se lancer.",
+159|      },
+160|    ],
+161|  },
+162|  {
+163|    id: "marrakech",
+164|    title: "Négocier au souk de Marrakech",
+165|    subtitle: "Les nombres et les prix (Niveau A2)",
+166|    length: "9 min",
+167|    status: "locked",
+168|    isPremium: true,
+169|    questions: [
+170|      {
+171|        prompt: "Comment demander « Combien coûte ceci ? »",
+172|        helper: "Expression clé pour entamer la discussion.",
+173|        options: ["Bchhal hada?", "Fin mchiti?", "Labas 3lik?"],
+174|        answer: "Bchhal hada?",
+175|        note: "« Bchhal hada? » permet de demander le prix de n'importe quel article.",
+176|      },
+177|      {
+178|        prompt: "Que veut dire « Naqas chwiya 3afak » ?",
+179|        helper: "La formule cordiale de marchandage.",
+180|        options: ["Baisse un peu s'il te plaît", "Donne-moi deux verres", "C'est trop beau"],
+181|        answer: "Baisse un peu s'il te plaît",
+182|        note: "« Naqas chwiya » = réduis un peu. Utilisé avec le sourire !",
+183|      },
+184|    ],
+185|  },
+186|  {
+187|    id: "tanger",
+188|    title: "Voyage à Tanger (Chamali)",
+189|    subtitle: "Les subtilités régionales (Niveau B2)",
+190|    length: "10 min",
+191|    status: "locked",
+192|    isPremium: true,
+193|    questions: [
+194|      {
+195|        prompt: "À Tanger, comment dit-on « Qu'est-ce que tu veux ? »",
+196|        helper: "Remplace le standard « Chno bghiti ».",
+197|        options: ["Chni katchof?", "Chni katsaksi?", "Chni khassek?"],
+198|        answer: "Chni khassek?",
+199|        note: "Dans le nord (Chamali), on utilise « Chni » au lieu de « Chno ».",
+200|      },
+201|    ],
+202|  },
+203|];
+204|
+205|const defaultPhrases: Phrase[] = [
+206|  { id: "salam", category: "Saluer", darija: "Salam, labas?", arabic: "سلام، لاباس؟", meaning: "Salut, ça va ?", note: "La formule la plus simple pour ouvrir une conversation." },
+207|  { id: "bikhir", category: "Saluer", darija: "Labas, hamdullah.", arabic: "لاباس، الحمد لله.", meaning: "Ça va, merci / Dieu merci.", note: "La réponse classique à « labas? »." },
+208|  { id: "afak", category: "Au café", darija: "Wahed atay, afak.", arabic: "واحد أتاي، عفاك.", meaning: "Un thé, s’il vous plaît.", note: "« Wahed » = un, « atay » = thé, « afak » = s’il te plaît." },
+209|  { id: "bghit", category: "Au café", darija: "Bghit lma, afak.", arabic: "بغيت الما، عفاك.", meaning: "Je voudrais de l’eau, s’il vous plaît.", note: "Remplace « lma » par ce que tu aimerais commander." },
+210|  { id: "fin", category: "Se déplacer", darija: "Fin kayn souk?", arabic: "فين كاين السوق؟", meaning: "Où est le souk ?", note: "Utilise cette structure pour demander un lieu." },
+211|  { id: "shukran", category: "Les essentiels", darija: "Shukran bzaf!", arabic: "شكرا بزاف!", meaning: "Merci beaucoup !", note: "« Bzaf » signifie beaucoup — un mot qui sert partout." },
+212|  { id: "smah", category: "Les essentiels", darija: "Smah liya.", arabic: "سمح ليا.", meaning: "Excuse-moi / pardon.", note: "Pour attirer l’attention ou demander pardon, avec douceur." },
+213|  { id: "bslama", category: "Saluer", darija: "Bslama, nshawfek.", arabic: "بسلامة، نشوفك.", meaning: "Au revoir, à bientôt.", note: "Une façon amicale de prendre congé." },
+214|];
+215|
+216|const navItems: { id: View; label: string; icon: LucideIcon }[] = [
+217|  { id: "today", label: "Aujourd’hui", icon: HomeIcon },
+218|  { id: "path", label: "Mon parcours", icon: Compass },
+219|  { id: "phrases", label: "Carnet de phrases", icon: Bookmark },
+220|  { id: "review", label: tr("Révision du jour", "Today’s review", "Revisión del día", "مراجعة اليوم"), icon: Sparkles },
+221|];
+222|
+223|export default function Home() {
+224|  const [view, setView] = useState<View>("today");
+225|  const [lessonId, setLessonId] = useState<string | null>(null);
+226|  const [questionIndex, setQuestionIndex] = useState(0);
+227|  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+228|  const [search, setSearch] = useState("");
+229|  const [category, setCategory] = useState("Tout voir");
+230|  const [favoritesOnly, setFavoritesOnly] = useState(false);
+231|  const [favorites, setFavorites] = useState<string[]>([]);
+232|  const [reviewIndex, setReviewIndex] = useState(0);
+233|  const [cardFlipped, setCardFlipped] = useState(false);
+234|  const [toast, setToast] = useState("");
+235|  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+236|  const searchInputRef = useRef<HTMLInputElement>(null);
+237|
+238|  // Zustand Store Integration
+239|  const {
+240|    xp,
+241|    streakDays,
+242|    completedLessons,
+243|    addXp,
+244|    completeLesson,
+245|    user,
+246|    setUser,
+247|    resetData,
+248|    soundEnabled,
+249|    toggleSound,
+250|    isPremium,
+251|    setIsPremium,
+252|    uiLanguage,
+253|    setLanguage,
+254|  } = useAppStore();
+255|
+256|  const { t } = useTranslation();
+257|  const navLabel = (id: string) => {
+258|    const key =
+259|      id === "today" ? "home"
+260|      : id === "path" ? "parcours"
+261|      : id === "phrases" ? "phrasebook"
+262|      : id === "review" ? "review"
+263|      : null;
+264|    return key ? ((t as any).side?.[key] as string | undefined) : undefined;
+265|  };
+266|
+267|  const handleGoogleLogin = async () => {
+268|    try {
+269|      const { error } = await supabase.auth.signInWithOAuth({
+270|        provider: "google",
+271|        options: {
+272|          redirectTo: typeof window !== "undefined" ? window.location.origin : undefined,
+273|        },
+274|      });
+275|      if (error) throw error;
+276|    } catch {
+277|      showToast("Impossible d'initier la connexion Google.");
+278|    }
+279|  };
+280|
+281|  const [checkpointOpen, setCheckpointOpen] = useState<{ id: string; name: string } | null>(null);
+282|  const [showScenarioSelector, setShowScenarioSelector] = useState(false);
+283|  const [activePersonaId, setActivePersonaId] = useState<PersonaId | null>(null);
+284|  const [pricingSource, setPricingSource] = useState<string | null>(null);
+285|
+286|  // 1. Sécurisation absolue de favorites (Null-Safety)
+287|  useEffect(() => {
+288|    try {
+289|      const stored = localStorage.getItem("kenza_favorites");
+290|      if (stored) {
+291|        const parsed = JSON.parse(stored);
+292|        if (Array.isArray(parsed)) {
+293|          setFavorites(parsed);
+294|          return;
+295|        }
+296|      }
+297|    } catch {}
+298|    setFavorites([]);
+299|  }, []);
+300|
+301|  const saveFavorites = (next: string[]) => {
+302|    const safeNext = Array.isArray(next) ? next : [];
+303|    setFavorites(safeNext);
+304|    try {
+305|      localStorage.setItem("kenza_favorites", JSON.stringify(safeNext));
+306|    } catch {}
+307|  };
+308|
+309|  const safeFavorites = useMemo(() => {
+310|    return Array.isArray(favorites) ? favorites : [];
+311|  }, [favorites]);
+312|
+313|  // Auth sync
+314|  useEffect(() => {
+315|    supabase.auth.getSession().then(({ data: { session } }) => {
+316|      if (session?.user) setUser(session.user);
+317|    });
+318|
+319|    const {
+320|      data: { subscription },
+321|    } = supabase.auth.onAuthStateChange(async (event, session) => {
+322|      if (event === "SIGNED_IN" && session?.user) {
+323|        setUser(session.user);
+324|        await syncService.syncCloudToLocal(session.user.id);
+325|      } else if (event === "SIGNED_OUT") {
+326|        setUser(null);
+327|        resetData();
+328|      }
+329|    });
+330|
+331|    return () => subscription.unsubscribe();
+332|  }, [setUser, resetData]);
+333|
+334|  // Check URL params (e.g. Stripe callback)
+335|  useEffect(() => {
+336|    if (typeof window === "undefined") return;
+337|    const searchParams = new URLSearchParams(window.location.search);
+338|    const upgradeStatus = searchParams.get("upgrade");
+339|    if (upgradeStatus === "success") {
+340|      setIsPremium(true);
+341|      showToast("Félicitations ! Votre abonnement Kenza Pro est activé.");
+342|      window.history.replaceState({}, document.title, window.location.pathname);
+343|    }
+344|  }, [setIsPremium]);
+345|
+346|  useEffect(() => {
+347|    if (!toast) return;
+348|    const timer = window.setTimeout(() => setToast(""), 3500);
+349|    return () => window.clearTimeout(timer);
+350|  }, [toast]);
+351|
+352|  useEffect(() => {
+353|    const handleShortcut = (event: KeyboardEvent) => {
+354|      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+355|        event.preventDefault();
+356|        setView("phrases");
+357|        window.setTimeout(() => searchInputRef.current?.focus(), 60);
+358|      }
+359|    };
+360|    window.addEventListener("keydown", handleShortcut);
+361|    return () => window.removeEventListener("keydown", handleShortcut);
+362|  }, []);
+363|
+364|  useEffect(() => {
+365|    setMobileMenuOpen(false);
+366|    window.scrollTo({ top: 0, behavior: "smooth" });
+367|  }, [view]);
+368|
+369|  // 2. Adaptateur universel pour les phrases (Format Manus ↔ Format KENZA)
+370|  const allPhrases: Phrase[] = useMemo(() => {
+371|    const rawVocabulary = (srsVocabulary || []).slice(0, 40).map((w, idx) => {
+372|      let meaningText = "Expression en darija";
+373|      if (typeof (w as any).translation === "string") {
+374|        meaningText = (w as any).translation;
+375|      } else if ((w as any).translation && typeof (w as any).translation === "object") {
+376|        meaningText = (w as any).translation.fr || (w as any).translation.en || "Expression en darija";
+377|      } else if ((w as any).translations?.fr) {
+378|        meaningText = (w as any).translations.fr;
+379|      } else if (typeof (w as any).back === "string") {
+380|        meaningText = (w as any).back;
+381|      }
+382|
+383|      let cat = "Les essentiels";
+384|      if (w.category === "polite_social") cat = "Saluer";
+385|      else if (w.category === "food_drink") cat = "Au café";
+386|      else if (w.category === "directions") cat = "Se déplacer";
+387|      else if (w.category) cat = w.category;
+388|
+389|      return {
+390|        id: w.id || `vocab_${idx}`,
+391|        category: cat,
+392|        darija: w.arabizi || (w as any).front || "",
+393|        arabic: w.arabic || "",
+394|        meaning: meaningText,
+395|        note: (w.example?.arabizi ? `Ex: ${w.example.arabizi}` : "") || "Vocabulaire du quotidien avec audio naturel.",
+396|      };
+397|    });
+398|
+399|    const combined: any[] = [...defaultPhrases];
+400|    for (const v of rawVocabulary) {
+401|      if (v.darija && !combined.some((p) => (p.darija || p.front || "").toLowerCase() === (v.darija || "").toLowerCase())) {
+402|        combined.push(v);
+403|      }
+404|    }
+405|
+406|    return combined.map((p) => {
+407|      let meaningStr = "Expression en darija";
+408|      if (typeof p.meaning === "string") {
+409|        meaningStr = p.meaning;
+410|      } else if (p.meaning && typeof p.meaning === "object") {
+411|        meaningStr = p.meaning.fr || p.meaning.en || "";
+412|      } else if (typeof p.back === "string") {
+413|        meaningStr = p.back;
+414|      } else if (p.back && typeof p.back === "object") {
+415|        meaningStr = p.back.fr || p.back.en || "";
+416|      } else if (p.translation) {
+417|        meaningStr = typeof p.translation === "string" ? p.translation : p.translation.fr || p.translation.en || "";
+418|      }
+419|
+420|      return {
+421|        id: String(p.id || Math.random()),
+422|        category: String(p.category || "Les essentiels"),
+423|        darija: String(p.darija || p.front || p.arabizi || ""),
+424|        arabic: String(p.arabic || ""),
+425|        meaning: String(meaningStr || "Expression en darija"),
+426|        note: String(p.note || p.notes || ""),
+427|      };
+428|    });
+429|  }, []);
+430|
+431|  const completedCount = completedLessons.length;
+432|  const nextLesson =
+433|    baseLessons.find((lesson) => !completedLessons.includes(lesson.id)) ??
+434|    baseLessons[baseLessons.length - 1];
+435|  const activeLesson = baseLessons.find((lesson) => lesson.id === lessonId) ?? null;
+436|  const activeQuestion = activeLesson?.questions[questionIndex] ?? null;
+437|
+438|  // 4. Sécurisation de la liste des catégories
+439|  const categories = useMemo(() => {
+440|    return ["Tout voir", ...Array.from(new Set(allPhrases.map((phrase) => phrase.category).filter(Boolean)))];
+441|  }, [allPhrases]);
+442|
+443|  // 3. Sécurisation de la recherche textuelle
+444|  const filteredPhrases = useMemo(() => {
+445|    const searchLower = (search || "").toLowerCase().trim();
+446|    return allPhrases.filter((phrase) => {
+447|      const matchesCategory = category === "Tout voir" || phrase.category === category;
+448|      const searchTarget = `${phrase.darija || ""} ${phrase.arabic || ""} ${phrase.meaning || ""} ${phrase.category || ""}`.toLowerCase();
+449|      const matchesSearch = !searchLower || searchTarget.includes(searchLower);
+450|      const matchesFavorite = !favoritesOnly || safeFavorites.includes(phrase.id);
+451|      return matchesCategory && matchesSearch && matchesFavorite;
+452|    });
+453|  }, [category, search, favoritesOnly, safeFavorites, allPhrases]);
+454|
+455|  const showToast = (message: string) => setToast(message);
+456|
+457|  const startLesson = (id: string) => {
+458|    const lesson = baseLessons.find((item) => item.id === id);
+459|    if (!lesson) return;
+460|
+461|    // Premium gating check
+462|    if (lesson.isPremium && !isPremium) {
+463|      setPricingSource("module_locked");
+464|      return;
+465|    }
+466|
+467|    const index = baseLessons.findIndex((item) => item.id === id);
+468|    const canStart =
+469|      index === 0 ||
+470|      completedLessons.includes(baseLessons[index - 1].id) ||
+471|      completedLessons.includes(id);
+472|
+473|    if (!canStart) {
+474|      showToast("Termine la leçon précédente pour continuer ton parcours.");
+475|      return;
+476|    }
+477|
+478|    setLessonId(id);
+479|    setQuestionIndex(0);
+480|    setSelectedAnswer(null);
+481|  };
+482|
+483|  const advanceQuestion = () => {
+484|    if (!activeLesson || !activeQuestion || !selectedAnswer) return;
+485|    if (questionIndex < activeLesson.questions.length - 1) {
+486|      setQuestionIndex((current) => current + 1);
+487|      setSelectedAnswer(null);
+488|      return;
+489|    }
+490|
+491|    const firstCompletion = !completedLessons.includes(activeLesson.id);
+492|    if (firstCompletion) {
+493|      completeLesson(activeLesson.id);
+494|      addXp(activeLesson.questions.length * 10);
+495|    }
+496|
+497|    setLessonId(null);
+498|    setSelectedAnswer(null);
+499|    showToast(
+500|      firstCompletion

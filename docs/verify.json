@@ -1,5 +1,5 @@
 {
-  "ts": "2026-09-29T00:10:42.142Z",
+  "ts": "2026-09-29T00:15:38.992Z",
   "appliedThisRun": 0,
   "already": 88,
   "missing": [
@@ -48,18 +48,6 @@
       "ok": true
     },
     {
-      "s": "tr(\"Continuer à apprendre\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"C’est parti\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"Terminer la leçon\"",
-      "ok": true
-    },
-    {
       "s": "tr(\"Voir mon espace\"",
       "ok": true
     },
@@ -68,27 +56,7 @@
       "ok": true
     },
     {
-      "s": "tr(\"Vocabulaire essentiel\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"Cartes du jour\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"Au café, en taxi\"",
-      "ok": true
-    },
-    {
       "s": "tr(\"rythme régulier\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"jour\", \"day\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"darija, la langue du lien\"",
       "ok": true
     },
     {
@@ -100,23 +68,7 @@
       "ok": true
     },
     {
-      "s": "tr(\"Ton carnet\", \"Your phrase\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"Faire une\", \"Do a quick\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"Mises en\", \"Real-life\"",
-      "ok": true
-    },
-    {
       "s": "tr(\"Les premiers bonjours\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"Saluer, se présenter, créer le lien\"",
       "ok": true
     }
   ]

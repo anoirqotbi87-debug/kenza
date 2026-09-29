@@ -1,0 +1,466 @@
+1501|      </aside>
+1502|    </div>
+1503|  );
+1504|}
+1505|
+1506|// -------------------------------------------------------------
+1507|// Composant 3 : PhrasesView
+1508|// -------------------------------------------------------------
+1509|function PhrasesView({
+1510|  search,
+1511|  searchInputRef,
+1512|  setSearch,
+1513|  category,
+1514|  setCategory,
+1515|  categories,
+1516|  phrases: visiblePhrases,
+1517|  favorites = [],
+1518|  favoritesOnly,
+1519|  setFavoritesOnly,
+1520|  onFavorite,
+1521|  onPlay,
+1522|  onCopy,
+1523|}: {
+1524|  search: string;
+1525|  searchInputRef: RefObject<HTMLInputElement | null>;
+1526|  setSearch: (value: string) => void;
+1527|  category: string;
+1528|  setCategory: (value: string) => void;
+1529|  categories: string[];
+1530|  phrases: Phrase[];
+1531|  favorites?: string[];
+1532|  favoritesOnly: boolean;
+1533|  setFavoritesOnly: (value: boolean) => void;
+1534|  onFavorite: (id: string) => void;
+1535|  onPlay: (darija: string, arabic: string) => void;
+1536|  onCopy: (phrase: Phrase) => void;
+1537|}) {
+1538|  const safeFavorites = Array.isArray(favorites) ? favorites : [];
+1539|  const safePhrases = Array.isArray(visiblePhrases) ? visiblePhrases : [];
+1540|
+1541|  return (
+1542|    <>
+1543|      <section className="phrase-toolbar">
+1544|        <label className="phrase-search">
+1545|          <Search size={17} />
+1546|          <input
+1547|            ref={searchInputRef}
+1548|            value={search}
+1549|            onChange={(event) => setSearch(event.target.value)}
+1550|            placeholder="Chercher une expression…"
+1551|            aria-label="Chercher une expression"
+1552|          />
+1553|          <kbd>⌘ K</kbd>
+1554|        </label>
+1555|        <button
+1556|          className={`favorites-filter ${favoritesOnly ? "filter-active" : ""}`}
+1557|          onClick={() => setFavoritesOnly(!favoritesOnly)}
+1558|        >
+1559|          <Heart size={15} fill={favoritesOnly ? "currentColor" : "none"} /> Mes favoris{" "}
+1560|          <span>{safeFavorites.length}</span>
+1561|        </button>
+1562|      </section>
+1563|
+1564|      <div className="category-tabs" role="tablist" aria-label="Catégories de phrases">
+1565|        {(categories || []).map((item) => (
+1566|          <button
+1567|            role="tab"
+1568|            aria-selected={category === item}
+1569|            key={item}
+1570|            className={category === item ? "category-active" : ""}
+1571|            onClick={() => setCategory(item)}
+1572|          >
+1573|            {item}
+1574|          </button>
+1575|        ))}
+1576|      </div>
+1577|
+1578|      <div className="phrase-section-top">
+1579|        <div>
+1580|          <span className="mini-kicker">{tr("À PORTÉE DE MAIN", "AT HAND", "A MANO", "في متناول اليد")}</span>
+1581|          <h2>
+1582|            {favoritesOnly
+1583|              ? "Tes phrases favorites"
+1584|              : category === "Tout voir"
+1585|              ? "Les expressions du quotidien"
+1586|              : category}
+1587|          </h2>
+1588|        </div>
+1589|        <span className="phrase-count">
+1590|          {safePhrases.length} expression{safePhrases.length === 1 ? "" : "s"}
+1591|        </span>
+1592|      </div>
+1593|
+1594|      {safePhrases.length > 0 ? (
+1595|        <div className="phrase-grid">
+1596|          {safePhrases.map((phrase, index) => {
+1597|            const isFav = safeFavorites.includes(phrase.id);
+1598|            const darijaText = phrase.darija || "";
+1599|            const arabicText = phrase.arabic || "";
+1600|            const meaningText = phrase.meaning || "";
+1601|            const categoryText = phrase.category || "Les essentiels";
+1602|
+1603|            return (
+1604|              <article className="phrase-card" key={phrase.id}>
+1605|                <div className="phrase-card-top">
+1606|                  <span className="phrase-category">{categoryText}</span>
+1607|                  <button
+1608|                    className={`heart-button ${isFav ? "heart-active" : ""}`}
+1609|                    onClick={() => onFavorite(phrase.id)}
+1610|                    aria-label={
+1611|                      isFav ? "Retirer des favoris" : "Ajouter aux favoris"
+1612|                    }
+1613|                  >
+1614|                    <Heart size={17} fill={isFav ? "currentColor" : "none"} />
+1615|                  </button>
+1616|                </div>
+1617|                <span className="phrase-index">0{index + 1}</span>
+1618|                <h3>{darijaText}</h3>
+1619|                {arabicText ? (
+1620|                  <span className="phrase-arabic" dir="rtl">
+1621|                    {arabicText}
+1622|                  </span>
+1623|                ) : null}
+1624|                <div className="phrase-divider" />
+1625|                <p className="phrase-meaning">{meaningText}</p>
+1626|                {phrase.note ? <p className="phrase-note">{phrase.note}</p> : null}
+1627|                <div className="phrase-actions">
+1628|                  <button onClick={() => onPlay(darijaText, arabicText)}>
+1629|                    <Volume2 size={15} /> Écouter
+1630|                  </button>
+1631|                  <button onClick={() => onCopy(phrase)}>
+1632|                    <Bookmark size={14} /> Copier
+1633|                  </button>
+1634|                </div>
+1635|              </article>
+1636|            );
+1637|          })}
+1638|        </div>
+1639|      ) : (
+1640|        <div className="empty-state">
+1641|          <span className="empty-symbol">
+1642|            <Search size={22} />
+1643|          </span>
+1644|          <h3>{tr("Aucune phrase trouvée", "No phrase found", "Ninguna frase encontrada", "لا توجد عبارات")}</h3>
+1645|          <p>{tr("Essaie un autre mot ou change de catégorie.", "Try another word or category.", "Prueba otra palabra o categoría.", "جرّب كلمة أو فئة أخرى.")}</p>
+1646|          <button
+1647|            className="plain-link"
+1648|            onClick={() => {
+1649|              setSearch("");
+1650|              setCategory("Tout voir");
+1651|              setFavoritesOnly(false);
+1652|            }}
+1653|          >
+1654|            Effacer les filtres <ArrowRight size={14} />
+1655|          </button>
+1656|        </div>
+1657|      )}
+1658|
+1659|      <div className="phrase-footnote">
+1660|        <span className="privacy-dot" /> Synthèse vocale naturelle haute fidélité (Edge TTS) avec
+1661|        cache hors-ligne intégré.
+1662|      </div>
+1663|    </>
+1664|  );
+1665|}
+1666|
+1667|// -------------------------------------------------------------
+1668|// Composant 4 : ReviewView (Flashcards SRS)
+1669|// -------------------------------------------------------------
+1670|function ReviewView({
+1671|  reviewIndex,
+1672|  cardFlipped,
+1673|  setCardFlipped,
+1674|  onGrade,
+1675|}: {
+1676|  reviewIndex: number;
+1677|  cardFlipped: boolean;
+1678|  setCardFlipped: (value: boolean) => void;
+1679|  onGrade: (grade: "again" | "hard" | "good" | "easy") => void;
+1680|}) {
+1681|  const cards = [
+1682|    {
+1683|      front: "Merci beaucoup",
+1684|      back: "Shukran bzaf",
+1685|      arabic: "شكرا بزاف!",
+1686|      hint: "Un petit mot chaleureux qui ouvre toutes les portes.",
+1687|    },
+1688|    {
+1689|      front: "Où est le souk ?",
+1690|      back: "Fin kayn souk?",
+1691|      arabic: "فين كاين السوق؟",
+1692|      hint: "Pour trouver ton chemin dans la médina.",
+1693|    },
+1694|    {
+1695|      front: "S’il vous plaît",
+1696|      back: "Afak",
+1697|      arabic: "عفاك",
+1698|      hint: "Un mot simple pour rendre tes demandes plus douces.",
+1699|    },
+1700|    {
+1701|      front: "Au revoir, à bientôt",
+1702|      back: "Bslama, nshawfek",
+1703|      arabic: "بسلامة، نشوفك",
+1704|      hint: "Une manière chaleureuse de se dire à bientôt.",
+1705|    },
+1706|    {
+1707|      front: "Je voudrais un thé",
+1708|      back: "Bghit wahed atay, afak",
+1709|      arabic: "بغيت واحد أتاي، عفاك",
+1710|      hint: "Pour savourer un moment au café.",
+1711|    },
+1712|  ];
+1713|
+1714|  const card = cards[reviewIndex % cards.length];
+1715|
+1716|  return (
+1717|    <div className="review-layout">
+1718|      <section className="review-main">
+1719|        <div className="review-card-top">
+1720|          <span className="mini-kicker">
+1721|            CARTE {String((reviewIndex % cards.length) + 1).padStart(2, "0")} <i>/</i> 0{cards.length}
+1722|          </span>
+1723|          <span className="review-session">
+1724|            <Sparkles size={14} /> Session tranquille
+1725|          </span>
+1726|        </div>
+1727|        <button
+1728|          className={`flashcard ${cardFlipped ? "flashcard-flipped" : ""}`}
+1729|          onClick={() => setCardFlipped(!cardFlipped)}
+1730|          aria-label={cardFlipped ? "Voir la question" : "Retourner la carte"}
+1731|        >
+1732|          <span className="flashcard-decoration decor-top">✳</span>
+1733|          <span className="flashcard-label">{cardFlipped ? "EN DARIJA" : "EN FRANÇAIS"}</span>
+1734|          {cardFlipped ? (
+1735|            <>
+1736|              <strong className="flashcard-answer">{card.back}</strong>
+1737|              <span className="flashcard-arabic" dir="rtl">
+1738|                {card.arabic}
+1739|              </span>
+1740|              <p>{card.hint}</p>
+1741|            </>
+1742|          ) : (
+1743|            <>
+1744|              <strong className="flashcard-question">{card.front}</strong>
+1745|              <span className="flashcard-tap">
+1746|                <span className="rotate-symbol">↻</span> Touche pour révéler
+1747|              </span>
+1748|            </>
+1749|          )}
+1750|          <span className="flashcard-decoration decor-bottom">✳</span>
+1751|        </button>
+1752|
+1753|        <div className="review-hint">
+1754|          <CircleHelp size={15} />
+1755|          <span>{tr("Réponds dans ta tête, puis retourne la carte pour vérifier.", "Answer in your head, then flip the card.", "Responde en tu mente y gira la tarjeta.", "أجب في ذهنك ثم اقلب البطاقة.")}</span>
+1756|        </div>
+1757|
+1758|        <div className="review-ratings">
+1759|          <button className="rate-again" onClick={() => onGrade("again")}>
+1760|            <span>{tr("Encore", "Again", "Otra vez", "مرة أخرى")}</span>
+1761|            <small>+1 XP</small>
+1762|          </button>
+1763|          <button className="rate-hard" onClick={() => onGrade("hard")}>
+1764|            <span>{tr("Difficile", "Hard", "Difícil", "صعب")}</span>
+1765|            <small>+2 XP</small>
+1766|          </button>
+1767|          <button className="rate-good" onClick={() => onGrade("good")}>
+1768|            <span>{tr("Bien", "Good", "Bien", "جيد")}</span>
+1769|            <small>+3 XP</small>
+1770|          </button>
+1771|          <button className="rate-easy" onClick={() => onGrade("easy")}>
+1772|            <span>{tr("Facile", "Easy", "Fácil", "سهل")}</span>
+1773|            <small>+5 XP</small>
+1774|          </button>
+1775|        </div>
+1776|      </section>
+1777|
+1778|      <aside className="review-aside">
+1779|        <div className="review-aside-card">
+1780|          <span className="aside-icon">
+1781|            <Sparkles size={18} />
+1782|          </span>
+1783|          <span className="mini-kicker">{tr("SANS PRESSION", "NO PRESSURE", "SIN PRESIÓN", "بدون ضغط")}</span>
+1784|          <h3>{tr("Le bon rythme, c’est le tien.", "The right pace is yours.", "El buen ritmo es el tuyo.", "الإيقاع المناسب هو إيقاعك.")}</h3>
+1785|          <p>
+1786|            L'algorithme de répétition espacée (SRS) consolide ta mémoire à long terme. Chaque point
+1787|            d'XP nourrit ton passeport.
+1788|          </p>
+1789|          <div className="aside-divider" />
+1790|          <div className="review-method">
+1791|            <span className="method-dot" />
+1792|            <p>
+1793|              <strong>{tr("Petit conseil", "Quick tip", "Pequeño consejo", "نصيحة")}</strong>
+1794|              <br />
+1795|              Dis la phrase à voix haute. La mémoire aime les histoires qu’on raconte.
+1796|            </p>
+1797|          </div>
+1798|        </div>
+1799|        <div className="review-alphabet">
+1800|          <span>أ ب ت</span>
+1801|          <p>Écoute · Répète · Reviens</p>
+1802|        </div>
+1803|      </aside>
+1804|    </div>
+1805|  );
+1806|}
+1807|
+1808|// -------------------------------------------------------------
+1809|// Composant 5 : SpaceView (Mon Espace & Passeport)
+1810|// -------------------------------------------------------------
+1811|function SpaceView({
+1812|  completedCount,
+1813|  xp,
+1814|  streak,
+1815|  user,
+1816|  isPremium,
+1817|  onReset,
+1818|  onOpenPaywall,
+1819|  onToast,
+1820|}: {
+1821|  completedCount: number;
+1822|  xp: number;
+1823|  streak: number;
+1824|  user: any;
+1825|  isPremium: boolean;
+1826|  onReset: () => void;
+1827|  onOpenPaywall: () => void;
+1828|  onToast: (message: string) => void;
+1829|}) {
+1830|  const username =
+1831|    user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Invité(e)";
+1832|
+1833|  const passportData = {
+1834|    userName: username,
+1835|    levelName: xp >= 300 ? "Niveau A2 — Essentiels" : "Niveau A1 — Premiers Pas",
+1836|    score: Math.min(100, Math.round((xp / 500) * 100)),
+1837|    date: new Date().toLocaleDateString("fr-FR"),
+1838|    passportId: `KNZ-${user ? "PRO" : "DEMO"}-7421`,
+1839|  };
+1840|
+1841|  return (
+1842|    <div className="space-layout">
+1843|      <section className="space-card space-profile">
+1844|        <div className="profile-avatar">
+1845|          {username[0]?.toUpperCase() || "ك"}
+1846|        </div>
+1847|        <div className="profile-intro">
+1848|          <span className="mini-kicker">{tr("MON COIN KENZA", "MY KENZA CORNER", "MI RINCÓN KENZA", "ركني في كنزة")}</span>
+1849|          <h2>Salam, {username} !</h2>
+1850|          <p>
+1851|            {user
+1852|              ? `Connecté en tant que ${user.email}. Données sauvegardées dans le cloud.`
+1853|              : "Mode Invité actif. Ta progression est préservée localement sur cet appareil."}
+1854|          </p>
+1855|        </div>
+1856|        <span className="local-badge">
+1857|          <span className="privacy-dot" /> {isPremium ? "MEMBRE KENZA PRO" : "VERSION GRATUITE"}
+1858|        </span>
+1859|      </section>
+1860|
+1861|      <div className="space-stats">
+1862|        <article>
+1863|          <span className="space-stat-icon stat-blue">
+1864|            <BookOpen size={18} />
+1865|          </span>
+1866|          <span className="mini-kicker">{tr("LEÇONS", "LESSONS", "LECCIONES", "الدروس")}</span>
+1867|          <strong>
+1868|            {completedCount}
+1869|            <small> / {baseLessons.length}</small>
+1870|          </strong>
+1871|          <p>{tr("Chaque pas compte.", "Every step counts.", "Cada paso cuenta.", "كل خطوة تُحسب.")}</p>
+1872|        </article>
+1873|        <article>
+1874|          <span className="space-stat-icon stat-gold">
+1875|            <Star size={18} />
+1876|          </span>
+1877|          <span className="mini-kicker">{tr("POINTS", "POINTS", "PUNTOS", "النقاط")}</span>
+1878|          <strong>
+1879|            {xp}
+1880|            <small> XP</small>
+1881|          </strong>
+1882|          <p>{tr("Gagnés en pratiquant.", "Earned by practicing.", "Ganados practicando.", "تُكتسب بالتدريب.")}</p>
+1883|        </article>
+1884|        <article>
+1885|          <span className="space-stat-icon stat-orange">
+1886|            <Flame size={18} />
+1887|          </span>
+1888|          <span className="mini-kicker">{tr("RYTHME", "PACE", "RITMO", "الإيقاع")}</span>
+1889|          <strong>
+1890|            {streak}
+1891|            <small> {tr("jour", "day", "día", "يوم")}{streak > 1 ? "s" : ""}</small>
+1892|          </strong>
+1893|          <p>{tr("La régularité avant tout.", "Consistency above all.", "La constancia ante todo.", "الاستمرارية أولاً.")}</p>
+1894|        </article>
+1895|      </div>
+1896|
+1897|      <div className="space-data-grid">
+1898|        <article className="data-card">
+1899|          <div className="data-card-heading">
+1900|            <span className="data-icon">
+1901|              <LockKeyhole size={18} />
+1902|            </span>
+1903|            <div>
+1904|              <span className="mini-kicker">{tr("TES DONNÉES", "YOUR DATA", "TUS DATOS", "بياناتك")}</span>
+1905|              <h3>{tr("Progression & Confidentialité", "Progress & Privacy", "Progreso y privacidad", "التقدم والخصوصية")}</h3>
+1906|            </div>
+1907|          </div>
+1908|          <p>
+1909|            La progression est sécurisée. Si tu te connectes, tes leçons, favoris et points se
+1910|            synchronisent automatiquement sur tous tes appareils.
+1911|          </p>
+1912|          <div className="data-safe-row">
+1913|            <CheckCircle2 size={15} />
+1914|            <span>PWA Hors-Ligne · Sauvegarde Hybride Local & Supabase</span>
+1915|          </div>
+1916|          {!isPremium && (
+1917|            <button className="outline-button" onClick={onOpenPaywall}>
+1918|              Passer à Kenza Pro <ArrowRight size={14} />
+1919|            </button>
+1920|          )}
+1921|        </article>
+1922|
+1923|        <article className="data-card data-card-cert">
+1924|          <div className="data-card-heading">
+1925|            <span className="data-icon certificate-icon">
+1926|              <Award size={18} />
+1927|            </span>
+1928|            <div>
+1929|              <span className="mini-kicker">{tr("CERTIFICATS", "CERTIFICATES", "CERTIFICADOS", "الشهادات")}</span>
+1930|              <h3>{tr("Passeport Culturel", "Cultural passport", "Pasaporte cultural", "الجواز الثقافي")}</h3>
+1931|            </div>
+1932|          </div>
+1933|          <p>
+1934|            Valide les examens de palier pour obtenir tes visas officiels du Passeport Darija et les
+1935|            télécharger en haute résolution.
+1936|          </p>
+1937|          <div className="py-2">
+1938|            <DarijaPassportCard data={passportData} />
+1939|          </div>
+1940|        </article>
+1941|      </div>
+1942|
+1943|      <div className="space-settings">
+1944|        <div>
+1945|          <span className="mini-kicker">{tr("GESTION DU COMPTE", "ACCOUNT", "GESTIÓN DE CUENTA", "إدارة الحساب")}</span>
+1946|          <h3>{tr("Repartir de zéro", "Start over", "Empezar de cero", "البدء من جديد")}</h3>
+1947|          <p>{tr("Réinitialise les leçons, points et favoris sur cet appareil.", "Reset lessons, points and favorites on this device.", "Reinicia lecciones, puntos y favoritos en este dispositivo.", "صفّر الدروس والنقاط والمفضلة على هذا الجهاز.")}</p>
+1948|        </div>
+1949|        <button className="outline-button danger-outline" onClick={onReset}>
+1950|          Effacer ma progression locale
+1951|        </button>
+1952|      </div>
+1953|
+1954|      <div className="future-note">
+1955|        <span>
+1956|          <Sparkles size={16} />
+1957|        </span>
+1958|        <p>
+1959|          <strong>Kenza Pro :</strong> Accède à l'intégralité des modules B1 & B2, aux dialogues IA
+1960|          illimités et aux visas de certification culturels.
+1961|        </p>
+1962|      </div>
+1963|    </div>
+1964|  );
+1965|}
+1966|

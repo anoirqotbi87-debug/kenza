@@ -1,0 +1,500 @@
+1001|                  }`}
+1002|                >
+1003|                  <strong>
+1004|                    {selectedAnswer === activeQuestion.answer ? "Bien joué !" : "Presque — retiens ceci."}
+1005|                  </strong>
+1006|                  <span>{activeQuestion.note}</span>
+1007|                </div>
+1008|              )}
+1009|              <button
+1010|                className="primary-button lesson-next"
+1011|                onClick={advanceQuestion}
+1012|                disabled={!selectedAnswer}
+1013|              >
+1014|                {questionIndex === activeLesson.questions.length - 1 ? tr("Terminer la leçon", "Finish the lesson", "Terminar la lección", "أنهِ الدرس") : tr("Continuer", "Continue", "Continuar", "متابعة")}
+1015|                <ArrowRight size={17} />
+1016|              </button>
+1017|              <div className="local-note">
+1018|                <LockKeyhole size={13} /> Progression enregistrée en direct sur ton profil.
+1019|              </div>
+1020|            </div>
+1021|          </section>
+1022|        </div>
+1023|      )}
+1024|
+1025|      {/* Roleplay Scenario Selector */}
+1026|      {showScenarioSelector && (
+1027|        <ScenarioSelectorModal
+1028|          onClose={() => setShowScenarioSelector(false)}
+1029|          onSelectAi={(personaId) => {
+1030|            setActivePersonaId(personaId);
+1031|            setShowScenarioSelector(false);
+1032|          }}
+1033|          onRequirePremium={() => setPricingSource("roleplay_locked")}
+1034|          onStartSrs={() => {
+1035|            setShowScenarioSelector(false);
+1036|            setView("review");
+1037|          }}
+1038|        />
+1039|      )}
+1040|
+1041|      {/* Fullscreen Roleplay IA Persona View */}
+1042|      {activePersonaId && (
+1043|        <div className="fixed inset-0 z-50 bg-[#FDFCF8] flex flex-col">
+1044|          <AiRoleplayView
+1045|            personaId={activePersonaId}
+1046|            onClose={() => setActivePersonaId(null)}
+1047|          />
+1048|        </div>
+1049|      )}
+1050|
+1051|      {/* Checkpoint Modal */}
+1052|      {checkpointOpen && (
+1053|        <CheckpointModal
+1054|          levelId={checkpointOpen.id}
+1055|          levelName={checkpointOpen.name}
+1056|          onClose={() => setCheckpointOpen(null)}
+1057|        />
+1058|      )}
+1059|
+1060|      {/* Paywall Modal */}
+1061|      {pricingSource && (
+1062|        <PaywallModal
+1063|          onClose={() => setPricingSource(null)}
+1064|          source={pricingSource}
+1065|        />
+1066|      )}
+1067|
+1068|      {/* Toast Notification */}
+1069|      {toast && (
+1070|        <div className="toast-message" role="status" aria-live="polite">
+1071|          <span className="toast-check">
+1072|            <Check size={15} />
+1073|          </span>
+1074|          {toast}
+1075|          <button aria-label="Fermer" onClick={() => setToast("")}>
+1076|            <X size={15} />
+1077|          </button>
+1078|        </div>
+1079|      )}
+1080|
+1081|      <InstallPwaBanner />
+1082|    </div>
+1083|  );
+1084|}
+1085|
+1086|// -------------------------------------------------------------
+1087|// Composant 1 : TodayView
+1088|// -------------------------------------------------------------
+1089|function TodayView({
+1090|  completedCount,
+1091|  xp,
+1092|  streak,
+1093|  nextLesson,
+1094|  onStart,
+1095|  onNavigate,
+1096|  onOpenRoleplay,
+1097|}: {
+1098|  completedCount: number;
+1099|  xp: number;
+1100|  streak: number;
+1101|  nextLesson: Lesson;
+1102|  onStart: (id: string) => void;
+1103|  onNavigate: (view: View) => void;
+1104|  onOpenRoleplay: () => void;
+1105|}) {
+1106|  const totalLessons = baseLessons.length;
+1107|
+1108|  return (
+1109|    <>
+1110|      <div className="today-grid">
+1111|        <article className="hero-panel">
+1112|          <div className="hero-texture" />
+1113|          <div className="hero-copy">
+1114|            <span className="hero-kicker">
+1115|              <Sparkles size={14} /> {tr("TON PETIT MOMENT DARIJA", "YOUR LITTLE DARIJA MOMENT", "TU MOMENTO DARIJA", "لحظتك مع الدارجة")}
+1116|            </span>
+1117|            <h2>
+1118|              {tr("La darija", "Darija", "La darija", "الدارجة")}
+1119|              <br />
+1120|              {tr("s’ouvre à toi.", "opens up to you.", "se abre a ti.", "تنفتح عليك.")}
+1121|            </h2>
+1122|            <p>{tr("Une phrase, une rencontre, une autre façon de voir le Maroc.", "A phrase, an encounter, another way to see Morocco.", "Una frase, un encuentro, otra forma de ver Marruecos.", "عبارة، لقاء، وطريقة أخرى لرؤية المغرب.")}</p>
+1123|            <button className="hero-button" onClick={() => onStart(nextLesson.id)}>
+1124|              {tr("Continuer à apprendre", "Keep learning", "Seguir aprendiendo", "واصل التعلم")} <ArrowRight size={16} />
+1125|            </button>
+1126|            <div className="hero-footnote">
+1127|              <span className="hero-foot-line" /> {tr("À ton rythme, toujours.", "At your pace, always.", "A tu ritmo, siempre.", "على إيقاعك، دائماً.")}
+1128|            </div>
+1129|          </div>
+1130|          <div className="hero-image-wrap" aria-hidden="true">
+1131|            <img
+1132|              className="hero-image"
+1133|              src="/manus-storage/kenza-hero_99e35384.jpg"
+1134|              alt="Maroc médina"
+1135|            />
+1136|            <div className="hero-image-wash" />
+1137|            <div className="hero-image-caption">
+1138|              <span>دَارِيجة</span>
+1139|              <small>{tr("darija, la langue du lien", "darija, the language of connection", "darija, la lengua del vínculo", "الدارجة، لغة التواصل")}</small>
+1140|            </div>
+1141|          </div>
+1142|          <div className="hero-medallion" aria-hidden="true">
+1143|            <span>مرحبا</span>
+1144|            <small>marhba</small>
+1145|          </div>
+1146|        </article>
+1147|
+1148|        <article className="next-card">
+1149|          <div className="next-card-head">
+1150|            <span className="mini-kicker">{tr("TA PROCHAINE ÉTAPE", "YOUR NEXT STEP", "TU PRÓXIMO PASO", "خطوتك التالية")}</span>
+1151|            <span className="next-icon">
+1152|              <ArrowDownRight size={17} />
+1153|            </span>
+1154|          </div>
+1155|          <div className="lesson-number">
+1156|            0{Math.min(completedCount + 1, totalLessons)}{" "}
+1157|            <span>/ 0{totalLessons}</span>
+1158|          </div>
+1159|          <div className="next-illustration">
+1160|            <img
+1161|              className="next-photo"
+1162|              src="/manus-storage/kenza-market_a0db8277.jpg"
+1163|              alt="Thé à la menthe"
+1164|            />
+1165|            <div className="cup-shadow" />
+1166|            <div className="tea-cup">
+1167|              <span />
+1168|              <i />
+1169|            </div>
+1170|            <div className="tea-steam steam-one" />
+1171|            <div className="tea-steam steam-two" />
+1172|            <div className="tea-leaf leaf-one" />
+1173|            <div className="tea-leaf leaf-two" />
+1174|          </div>
+1175|          <div className="next-card-copy">
+1176|            <span className="lesson-pill">{tr("LEÇON SUIVANTE", "NEXT LESSON", "PRÓXIMA LECCIÓN", "الدرس التالي")} · {nextLesson.length}</span>
+1177|            <h3>{nextLesson.title}</h3>
+1178|            <p>{nextLesson.subtitle}</p>
+1179|          </div>
+1180|          <button className="text-link" onClick={() => onStart(nextLesson.id)}>
+1181|            {tr("C’est parti", "Let’s go", "¡Vamos!", "هيا بنا")} <ArrowRight size={15} />
+1182|          </button>
+1183|        </article>
+1184|      </div>
+1185|
+1186|      <div className="stat-strip">
+1187|        <div className="stat-item">
+1188|          <span className="stat-icon stat-blue">
+1189|            <BookOpen size={17} />
+1190|          </span>
+1191|          <div>
+1192|            <strong>
+1193|              {completedCount}
+1194|              <small>/{totalLessons}</small>
+1195|            </strong>
+1196|            <span>{tr("leçons terminées", "lessons completed", "lecciones completadas", "دروس مكتملة")}</span>
+1197|          </div>
+1198|        </div>
+1199|        <div className="stat-divider" />
+1200|        <div className="stat-item">
+1201|          <span className="stat-icon stat-gold">
+1202|            <Star size={17} />
+1203|          </span>
+1204|          <div>
+1205|            <strong>
+1206|              {xp}
+1207|              <small> XP</small>
+1208|            </strong>
+1209|            <span>{tr("points de pratique", "practice points", "puntos de práctica", "نقاط التدريب")}</span>
+1210|          </div>
+1211|        </div>
+1212|        <div className="stat-divider" />
+1213|        <div className="stat-item">
+1214|          <span className="stat-icon stat-orange">
+1215|            <Flame size={17} />
+1216|          </span>
+1217|          <div>
+1218|            <strong>
+1219|              {streak}
+1220|              <small> {tr("jour", "day", "día", "يوم")}{streak > 1 ? "s" : ""}</small>
+1221|            </strong>
+1222|            <span>{tr("rythme régulier", "steady rhythm", "ritmo constante", "إيقاع منتظم")}</span>
+1223|          </div>
+1224|        </div>
+1225|        <button className="stat-action" onClick={() => onNavigate("space")}>
+1226|          {tr("Voir mon espace", "See my space", "Ver mi espacio", "فضائي")} <ArrowRight size={14} />
+1227|        </button>
+1228|      </div>
+1229|
+1230|      <div className="section-heading">
+1231|        <div>
+1232|          <span className="eyebrow">
+1233|            <span className="eyebrow-line" />
+1234|            {tr("POUR AUJOURD’HUI", "FOR TODAY", "PARA HOY", "لهذا اليوم")}
+1235|          </span>
+1236|          <h2>{tr("À toi de choisir ton pas.", "Your pace, your choice.", "Tú eliges tu paso.", "اختر خطوتك.")}</h2>
+1237|        </div>
+1238|        <button className="plain-link" onClick={() => onNavigate("path")}>
+1239|          {tr("Voir le parcours", "View the journey", "Ver la ruta", "المسار")} <ArrowRight size={15} />
+1240|        </button>
+1241|      </div>
+1242|
+1243|      <div className="quick-grid">
+1244|        <button className="quick-card quick-card-phrases" onClick={() => onNavigate("phrases")}>
+1245|          <span className="quick-icon">
+1246|            <Bookmark size={18} />
+1247|          </span>
+1248|          <span className="quick-label">{tr("UN MOT À EMPORTER", "A WORD TO GO", "UNA PALABRA PARA LLEVAR", "كلمة معك")}</span>
+1249|          <strong>
+1250|            {tr("Ton carnet", "Your phrase", "Tu cuaderno", "دفترك")}
+1251|            <br />
+1252|            {tr("de phrases", " book", " de frases", " للعبارات")}
+1253|          </strong>
+1254|          <span className="quick-bottom">
+1255|            {tr("Vocabulaire essentiel", "Essential vocabulary", "Vocabulario esencial", "مفردات أساسية")} <ArrowRight size={14} />
+1256|          </span>
+1257|        </button>
+1258|
+1259|        <button className="quick-card quick-card-review" onClick={() => onNavigate("review")}>
+1260|          <span className="quick-icon">
+1261|            <Sparkles size={18} />
+1262|          </span>
+1263|          <span className="quick-label">{tr("5 MINUTES, PAS PLUS", "5 MINUTES, NO MORE", "5 MINUTOS, NO MÁS", "5 دقائق فقط")}</span>
+1264|          <strong>
+1265|            {tr("Faire une", "Do a quick", "Haz una", "قم بمراجعة")}
+1266|            <br />
+1267|            {tr("petite révision", "review", "revisión rápida", "سريعة")}
+1268|          </strong>
+1269|          <span className="quick-bottom">
+1270|            {tr("Cartes du jour", "Cards of the day", "Cartas del día", "بطاقات اليوم")} <ArrowRight size={14} />
+1271|          </span>
+1272|        </button>
+1273|
+1274|        <button className="quick-card quick-card-listen" onClick={onOpenRoleplay}>
+1275|          <span className="quick-icon">
+1276|            <MessageCircle size={18} />
+1277|          </span>
+1278|          <span className="quick-label">{tr("IMMERSION IA", "AI IMMERSION", "INMERSIÓN IA", "انغماس مع الذكاء")}</span>
+1279|          <strong>
+1280|            {tr("Mises en", "Real-life", "Situaciones", "مواقف")}
+1281|            <br />
+1282|            {tr("situation", "scenarios", "de la vida real", "من الحياة")}
+1283|          </strong>
+1284|          <span className="quick-bottom">
+1285|            {tr("Au café, en taxi", "At the café, in a taxi", "En el café, en taxi", "في المقهى وفي التاكسي")} <ArrowRight size={14} />
+1286|          </span>
+1287|        </button>
+1288|      </div>
+1289|
+1290|      <div className="bottom-callout">
+1291|        <div className="callout-art">
+1292|          <div className="callout-sun" />
+1293|          <div className="callout-arch">
+1294|            <span>مرحبا</span>
+1295|          </div>
+1296|          <span className="callout-spark spark-a">✳</span>
+1297|          <span className="callout-spark spark-b">✳</span>
+1298|        </div>
+1299|        <div className="callout-copy">
+1300|          <span className="mini-kicker">{tr("UNE LANGUE, DES RENCONTRES", "A LANGUAGE, ENCOUNTERS", "UN IDIOMA, ENCUENTROS", "لغةٌ ولقاءات")}</span>
+1301|          <h3>
+1302|            Pas besoin d’être parfait·e.
+1303|            <br />
+1304|            <em>{tr("Il suffit de commencer.", "Just start.", "Solo empieza.", "ابدأ فقط.")}</em>
+1305|          </h3>
+1306|          <p>Chaque expression est une petite invitation à aller vers l’autre.</p>
+1307|        </div>
+1308|        <button onClick={() => onNavigate("path")} aria-label="Explorer le parcours">
+1309|          <ArrowRight size={20} />
+1310|        </button>
+1311|      </div>
+1312|    </>
+1313|  );
+1314|}
+1315|
+1316|// -------------------------------------------------------------
+1317|// Composant 2 : PathView
+1318|// -------------------------------------------------------------
+1319|function PathView({
+1320|  completedLessons,
+1321|  onStart,
+1322|  onOpenCheckpoint,
+1323|  onOpenPaywall,
+1324|  isPremium,
+1325|}: {
+1326|  completedLessons: string[];
+1327|  onStart: (id: string) => void;
+1328|  onOpenCheckpoint: (id: string, name: string) => void;
+1329|  onOpenPaywall: () => void;
+1330|  isPremium: boolean;
+1331|}) {
+1332|  const { hasPassedLevel } = useCheckpointProgress();
+1333|
+1334|  return (
+1335|    <div className="path-layout">
+1336|      <section className="path-main-card">
+1337|        <div className="path-banner">
+1338|          <div>
+1339|            <span className="hero-kicker">
+1340|              <Compass size={14} /> PARCOURS DÉCOUVERTE
+1341|            </span>
+1342|            <h2>
+1343|              Les premiers pas
+1344|              <br />
+1345|              en darija.
+1346|            </h2>
+1347|            <p>{tr("Trois escales pour oser dire les premiers mots.", "Three stops to dare your first words.", "Tres paradas para atreverte a hablar.", "ثلاث محطات لتبدأ كلماتك الأولى.")}</p>
+1348|          </div>
+1349|          <div className="path-stamp">
+1350|            <span>المغرب</span>
+1351|            <small>Maroc</small>
+1352|          </div>
+1353|          <div className="path-doodle" />
+1354|        </div>
+1355|
+1356|        <div className="path-progress-row">
+1357|          <div>
+1358|            <span className="mini-kicker">{tr("TON AVANCÉE", "YOUR PROGRESS", "TU AVANCE", "تقدّمك")}</span>
+1359|            <strong>
+1360|              {completedLessons.length}{" "}
+1361|              <small>
+1362|                leçon{completedLessons.length > 1 ? "s" : ""} sur {baseLessons.length}
+1363|              </small>
+1364|            </strong>
+1365|          </div>
+1366|          <div className="path-overall-track">
+1367|            <span
+1368|              style={{
+1369|                width: `${Math.round((completedLessons.length / baseLessons.length) * 100)}%`,
+1370|              }}
+1371|            />
+1372|          </div>
+1373|          <span className="path-percent">
+1374|            {Math.round((completedLessons.length / baseLessons.length) * 100)}%
+1375|          </span>
+1376|        </div>
+1377|
+1378|        <div className="lesson-roadmap">
+1379|          {baseLessons.map((lesson, index) => {
+1380|            const done = completedLessons.includes(lesson.id);
+1381|            const unlocked =
+1382|              index === 0 || completedLessons.includes(baseLessons[index - 1].id) || done;
+1383|            const isGated = lesson.isPremium && !isPremium;
+1384|            const locked = !unlocked && !isGated;
+1385|
+1386|            return (
+1387|              <div
+1388|                className={`roadmap-row ${done ? "roadmap-done" : ""} ${locked ? "roadmap-locked" : ""}`}
+1389|                key={lesson.id}
+1390|              >
+1391|                <div className="roadmap-track">
+1392|                  <div className="roadmap-line" />
+1393|                  <button
+1394|                    className={`roadmap-node ${done ? "node-done" : ""} ${
+1395|                      !locked && !done ? "node-current" : ""
+1396|                    }`}
+1397|                    disabled={locked}
+1398|                    onClick={() => (isGated ? onOpenPaywall() : onStart(lesson.id))}
+1399|                    aria-label={
+1400|                      done
+1401|                        ? `Revoir ${lesson.title}`
+1402|                        : locked
+1403|                        ? `${lesson.title}, verrouillée`
+1404|                        : `Commencer ${lesson.title}`
+1405|                    }
+1406|                  >
+1407|                    {done ? (
+1408|                      <Check size={16} />
+1409|                    ) : isGated ? (
+1410|                      <Crown size={14} className="text-[#C9A05C]" />
+1411|                    ) : locked ? (
+1412|                      <LockKeyhole size={14} />
+1413|                    ) : (
+1414|                      <span>0{index + 1}</span>
+1415|                    )}
+1416|                  </button>
+1417|                </div>
+1418|                <div className="roadmap-content">
+1419|                  <div className="roadmap-meta">
+1420|                    <span>
+1421|                      {lesson.length.toUpperCase()} ·{" "}
+1422|                      {index === 0
+1423|                        ? "LES ESSENTIELS"
+1424|                        : index === 1
+1425|                        ? "AU QUOTIDIEN"
+1426|                        : index === 2
+1427|                        ? "SE REPÉRER"
+1428|                        : "IMMERSION AVANCÉE"}
+1429|                    </span>
+1430|                    {done && (
+1431|                      <span className="done-tag">
+1432|                        <CheckCircle2 size={13} /> TERMINÉE
+1433|                      </span>
+1434|                    )}
+1435|                    {!done && !locked && !isGated && (
+1436|                      <span className="current-tag">{tr("À SUIVRE", "TO CONTINUE", "A CONTINUAR", "للمتابعة")}</span>
+1437|                    )}
+1438|                    {isGated && (
+1439|                      <span className="current-tag" style={{ background: "#fef3c7", color: "#b45309" }}>
+1440|                        PRO
+1441|                      </span>
+1442|                    )}
+1443|                  </div>
+1444|                  <h3>{lesson.title}</h3>
+1445|                  <p>{lesson.subtitle}</p>
+1446|                  <div className="roadmap-footer">
+1447|                    <span>
+1448|                      <BookOpen size={14} /> {lesson.questions.length} exercices
+1449|                    </span>
+1450|                    {isGated ? (
+1451|                      <button onClick={onOpenPaywall} style={{ color: "#d69b47" }}>
+1452|                        Débloquer avec Pro <ArrowRight size={14} />
+1453|                      </button>
+1454|                    ) : unlocked ? (
+1455|                      <button onClick={() => onStart(lesson.id)}>
+1456|                        {done ? "Revoir" : "Commencer"}
+1457|                        <ArrowRight size={14} />
+1458|                      </button>
+1459|                    ) : (
+1460|                      <span className="locked-copy">
+1461|                        <LockKeyhole size={13} /> Finis l’étape avant
+1462|                      </span>
+1463|                    )}
+1464|                  </div>
+1465|                </div>
+1466|              </div>
+1467|            );
+1468|          })}
+1469|        </div>
+1470|      </section>
+1471|
+1472|      <aside className="path-aside">
+1473|        <div className="path-aside-card">
+1474|          <span className="aside-icon">
+1475|            <Leaf size={18} />
+1476|          </span>
+1477|          <span className="mini-kicker">{tr("PETIT CONSEIL", "QUICK TIP", "PEQUEÑO CONSEJO", "نصيحة صغيرة")}</span>
+1478|          <h3>{tr("La régularité avant la perfection.", "Consistency beats perfection.", "La constancia antes que la perfección.", "الاستمرارية قبل الإتقان.")}</h3>
+1479|          <p>
+1480|            5 minutes par jour font plus qu’une heure de temps en temps. Reviens quand tu veux.
+1481|          </p>
+1482|          <div className="aside-divider" />
+1483|          <div className="aside-stat">
+1484|            <span>{tr("Palier A1 (Fondations)", "Level A1 (Foundations)", "Nivel A1 (Fundamentos)", "المستوى A1 (الأساسيات)")}</span>
+1485|            <strong>{hasPassedLevel("1") ? "Validé ✓" : "En cours"}</strong>
+1486|          </div>
+1487|          <button
+1488|            onClick={() => onOpenCheckpoint("1", "Palier A1 — Fondations")}
+1489|          >
+1490|            Passer le Checkpoint A1 <ArrowRight size={14} />
+1491|          </button>
+1492|        </div>
+1493|
+1494|        <div className="path-aside-note">
+1495|          <span className="note-symbol">✳</span>
+1496|          <p>
+1497|            Le mot <strong>darija</strong> vient de l’arabe <span dir="rtl">الدارجة</span> — la
+1498|            langue courante, celle de tous les jours.
+1499|          </p>
+1500|        </div>
