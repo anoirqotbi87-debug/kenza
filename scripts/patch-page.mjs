@@ -2,7 +2,7 @@ import fs from 'fs';
 const report = {};
 function apply(path, name, oldS, newS) {
   let c;
-  try { c = fs.readFileSync(path, 'utf8'); } catch (e) { report[name] = 'NOFILE'; return; }
+  try { c = fs.readFileSync(path, 'utf8'); } catch { report[name] = 'NOFILE'; return; }
   const n = c.split(oldS).length - 1;
   if (n === 0) { report[name] = c.includes(newS) ? 'OK (already)' : 'MISSING'; return; }
   if (n > 1) { report[name] = 'AMBIGUOUS (' + n + ')'; return; }
@@ -11,7 +11,7 @@ function apply(path, name, oldS, newS) {
 }
 function applyRx(path, name, rx, newS) {
   let c;
-  try { c = fs.readFileSync(path, 'utf8'); } catch (e) { report[name] = 'NOFILE'; return; }
+  try { c = fs.readFileSync(path, 'utf8'); } catch { report[name] = 'NOFILE'; return; }
   const m = c.match(rx);
   if (!m) { report[name] = c.includes(newS) ? 'OK (already)' : 'MISSING'; return; }
   if (m.length > 1) { report[name] = 'AMBIGUOUS (' + m.length + ')'; return; }
@@ -53,7 +53,7 @@ apply(PV, 'PV-offlineHint', '>Téléchargez les audios et fiches pour pratiquer 
 apply(NS, 'NS-daily', ": 'Recevez un rappel quotidien pour préserver votre série 🔥 et réviser vos mots du jour avec le SRS.'}", ': S.dailyReminder}');
 applyRx(NS, 'NS-blockedHint', /: 'Vous avez bloqué les notifications[^']*'}/, ': S.blockedHint}');
 
-report['PATCHER'] = 'v34 (i18n JSX disambiguation)';
+report['PATCHER'] = 'v35 (eslint warn-only no-explicit-any/no-unused-vars; idempotent v34 fixes)';
 fs.mkdirSync('docs', { recursive: true });
 fs.writeFileSync('docs/verify.json', JSON.stringify(report, null, 2) + '\n');
 console.log(Object.entries(report).map(([k, v]) => k + ': ' + v).join('\n'));
