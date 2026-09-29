@@ -1,7 +1,7 @@
 {
-  "ts": "2026-09-29T14:21:22.545Z",
-  "appliedThisRun": 1,
-  "already": 88,
+  "ts": "2026-09-29T16:38:50.825Z",
+  "appliedThisRun": 83,
+  "already": 0,
   "missing": [
     "la darija, en chemin",
     "Grammaire active",
@@ -131,12 +131,18 @@
     "Écoute · Répète · Reviens",
     "Effacer ma progression locale",
     "PARCOURS DÉCOUVERTE",
+    "À demain",
+    "J’ai faim",
+    "C’est loin",
+    "Peut-être",
     "« Bchhal hada? » permet de demander le prix de n’importe que",
+    "Donne-moi deux verres",
+    "C'est trop beau",
     "« Wahed » = un, « atay » = thé, « afak » = s’il vous plaît.",
     "Progression enregistrée en direct sur ton profil.",
     "Finis l’étape avant"
   ],
-  "trCallCount": 105,
+  "trCallCount": 98,
   "checks": [
     {
       "s": "tr(\"Comment dit-on « bonjour » en darija ?\"",
