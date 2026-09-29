@@ -1247,7 +1247,7 @@
 1247|        <div>
 1248|          <span className="eyebrow">
 1249|            <span className="eyebrow-line" />
-1250|            {tr(lang, "{tr("POUR AUJOURD’HUI", "FOR TODAY", "PARA HOY", "لهذا اليوم")}", "FOR TODAY", "PARA HOY", "لهذا اليوم")}          </span>
+1250|            {tr(lang, "{tr("POUR AUJOURD’HUI", "FOR TODAY", "PARA HOY", "لهذا اليوم")}", "FOR TODAY", "PARA HOY", "لهذا اليوم")}
 1251|          <h2>{tr(lang, "À toi de choisir ton pas.", "Your pace, your choice.", "Tú eliges tu paso.", "اختر خطوتك.")}</h2>
 1252|        </div>
 1253|        <button className="plain-link" onClick={() => onNavigate("path")}>
