@@ -47,7 +47,7 @@
 1247|        <div>
 1248|          <span className="eyebrow">
 1249|            <span className="eyebrow-line" />
-1250|            {trL(lang, "{tr("POUR AUJOURD’HUI", "FOR TODAY", "PARA HOY", "لهذا اليوم")}", "FOR TODAY", "PARA HOY", "لهذا اليوم")}
+1250|            {trL(lang, "POUR AUJOURD’HUI", "FOR TODAY", "PARA HOY", "لهذا اليوم")}
 1251|          </span>
 1252|          <h2>{trL(lang, "À toi de choisir ton pas.", "Your pace, your choice.", "Tú eliges tu paso.", "اختر خطوتك.")}</h2>
 1253|        </div>
@@ -115,7 +115,7 @@
 1315|        <div className="callout-copy">
 1316|          <span className="mini-kicker">{trL(lang, "UNE LANGUE, DES RENCONTRES", "A LANGUAGE, ENCOUNTERS", "UN IDIOMA, ENCUENTROS", "لغةٌ ولقاءات")}</span>
 1317|          <h3>
-1318|            {trL(lang, "{tr("Pas besoin d’être parfait·e.", "No need to be perfect.", "No hace falta ser perfecto.", "لا داعي للكمال.")}", "No need to be perfect.", "No hace falta ser perfecto.", "لا داعي للكمال.")}
+1318|            {trL(lang, "Pas besoin d’être parfait·e.", "No need to be perfect.", "No hace falta ser perfecto.", "لا داعي للكمال.")}
 1319|            <br />
 1320|            <em>{trL(lang, "Il suffit de commencer.", "Just start.", "Solo empieza.", "ابدأ فقط.")}</em>
 1321|          </h3>

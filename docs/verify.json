@@ -1,49 +1,11 @@
-A1-rename-def: OK
-A2-rename-calls: OK x243
-B-repair-wrapped: 0
-C1-toast-audio: OK
-C2-toast-copied: OK
-C3-toast-copyfail: OK
-C4-aria-closemenu: OK x2
-C5-aria-langswitch: OK
-C6-aria-navmain: OK
-C7-aria-navmobile: OK
-C8-aria-quitter: OK
-C9-aria-close: OK
-C10-fallback-learn: OK
-C11-fallback-oral: OK
-C12-fallback-space: OK
-C13-alt-hero: OK
-C14-plural-s: OK x2
-C15-lecon-sur: OK
-C16-tag-essentiels: OK
-C17-tag-quotidien: OK
-C18-tag-reperer: OK
-C19-tag-immersion: OK
-C20-terminee: OK
-C21-exercices: OK
-C22-valide: OK
-C23-aside-tip: OK
-C24-darija-note: OK
-C25-phrase-count: OK
-C26-aria-fav: OK
-C27-ecouter: OK
-C28-copier: OK
-C29-cat-all: OK
-C30-phrase-footnote: OK
-C31-space-privacy: OK
-C32-pwa-row: OK
-C33-cert-para: OK
-C34-erase-progress: OK
-C35-future-note: OK
-C36-note-bchhal: OK
-C37-note-wahed: OK
-C38-meaning-bslama: OK
-C39-expression-darija: OK x4
-C40-note-vocab: OK
+A1-rename-def: MISSING
+A2-rename-calls: MISSING
+B-repair[POUR AUJOURD’HUI]
+B-repair[Pas besoin d’être parfait·e.]
+B-repair[Dis la phrase à voix haute. La]
+B-repair-wrapped: 3
 D-tr-def-count: 1
 D-trL-def: OK
 D-wrapped-left: OK
 D-home-export: OK
 D-trL-calls: 243
-D-tr4-calls: 149
