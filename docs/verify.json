@@ -1,9 +1,6 @@
 A1-rename-def: MISSING
 A2-rename-calls: MISSING
-B-repair[POUR AUJOURD’HUI]
-B-repair[Pas besoin d’être parfait·e.]
-B-repair[Dis la phrase à voix haute. La]
-B-repair-wrapped: 3
+B-repair-wrapped: 0
 D-tr-def-count: 1
 D-trL-def: OK
 D-wrapped-left: OK
