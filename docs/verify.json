@@ -1,3 +1,15 @@
+UAS-toggleDevUnlockAll: OK
+UAS-setRegionalVariant: OK
+UAS-addXp: OK
+UAS-completeLesson: OK
+UAS-unlockBadge: OK
+UAS-useStreakFreeze: OK
+UAS-recordActivity: OK
+UAS-setNotation: OK
+UAS-toggleSound: OK
+UAS-setAudioSpeed: OK
+UAS-addCardsToSRS: OK
+UAS-reviewCard: OK
 SPC-ttrack-viewed: OK (already)
 SPC-ttrack-clicked: OK (already)
 AM-data-destructure: OK (already)

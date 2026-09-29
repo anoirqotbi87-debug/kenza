@@ -96,8 +96,8 @@ export const useAppStore = create<AppState>()(
       }),
       setIsPremium: (isPremium: boolean) => set({ isPremium }),
       
-      toggleDevUnlockAll: () => set((state) => ({ devUnlockAll: !state.devUnlockAll })),
-      setRegionalVariant: (variant) => set({ regionalVariant: variant }),
+      toggleDevUnlockAll: () => set((state: AppState) => ({ devUnlockAll: !state.devUnlockAll })),
+      setRegionalVariant: (variant: AppState['regionalVariant']) => set({ regionalVariant: variant }),
       
       resetData: () => set({
         user: null,
@@ -111,7 +111,7 @@ export const useAppStore = create<AppState>()(
         srsDeck: {}
       }),
       
-      addXp: (amount) => set((state) => {
+      addXp: (amount: number) => set((state: AppState) => {
         const newXp = state.xp + amount;
         const newBadges = [...state.unlockedBadges];
         if (newXp >= 500 && !newBadges.includes('polyglot')) {
@@ -120,7 +120,7 @@ export const useAppStore = create<AppState>()(
         return { xp: newXp, unlockedBadges: newBadges };
       }),
       
-      completeLesson: (lessonId) => set((state) => {
+      completeLesson: (lessonId: string) => set((state: AppState) => {
         const completed = state.completedLessons.includes(lessonId)
           ? state.completedLessons
           : [...state.completedLessons, lessonId];
@@ -136,17 +136,17 @@ export const useAppStore = create<AppState>()(
         return { completedLessons: completed, unlockedBadges: newBadges };
       }),
 
-      unlockBadge: (badgeId) => set((state) => ({
+      unlockBadge: (badgeId: string) => set((state: AppState) => ({
         unlockedBadges: state.unlockedBadges.includes(badgeId)
           ? state.unlockedBadges
           : [...state.unlockedBadges, badgeId]
       })),
 
-      useStreakFreeze: () => set((state) => ({
+      useStreakFreeze: () => set((state: AppState) => ({
         streakFreezes: Math.max(0, state.streakFreezes - 1)
       })),
 
-      recordActivity: () => set((state) => {
+      recordActivity: () => set((state: AppState) => {
         const today = getLocalTodayDateString();
         
         if (state.activityDates.includes(today)) {
@@ -180,15 +180,15 @@ export const useAppStore = create<AppState>()(
         };
       }),
       
-      setNotation: (notation) => set({ preferredNotation: notation }),
+      setNotation: (notation: Notation) => set({ preferredNotation: notation }),
       
-      toggleSound: () => set((state) => ({ soundEnabled: !state.soundEnabled })),
+      toggleSound: () => set((state: AppState) => ({ soundEnabled: !state.soundEnabled })),
 
-      setAudioSpeed: (speed) => set({ audioSpeed: speed }),
+      setAudioSpeed: (speed: number) => set({ audioSpeed: speed }),
       
       setLanguage: (lang) => set({ uiLanguage: (lang || 'fr').toLowerCase() as any }),
       
-      addCardsToSRS: (wordIds) => set((state) => {
+      addCardsToSRS: (wordIds: string[]) => set((state: AppState) => {
         const newDeck = { ...state.srsDeck };
         const now = new Date().toISOString();
         
@@ -244,7 +244,7 @@ export const useAppStore = create<AppState>()(
         return { customVocabulary: newVocab, srsDeck: newDeck };
       }),
       
-      reviewCard: (wordId, grade) => set((state) => {
+      reviewCard: (wordId: string, grade: ReviewGrade) => set((state: AppState) => {
         const card = state.srsDeck[wordId];
         if (!card) return state;
 
