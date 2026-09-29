@@ -1,4 +1,4 @@
-// patch-page.mjs v20 — i18n audit v2: fix "{tr("... syntax errors (unescaped quotes), idempotent table
+// patch-page.mjs v21 — fix truncated startLesson line 481 (syntax error), category sentinel __all__
 import fs from "node:fs";
 
 const P = "src/app/page.tsx";
@@ -17,14 +17,13 @@ function fix(name, oldS, newS) {
   }
 }
 
-// A) Idempotent: dedupe tr (rename 5-arg variant to trL if still needed)
+// A) Idempotent guards from previous versions
 fix("A1-rename-def",
   'const tr = (lang: string, fr: string, en: string, es: string, ar: string) =>',
   'const trL = (lang: string, fr: string, en: string, es: string, ar: string) =>');
 fix("A2-rename-calls", "tr(lang,", "trL(lang,");
 
-// B) Repair corrupted first-arg literals: trL(lang, "{tr("FR", "EN", "ES", "AR")} garbage", "EN", "ES", "AR")
-// Real on-disk form has UNESCAPED quotes => syntax error. Extract FR, keep outer args.
+// B) Idempotent repair of "{tr(" wrapper corruptions
 (function () {
   const marker = '"' + "{tr(" + '"';
   let count = 0;
@@ -41,12 +40,22 @@ fix("A2-rename-calls", "tr(lang,", "trL(lang,");
     const newLit = '"' + fr + '"';
     s = s.slice(0, idx) + newLit + s.slice(endQuote + 1);
     count += 1;
-    report.push("B-repair[" + fr.slice(0, 30) + "]");
     idx = s.indexOf(marker, idx + newLit.length);
   }
   report.push("B-repair-wrapped: " + count);
   if (count > 0) applied += 1;
 })();
+
+// E) New fixes
+fix("E1-startlesson-truncated",
+  'const index = lessons.findIndex((item) => item\n    const canStart =',
+  'const index = lessons.findIndex((item) => item.id === id);\n    const canStart =');
+fix("E2-category-sentinel-init",
+  'useState("Tout voir")',
+  'useState("__all__")');
+fix("E3-category-sentinel-reset",
+  'setCategory("Tout voir")',
+  'setCategory("__all__")');
 
 // D) Sanity checks
 report.push("D-tr-def-count: " + (s.split("const tr =").length - 1));
@@ -54,8 +63,9 @@ report.push("D-trL-def: " + (s.includes("const trL = (lang") ? "OK" : "MISSING")
 report.push("D-wrapped-left: " + (s.indexOf('"' + "{tr(" + '"') === -1 ? "OK" : "FAIL"));
 report.push("D-home-export: " + (s.includes("export default function Home") ? "OK" : "FAIL"));
 report.push("D-trL-calls: " + (s.split("trL(lang,").length - 1));
+report.push("D-findindex-ok: " + (s.includes("findIndex((item) => item.id === id)") ? "OK" : "FAIL"));
 
-// E) Write file + dumps (400-line chunks)
+// F) Write file + dumps (400-line chunks)
 fs.writeFileSync(P, s);
 const lines = s.split("\n");
 const CH = 400;
