@@ -217,7 +217,7 @@
 717|        <header className="topbar">
 718|          <button
 719|            className="icon-button mobile-menu-trigger"
-720|            aria-label="Ouvrir le menu"
+720|            aria-label={t.modules.home.langSwitcher}
 721|            onClick={() => setMobileMenuOpen(true)}
 722|          >
 723|            <Menu size={21} />
@@ -235,7 +235,7 @@
 735|                type="button"
 736|                onClick={() => setLanguage("fr")}
 737|                className={`lang-btn ${uiLanguage === "fr" ? "lang-btn-active" : ""}`}
-738|                aria-label="Passer en français"
+738|                aria-label={t.modules.home.switchToFr}
 739|              >
 740|                FR
 741|              </button>
@@ -244,7 +244,7 @@
 744|                type="button"
 745|                onClick={() => setLanguage("en")}
 746|                className={`lang-btn ${uiLanguage === "en" ? "lang-btn-active" : ""}`}
-747|                aria-label="Switch to English"
+747|                aria-label={t.modules.home.switchToEn}
 748|              >
 749|                EN
 750|              </button>
@@ -253,7 +253,7 @@
 753|                type="button"
 754|                onClick={() => setLanguage("es")}
 755|                className={`lang-btn ${uiLanguage === "es" ? "lang-btn-active" : ""}`}
-756|                aria-label="Cambiar a español"
+756|                aria-label={t.modules.home.switchToEs}
 757|              >
 758|                ES
 759|              </button>
@@ -262,7 +262,7 @@
 762|                type="button"
 763|                onClick={() => setLanguage("ar")}
 764|                className={`lang-btn ${uiLanguage === "ar" ? "lang-btn-active" : ""}`}
-765|                aria-label="Passer en arabe"
+765|                aria-label={t.modules.home.switchToAr}
 766|              >
 767|                AR
 768|              </button>
