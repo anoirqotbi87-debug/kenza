@@ -186,7 +186,7 @@ export const useAppStore = create<AppState>()(
 
       setAudioSpeed: (speed: number) => set({ audioSpeed: speed }),
       
-      setLanguage: (lang) => set({ uiLanguage: (lang || 'fr').toLowerCase() as any }),
+      setLanguage: (lang: UILanguage) => set({ uiLanguage: (lang || 'fr').toLowerCase() as any }),
       
       addCardsToSRS: (wordIds: string[]) => set((state: AppState) => {
         const newDeck = { ...state.srsDeck };

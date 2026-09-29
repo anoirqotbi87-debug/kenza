@@ -1,7 +1,7 @@
-UAS-setLanguage: MISSING
-UAS-addCustomWordToSRS: OK
-UAS-updateCustomWord: OK
-UAS-deleteCustomWord: OK
+UAS-setLanguage: OK
+UAS-addCustomWordToSRS: OK (already)
+UAS-updateCustomWord: OK (already)
+UAS-deleteCustomWord: OK (already)
 UAS-toggleDevUnlockAll: OK (already)
 UAS-setRegionalVariant: OK (already)
 UAS-addXp: OK (already)
@@ -14,12 +14,12 @@ UAS-toggleSound: OK (already)
 UAS-setAudioSpeed: OK (already)
 UAS-addCardsToSRS: OK (already)
 UAS-reviewCard: OK (already)
-SPC-ttrack-viewed: OK (already)
-SPC-ttrack-clicked: OK (already)
-AM-data-destructure: OK (already)
 UAS-setUser: OK (already)
 UAS-completeOnboarding: OK (already)
 UAS-setIsPremium: OK (already)
+SPC-ttrack-viewed: OK (already)
+SPC-ttrack-clicked: OK (already)
+AM-data-destructure: OK (already)
 TYPE-ExerciseOption: OK (already)
 M3-l1-chambre: OK (already)
 M3-l1-cle: OK (already)
