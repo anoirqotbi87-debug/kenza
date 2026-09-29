@@ -1,4 +1,4 @@
-// patch-page.mjs v26 — fix typecheck errors: ttrack->track (SaveProgressCard), missing data destructure (AuthModal), implicit any (useAppStore) + v25 i18n fixes kept idempotent
+// patch-page.mjs v27 — typecheck wave 3: explicit param types in useAppStore (contextual typing broken by persist wrapper) + v26/v25 kept idempotent
 import fs from "node:fs";
 const report = [];
 function fix(path, name, oldS, newS) {
@@ -13,6 +13,55 @@ function fix(path, name, oldS, newS) {
   fs.writeFileSync(path, s);
   report.push(name + ": OK");
 }
+
+fix("src/store/useAppStore.ts", "UAS-toggleDevUnlockAll",
+  "toggleDevUnlockAll: () => set((state) => ({ devUnlockAll: !state.devUnlockAll })),",
+  "toggleDevUnlockAll: () => set((state: AppState) => ({ devUnlockAll: !state.devUnlockAll })),")
+;
+fix("src/store/useAppStore.ts", "UAS-setRegionalVariant",
+  "setRegionalVariant: (variant) => set({ regionalVariant: variant }),",
+  "setRegionalVariant: (variant: AppState['regionalVariant']) => set({ regionalVariant: variant }),")
+;
+fix("src/store/useAppStore.ts", "UAS-addXp",
+  "addXp: (amount) => set((state) => {",
+  "addXp: (amount: number) => set((state: AppState) => {")
+;
+fix("src/store/useAppStore.ts", "UAS-completeLesson",
+  "completeLesson: (lessonId) => set((state) => {",
+  "completeLesson: (lessonId: string) => set((state: AppState) => {")
+;
+fix("src/store/useAppStore.ts", "UAS-unlockBadge",
+  "unlockBadge: (badgeId) => set((state) => ({",
+  "unlockBadge: (badgeId: string) => set((state: AppState) => ({")
+;
+fix("src/store/useAppStore.ts", "UAS-useStreakFreeze",
+  "useStreakFreeze: () => set((state) => ({",
+  "useStreakFreeze: () => set((state: AppState) => ({")
+;
+fix("src/store/useAppStore.ts", "UAS-recordActivity",
+  "recordActivity: () => set((state) => {",
+  "recordActivity: () => set((state: AppState) => {")
+;
+fix("src/store/useAppStore.ts", "UAS-setNotation",
+  "setNotation: (notation) => set({ preferredNotation: notation }),",
+  "setNotation: (notation: Notation) => set({ preferredNotation: notation }),")
+;
+fix("src/store/useAppStore.ts", "UAS-toggleSound",
+  "toggleSound: () => set((state) => ({ soundEnabled: !state.soundEnabled })),",
+  "toggleSound: () => set((state: AppState) => ({ soundEnabled: !state.soundEnabled })),")
+;
+fix("src/store/useAppStore.ts", "UAS-setAudioSpeed",
+  "setAudioSpeed: (speed) => set({ audioSpeed: speed }),",
+  "setAudioSpeed: (speed: number) => set({ audioSpeed: speed }),")
+;
+fix("src/store/useAppStore.ts", "UAS-addCardsToSRS",
+  "addCardsToSRS: (wordIds) => set((state) => {",
+  "addCardsToSRS: (wordIds: string[]) => set((state: AppState) => {")
+;
+fix("src/store/useAppStore.ts", "UAS-reviewCard",
+  "reviewCard: (wordId, grade) => set((state) => {",
+  "reviewCard: (wordId: string, grade: ReviewGrade) => set((state: AppState) => {")
+;
 
 fix("src/components/auth/SaveProgressCard.tsx", "SPC-ttrack-viewed",
   "ttrack('save_prompt_viewed'",
@@ -39,7 +88,6 @@ fix("src/store/useAppStore.ts", "UAS-setIsPremium",
   "setIsPremium: (isPremium: boolean) => set({ isPremium }),")
 ;
 
-// v25 i18n fixes (idempotent re-check)
 fix("src/types/curriculum.ts", "TYPE-ExerciseOption",
   "text: string; // Keeps Darija in text",
   "text: MultiLangText | string; // Darija in text, or localized meaning (MultiLangText)")
