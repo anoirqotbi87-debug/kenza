@@ -209,7 +209,7 @@ export const useAppStore = create<AppState>()(
         return { srsDeck: newDeck };
       }),
       
-      addCustomWordToSRS: (word: any) => set((state) => {
+      addCustomWordToSRS: (word: any) => set((state: AppState) => {
         const newVocab = { ...state.customVocabulary, [word.id]: word };
         const newDeck = { ...state.srsDeck };
         const now = new Date().toISOString();
@@ -227,7 +227,7 @@ export const useAppStore = create<AppState>()(
         return { customVocabulary: newVocab, srsDeck: newDeck };
       }),
 
-      updateCustomWord: (wordId: string, updates: any) => set((state) => {
+      updateCustomWord: (wordId: string, updates: any) => set((state: AppState) => {
         if (!state.customVocabulary[wordId]) return state;
         const newVocab = { 
           ...state.customVocabulary, 
@@ -236,7 +236,7 @@ export const useAppStore = create<AppState>()(
         return { customVocabulary: newVocab };
       }),
 
-      deleteCustomWord: (wordId: string) => set((state) => {
+      deleteCustomWord: (wordId: string) => set((state: AppState) => {
         const newVocab = { ...state.customVocabulary };
         delete newVocab[wordId];
         const newDeck = { ...state.srsDeck };

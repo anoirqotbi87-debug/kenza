@@ -1,3 +1,7 @@
+UAS-setLanguage: MISSING
+UAS-addCustomWordToSRS: OK
+UAS-updateCustomWord: OK
+UAS-deleteCustomWord: OK
 UAS-toggleDevUnlockAll: OK (already)
 UAS-setRegionalVariant: OK (already)
 UAS-addXp: OK (already)
