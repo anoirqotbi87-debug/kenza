@@ -19,7 +19,7 @@ export default function SaveProgressCard({ variant, lessonsCompleted, onSave, on
   const xp = useAppStore((s) => s.xp);
 
   useEffect(() => {
-    track('save_prompt_viewed', { variant, lessons_completed: lessonsCompleted }, '/lesson');
+    ttrack('save_prompt_viewed', { variant, lessons_completed: lessonsCompleted }, '/lesson');
   }, [variant, lessonsCompleted]);
 
   const title = variant === 'first' ? t.savePrompt.title : t.savePrompt.reminderTitle;
@@ -37,7 +37,7 @@ export default function SaveProgressCard({ variant, lessonsCompleted, onSave, on
       <p className="text-sm text-blue-800 mb-4">{body}</p>
       <button
         onClick={() => {
-          track('save_prompt_clicked', { variant, lessons_completed: lessonsCompleted }, '/lesson');
+          ttrack('save_prompt_clicked', { variant, lessons_completed: lessonsCompleted }, '/lesson');
           onSave();
         }}
         className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold shadow-md transition-colors"
@@ -48,7 +48,8 @@ export default function SaveProgressCard({ variant, lessonsCompleted, onSave, on
       <button
         onClick={() => {
           t
-rack('save_prompt_dismissed', { variant, lessons_completed: lessonsCompleted }, '/lesson');
+
+track('save_prompt_dismissed', { variant, lessons_completed: lessonsCompleted }, '/lesson');
           onLater();
         }}
         className="w-full mt-2 py-2 text-sm font-bold text-slate-500 hover:text-slate-700"
