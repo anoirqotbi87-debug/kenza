@@ -1,8 +1,12 @@
 A1-rename-def: MISSING
 A2-rename-calls: MISSING
 B-repair-wrapped: 0
+E1-startlesson-truncated: MISSING
+E2-category-sentinel-init: OK
+E3-category-sentinel-reset: OK
 D-tr-def-count: 1
 D-trL-def: OK
 D-wrapped-left: OK
 D-home-export: OK
 D-trL-calls: 243
+D-findindex-ok: OK

@@ -65,7 +65,7 @@
 1665|            className="plain-link"
 1666|            onClick={() => {
 1667|              setSearch("");
-1668|              setCategory("Tout voir");
+1668|              setCategory("__all__");
 1669|              setFavoritesOnly(false);
 1670|            }}
 1671|          >

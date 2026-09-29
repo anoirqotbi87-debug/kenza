@@ -239,7 +239,7 @@ export default function Home() {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("Tout voir");
+  const [category, setCategory] = useState("__all__");
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [reviewIndex, setReviewIndex] = useState(0);
@@ -1665,7 +1665,7 @@ function PhrasesView({
             className="plain-link"
             onClick={() => {
               setSearch("");
-              setCategory("Tout voir");
+              setCategory("__all__");
               setFavoritesOnly(false);
             }}
           >
