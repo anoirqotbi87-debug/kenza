@@ -1,7 +1,7 @@
 {
-  "ts": "2026-09-29T00:29:44.203Z",
-  "appliedThisRun": 6,
-  "already": 181,
+  "ts": "2026-09-29T00:30:36.839Z",
+  "appliedThisRun": 0,
+  "already": 187,
   "missing": [
     "Cartes du jour",
     "Au café, en taxi",
@@ -32,10 +32,10 @@
     "TON ESPACE",
     "objectif",
     "Mon espace",
+    "front: \"Où est le souk ?\"",
     "Palier A1 — Fondations",
     "Effacer ma progression locale",
     "« Bchhal hada? » permet de demander le prix de n’importe que",
-    "Progression enregistrée en direct sur ton profil.",
     "« Wahed » = un, « atay » = thé, « afak » = s’il vous plaît."
   ],
   "trCallCount": 214,
