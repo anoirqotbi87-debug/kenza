@@ -247,7 +247,7 @@ export default function PlacementTestModal({ isOpen, onClose, onComplete }: Plac
                 className="mt-6 flex items-center justify-center gap-2 w-full py-3 text-[#7A7670] hover:text-[#1B2A4A] font-semibold text-xs transition-colors"
               >
                 <SkipForward className="w-4 h-4" />
-                <span>Passer et commencer à zéro</span>
+                <span>{S.skip}</span>
               </button>
             </div>
           ) : (
@@ -260,7 +260,7 @@ export default function PlacementTestModal({ isOpen, onClose, onComplete }: Plac
                 <div className="text-[#C9A05C] text-xs font-bold tracking-[0.25em] uppercase mb-1">
                   — {S.result}
                 </div>
-                <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#1B2A4A] mb-1">Test terminé !</h2>
+                <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#1B2A4A] mb-1">{S.testDone}</h2>
                 <p className="text-xs sm:text-sm text-[#7A7670]">
                   {S.scoreLine} <strong className="text-[#1B2A4A]">{score} / {PLACEMENT_QUESTIONS.length}</strong>.
                 </p>
@@ -271,7 +271,7 @@ export default function PlacementTestModal({ isOpen, onClose, onComplete }: Plac
                 <p className="font-serif text-xl sm:text-2xl font-bold text-[#1B2A4A]">{levelAssigned}</p>
                 {score >= 3 && (
                   <p className="text-xs text-[#7A9174] font-bold mt-2">
-                    +{score >= 6 ? '350' : '150'} XP et visas officiels débloqués !
+                    +{score >= 6 ? '350' : '150'} {S.xpUnlocked}
                   </p>
                 )}
               </div>

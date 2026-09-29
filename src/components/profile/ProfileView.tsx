@@ -234,14 +234,14 @@ export default function ProfileView() {
           </div>
           <div>
             <h3 className="font-serif font-bold text-lg text-[#1B2A4A]">{S.placementTitle}</h3>
-            <p className="text-xs text-[#7A7670]">Réévaluez votre niveau pour ajuster votre parcours.</p>
+            <p className="text-xs text-[#7A7670]">{S.placementHint}</p>
           </div>
         </div>
         <button 
           onClick={() => setIsPlacementTestOpen(true)}
           className="w-full py-3 px-4 bg-[#F7F3EA] hover:bg-[#E8E2D5]/60 text-[#1B2A4A] border border-[#E8E2D5] rounded-full font-bold text-xs transition-colors"
         >
-          Re-passer le test
+          {S.retakeTest}
         </button>
       </div>
 
@@ -261,7 +261,7 @@ export default function ProfileView() {
           </div>
           <div>
             <h3 className="font-serif font-bold text-lg text-[#1B2A4A]">{S.offlineTitle}</h3>
-            <p className="text-xs text-[#7A7670]">Téléchargez les audios et fiches pour pratiquer sans connexion internet.</p>
+            <p className="text-xs text-[#7A7670]">{S.offlineHint}</p>
           </div>
         </div>
         

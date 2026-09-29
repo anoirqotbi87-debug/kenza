@@ -101,7 +101,7 @@ export default function NotificationSettings() {
           <p className="text-slate-700 text-sm mb-4 leading-relaxed">
             {isAr 
               ? 'احصل على تذكير يومي لحفظ سلسلتك 🔥 ومراجعة كلماتك في الوقت المناسب مع نظام SRS.'
-              : 'Recevez un rappel quotidien pour préserver votre série 🔥 et réviser vos mots du jour avec le SRS.'}
+              : S.dailyReminder}
           </p>
           <button
             onClick={requestPermission}
@@ -136,7 +136,7 @@ export default function NotificationSettings() {
           <p className="text-slate-600 text-sm">
             {isAr 
               ? 'لقد قمت بحظر الإشعارات. يرجى تفعيلها من إعدادات متصفحك إذا كنت ترغب في تلقي التذكيرات.'
-              : 'Vous avez bloqué les notifications. Veuillez les réactiver dans les paramètres de votre navigateur si vous souhaitez recevoir des rappels.'}
+              : S.blockedHint}
           </p>
         </div>
       )}

@@ -115,8 +115,8 @@ export default function OnboardingModal() {
           {step === 1 && (
             <div className="space-y-6 animate-in slide-in-from-right">
               <div className="text-center">
-                <h2 className="text-2xl font-black text-slate-800 mb-2">Bienvenue sur KENZA 👋</h2>
-                <p className="text-slate-500">Quel est votre objectif principal avec la Darija ?</p>
+                <h2 className="text-2xl font-black text-slate-800 mb-2">{S.welcome}</h2>
+                <p className="text-slate-500">{S.goalQuestion}</p>
               </div>
               <div className="space-y-3">
                 {GOALS.map(g => (
@@ -143,8 +143,8 @@ export default function OnboardingModal() {
           {step === 2 && (
             <div className="space-y-6 animate-in slide-in-from-right">
               <div className="text-center">
-                <h2 className="text-2xl font-black text-slate-800 mb-2">Votre rythme idéal ⏱️</h2>
-                <p className="text-slate-500">Combien de temps souhaitez-vous y consacrer par jour ?</p>
+                <h2 className="text-2xl font-black text-slate-800 mb-2">{S.tempoTitle}</h2>
+                <p className="text-slate-500">{S.tempoQuestion}</p>
               </div>
               <div className="space-y-3">
                 {TEMPOS.map(t => (
@@ -170,8 +170,8 @@ export default function OnboardingModal() {
           {step === 3 && (
             <div className="space-y-6 animate-in slide-in-from-right">
               <div className="text-center">
-                <h2 className="text-2xl font-black text-slate-800 mb-2">Quel est votre niveau ? 🇲🇦</h2>
-                <p className="text-slate-500">Pour vous proposer le meilleur point de départ.</p>
+                <h2 className="text-2xl font-black text-slate-800 mb-2">{S.levelQuestion}</h2>
+                <p className="text-slate-500">{S.levelHint}</p>
               </div>
               
               <div className="space-y-4">
@@ -185,9 +185,9 @@ export default function OnboardingModal() {
                   <div className="text-left">
                     <div className="text-emerald-600 mb-1 flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                      Je débute complètement
+                      {S.beginner}
                     </div>
-                    <div className="text-sm font-normal text-slate-500">Commencer depuis le Module 1</div>
+                    <div className="text-sm font-normal text-slate-500">{S.beginnerHint}</div>
                   </div>
                   <ArrowRight className="w-5 h-5 text-slate-400" />
                 </button>
@@ -199,9 +199,9 @@ export default function OnboardingModal() {
                   <div className="text-left">
                     <div className="text-blue-600 mb-1 flex items-center gap-2">
                       <Zap className="w-4 h-4" />
-                      J'ai déjà des notions
+                      {S.notions}
                     </div>
-                    <div className="text-sm font-normal text-slate-500">Test rapide de 2 min pour sauter des niveaux</div>
+                    <div className="text-sm font-normal text-slate-500">{S.notionsHint}</div>
                   </div>
                   <ArrowRight className="w-5 h-5 text-slate-400" />
                 </button>
@@ -215,13 +215,13 @@ export default function OnboardingModal() {
                 <CheckCircle2 className="w-12 h-12" />
               </div>
               <h2 className="text-3xl font-black text-slate-800">
-                Profil configuré !
+                {S.done}
               </h2>
               <p className="text-slate-500 text-lg">
                 {S.youScored} {quizScore} / 3.<br/>
                 {quizScore >= 2 
-                  ? "Bravo ! Vous semblez avoir les bases. Vous pourrez commencer direct au Module 2." 
-                  : "Parfait ! Nous allons commencer par les fondations doucement."}
+                  ? S.bravo 
+                  : S.parfait}
               </p>
               <button 
                 onClick={handleFinish}
