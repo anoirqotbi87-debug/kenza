@@ -485,7 +485,7 @@
 1485|            <strong>{hasPassedLevel("1") ? "Validé ✓" : "En cours"}</strong>
 1486|          </div>
 1487|          <button
-1488|            onClick={() => onOpenCheckpoint("1", "Palier A1 — Fondations")}
+1488|            onClick={() => onOpenCheckpoint("1", tr("Palier A1 — Fondations", "Level A1 — Foundations", "Nivel A1 — Fundamentos", "المستوى A1 — الأساسيات"))}
 1489|          >
 1490|            {tr("Passer le Checkpoint A1", "Take Checkpoint A1", "Pasar el Checkpoint A1", "اجتز نقطة A1")} <ArrowRight size={14} />
 1491|          </button>

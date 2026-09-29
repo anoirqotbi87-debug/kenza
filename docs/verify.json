@@ -1,7 +1,7 @@
 {
-  "ts": "2026-09-29T00:17:40.847Z",
-  "appliedThisRun": 0,
-  "already": 117,
+  "ts": "2026-09-29T00:27:30.616Z",
+  "appliedThisRun": 64,
+  "already": 120,
   "missing": [
     "Cartes du jour",
     "Au café, en taxi",
@@ -33,72 +33,66 @@
     "objectif",
     "Mon espace",
     "Palier A1 — Fondations",
-    "Effacer ma progression locale"
+    "Effacer ma progression locale",
+    "« Bchhal hada? » permet de demander le prix de n’importe que",
+    "Baisse un peu s’il te plaît",
+    "C’est trop beau",
+    "À Tanger, comment dit-on « Qu’est-ce que tu veux ? »",
+    "Progression enregistrée en direct sur ton profil.",
+    "« Wahed » = un, « atay » = thé, « afak » = s’il vous plaît."
   ],
-  "trCallCount": 130,
+  "trCallCount": 207,
   "checks": [
     {
-      "s": "tr(\"Salam, on s’y remet ?\"",
+      "s": "tr(\"Comment dit-on « bonjour » en darija ?\"",
       "ok": true
     },
     {
-      "s": "tr(\"Voir mon espace\"",
+      "s": "tr(\"Choisis la formule la plus naturelle.\"",
       "ok": true
     },
     {
-      "s": "tr(\"POUR AUJOURD’HUI\"",
+      "s": "tr(\"Comment demander un thé, s’il vous plaît",
       "ok": true
     },
     {
-      "s": "tr(\"LEÇON SUIVANTE\"",
+      "s": "tr(\"Je voudrais\", \"I would like\"",
       "ok": true
     },
     {
-      "s": "front: tr(\"Merci beaucoup\"",
+      "s": "tr(\"Que signifie « yallah » ?\"",
       "ok": true
     },
     {
-      "s": "front: tr(\"Je voudrais un thé\"",
+      "s": "tr(\"Baisse un peu s’il te plaît\"",
+      "ok": false
+    },
+    {
+      "s": "tr(\"Au café du coin\"",
       "ok": true
     },
     {
-      "s": "hint: tr(\"Pour savourer un moment au café.\"",
+      "s": "tr(\"Négocier au souk de Marrakech\"",
       "ok": true
     },
     {
-      "s": "tr(\"Touche pour révéler\"",
+      "s": "tr(\"Voyage à Tanger (Chamali)\"",
       "ok": true
     },
     {
-      "s": "tr(\"Session tranquille\"",
+      "s": "tr(\"LEÇON\", \"LESSON\"",
       "ok": true
     },
     {
-      "s": "tr(\"CARTE\", \"CARD\"",
+      "s": "tr(\"Progression enregistrée en direct\"",
+      "ok": false
+    },
+    {
+      "s": "tr(\"Merci beaucoup !\", \"Thank you very much!",
       "ok": true
     },
     {
-      "s": "tr(\"Accueil\", \"Home\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"EN FRANÇAIS\", \"IN ENGLISH\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"Pas besoin d’être parfait·e.\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"Les premiers pas\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"Passeport Culturel & Données\"",
-      "ok": true
-    },
-    {
-      "s": "tr(\"Écoute · Répète · Reviens\"",
+      "s": "tr(\"Au café\", \"At the café\"",
       "ok": true
     }
   ]

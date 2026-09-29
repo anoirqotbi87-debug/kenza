@@ -450,7 +450,7 @@
 950|                <ArrowLeft size={19} />
 951|              </button>
 952|              <div className="lesson-progress-label">
-953|                <span>LEÇON · {activeLesson.length.toUpperCase()}</span>
+953|                <span>{tr("LEÇON", "LESSON", "LECCIÓN", "درس")} · {activeLesson.length.toUpperCase()}</span>
 954|                <span>
 955|                  {questionIndex + 1} / {activeLesson.questions.length}
 956|                </span>

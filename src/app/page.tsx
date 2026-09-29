@@ -91,126 +91,126 @@ const baseLessons: Lesson[] = [
     status: "current",
     questions: [
       {
-        prompt: "Comment dit-on « bonjour » en darija ?",
-        helper: "Choisis la formule la plus naturelle.",
+        prompt: tr("Comment dit-on « bonjour » en darija ?", "How do you say « hello » in darija?", "¿Cómo se dice «hola» en darija?", "كيف نقول «مرحبا» بالدارجة؟"),
+        helper: tr("Choisis la formule la plus naturelle.", "Choose the most natural phrase.", "Elige la fórmula más natural.", "اختر الصيغة الأكثر طبيعية."),
         options: ["Salam", "Shukran", "Bslama"],
         answer: "Salam",
-        note: "« Salam » veut dire paix. C’est le bonjour simple, chaleureux et passe-partout.",
+        note: tr("« Salam » veut dire paix. C’est le bonjour simple, chaleureux et passe-partout.", "« Salam » means peace. The simple, warm, all-purpose hello.", "« Salam » significa paz. Es el saludo simple, cálido y universal.", "«سلام» تعني السلام. تحية بسيطة دافئة تصلح لكل مناسبة."),
       },
       {
-        prompt: "Tu rencontres quelqu’un pour la première fois. Que dis-tu ?",
-        helper: "Pense à une formule de bienvenue.",
+        prompt: tr("Tu rencontres quelqu’un pour la première fois. Que dis-tu ?", "You meet someone for the first time. What do you say?", "Conoces a alguien por primera vez. ¿Qué dices?", "تقابل شخصاً لأول مرة. ماذا تقول؟"),
+        helper: tr("Pense à une formule de bienvenue.", "Think of a welcoming phrase.", "Piensa en una fórmula de bienvenida.", "فكر في صيغة ترحيب."),
         options: ["Labas?", "Tsharrafna", "Afak"],
         answer: "Tsharrafna",
-        note: "« Tsharrafna » signifie littéralement « enchanté·e ». Une belle façon de faire connaissance.",
+        note: tr("« Tsharrafna » signifie littéralement « enchanté·e ». Une belle façon de faire connaissance.", "« Tsharrafna » literally means « delighted to meet you ». A lovely way to connect.", "« Tsharrafna » significa literalmente «encantado». Una bonita forma de conocerse.", "«تشرفنا» تعني حرفياً «تشرّفت بلقائك». طريقة جميلة للتعارف."),
       },
       {
-        prompt: "Que signifie « labas? »",
-        helper: "Une question qu’on entend partout.",
-        options: ["Où vas-tu ?", "Ça va ?", "À demain"],
-        answer: "Ça va ?",
-        note: "« Labas? » est le petit « ça va ? » du quotidien. On répond souvent « labas, hamdullah ».",
+        prompt: tr("Que signifie « labas? »", "What does « labas? » mean?", "¿Qué significa « labas? »?", "ماذا تعني «لاباس؟»"),
+        helper: tr("Une question qu’on entend partout.", "A question you hear everywhere.", "Una pregunta que se oye por todas partes.", "سؤال تسمعه في كل مكان."),
+        options: [tr("Où vas-tu ?", "Where are you going?", "¿Adónde vas?", "إلى أين تذهب؟"), tr("Ça va ?", "How are you?", "¿Qué tal?", "كيف حالك؟"), tr("À demain", "See you tomorrow", "Hasta mañana", "إلى الغد")],
+        answer: tr("Ça va ?", "How are you?", "¿Qué tal?", "كيف حالك؟"),
+        note: tr("« Labas? » est le petit « ça va ? » du quotidien. On répond souvent « labas, hamdullah ».", "« Labas? » is the everyday « how are you? ». People often reply « labas, hamdullah ».", "« Labas? » es el «¿qué tal?» del día a día. Suele responderse «labas, hamdullah».", "«لاباس؟» هي «كيف حالك؟» اليومية. غالباً يُجاب «لاباس، الحمد لله»."),
       },
     ],
   },
   {
     id: "cafe",
-    title: "Au café du coin",
-    subtitle: "Commander un thé à la menthe",
+    title: tr("Au café du coin", "At the corner café", "En el café de la esquina", "في مقهى الحي"),
+    subtitle: tr("Commander un thé à la menthe", "Ordering a mint tea", "Pedir un té a la menta", "طلب شاي بالنعناع"),
     length: "8 min",
     status: "locked",
     questions: [
       {
-        prompt: "Comment demander un thé, s’il vous plaît ?",
-        helper: "Une formule utile au café.",
+        prompt: tr("Comment demander un thé, s’il vous plaît ?", "How do you ask for a tea, please?", "¿Cómo pedir un té, por favor?", "كيف تطلب شاياً، من فضلك؟"),
+        helper: tr("Une formule utile au café.", "A handy phrase at the café.", "Una fórmula útil en el café.", "صيغة مفيدة في المقهى."),
         options: ["Atay, afak", "Fin ghadi?", "Smah liya"],
         answer: "Atay, afak",
-        note: "« Atay, afak » : un thé, s’il vous plaît. « Afak » ajoute la politesse.",
+        note: tr("« Atay, afak » : un thé, s’il vous plaît. « Afak » ajoute la politesse.", "« Atay, afak »: a tea, please. « Afak » adds politeness.", "« Atay, afak »: un té, por favor. « Afak » añade cortesía.", "«أتاي، عفاك»: شاي من فضلك. «عفاك» تضيف اللطف."),
       },
       {
-        prompt: "Qu’est-ce que « bghit » veut dire ?",
-        helper: "Un mot très pratique pour commander.",
-        options: ["Je voudrais", "J’ai faim", "C’est loin"],
-        answer: "Je voudrais",
-        note: "« Bghit » veut dire « je veux » ou « je voudrais », selon le contexte.",
+        prompt: tr("Qu’est-ce que « bghit » veut dire ?", "What does « bghit » mean?", "¿Qué significa « bghit »?", "ماذا تعني «بغيت»؟"),
+        helper: tr("Un mot très pratique pour commander.", "A very handy word for ordering.", "Una palabra muy práctica para pedir.", "كلمة عملية جداً للطلب."),
+        options: [tr("Je voudrais", "I would like", "Quisiera", "أريد"), tr("J’ai faim", "I’m hungry", "Tengo hambre", "أنا جائع"), tr("C’est loin", "It’s far", "Está lejos", "إنه بعيد")],
+        answer: tr("Je voudrais", "I would like", "Quisiera", "أريد"),
+        note: tr("« Bghit » veut dire « je veux » ou « je voudrais », selon le contexte.", "« Bghit » means « I want » or « I would like », depending on context.", "« Bghit » significa «quiero» o «quisiera», según el contexto.", "«بغيت» تعني «أريد» حسب السياق."),
       },
     ],
   },
   {
     id: "medina",
-    title: "Se repérer dans la médina",
-    subtitle: "Demander son chemin sans stress",
+    title: tr("Se repérer dans la médina", "Finding your way in the medina", "Orientarse en la medina", "التعرف على طريقك في المدينة القديمة"),
+    subtitle: tr("Demander son chemin sans stress", "Asking for directions, stress-free", "Preguntar el camino sin estrés", "اسأل عن الطريق بلا توتر"),
     length: "7 min",
     status: "locked",
     questions: [
       {
-        prompt: "Comment demander « où est… ? »",
-        helper: "La phrase qui débloque une promenade.",
+        prompt: tr("Comment demander « où est… ? »", "How to ask « where is…? »", "Cómo preguntar «¿dónde está…?»", "كيف تسأل «أين يوجد…؟»"),
+        helper: tr("La phrase qui débloque une promenade.", "The phrase that unlocks a stroll.", "La frase que desbloquea un paseo.", "العبارة التي تفتح لك التنزه."),
         options: ["Fin kayn…?", "Chhal hadi?", "Mumkin…?"],
         answer: "Fin kayn…?",
-        note: "« Fin kayn…? » signifie « où se trouve… ? ». Ajoute le lieu que tu cherches.",
+        note: tr("« Fin kayn…? » signifie « où se trouve… ? ». Ajoute le lieu que tu cherches.", "« Fin kayn…? » means « where is…? ». Add the place you’re looking for.", "« Fin kayn…? » significa «¿dónde está…?». Añade el lugar que buscas.", "«فين كاين…؟» تعني «أين يوجد…؟». أضف المكان الذي تبحث عنه."),
       },
       {
-        prompt: "Que signifie « yallah » ?",
-        helper: "Un mot qu’on entend souvent.",
-        options: ["Allons-y", "Peut-être", "Merci beaucoup"],
-        answer: "Allons-y",
-        note: "« Yallah » invite à partir, à avancer, ou simplement à se lancer.",
+        prompt: tr("Que signifie « yallah » ?", "What does « yallah » mean?", "¿Qué significa « yallah »?", "ماذا تعني «يللاه»؟"),
+        helper: tr("Un mot qu’on entend souvent.", "A word you hear often.", "Una palabra que se oye a menudo.", "كلمة تُسمع كثيراً."),
+        options: [tr("Allons-y", "Let’s go", "Vamos", "هيا بنا"), tr("Peut-être", "Maybe", "Quizás", "ربما"), "Merci beaucoup"],
+        answer: tr("Allons-y", "Let’s go", "Vamos", "هيا بنا"),
+        note: tr("« Yallah » invite à partir, à avancer, ou simplement à se lancer.", "« Yallah » invites you to leave, move, or simply dive in.", "« Yallah » invita a partir, avanzar o simplemente lanzarse.", "«يللاه» دعوة للانطلاق والتقدم أو البدء."),
       },
     ],
   },
   {
     id: "marrakech",
-    title: "Négocier au souk de Marrakech",
-    subtitle: "Les nombres et les prix (Niveau A2)",
+    title: tr("Négocier au souk de Marrakech", "Bargaining at the Marrakech souk", "Regatear en el souk de Marrakech", "المفاوضة في سوق مراكش"),
+    subtitle: tr("Les nombres et les prix (Niveau A2)", "Numbers and prices (Level A2)", "Números y precios (Nivel A2)", "الأرقام والأسعار (مستوى A2)"),
     length: "9 min",
     status: "locked",
     isPremium: true,
     questions: [
       {
-        prompt: "Comment demander « Combien coûte ceci ? »",
-        helper: "Expression clé pour entamer la discussion.",
+        prompt: tr("Comment demander « Combien coûte ceci ? »", "How to ask « How much is this? »", "Cómo preguntar «¿Cuánto cuesta esto?»", "كيف تسأل «بشحال هادا؟»"),
+        helper: tr("Expression clé pour entamer la discussion.", "Key phrase to start the conversation.", "Expresión clave para entablar la conversación.", "عبارة مفتاحية لبدء الحوار."),
         options: ["Bchhal hada?", "Fin mchiti?", "Labas 3lik?"],
         answer: "Bchhal hada?",
         note: "« Bchhal hada? » permet de demander le prix de n'importe quel article.",
       },
       {
-        prompt: "Que veut dire « Naqas chwiya 3afak » ?",
-        helper: "La formule cordiale de marchandage.",
-        options: ["Baisse un peu s'il te plaît", "Donne-moi deux verres", "C'est trop beau"],
+        prompt: tr("Que veut dire « Naqas chwiya 3afak » ?", "What does « Naqas chwiya 3afak » mean?", "¿Qué significa « Naqas chwiya 3afak »?", "ماذا تعني «نقّص شوية عفاك»؟"),
+        helper: tr("La formule cordiale de marchandage.", "The friendly way to bargain.", "La fórmula cordial del regateo.", "الصيغة الودية للمساومة."),
+        options: ["Baisse un peu s'il te plaît", tr("Donne-moi deux verres", "Give me two glasses", "Dame dos vasos", "أعطني كأسين"), "C'est trop beau"],
         answer: "Baisse un peu s'il te plaît",
-        note: "« Naqas chwiya » = réduis un peu. Utilisé avec le sourire !",
+        note: tr("« Naqas chwiya » = réduis un peu. Utilisé avec le sourire !", "« Naqas chwiya » = cut it down a bit. Used with a smile!", "« Naqas chwiya » = reduce un poco. ¡Se usa con una sonrisa!", "«نقّص شوية» = خفّض قليلاً. تُقال بابتسامة!"),
       },
     ],
   },
   {
     id: "tanger",
-    title: "Voyage à Tanger (Chamali)",
-    subtitle: "Les subtilités régionales (Niveau B2)",
+    title: tr("Voyage à Tanger (Chamali)", "Trip to Tangier (Chamali)", "Viaje a Tánger (Chamali)", "رحلة إلى طنجة (الشمالي)"),
+    subtitle: tr("Les subtilités régionales (Niveau B2)", "Regional subtleties (Level B2)", "Sutilezas regionales (Nivel B2)", "الفروق الإقليمية (مستوى B2)"),
     length: "10 min",
     status: "locked",
     isPremium: true,
     questions: [
       {
         prompt: "À Tanger, comment dit-on « Qu'est-ce que tu veux ? »",
-        helper: "Remplace le standard « Chno bghiti ».",
+        helper: tr("Remplace le standard « Chno bghiti ».", "Replaces the standard « Chno bghiti ».", "Sustituye al estándar « Chno bghiti ».", "تعوض الصيغة القياسية «شنو بغيتي»."),
         options: ["Chni katchof?", "Chni katsaksi?", "Chni khassek?"],
         answer: "Chni khassek?",
-        note: "Dans le nord (Chamali), on utilise « Chni » au lieu de « Chno ».",
+        note: tr("Dans le nord (Chamali), on utilise « Chni » au lieu de « Chno ».", "In the north (Chamali), people use « Chni » instead of « Chno ».", "En el norte (Chamali), se usa « Chni » en lugar de « Chno ».", "في الشمال (الشمالي) يُستخدم «شني» بدل «شنو»."),
       },
     ],
   },
 ];
 
 const defaultPhrases: Phrase[] = [
-  { id: "salam", category: "Saluer", darija: "Salam, labas?", arabic: "سلام، لاباس؟", meaning: "Salut, ça va ?", note: "La formule la plus simple pour ouvrir une conversation." },
-  { id: "bikhir", category: "Saluer", darija: "Labas, hamdullah.", arabic: "لاباس، الحمد لله.", meaning: "Ça va, merci / Dieu merci.", note: "La réponse classique à « labas? »." },
-  { id: "afak", category: "Au café", darija: "Wahed atay, afak.", arabic: "واحد أتاي، عفاك.", meaning: "Un thé, s’il vous plaît.", note: "« Wahed » = un, « atay » = thé, « afak » = s’il te plaît." },
-  { id: "bghit", category: "Au café", darija: "Bghit lma, afak.", arabic: "بغيت الما، عفاك.", meaning: "Je voudrais de l’eau, s’il vous plaît.", note: "Remplace « lma » par ce que tu aimerais commander." },
-  { id: "fin", category: "Se déplacer", darija: "Fin kayn souk?", arabic: "فين كاين السوق؟", meaning: "Où est le souk ?", note: "Utilise cette structure pour demander un lieu." },
-  { id: "shukran", category: "Les essentiels", darija: "Shukran bzaf!", arabic: "شكرا بزاف!", meaning: "Merci beaucoup !", note: "« Bzaf » signifie beaucoup — un mot qui sert partout." },
-  { id: "smah", category: "Les essentiels", darija: "Smah liya.", arabic: "سمح ليا.", meaning: "Excuse-moi / pardon.", note: "Pour attirer l’attention ou demander pardon, avec douceur." },
-  { id: "bslama", category: "Saluer", darija: "Bslama, nshawfek.", arabic: "بسلامة، نشوفك.", meaning: "Au revoir, à bientôt.", note: "Une façon amicale de prendre congé." },
+  { id: "salam", category: tr("Saluer", "Greeting", "Saludar", "التحية"), darija: "Salam, labas?", arabic: "سلام، لاباس؟", meaning: tr("Salut, ça va ?", "Hi, how are you?", "Hola, ¿qué tal?", "مرحبا، كيف حالك؟"), note: tr("La formule la plus simple pour ouvrir une conversation.", "The simplest way to open a conversation.", "La fórmula más simple para abrir una conversación.", "أبسط صيغة لبدء أي حديث.") },
+  { id: "bikhir", category: tr("Saluer", "Greeting", "Saludar", "التحية"), darija: "Labas, hamdullah.", arabic: "لاباس، الحمد لله.", meaning: tr("Ça va, merci / Dieu merci.", "Fine, thanks / Thank God.", "Bien, gracias / Gracias a Dios.", "بخير، الحمد لله."), note: tr("La réponse classique à « labas? ».", "The classic reply to « labas? ».", "La respuesta clásica a « labas? ».", "الرد المألوف على «لاباس؟».") },
+  { id: "afak", category: tr("Au café", "At the café", "En el café", "في المقهى"), darija: "Wahed atay, afak.", arabic: "واحد أتاي، عفاك.", meaning: tr("Un thé, s’il vous plaît.", "A tea, please.", "Un té, por favor.", "شاي من فضلك."), note: "« Wahed » = un, « atay » = thé, « afak » = s’il te plaît." },
+  { id: "bghit", category: tr("Au café", "At the café", "En el café", "في المقهى"), darija: "Bghit lma, afak.", arabic: "بغيت الما، عفاك.", meaning: tr("Je voudrais de l’eau, s’il vous plaît.", "I’d like some water, please.", "Quisiera agua, por favor.", "أريد ماءً، من فضلك."), note: tr("Remplace « lma » par ce que tu aimerais commander.", "Replace « lma » with whatever you’d like to order.", "Sustituye « lma » por lo que quieras pedir.", "استبدل «لما» بما تود طلبه.") },
+  { id: "fin", category: tr("Se déplacer", "Getting around", "Desplazarse", "التنقل"), darija: "Fin kayn souk?", arabic: "فين كاين السوق؟", meaning: "Où est le souk ?", note: tr("Utilise cette structure pour demander un lieu.", "Use this structure to ask for a place.", "Usa esta estructura para preguntar por un lugar.", "استخدم هذه الصيغة لسؤال عن مكان.") },
+  { id: "shukran", category: tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات"), darija: "Shukran bzaf!", arabic: "شكرا بزاف!", meaning: tr("Merci beaucoup !", "Thank you very much!", "¡Muchas gracias!", "شكراً جزيلاً!"), note: tr("« Bzaf » signifie beaucoup — un mot qui sert partout.", "« Bzaf » means a lot — a word useful everywhere.", "« Bzaf » significa mucho — una palabra útil en todo.", "«بزاف» تعني كثيراً — كلمة تفيد في كل مكان.") },
+  { id: "smah", category: tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات"), darija: "Smah liya.", arabic: "سمح ليا.", meaning: tr("Excuse-moi / pardon.", "Excuse me / sorry.", "Disculpa / perdón.", "المامعة / عفواً."), note: tr("Pour attirer l’attention ou demander pardon, avec douceur.", "To catch attention or apologize, gently.", "Para llamar la atención o pedir perdón, con dulzura.", "للتنبيه أو طلب العفو، بلطف.") },
+  { id: "bslama", category: tr("Saluer", "Greeting", "Saludar", "التحية"), darija: "Bslama, nshawfek.", arabic: "بسلامة، نشوفك.", meaning: "Au revoir, à bientôt.", note: tr("Une façon amicale de prendre congé.", "A friendly way to say goodbye.", "Una manera amable de despedirse.", "طريقة ودية للوداع.") },
 ];
 
 const navItems: { id: View; label: string; icon: LucideIcon }[] = [
@@ -380,10 +380,10 @@ export default function Home() {
         meaningText = (w as any).back;
       }
 
-      let cat = "Les essentiels";
-      if (w.category === "polite_social") cat = "Saluer";
-      else if (w.category === "food_drink") cat = "Au café";
-      else if (w.category === "directions") cat = "Se déplacer";
+      let cat = tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات");
+      if (w.category === "polite_social") cat = tr("Saluer", "Greeting", "Saludar", "التحية");
+      else if (w.category === "food_drink") cat = tr("Au café", "At the café", "En el café", "في المقهى");
+      else if (w.category === "directions") cat = tr("Se déplacer", "Getting around", "Desplazarse", "التنقل");
       else if (w.category) cat = w.category;
 
       return {
@@ -419,7 +419,7 @@ export default function Home() {
 
       return {
         id: String(p.id || Math.random()),
-        category: String(p.category || "Les essentiels"),
+        category: String(p.category || tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات")),
         darija: String(p.darija || p.front || p.arabizi || ""),
         arabic: String(p.arabic || ""),
         meaning: String(meaningStr || "Expression en darija"),
@@ -950,7 +950,7 @@ export default function Home() {
                 <ArrowLeft size={19} />
               </button>
               <div className="lesson-progress-label">
-                <span>LEÇON · {activeLesson.length.toUpperCase()}</span>
+                <span>{tr("LEÇON", "LESSON", "LECCIÓN", "درس")} · {activeLesson.length.toUpperCase()}</span>
                 <span>
                   {questionIndex + 1} / {activeLesson.questions.length}
                 </span>
@@ -1485,7 +1485,7 @@ function PathView({
             <strong>{hasPassedLevel("1") ? "Validé ✓" : "En cours"}</strong>
           </div>
           <button
-            onClick={() => onOpenCheckpoint("1", "Palier A1 — Fondations")}
+            onClick={() => onOpenCheckpoint("1", tr("Palier A1 — Fondations", "Level A1 — Foundations", "Nivel A1 — Fundamentos", "المستوى A1 — الأساسيات"))}
           >
             {tr("Passer le Checkpoint A1", "Take Checkpoint A1", "Pasar el Checkpoint A1", "اجتز نقطة A1")} <ArrowRight size={14} />
           </button>
@@ -1598,7 +1598,7 @@ function PhrasesView({
             const darijaText = phrase.darija || "";
             const arabicText = phrase.arabic || "";
             const meaningText = phrase.meaning || "";
-            const categoryText = phrase.category || "Les essentiels";
+            const categoryText = phrase.category || tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات");
 
             return (
               <article className="phrase-card" key={phrase.id}>

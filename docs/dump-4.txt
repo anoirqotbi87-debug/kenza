@@ -98,7 +98,7 @@
 1598|            const darijaText = phrase.darija || "";
 1599|            const arabicText = phrase.arabic || "";
 1600|            const meaningText = phrase.meaning || "";
-1601|            const categoryText = phrase.category || "Les essentiels";
+1601|            const categoryText = phrase.category || tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات");
 1602|
 1603|            return (
 1604|              <article className="phrase-card" key={phrase.id}>
