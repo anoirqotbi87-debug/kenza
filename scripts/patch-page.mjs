@@ -1,60 +1,106 @@
-// patch-page.mjs v24 — minimal: programmatic T4 (AR savePrompt, no fragile anchor) + dumps
+// patch-page.mjs v25 — i18n: localize hardcoded FR exercise options (module3/5/7) + ExerciseOption type
 import fs from "node:fs";
 
 const report = [];
-const P = "src/app/page.tsx";
-const TRF = "src/lib/i18n/translations.ts";
 
-// ---- T4: insert headerLogin/checkEmail into AR auth + savePrompt sibling ----
-let s = fs.readFileSync(TRF, "utf8");
-if (s.includes("savePrompt") && s.includes("\u0627\u062d\u0641\u0638 \u062a\u0642\u062f\u0651\u0645\u064a")) {
-  report.push("T4-ar-saveprompt: OK (already present)");
-} else {
-  const idx = s.lastIndexOf("continueGuest:");
-  if (idx < 0) {
-    report.push("T4-ar-saveprompt: MISSING (no continueGuest found)");
-  } else {
-    const closeMatch = /\n(\s*)\},/.exec(s.slice(idx));
-    if (!closeMatch) {
-      report.push("T4-ar-saveprompt: MISSING (no closing brace after continueGuest)");
-    } else {
-      const closeIdx = idx + closeMatch.index;
-      const region = s.slice(idx, closeIdx).trim();
-      const needsComma = !/[,\[{]$/.test(region);
-      const head = (needsComma ? "," : "") + "\n      headerLogin: \"\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644\", checkEmail: \"\u062a\u0645 \u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u062d\u0633\u0627\u0628. \u0623\u0643\u0651\u062f \u0628\u0631\u064a\u062f\u0643 \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a \u0639\u0628\u0631 \u0627\u0644\u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u062a\u064a \u0623\u0631\u0633\u0644\u0646\u0627\u0647\u0627 \u0644\u0644\u062a\u0648\u060c \u062b\u0645 \u0639\u062f \u0625\u0644\u0649 \u0647\u0646\u0627: \u0633\u064a\u062a\u0645 \u062d\u0641\u0638 \u062a\u0642\u062f\u0651\u0645\u0643.\"";
-      const sp = [
-        "    savePrompt: {",
-        "      title: \"\u0644\u0627 \u062a\u0641\u0642\u062f \u062a\u0642\u062f\u0651\u0645\u0643\",",
-        "      body: \"\u0623\u0646\u0634\u0626 \u062d\u0633\u0627\u0628\u0643 \u0627\u0644\u0645\u062c\u0627\u0646\u064a \u0644\u0627\u062d\u062a\u0641\u0627\u0638 \u0628\u0646\u0642\u0627\u0637 XP \u0648\u0633\u0644\u0633\u0644\u0629 \u0623\u064a\u0627\u0645\u0643\u060c \u0648\u0627\u0644\u0645\u062a\u0627\u0628\u0639\u0629 \u0639\u0644\u0649 \u0623\u064a \u062c\u0647\u0627\u0632.\",",
-        "      reminderTitle: \"\u062a\u0642\u062f\u0651\u0645\u0643 \u063a\u064a\u0631 \u0645\u062d\u0641\u0648\u0638 \u0628\u0639\u062f\",",
-        "      reminderBody: \"\u0644\u062f\u064a\u0643 \u0628\u0627\u0644\u0641\u0639\u0644 {xp} XP \u0648{lessons} \u062f\u0631\u0648\u0633 \u0645\u0643\u062a\u0645\u0644\u0629. \u0625\u0646\u0647\u0627 \u0645\u062d\u0641\u0648\u0638\u0629 \u0639\u0644\u0649 \u0647\u0630\u0627 \u0627\u0644\u062c\u0647\u0627\u0632 \u0641\u0642\u0637: \u0623\u0646\u0634\u0626 \u062d\u0633\u0627\u0628\u064b\u0627 \u0645\u062c\u0627\u0646\u064a\u064b\u0627 \u062d\u062a\u0649 \u0644\u0627 \u062a\u0641\u0642\u062f \u0634\u064a\u0626\u064b\u0627.\",",
-        "      cta: \"\u0627\u062d\u0641\u0638 \u062a\u0642\u062f\u0651\u0645\u064a\",",
-        "      later: \"\u0644\u0627\u062d\u0642\u064b\u0627\",",
-        "      reassurance: \"\u0645\u062c\u0627\u0646\u064a \u00b7 30 \u062b\u0627\u0646\u064a\u0629 \u00b7 \u0639\u0628\u0631 \u062c\u0648\u062c\u0644 \u0623\u0648 \u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a\"",
-        "    },"
-      ].join("\n");
-      const closing = closeMatch[0];
-      const newBlock = head + closing + "\n" + sp;
-      s = s.slice(0, closeIdx) + newBlock + s.slice(closeIdx + closing.length);
-      fs.writeFileSync(TRF, s);
-      report.push("T4-ar-saveprompt: OK (inserted programmatically)");
-    }
+function fix(path, name, oldS, newS) {
+  let s = fs.readFileSync(path, "utf8");
+  if (!s.includes(oldS)) {
+    report.push(s.includes(newS) ? name + ": OK (already)" : name + ": MISSING");
+    return;
   }
+  const n = s.split(oldS).length - 1;
+  if (n !== 1) { report.push(name + ": AMBIGUOUS (" + n + " occurrences)"); return; }
+  s = s.replace(oldS, newS);
+  fs.writeFileSync(path, s);
+  report.push(name + ": OK");
 }
 
-// ---- dumps ----
+fix("src/types/curriculum.ts", "TYPE-ExerciseOption",
+  String.raw`text: string; // Keeps Darija in text`,
+  String.raw`text: MultiLangText | string; // Darija in text, or localized meaning (MultiLangText)`)
+;
+
+fix("src/data/module3.ts", "M3-l1-chambre",
+  "text: 'La chambre', isCorrect: false },",
+  "text: { fr: 'La chambre', en: 'The bedroom', es: 'El dormitorio', ar: 'الغرفة' }, isCorrect: false },")
+;
+fix("src/data/module3.ts", "M3-l1-cle",
+  "text: 'La clé', isCorrect: true },",
+  "text: { fr: 'La clé', en: 'The key', es: 'La llave', ar: 'المفتاح' }, isCorrect: true },")
+;
+fix("src/data/module3.ts", "M3-l1-lit",
+  "text: 'Le lit', isCorrect: false }",
+  "text: { fr: 'Le lit', en: 'The bed', es: 'La cama', ar: 'السرير' }, isCorrect: false }")
+;
+fix("src/data/module3.ts", "M3-l3-medecin",
+  "text: 'Médecin', isCorrect: false },",
+  "text: { fr: 'Médecin', en: 'Doctor', es: 'Médico', ar: 'طبيب' }, isCorrect: false },")
+;
+fix("src/data/module3.ts", "M3-l3-medicament",
+  "text: 'Médicament', isCorrect: true },",
+  "text: { fr: 'Médicament', en: 'Medicine', es: 'Medicamento', ar: 'دواء' }, isCorrect: true },")
+;
+fix("src/data/module3.ts", "M3-l3-malade",
+  "text: 'Malade', isCorrect: false }",
+  "text: { fr: 'Malade', en: 'Sick', es: 'Enfermo', ar: 'مريض' }, isCorrect: false }")
+;
+
+fix("src/data/module5.ts", "M5-agree",
+  "text: 'Je suis d\\'accord', isCorrect: false },",
+  "text: { fr: 'Je suis d\\'accord', en: 'I agree', es: 'Estoy de acuerdo', ar: 'أنا موافق' }, isCorrect: false },")
+;
+fix("src/data/module5.ts", "M5-pasforce",
+  "text: 'Pas forcément', isCorrect: true },",
+  "text: { fr: 'Pas forcément', en: 'Not necessarily', es: 'No necesariamente', ar: 'ليس بالضرورة' }, isCorrect: true },")
+;
+fix("src/data/module5.ts", "M5-tort",
+  "text: 'Tu as tort', isCorrect: false }",
+  "text: { fr: 'Tu as tort', en: 'You are wrong', es: 'Estás equivocado', ar: 'أنت مخطئ' }, isCorrect: false }")
+;
+fix("src/data/module5.ts", "M5-employe",
+  "text: 'Employé', isCorrect: false },",
+  "text: { fr: 'Employé', en: 'Employee', es: 'Empleado', ar: 'موظف' }, isCorrect: false },")
+;
+fix("src/data/module5.ts", "M5-rdv",
+  "text: 'Rendez-vous', isCorrect: false },",
+  "text: { fr: 'Rendez-vous', en: 'Appointment', es: 'Cita', ar: 'موعد' }, isCorrect: false },")
+;
+fix("src/data/module5.ts", "M5-projet",
+  "text: 'Projet', isCorrect: true }",
+  "text: { fr: 'Projet', en: 'Project', es: 'Proyecto', ar: 'مشروع' }, isCorrect: true }")
+;
+fix("src/data/module5.ts", "M5-secret",
+  "text: 'Garde le secret / N\\'en parle pas', isCorrect: true },",
+  "text: { fr: 'Garde le secret / N\\'en parle pas', en: 'Keep it secret / Don\\'t talk about it', es: 'Guárdalo en secreto / No lo menciones', ar: 'احفظ السر / لا تتحدث عنه' }, isCorrect: true },")
+;
+fix("src/data/module5.ts", "M5-passe",
+  "text: 'Ce qui est passé est passé', isCorrect: false },",
+  "text: { fr: 'Ce qui est passé est passé', en: 'What\\'s done is done', es: 'Lo pasado, pasado está', ar: 'ما فات مات' }, isCorrect: false },")
+;
+fix("src/data/module5.ts", "M5-petit",
+  "text: 'Petit à petit', isCorrect: false }",
+  "text: { fr: 'Petit à petit', en: 'Little by little', es: 'Poco a poco', ar: 'شيئاً فشيئاً' }, isCorrect: false }")
+;
+
+fix("src/data/module7.ts", "M7-tourner",
+  "right: { text: 'Tourner la page' }",
+  "right: { text: { fr: 'Tourner la page', en: 'Turn the page', es: 'Pasar la página', ar: 'طوّي الصفحة' } }")
+;
+fix("src/data/module7.ts", "M7-patience",
+  "right: { text: 'Patience et régularité' }",
+  "right: { text: { fr: 'Patience et régularité', en: 'Patience and consistency', es: 'Paciencia y constancia', ar: 'الصبر والانتظام' } }")
+;
+fix("src/data/module7.ts", "M7-courir",
+  "right: { text: 'Rien ne sert de courir' }",
+  "right: { text: { fr: 'Rien ne sert de courir', en: 'No point in rushing', es: 'No sirve de nada correr', ar: 'لا فائدة من الاستعجال' } }")
+;
+
+// ---- dumps (keep) ----
 const DUMP_MODE = (process.env.DUMP_MODE || "on") === "on";
 report.push("DUMP_MODE: " + (DUMP_MODE ? "on" : "off"));
 if (DUMP_MODE) {
-  const s2 = fs.readFileSync(P, "utf8");
-  const lines = s2.split("\n");
-  const CH = 400;
-  for (let c = 0; c * CH < lines.length; c++) {
-    const chunk = lines.slice(c * CH, (c + 1) * CH)
-      .map((l, i) => String(c * CH + i + 1).padStart(4, "0") + "|" + l).join("\n");
-    fs.writeFileSync("docs/dump-" + (c + 1) + ".txt", chunk);
-  }
-  const tr = fs.readFileSync(TRF, "utf8");
+  const tr = fs.readFileSync("src/lib/i18n/translations.ts", "utf8");
   const trLines = tr.split("\n");
   const TRC = 220;
   for (let c = 0; c * TRC < trLines.length; c++) {
