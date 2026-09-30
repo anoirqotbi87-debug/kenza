@@ -69,10 +69,9 @@ export async function POST(req: NextRequest) {
         const subscription = event.data.object as Stripe.Subscription;
         console.log(`[Stripe Webhook] Résiliation abonnement ${subscription.id}`);
 
-        const { error } = await supabase
-          .from('profiles')
-          .update({ is_premium: false })
-          .eq('stripe_subscription_id', subscription.id);
+        const { error } = await supabase.rpc('cancel_user_subscription', {
+          p_subscription_id: subscription.id,
+        });
 
         if (error) {
           console.error('[Stripe Webhook Error subscription.deleted]:', error);
@@ -85,10 +84,10 @@ export async function POST(req: NextRequest) {
         const subscription = event.data.object as Stripe.Subscription;
         const isActive = subscription.status === 'active' || subscription.status === 'trialing';
 
-        const { error } = await supabase
-          .from('profiles')
-          .update({ is_premium: isActive })
-          .eq('stripe_subscription_id', subscription.id);
+        const { error } = await supabase.rpc('update_user_subscription_status', {
+          p_subscription_id: subscription.id,
+          p_is_active: isActive,
+        });
 
         if (error) {
           console.error('[Stripe Webhook Error subscription.updated]:', error);

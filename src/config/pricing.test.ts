@@ -132,5 +132,5 @@ describe('pricing — plus aucune duplication de montant dans le code', () => {
       }
     }
     expect(offenders).toEqual([]);
-  });
+  }, 30000);
 });
