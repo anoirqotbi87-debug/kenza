@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
 
     // Call the Gemini model using Vercel AI SDK
     const result = await streamText({
-      model: google('gemini-1.5-flash'),
+      model: google('gemini-3.8-flash'),
       system: systemPrompt,
       messages,
       temperature: 0.7,
