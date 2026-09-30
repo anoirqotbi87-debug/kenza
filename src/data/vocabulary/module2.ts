@@ -1,0 +1,128 @@
+import type { ModuleVocabularyItem } from './types';
+
+/**
+ * Module 2 — Survie Quotidienne : commander, se déplacer, marchander.
+ * Entrées dérivées de `lesson-cafe`, `lesson-taxi` et du scénario du souk.
+ */
+export const module2Vocabulary: ModuleVocabularyItem[] = [
+  {
+    id: 'vocab_m2_9hwa_atay',
+    arabizi: '9hwa / Atay',
+    arabic: 'قهوة / أتاي',
+    translation: { fr: 'Café / Thé', en: 'Coffee / Tea', es: 'Café / Té', ar: 'قهوة / أتاي' },
+    module: 2,
+    category: 'cafe',
+    culturalNote: {
+      fr: "« Atay » désigne le thé à la menthe, boisson sociale par excellence. Le « 9 » note le ق, un k profond.",
+      en: '"Atay" is mint tea, the social drink par excellence. The "9" marks ق, a deep k.',
+      es: '«Atay» es el té con menta, la bebida social por excelencia. El «9» marca ق.',
+      ar: 'أتاي هو الشاي بالنعناع. الرقم 9 يعوّض ق.',
+    },
+    source: 'l_module2_cafe_1',
+  },
+  {
+    id: 'vocab_m2_bghit',
+    arabizi: 'Bghit',
+    arabic: 'بغيت',
+    translation: { fr: 'Je veux', en: 'I want', es: 'Quiero', ar: 'بغيت' },
+    module: 2,
+    category: 'verb',
+    culturalNote: {
+      fr: "Direct mais poli s'il est suivi de « 3afak ». Pour adoucir, on préfère « bghit » à l'impératif.",
+      en: 'Direct but polite when followed by "3afak". Softer than the imperative.',
+      es: 'Directo pero cortés si le sigue «3afak». Más suave que el imperativo.',
+      ar: 'مباشر لكن مهذب إذا تلاه «عفاك».',
+    },
+    source: 'l_module2_cafe_1',
+  },
+  {
+    id: 'vocab_m2_l7sab',
+    arabizi: 'L-7sab',
+    arabic: 'الحساب',
+    translation: { fr: "L'addition", en: 'The bill', es: 'La cuenta', ar: 'الحساب' },
+    module: 2,
+    category: 'cafe',
+    culturalNote: {
+      fr: "« Jib liya l-7sab, 3afak » = apportez-moi l'addition. Au café, on paie souvent au comptoir, pas à table.",
+      en: '"Jib liya l-7sab, 3afak" = bring me the bill. In cafés you often pay at the counter, not at the table.',
+      es: '«Jib liya l-7sab, 3afak» = tráigame la cuenta. En los cafés a menudo se paga en la barra.',
+      ar: '«جيب ليا الحساب عفاك». في المقاهي غالباً ندفع عند الصندوق.',
+    },
+    source: 'l_module2_cafe_1',
+  },
+  {
+    id: 'vocab_m2_khdem_lkuntur',
+    arabizi: 'Khdem l-kuntur',
+    arabic: 'خدم الكونتور',
+    translation: { fr: 'Mettez le compteur', en: 'Turn on the meter', es: 'Ponga el contador', ar: 'خدم الكونتور' },
+    module: 2,
+    category: 'transport',
+    culturalNote: {
+      fr: "Phrase indispensable au petit taxi. Si le chauffeur refuse, on peut descendre : le compteur est obligatoire.",
+      en: 'Essential in a petit taxi. If the driver refuses you may get out: the meter is mandatory.',
+      es: 'Imprescindible en el petit taxi. Si el conductor se niega, puede bajarse: el taxímetro es obligatorio.',
+      ar: 'ضرورية في الطاكسي الصغير. العداد إلزامي.',
+    },
+    source: 'l_module2_taxi_1',
+  },
+  {
+    id: 'vocab_m2_b_sh7al',
+    arabizi: 'B sh7al?',
+    arabic: 'ب شحال؟',
+    translation: { fr: 'Combien ?', en: 'How much?', es: '¿Cuánto?', ar: 'ب شحال؟' },
+    module: 2,
+    category: 'transport',
+    culturalNote: {
+      fr: "Question de prix universelle. Au souk, elle ouvre la négociation : ne jamais accepter le premier prix.",
+      en: 'Universal price question. At the souk it opens the negotiation: never accept the first price.',
+      es: 'Pregunta de precio universal. En el zoco abre la negociación: nunca acepte el primer precio.',
+      ar: 'سؤال السعر. في السوق يفتح التفاوض.',
+    },
+    source: 'l_module2_taxi_1',
+  },
+  {
+    id: 'vocab_m2_ma_bghitch',
+    arabizi: 'Ma bghitch',
+    arabic: 'ما بغيتش',
+    translation: { fr: 'Je ne veux pas', en: "I don't want", es: 'No quiero', ar: 'ما بغيتش' },
+    module: 2,
+    category: 'verb',
+    culturalNote: {
+      fr: "La négation encadre le verbe : « ma » … « sh ». Sert à refuser un prix ou une proposition.",
+      en: 'Negation wraps the verb: "ma" … "sh". Used to refuse a price or an offer.',
+      es: 'La negación rodea el verbo: «ma» … «sh». Sirve para rechazar un precio.',
+      ar: 'النفي يحيط بالفعل: «ما» … «ش».',
+    },
+    source: 'l_module2_taxi_1',
+  },
+  {
+    id: 'vocab_m2_souk',
+    arabizi: 'Souk',
+    arabic: 'السوق',
+    translation: { fr: 'Le marché', en: 'The market', es: 'El zoco', ar: 'السوق' },
+    module: 2,
+    category: 'abstract',
+    culturalNote: {
+      fr: 'Le souk est un lieu de socialisation autant que de commerce. Négocier fait partie de l\'échange.',
+      en: 'The souk is as much a place of socialising as of commerce. Haggling is part of it.',
+      es: 'El zoco es tanto un lugar de socialización como de comercio.',
+      ar: 'السوق مكان للتواصل الاجتماعي والتجارة معاً.',
+    },
+    source: 'l_module2_souk_1',
+  },
+  {
+    id: 'vocab_m2_sh7al_dyal',
+    arabizi: 'Sh7al dyal...?',
+    arabic: 'شحال ديال...؟',
+    translation: { fr: 'Combien coûte... ?', en: 'How much for...?', es: '¿Cuánto cuesta...?', ar: 'شحال ديال...؟' },
+    module: 2,
+    category: 'abstract',
+    culturalNote: {
+      fr: "« Dyal » marque l'appartenance. Au souk, on demande le prix d'un lot : « sh7al dyal kilo? ».",
+      en: '"Dyal" marks possession. At the souk you ask the price of a lot: "sh7al dyal kilo?".',
+      es: '«Dyal» marca la posesión. En el zoco se pregunta el precio de un lote.',
+      ar: '«ديال» تفيد الملكية. في السوق نسأل عن ثمن الكيلو.',
+    },
+    source: 'l_module2_souk_1',
+  },
+];
