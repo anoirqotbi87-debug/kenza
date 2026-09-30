@@ -269,14 +269,17 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'darija-quest-storage',
-      version: 3,
+      version: 4,
       partialize: (state: AppState) => {
-        const { devUnlockAll: _devUnlockAll, ...rest } = state;
+        // isPremium est exclu : c'est un droit payant, il ne doit jamais pouvoir être
+        // débloqué en éditant le localStorage. Source de vérité unique : profiles.is_premium,
+        // relu à la connexion (src/app/page.tsx).
+        const { devUnlockAll: _devUnlockAll, isPremium: _isPremium, ...rest } = state;
         return rest;
       },
       migrate: (persistedState: unknown, version: number) => {
         if (!persistedState) return persistedState as AppState;
-        const state = persistedState as AppState & { devUnlockAll?: boolean };
+        const state = persistedState as AppState & { devUnlockAll?: boolean; isPremium?: boolean };
         if (version < 2) {
           if (state.srsDeck) {
             const hasLegacyCards = Object.keys(state.srsDeck).some(
@@ -290,6 +293,12 @@ export const useAppStore = create<AppState>()(
         }
         if (version < 3) {
           delete (state as { devUnlockAll?: boolean }).devUnlockAll;
+        }
+        if (version < 4) {
+          // Un ancien localStorage peut contenir isPremium: true. Il est désormais exclu de
+          // la persistance, mais il faut aussi purger la valeur déjà écrite : sinon elle est
+          // réhydratée avant la lecture en base et débloque le contenu entre-temps.
+          delete (state as { isPremium?: boolean }).isPremium;
         }
         return state;
       }

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { X, Check, Crown, Sparkles, BookOpen, Headphones, Award, ArrowRight, ShieldCheck, Loader2 } from 'lucide-react';
-import { useAppStore, useTranslation } from '../../store/useAppStore';
+import { useTranslation } from '../../store/useAppStore';
 import { trackEvent } from '../../utils/analytics';
 import { supabase } from '../../lib/supabase';
 
@@ -12,7 +12,6 @@ interface PaywallModalProps {
 }
 
 export default function PaywallModal({ onClose, source = 'direct' }: PaywallModalProps) {
-  const { setIsPremium } = useAppStore();
   const { t } = useTranslation();
   const pw = t.modules.paywall;
   const [billingCycle, setBillingCycle] = useState<'yearly' | 'monthly'>('yearly');
@@ -76,12 +75,10 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
         return;
       }
 
-      if (data.simulated) {
-        // Simulation en local ou sans clé secrète Stripe renseignée
-        setIsPremium(true);
-        alert(pw.upgradeSuccess);
-        onClose();
-      }
+      // Aucune URL de paiement : on n'accorde jamais l'accès ici. Le mode « simulé » a été
+      // supprimé — il permettait de débloquer le premium sans paiement. L'octroi se fait
+      // uniquement via le webhook Stripe, puis relecture de profiles.is_premium.
+      throw new Error(data.error || pw.errorInit);
     } catch (err) {
       console.error('[Paywall Checkout Error]:', err);
       setErrorMessage(err instanceof Error ? err.message : pw.errorRetry);

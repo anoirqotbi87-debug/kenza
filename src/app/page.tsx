@@ -46,6 +46,7 @@ const trL = (lang: string, fr: string, en: string, es: string, ar: string) =>
 import { playAudio } from "@/lib/audio";
 import { getDateLocale } from "@/lib/i18n/utils";
 import { supabase } from "@/lib/supabase";
+import { fetchPremiumStatus } from "@/lib/premium";
 import { syncService } from "@/lib/syncService";
 import { useCheckpointProgress } from "@/hooks/useCheckpointProgress";
 import CheckpointModal from "@/components/checkpoint/CheckpointModal";
@@ -335,8 +336,14 @@ export default function Home() {
 
   // Auth sync
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) setUser(session.user);
+    // isPremium n'est plus persisté localement : il est relu depuis profiles.is_premium,
+    // seule source de vérité (voir src/lib/premium.ts). Sinon éditer le localStorage
+    // débloquerait le contenu premium sans passer par Stripe.
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        setUser(session.user);
+        setIsPremium(await fetchPremiumStatus(session.user.id));
+      }
     });
 
     const {
@@ -344,25 +351,34 @@ export default function Home() {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN" && session?.user) {
         setUser(session.user);
+        setIsPremium(await fetchPremiumStatus(session.user.id));
         await syncService.syncCloudToLocal(session.user.id);
       } else if (event === "SIGNED_OUT") {
         setUser(null);
+        setIsPremium(false);
         resetData();
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [setUser, resetData]);
+  }, [setUser, setIsPremium, resetData]);
 
   // Check URL params (e.g. Stripe callback)
   useEffect(() => {
     if (typeof window === "undefined") return;
     const searchParams = new URLSearchParams(window.location.search);
     if (searchParams.get("upgrade") !== "success") return;
-    const timer = window.setTimeout(() => {
+    const timer = window.setTimeout(async () => {
+      // Affichage optimiste au retour de Stripe, mais uniquement en complément de la
+      // relecture en base : c'est elle qui décide, et elle corrige le flag si le webhook
+      // n'a pas encore traité l'événement.
       setIsPremium(true);
       showToast(t.modules.home.proActivated);
       window.history.replaceState({}, document.title, window.location.pathname);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setIsPremium(await fetchPremiumStatus(session.user.id));
+      }
     }, 0);
     return () => window.clearTimeout(timer);
   }, [setIsPremium, showToast, t]);

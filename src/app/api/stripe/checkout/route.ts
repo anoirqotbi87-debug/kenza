@@ -30,11 +30,21 @@ export async function POST(req: NextRequest) {
 
     // 2. Si la clé secrète Stripe n'est pas configurée dans l'environnement
     if (!stripe) {
-      console.warn('[Stripe Checkout] STRIPE_SECRET_KEY non configurée. Mode démo actif.');
-      return NextResponse.json({
-        simulated: true,
-        message: 'Clé Stripe non configurée dans .env.local. Simulation réussie.',
-      });
+      // En production, l'absence de clé est une erreur de configuration : on refuse
+      // explicitement plutôt que de renvoyer un succès simulé (qui, combiné au client,
+      // débloquait le premium sans paiement).
+      if (process.env.VERCEL_ENV === 'production' || process.env.NODE_ENV === 'production') {
+        console.error('[Stripe Checkout] STRIPE_SECRET_KEY manquante en production.');
+        return NextResponse.json(
+          { error: 'Le paiement est momentanément indisponible. Merci de réessayer plus tard.' },
+          { status: 503 }
+        );
+      }
+      console.warn('[Stripe Checkout] STRIPE_SECRET_KEY non configurée (hors production).');
+      return NextResponse.json(
+        { error: 'Paiement non configuré dans cet environnement.' },
+        { status: 503 }
+      );
     }
 
     // 3. Définition du tarif
