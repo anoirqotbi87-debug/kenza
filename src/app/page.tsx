@@ -49,6 +49,7 @@ import { supabase } from "@/lib/supabase";
 import { fetchPremiumStatus } from "@/lib/premium";
 import { openBillingPortal } from "@/lib/billingPortal";
 import { shouldShowOnboardingPaywall } from "@/lib/monetizationGates";
+import { isPremiumLesson } from "@/data/homeCurriculum";
 import { syncService } from "@/lib/syncService";
 import { useCheckpointProgress } from "@/hooks/useCheckpointProgress";
 import CheckpointModal from "@/components/checkpoint/CheckpointModal";
@@ -84,7 +85,6 @@ export type HomeLesson = {
   subtitle: string;
   length: string;
   status: "done" | "current" | "locked";
-  isPremium?: boolean;
   questions: Question[];
 };
 
@@ -180,7 +180,6 @@ const buildLessons = (lang: string): HomeLesson[] => [
     subtitle: trL(lang, tr("Les nombres et les prix (Niveau A2)", "Numbers and prices (Level A2)", "Números y precios (Nivel A2)", "الأرقام والأسعار (مستوى A2)"), "Numbers and prices (Level A2)", "Números y precios (Nivel A2)", "الأرقام والأسعار (مستوى A2)"),
     length: "9 min",
     status: "locked",
-    isPremium: true,
     questions: [
       {
         prompt: trL(lang, tr("Comment demander « Combien coûte ceci ? »", "How to ask « How much is this? »", "Cómo preguntar «¿Cuánto cuesta esto?»", "كيف تسأل «بشحال هادا؟»"), "How to ask « How much is this? »", "Cómo preguntar «¿Cuánto cuesta esto?»", "كيف تسأل «بشحال هادا؟»"),
@@ -204,7 +203,6 @@ const buildLessons = (lang: string): HomeLesson[] => [
     subtitle: trL(lang, tr("Les subtilités régionales (Niveau B2)", "Regional subtleties (Level B2)", "Sutilezas regionales (Nivel B2)", "الفروق الإقليمية (مستوى B2)"), "Regional subtleties (Level B2)", "Sutilezas regionales (Nivel B2)", "الفروق الإقليمية (مستوى B2)"),
     length: "10 min",
     status: "locked",
-    isPremium: true,
     questions: [
       {
         prompt: trL(lang, tr("À Tanger, comment dit-on « Qu'est-ce que tu veux ? »", "In Tangier, how do you say « What do you want? »", "En Tánger, ¿cómo se dice «¿Qué quieres?»", "في طنجة، كيف تقول «ماذا تريد؟»"), "In Tangier, how do you say « What do you want? »", "En Tánger, ¿cómo se dice «¿Qué quieres?»", "في طنجة، كيف تقول «ماذا تريد؟»"),
@@ -572,8 +570,8 @@ export default function Home() {
     const lesson = lessons.find((item) => item.id === id);
     if (!lesson) return;
 
-    // Premium gating check
-    if (lesson.isPremium && !isPremium) {
+    // Premium gating check — le decoupage vient de @/lib/premiumModules
+    if (isPremiumLesson(lesson.id) && !isPremium) {
       setPricingSource("module_locked");
       return;
     }
@@ -1562,7 +1560,7 @@ function PathView({
             const done = completedLessons.includes(lesson.id);
             const unlocked =
               index === 0 || completedLessons.includes(lessons[index - 1].id) || done;
-            const isGated = lesson.isPremium && !isPremium;
+            const isGated = isPremiumLesson(lesson.id) && !isPremium;
             const locked = !unlocked && !isGated;
 
             return (
