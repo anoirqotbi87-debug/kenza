@@ -89,13 +89,27 @@ export async function POST(req: NextRequest) {
     }
 
     // Call the Gemini model using Vercel AI SDK
-    const result = await streamText({
-      model: google('gemini-3.8-flash'),
-      system: systemPrompt,
-      messages,
-      temperature: 0.7,
-      maxTokens: 300, // Short responses
-    });
+    const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
+    let result;
+    try {
+      result = await streamText({
+        model: google(primaryModel),
+        system: systemPrompt,
+        messages,
+        temperature: 0.7,
+        maxTokens: 300, // Short responses
+      });
+    } catch (modelErr) {
+      console.warn(`[AI Roleplay] Primary model ${primaryModel} failed, trying fallback:`, modelErr);
+      const fallbackModel = primaryModel === 'gemini-3.8-flash' ? 'gemini-1.5-flash' : 'gemini-3.8-flash';
+      result = await streamText({
+        model: google(fallbackModel),
+        system: systemPrompt,
+        messages,
+        temperature: 0.7,
+        maxTokens: 300,
+      });
+    }
 
     // Return the streaming response
     return result.toDataStreamResponse();

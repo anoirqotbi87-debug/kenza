@@ -34,6 +34,40 @@ export const preloadAudio = async (url: string): Promise<void> => {
   }
 };
 
+/**
+ * Preload TTS audio into the Web Audio API buffer cache for zero latency playback.
+ */
+export const preloadTtsAudio = async (
+  text: string,
+  arabicText?: string,
+  voice: 'female' | 'male' = 'female',
+  speed: 'normal' | 'slow' = 'normal'
+): Promise<void> => {
+  if (typeof window === 'undefined') return;
+  const cleanText = text.trim();
+  const cleanArabic = arabicText ? arabicText.trim() : undefined;
+  const textToSpeak = cleanArabic || cleanText;
+  const cacheKey = `tts_${textToSpeak}_${voice}_${speed}`;
+  if (audioCache.has(cacheKey)) return;
+
+  try {
+    const params = new URLSearchParams();
+    params.append('text', cleanText);
+    if (cleanArabic) params.append('arabicText', cleanArabic);
+    params.append('voice', voice);
+    params.append('speed', speed);
+
+    const response = await fetch(`/api/tts?${params.toString()}`);
+    if (!response.ok) return;
+    const arrayBuffer = await response.arrayBuffer();
+    const ctx = getAudioContext();
+    const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+    audioCache.set(cacheKey, audioBuffer);
+  } catch {
+    // Silent fail on background prefetch
+  }
+};
+
 /** Stockage navigateur, ou `null` si indisponible (SSR, mode privé strict). */
 function audioQuotaStorage(): Storage | null {
   try {
@@ -43,18 +77,36 @@ function audioQuotaStorage(): Storage | null {
   }
 }
 
+export interface AudioOptions {
+  speed?: number | 'normal' | 'slow';
+  voice?: 'female' | 'male';
+}
+
 /**
  * Play audio with speed control via Web Audio API, or fallback to SpeechSynthesis.
  *
  * Point de passage unique de la lecture : c'est ici qu'est appliqué le quota
  * journalier des utilisateurs gratuits (les sons d'interface ne le consomment pas).
  */
-export const playAudio = async (text: string, audioUrl?: string, soundEnabled: boolean = true, speed: number = 1.0) => {
+export const playAudio = async (
+  text: string,
+  audioUrl?: string,
+  soundEnabled: boolean = true,
+  speed: number | 'normal' | 'slow' = 1.0,
+  options?: AudioOptions
+) => {
   if (!soundEnabled) return;
   if (!text && !audioUrl) return;
 
-  // Quota des écoutes gratuites : on refuse AVANT toute requête réseau, pour ne
-  // pas générer de TTS (coût serveur) au-delà de la limite.
+  // Resolve speed and voice parameters
+  const speedParam: 'normal' | 'slow' =
+    options?.speed === 'slow' || speed === 'slow' || (typeof speed === 'number' && speed <= 0.8)
+      ? 'slow'
+      : 'normal';
+  const numericSpeed = typeof speed === 'number' ? speed : (speedParam === 'slow' ? 0.75 : 1.0);
+  const voiceParam: 'female' | 'male' = options?.voice || 'female';
+
+  // Quota des écoutes gratuites : on refuse AVANT toute requête réseau
   if (shouldConsumeAudioQuota(text, audioUrl)) {
     const { isPremium, setAudioQuotaExceeded } = useAppStore.getState();
     const storage = audioQuotaStorage();
@@ -117,7 +169,7 @@ export const playAudio = async (text: string, audioUrl?: string, soundEnabled: b
       return new Promise<void>((resolve) => {
         const source = ctx.createBufferSource();
         source.buffer = audioBuffer;
-        source.playbackRate.value = speed;
+        source.playbackRate.value = numericSpeed;
         source.connect(ctx.destination);
         source.onended = () => resolve();
         source.start();
@@ -130,19 +182,19 @@ export const playAudio = async (text: string, audioUrl?: string, soundEnabled: b
   // Sinon, on tente notre vraie voix IA via Edge TTS (sauf pour les sons d'UI simples)
   if (text && text !== 'correct' && text !== 'error') {
     try {
-      // Clé de cache pour le TTS
+      // Clé de cache pour le TTS (inclut la voix et la vitesse pour l'immédiateté)
       const textToSpeak = arabicText || text;
-      const cacheKey = `tts_${textToSpeak}`;
+      const cacheKey = `tts_${textToSpeak}_${voiceParam}_${speedParam}`;
       let audioBuffer = audioCache.get(cacheKey);
 
       if (!audioBuffer) {
-        // 1. Check Offline IndexedDB First
+        // 1. Check Offline IndexedDB First (pour le mode normal)
         const cleanText = text.trim();
         const cleanArabic = arabicText ? arabicText.trim() : undefined;
         const offlineBlob = await getOfflineAudio(cleanText);
         let arrayBuffer: ArrayBuffer;
 
-        if (offlineBlob) {
+        if (offlineBlob && speedParam === 'normal') {
           arrayBuffer = await offlineBlob.arrayBuffer();
         } else {
           // Si l'utilisateur est hors-ligne et que l'audio n'est pas dans le cache IndexedDB
@@ -151,10 +203,12 @@ export const playAudio = async (text: string, audioUrl?: string, soundEnabled: b
             throw new Error('OFFLINE_AUDIO_UNAVAILABLE');
           }
 
-          // 2. Fetch from network (using GET for ServiceWorker CacheFirst compat)
+          // 2. Fetch from network avec voice et speed
           const params = new URLSearchParams();
           params.append('text', cleanText);
           if (cleanArabic) params.append('arabicText', cleanArabic);
+          params.append('voice', voiceParam);
+          params.append('speed', speedParam);
           
           const response = await fetch(`/api/tts?${params.toString()}`);
           if (!response.ok) throw new Error('TTS API failed');
@@ -168,7 +222,7 @@ export const playAudio = async (text: string, audioUrl?: string, soundEnabled: b
       return new Promise<void>((resolve) => {
         const source = ctx.createBufferSource();
         source.buffer = audioBuffer;
-        source.playbackRate.value = speed;
+        source.playbackRate.value = numericSpeed;
         source.connect(ctx.destination);
         source.onended = () => resolve();
         source.start();
@@ -185,10 +239,9 @@ export const playAudio = async (text: string, audioUrl?: string, soundEnabled: b
         const voices = window.speechSynthesis.getVoices();
         const voice = voices.find(v => v.lang.includes('ar-MA')) || voices.find(v => v.lang.includes('ar-'));
         
-        // Priorité au texte en alphabet arabe s'il est disponible pour une prononciation naturelle
         const utterance = new SpeechSynthesisUtterance(arabicText?.trim() || text.trim());
         utterance.lang = 'ar-MA';
-        utterance.rate = speed;
+        utterance.rate = numericSpeed;
         if (voice) {
           utterance.voice = voice;
         }

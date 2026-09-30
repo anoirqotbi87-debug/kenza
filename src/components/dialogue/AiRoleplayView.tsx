@@ -4,8 +4,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useChat, Message } from 'ai/react';
 import { PersonaId, personas } from '@/lib/ai/prompts';
 import { useVoiceRecognition } from '@/hooks/useVoiceRecognition';
-import { Send, Mic, MicOff, Save, Loader2, RefreshCw } from 'lucide-react';
+import { Send, Mic, MicOff, Save, Loader2, RefreshCw, Volume2, Turtle } from 'lucide-react';
 import { useAppStore, useTranslation } from '@/store/useAppStore';
+import { playAudio } from '@/lib/audio';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/lib/supabase';
 import PaywallModal from '@/components/monetization/PaywallModal';
@@ -64,11 +65,18 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
     });
   }, []);
   const persona = personas[personaId];
-  const { addCustomWordToSRS } = useAppStore();
+  const { addCustomWordToSRS, soundEnabled } = useAppStore();
   const { t } = useTranslation();
   const rp = t.modules.roleplay;
   const [showImmersion, setShowImmersion] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const handlePlayVoice = (text: string, arabic?: string, speed: 'normal' | 'slow' = 'normal') => {
+    playAudio(text, arabic, soundEnabled, speed === 'slow' ? 0.75 : 1.0, {
+      speed,
+      voice: personaId === 'cafe' || personaId === 'taxi' || personaId === 'souk' ? 'male' : 'female',
+    });
+  };
 
   const { messages, input, handleInputChange, handleSubmit, isLoading, setInput, reload, error } = useChat({
     api: '/api/roleplay/chat',
@@ -196,6 +204,29 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
                   <p className="text-sm font-medium">{m.content}</p>
                 ) : (
                   <div className="space-y-2">
+                    {/* Audio playback controls */}
+                    <div className="flex items-center gap-1.5 pb-1 border-b border-[#E8E2D5]/60">
+                      <button
+                        type="button"
+                        onClick={() => handlePlayVoice(arz || m.content, ar, 'normal')}
+                        className="p-1 text-[#1B2A4A] hover:text-[#C9A05C] rounded-lg transition-colors flex items-center gap-1 text-[11px] font-bold"
+                        title="Écouter à vitesse normale"
+                      >
+                        <Volume2 className="w-3.5 h-3.5 text-[#C9A05C]" />
+                        <span>1.0x</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handlePlayVoice(arz || m.content, ar, 'slow')}
+                        className="p-1 text-[#7A7670] hover:text-[#1B2A4A] rounded-lg transition-colors flex items-center gap-1 text-[11px] font-bold"
+                        title="Écouter au ralenti (mode tortue)"
+                      >
+                        <Turtle className="w-3.5 h-3.5 text-[#C9A05C]" />
+                        <span>0.75x</span>
+                      </button>
+                    </div>
+
                     {ar && (
                       <p className="text-xl font-bold font-arabic text-right leading-relaxed text-[#1B2A4A]" dir="rtl">
                         {ar}

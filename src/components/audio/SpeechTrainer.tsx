@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, Volume2, Trophy, AlertCircle, RefreshCw, MessageSquare, CarFront, Coffee, ShoppingBag, Globe, ArrowRight } from 'lucide-react';
+import { Mic, Volume2, Trophy, AlertCircle, RefreshCw, MessageSquare, CarFront, Coffee, ShoppingBag, Globe, ArrowRight, Turtle } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useTranslation, useAppStore } from '../../store/useAppStore';
 import { playAudio } from '../../lib/audio';
@@ -228,13 +228,26 @@ export default function SpeechTrainer() {
               <div className="font-serif text-2xl font-bold text-[#1B2A4A]">{currentExercise.arabizi}</div>
               <div className="text-[#7A7670] text-sm mt-1">{currentExercise.translation[lang as keyof typeof currentExercise.translation] || currentExercise.translation.fr}</div>
               
-              <button 
-                onClick={() => playAudio(currentExercise.arabizi, currentExercise.arabic, soundEnabled)}
-                className="mt-6 mx-auto w-11 h-11 bg-[#1B2A4A] text-[#FDFCF8] rounded-full flex items-center justify-center shadow-md hover:bg-[#1B2A4A]/90 hover:scale-105 transition-all"
-                title={t.modules.speech.listenModel}
-              >
-                <Volume2 className="w-5 h-5 text-[#C9A05C]" />
-              </button>
+              <div className="mt-6 flex items-center justify-center gap-3">
+                <button 
+                  type="button"
+                  onClick={() => playAudio(currentExercise.arabizi, currentExercise.arabic, soundEnabled, 1.0, { speed: 'normal' })}
+                  className="px-4 py-2 bg-[#1B2A4A] text-[#FDFCF8] rounded-full flex items-center gap-2 shadow-xs hover:bg-[#1B2A4A]/90 hover:scale-105 transition-all text-xs font-bold"
+                  title="Écouter à vitesse normale"
+                >
+                  <Volume2 className="w-4 h-4 text-[#C9A05C]" />
+                  <span>Normal</span>
+                </button>
+                <button 
+                  type="button"
+                  onClick={() => playAudio(currentExercise.arabizi, currentExercise.arabic, soundEnabled, 0.75, { speed: 'slow' })}
+                  className="px-4 py-2 bg-[#FDFCF8] border border-[#E8E2D5] text-[#1B2A4A] rounded-full flex items-center gap-2 shadow-xs hover:bg-[#E8E2D5]/50 hover:scale-105 transition-all text-xs font-bold"
+                  title="Écouter au ralenti (mode tortue)"
+                >
+                  <Turtle className="w-4 h-4 text-[#C9A05C]" />
+                  <span>Tortue 🐢</span>
+                </button>
+              </div>
             </div>
 
             {/* Zone d'enregistrement */}
