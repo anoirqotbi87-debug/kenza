@@ -7,6 +7,7 @@ import type { Lesson, MultiLangText } from '@/types/curriculum';
 import { useAppStore, useTranslation } from '@/store/useAppStore';
 import type { UILanguage } from '@/lib/i18n/translations';
 import { getLocalizedText } from '@/lib/i18n/utils';
+import { isModuleLocked } from '@/lib/premiumModules';
 import ExerciseRunner from '@/components/ExerciseRunner';
 import PaywallModal from '@/components/monetization/PaywallModal';
 import PageHeader from '@/components/ui/PageHeader';
@@ -19,7 +20,6 @@ export default function EtudierPage() {
 
   const lang = uiLanguage || 'fr';
   const isAr = lang === 'ar';
-  const PREMIUM_MODULES = ['5', '6', '7'];
 
   const tp = t.pages.etudier;
   const tc = t.common;
@@ -27,7 +27,7 @@ export default function EtudierPage() {
   const localized = (text: MultiLangText | string | undefined) => getLocalizedText(text, lang as UILanguage);
 
   const handleStart = (moduleKey: string, lesson: Lesson) => {
-    if (PREMIUM_MODULES.includes(moduleKey) && !isPremium) {
+    if (isModuleLocked(moduleKey, isPremium)) {
       setShowPaywall(true);
       return;
     }
@@ -43,9 +43,9 @@ export default function EtudierPage() {
 
       <main className="max-w-4xl mx-auto p-6 space-y-8">
         {Object.entries(fullCurriculum).map(([key, mod]) => {
-          const isPremiumModule = PREMIUM_MODULES.includes(key);
+          const isPremiumModule = isModuleLocked(key, isPremium);
           return (
-            <section key={key} className={`bg-[#FDFCF8] rounded-2xl border border-[#E8E2D5] p-6 shadow-xs ${isPremiumModule && !isPremium ? 'opacity-90' : ''}`}>
+            <section key={key} className={`bg-[#FDFCF8] rounded-2xl border border-[#E8E2D5] p-6 shadow-xs ${isPremiumModule ? 'opacity-90' : ''}`}>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-serif text-xl font-bold text-[#1B2A4A]">
                   {tp.module || 'Module'} {key} — {localized(mod.title)}

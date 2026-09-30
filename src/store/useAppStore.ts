@@ -51,8 +51,6 @@ interface AppState {
   reviewCard: (wordId: string, grade: ReviewGrade) => void;
   getDueCards: () => SRSCard[];
   
-  devUnlockAll: boolean;
-  toggleDevUnlockAll: () => void;
   resetData: () => void;
   
   // Onboarding & Premium
@@ -60,9 +58,16 @@ interface AppState {
   userGoal: string | null;
   dailyTargetMinutes: number | null;
   isPremium: boolean;
-  
+  /** Trigger 1 : le paywall de fin d'onboarding ne s'affiche qu'une fois par cycle de vie. */
+  hasSeenOnboardingPaywall: boolean;
+
   completeOnboarding: (goal: string, minutes: number) => void;
+  markOnboardingPaywallSeen: () => void;
   setIsPremium: (isPremium: boolean) => void;
+
+  /** UI seulement : vrai quand le quota audio du jour est epuise (non persiste). */
+  audioQuotaExceeded: boolean;
+  setAudioQuotaExceeded: (exceeded: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -84,21 +89,24 @@ export const useAppStore = create<AppState>()(
       audioSpeed: 1.0,
       uiLanguage: 'fr',
       regionalVariant: 'casablanca',
-      devUnlockAll: process.env.NEXT_PUBLIC_DEV_UNLOCK_ALL === 'true', // Prod : verrouille ; en local : NEXT_PUBLIC_DEV_UNLOCK_ALL=true
       
       hasCompletedOnboarding: false,
       userGoal: null,
       dailyTargetMinutes: null,
       isPremium: false,
-      
+      hasSeenOnboardingPaywall: false,
+
       completeOnboarding: (goal: AppState['userGoal'], minutes: AppState['dailyTargetMinutes']) => set({
         hasCompletedOnboarding: true,
         userGoal: goal,
         dailyTargetMinutes: minutes
       }),
+      markOnboardingPaywallSeen: () => set({ hasSeenOnboardingPaywall: true }),
       setIsPremium: (isPremium: boolean) => set({ isPremium }),
+
+      audioQuotaExceeded: false,
+      setAudioQuotaExceeded: (exceeded: boolean) => set({ audioQuotaExceeded: exceeded }),
       
-      toggleDevUnlockAll: () => set((state: AppState) => ({ devUnlockAll: !state.devUnlockAll })),
       setRegionalVariant: (variant: AppState['regionalVariant']) => set({ regionalVariant: variant }),
       
       resetData: () => set({
@@ -274,7 +282,11 @@ export const useAppStore = create<AppState>()(
         // isPremium est exclu : c'est un droit payant, il ne doit jamais pouvoir être
         // débloqué en éditant le localStorage. Source de vérité unique : profiles.is_premium,
         // relu à la connexion (src/app/page.tsx).
-        const { devUnlockAll: _devUnlockAll, isPremium: _isPremium, ...rest } = state;
+        const {
+          isPremium: _isPremium,
+          audioQuotaExceeded: _audioQuotaExceeded,
+          ...rest
+        } = state;
         return rest;
       },
       migrate: (persistedState: unknown, version: number) => {

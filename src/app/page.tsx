@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type RefObject } from "react";
 import {
   ArrowDownRight,
   ArrowLeft,
@@ -47,12 +47,17 @@ import { playAudio } from "@/lib/audio";
 import { getDateLocale } from "@/lib/i18n/utils";
 import { supabase } from "@/lib/supabase";
 import { fetchPremiumStatus } from "@/lib/premium";
+import { openBillingPortal } from "@/lib/billingPortal";
+import { shouldShowOnboardingPaywall } from "@/lib/monetizationGates";
 import { syncService } from "@/lib/syncService";
 import { useCheckpointProgress } from "@/hooks/useCheckpointProgress";
 import CheckpointModal from "@/components/checkpoint/CheckpointModal";
 import ScenarioSelectorModal from "@/components/dialogue/ScenarioSelectorModal";
 import AiRoleplayView from "@/components/dialogue/AiRoleplayView";
 import PaywallModal from "@/components/monetization/PaywallModal";
+import SubscriptionBadge from "@/components/monetization/SubscriptionBadge";
+import OnboardingModal from "@/components/onboarding/OnboardingModal";
+import OfflineDownloadCard from "@/components/monetization/OfflineDownloadCard";
 import InstallPwaBanner from "@/components/pwa/InstallPwaBanner";
 import DarijaPassportCard from "@/components/certificate/DarijaPassportCard";
 import { PersonaId } from "@/lib/ai/prompts";
@@ -73,7 +78,7 @@ export type Question = {
   note: string;
 };
 
-export type Lesson = {
+export type HomeLesson = {
   id: string;
   title: string;
   subtitle: string;
@@ -92,7 +97,7 @@ export type Phrase = {
   note: string;
 };
 
-const buildLessons = (lang: string): Lesson[] => [
+const buildLessons = (lang: string): HomeLesson[] => [
   {
     id: "hello",
     title: trL(lang, tr("Les premiers bonjours", "The first hellos", "Los primeros saludos", "أول التحيات"), "The first hellos", "Los primeros saludos", "أول التحيات"),
@@ -264,6 +269,22 @@ export default function Home() {
   const [cardFlipped, setCardFlipped] = useState(false);
   const [toast, setToast] = useState("");
   const showToast = useCallback((message: string) => setToast(message), []);
+
+  // Ouvre le portail de facturation Stripe (gestion / résiliation de l'abonnement).
+  const handleManageSubscription = useCallback(async () => {
+    const { error } = await openBillingPortal();
+    if (error) {
+      showToast(
+        trL(
+          useAppStore.getState().uiLanguage || "fr",
+          "Impossible d'ouvrir la gestion de l'abonnement. Réessaie plus tard.",
+          "Could not open subscription management. Please try again later.",
+          "No se pudo abrir la gestión de la suscripción. Inténtalo más tarde.",
+          "تعذّر فتح إدارة الاشتراك. حاول لاحقاً."
+        )
+      );
+    }
+  }, [showToast]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [prevView, setPrevView] = useState<View>(view);
   if (prevView !== view) {
@@ -288,6 +309,11 @@ export default function Home() {
     setIsPremium,
     uiLanguage,
     setLanguage,
+    hasCompletedOnboarding,
+    hasSeenOnboardingPaywall,
+    markOnboardingPaywallSeen,
+    audioQuotaExceeded,
+    setAudioQuotaExceeded,
   } = useAppStore();
 
   const { t } = useTranslation();
@@ -321,6 +347,42 @@ export default function Home() {
   const [showScenarioSelector, setShowScenarioSelector] = useState(false);
   const [activePersonaId, setActivePersonaId] = useState<PersonaId | null>(null);
   const [pricingSource, setPricingSource] = useState<string | null>(null);
+
+  // Première visite : le questionnaire de personnalisation s'ouvre une fois le
+  // store hydraté (sinon l'onboarding se rouvrirait à chaque rechargement).
+  const hydrated = useSyncExternalStore(
+    (onChange) => useAppStore.persist.onFinishHydration(onChange),
+    () => useAppStore.persist.hasHydrated(),
+    () => false
+  );
+  const [onboardingDismissed, setOnboardingDismissed] = useState(false);
+  const onboardingOpen = hydrated && !hasCompletedOnboarding && !onboardingDismissed;
+
+  // Trigger 1 : paywall personnalisé juste après l'onboarding, une seule fois
+  // par cycle de vie. Trigger 2 : paywall quand le quota audio gratuit du jour
+  // est épuisé. Les deux sont dérivés de l'état, sans effet ni état dupliqué.
+  const onboardingPaywallSource = shouldShowOnboardingPaywall({
+    hasCompletedOnboarding,
+    hasSeenOnboardingPaywall,
+    isPremium,
+  })
+    ? "onboarding"
+    : null;
+
+  const derivedPricingSource = onboardingPaywallSource ?? (audioQuotaExceeded ? "audio_quota_exceeded" : null);
+  const activePricingSource = pricingSource ?? derivedPricingSource;
+
+  const closePaywall = () => {
+    setPricingSource(null);
+    if (onboardingPaywallSource) markOnboardingPaywallSeen();
+    if (audioQuotaExceeded) setAudioQuotaExceeded(false);
+  };
+
+  /** Ferme le paywall de fin d'onboarding et emmène l'utilisateur au module 1. */
+  const continueWithFreeVersion = () => {
+    closePaywall();
+    setView("path");
+  };
 
   const saveFavorites = (next: string[]) => {
     const safeNext = Array.isArray(next) ? next : [];
@@ -720,6 +782,11 @@ export default function Home() {
 
         <div className="sidebar-spacer" />
 
+        {/* Badge d'abonnement persistant (Trigger 4) */}
+        <div className="px-4 pb-2">
+          <SubscriptionBadge onUpgrade={() => setPricingSource("sidebar_upgrade")} />
+        </div>
+
         <div className="daily-goal-card">
           <div className="goal-orbit">
             <Target size={17} />
@@ -776,6 +843,9 @@ export default function Home() {
             <span>{currentHeader.eyebrow.toLocaleLowerCase(lang)}</span>
           </div>
           <div className="topbar-actions">
+            {/* Badge d'abonnement persistant (Trigger 4) */}
+            <SubscriptionBadge onUpgrade={() => setPricingSource("header_upgrade")} />
+
             {/* Sélecteur de langue bilingue */}
             <div className="lang-switcher" role="group" aria-label={tr("Sélecteur de langue", "Language switcher", "Selector de idioma", "مبدل اللغة")}>
               <Globe size={13} className="lang-icon" />
@@ -957,6 +1027,7 @@ export default function Home() {
               isPremium={isPremium}
               onReset={resetProgress}
               onOpenPaywall={() => setPricingSource("profile_upgrade")}
+              onManageSubscription={handleManageSubscription}
               onToast={showToast}
             />
           )}
@@ -1122,11 +1193,18 @@ export default function Home() {
         />
       )}
 
+      {/* Onboarding : questionnaire de première visite */}
+      {onboardingOpen && (
+        <OnboardingModal onComplete={() => setOnboardingDismissed(true)} />
+      )}
+
       {/* Paywall Modal */}
-      {pricingSource && (
+      {activePricingSource && (
         <PaywallModal
-          onClose={() => setPricingSource(null)}
-          source={pricingSource}
+          onClose={closePaywall}
+          source={activePricingSource}
+          dismissLabel={activePricingSource === "onboarding" ? t.modules.paywall.onboardingDismiss : undefined}
+          onDismiss={activePricingSource === "onboarding" ? continueWithFreeVersion : undefined}
         />
       )}
 
@@ -1193,7 +1271,7 @@ function TodayView({
   completedCount: number;
   xp: number;
   streak: number;
-  nextLesson: Lesson;
+  nextLesson: HomeLesson;
   onStart: (id: string) => void;
   onNavigate: (view: View) => void;
   onOpenRoleplay: () => void;
@@ -1919,6 +1997,7 @@ function SpaceView({
   isPremium,
   onReset,
   onOpenPaywall,
+  onManageSubscription,
 }: {
   completedCount: number;
   xp: number;
@@ -1926,7 +2005,8 @@ function SpaceView({
   user: User | null;
   isPremium: boolean;
   onReset: () => void;
-  onOpenPaywall: () => void;
+  onOpenPaywall: (source?: string) => void;
+  onManageSubscription: () => void;
   onToast: (message: string) => void;
 }) {
   const { t } = useTranslation();
@@ -2019,11 +2099,21 @@ function SpaceView({
             <span>{tr("PWA Hors-Ligne · Sauvegarde Hybride Local & Supabase", "Offline PWA · Hybrid Local & Supabase Backup", "PWA sin conexión · Copia de seguridad híbrida local y Supabase", "تطبيق PWA دون اتصال · نسخ احتياطي هجين محلي وSupabase")}</span>
           </div>
           {!isPremium && (
-            <button className="outline-button" onClick={onOpenPaywall}>
+            <button className="outline-button" onClick={() => onOpenPaywall("profile_upgrade")}>
               {trL(lang, "Passer à Kenza Pro", "Go Kenza Pro", "Pasar a Kenza Pro", "انتقل إلى كنزة برو")} <ArrowRight size={14} />
             </button>
           )}
+          {isPremium && (
+            <button className="outline-button" onClick={onManageSubscription}>
+              {trL(lang, "Gérer mon abonnement", "Manage my subscription", "Gestionar mi suscripción", "إدارة اشتراكي")} <ArrowRight size={14} />
+            </button>
+          )}
         </article>
+
+        <OfflineDownloadCard
+          isPremium={isPremium}
+          onLocked={() => onOpenPaywall("offline_locked")}
+        />
 
         <article className="data-card data-card-cert">
           <div className="data-card-heading">

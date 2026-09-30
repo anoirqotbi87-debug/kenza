@@ -1,4 +1,10 @@
 import { getOfflineAudio } from './offlineStorage';
+import { useAppStore } from '../store/useAppStore';
+import {
+  hasAudioQuota,
+  recordAudioPlay,
+  shouldConsumeAudioQuota,
+} from './audioQuota';
 
 // Web Audio API context
 let audioCtx: AudioContext | null = null;
@@ -28,12 +34,38 @@ export const preloadAudio = async (url: string): Promise<void> => {
   }
 };
 
+/** Stockage navigateur, ou `null` si indisponible (SSR, mode privé strict). */
+function audioQuotaStorage(): Storage | null {
+  try {
+    return typeof window !== 'undefined' ? window.localStorage : null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Play audio with speed control via Web Audio API, or fallback to SpeechSynthesis.
+ *
+ * Point de passage unique de la lecture : c'est ici qu'est appliqué le quota
+ * journalier des utilisateurs gratuits (les sons d'interface ne le consomment pas).
  */
 export const playAudio = async (text: string, audioUrl?: string, soundEnabled: boolean = true, speed: number = 1.0) => {
   if (!soundEnabled) return;
   if (!text && !audioUrl) return;
+
+  // Quota des écoutes gratuites : on refuse AVANT toute requête réseau, pour ne
+  // pas générer de TTS (coût serveur) au-delà de la limite.
+  if (shouldConsumeAudioQuota(text, audioUrl)) {
+    const { isPremium, setAudioQuotaExceeded } = useAppStore.getState();
+    const storage = audioQuotaStorage();
+    const now = new Date();
+
+    if (!hasAudioQuota(storage, isPremium, now)) {
+      setAudioQuotaExceeded(true);
+      return;
+    }
+    if (!isPremium) recordAudioPlay(storage, now);
+  }
 
   const ctx = getAudioContext();
   if (ctx.state === 'suspended') {

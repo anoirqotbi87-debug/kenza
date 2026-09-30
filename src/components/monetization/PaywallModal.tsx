@@ -1,18 +1,35 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { X, Check, Crown, Sparkles, BookOpen, Headphones, Award, ArrowRight, ShieldCheck, Loader2 } from 'lucide-react';
-import { useTranslation } from '../../store/useAppStore';
+import { useAppStore, useTranslation } from '../../store/useAppStore';
 import { trackEvent } from '../../utils/analytics';
 import { supabase } from '../../lib/supabase';
+import { openBillingPortal } from '../../lib/billingPortal';
+import { getDisplayPricing } from '../../config/pricing';
 
 interface PaywallModalProps {
   onClose: () => void;
   source?: string;
+  /**
+   * Libellé d'une action de refus explicite (ex. « Continuer avec la version
+   * gratuite »). Affiché sous le CTA quand fourni, pour offrir une sortie
+   * claire et non trompeuse.
+   */
+  dismissLabel?: string;
+  /** Callback de l'action de refus. Par défaut, ferme simplement la modale. */
+  onDismiss?: () => void;
 }
 
-export default function PaywallModal({ onClose, source = 'direct' }: PaywallModalProps) {
+export default function PaywallModal({
+  onClose,
+  source = 'direct',
+  dismissLabel,
+  onDismiss,
+}: PaywallModalProps) {
   const { t } = useTranslation();
+  const isPremium = useAppStore((s) => s.isPremium);
   const pw = t.modules.paywall;
   const [billingCycle, setBillingCycle] = useState<'yearly' | 'monthly'>('yearly');
   const [currency, setCurrency] = useState<'EUR' | 'MAD'>('EUR');
@@ -23,22 +40,26 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
     trackEvent('paywall_modal_opened', { source });
   }, [source]);
 
-  const prices = {
-    EUR: {
-      yearlyPerMonth: '4,90 €',
-      yearlyTotal: '59 € / an',
-      monthlyPrice: '9,00 €',
-      currencySymbol: '€',
-    },
-    MAD: {
-      yearlyPerMonth: '49 DH',
-      yearlyTotal: '590 DH / an',
-      monthlyPrice: '90 DH',
-      currencySymbol: 'DH',
-    },
-  };
+  // Devise auto-détectée (pays côté serveur, fuseau en secours). Le toggle manuel
+  // reste disponible pour les cas limites (MRE avec carte française, etc.).
+  React.useEffect(() => {
+    let cancelled = false;
+    const timeZone =
+      typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : '';
+    fetch(`/api/geo/currency${timeZone ? `?tz=${encodeURIComponent(timeZone)}` : ''}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.currency) setCurrency(data.currency);
+      })
+      .catch(() => {
+        // Détection impossible : on garde EUR par défaut.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-  const currentPricing = prices[currency];
+  const currentPricing = getDisplayPricing(currency);
 
   const handleSubscribe = async () => {
     trackEvent('plan_subscribed', { billingCycle, currency, source });
@@ -87,8 +108,49 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
     }
   };
 
+  const handleManageSubscription = async () => {
+    trackEvent('manage_subscription_clicked', { source });
+    setLoading(true);
+    setErrorMessage(null);
+
+    const { error } = await openBillingPortal();
+
+    if (error) {
+      console.error('[Paywall Portal Error]:', error);
+      setErrorMessage(pw.errorRetry);
+      setLoading(false);
+      return;
+    }
+    // En cas de succès, la page est déjà en cours de redirection.
+  };
+
+  // L'essai gratuit 7 jours ne s'applique qu'à l'annuel : le CTA et la timeline
+  // suivent donc le cycle sélectionné.
+  const isYearly = billingCycle === 'yearly';
+
   // Titres et accroches contextuelles selon la provenance (source)
   const getContextualContent = () => {
+    if (source === 'onboarding') {
+      return {
+        kicker: `— ${pw.culturalKicker}`,
+        title: pw.onboardingTitle,
+        subtitle: pw.culturalSubtitle,
+      };
+    }
+    if (source === 'audio_quota_exceeded') {
+      return {
+        kicker: `— ${pw.aiImmersion}`,
+        title: pw.audioQuotaTitle,
+        subtitle: pw.culturalSubtitle,
+      };
+    }
+    if (source === 'offline_locked') {
+      return {
+        kicker: `— ${pw.culturalKicker}`,
+        title: pw.offlineTitle,
+        subtitle: pw.culturalSubtitle,
+      };
+    }
     if (source.includes('module') || source === 'module_locked') {
       return {
         kicker: `— ${pw.advancedPath}`,
@@ -185,38 +247,12 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
         {/* Volet Droit : Sélecteur d'offres & CTA */}
         <div className="bg-[#FDFCF8] p-6 sm:p-8 md:p-10 md:w-1/2 flex flex-col justify-between space-y-6">
           
-          {/* Header Volet Droit : Titre + Toggle EUR / MAD */}
+          {/* Header Volet Droit : Titre */}
           <div>
             <div className="flex items-center justify-between gap-4 mb-2">
               <span className="text-xs font-bold tracking-[0.2em] uppercase text-[#C9A05C]">
                 — {pw.plansTitle}
               </span>
-
-              {/* Toggle de devises EUR / MAD */}
-              <div className="inline-flex items-center bg-[#F7F3EA] p-1 rounded-full border border-[#E8E2D5] text-xs font-bold">
-                <button
-                  type="button"
-                  onClick={() => setCurrency('EUR')}
-                  className={`px-2.5 py-1 rounded-full transition-all ${
-                    currency === 'EUR'
-                      ? 'bg-[#1B2A4A] text-[#FDFCF8] shadow-xs'
-                      : 'text-[#7A7670] hover:text-[#1B2A4A]'
-                  }`}
-                >
-                  EUR (€)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCurrency('MAD')}
-                  className={`px-2.5 py-1 rounded-full transition-all ${
-                    currency === 'MAD'
-                      ? 'bg-[#1B2A4A] text-[#FDFCF8] shadow-xs'
-                      : 'text-[#7A7670] hover:text-[#1B2A4A]'
-                  }`}
-                >
-                  MAD (DH)
-                </button>
-              </div>
             </div>
 
             <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#1B2A4A]">
@@ -297,10 +333,29 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
             </div>
           </div>
 
+          {/* Timeline de réassurance 3 étapes — affichée quand l'essai annuel est sélectionné. */}
+          {!isPremium && isYearly && (
+            <ol className="space-y-2.5 rounded-2xl bg-[#F7F3EA]/70 border border-[#E8E2D5] p-4">
+              {[
+                { day: 'J0', text: pw.timelineStep1 },
+                { day: 'J5', text: pw.timelineStep2 },
+                { day: 'J7', text: pw.timelineStep3 },
+              ].map((step, idx) => (
+                <li key={step.day} className="flex items-start gap-3">
+                  <span className="mt-0.5 w-9 shrink-0 text-center rounded-full bg-[#1B2A4A] text-[#FDFCF8] text-[10px] font-bold py-1 tracking-wide">
+                    {step.day}
+                  </span>
+                  <span className="text-[11px] sm:text-xs text-[#4A4741] leading-snug">{step.text}</span>
+                  {idx < 2 && <span className="sr-only">→</span>}
+                </li>
+              ))}
+            </ol>
+          )}
+
           {/* Bouton d'action CTA & Réassurance */}
           <div className="space-y-3 pt-1">
             <button
-              onClick={handleSubscribe}
+              onClick={isPremium ? handleManageSubscription : handleSubscribe}
               disabled={loading}
               className="w-full py-3.5 sm:py-4 px-6 rounded-full bg-[#C9A05C] hover:bg-[#b88f4b] disabled:opacity-60 disabled:cursor-not-allowed text-[#1B2A4A] font-bold text-sm sm:text-base shadow-md hover:shadow-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-3 group"
             >
@@ -311,7 +366,7 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
                 </>
               ) : (
                 <>
-                  <span>{pw.unlockCta}</span>
+                  <span>{isPremium ? pw.manageSubscription : (isYearly ? pw.trialCta : pw.monthlyCta)}</span>
                   <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
                 </>
               )}
@@ -323,9 +378,63 @@ export default function PaywallModal({ onClose, source = 'direct' }: PaywallModa
               </p>
             )}
 
+            {/* Résumé de l'essai (une ligne, sous le CTA) */}
+            {!isPremium && isYearly && (
+              <p className="text-[11px] text-center text-[#7A7670] leading-snug">
+                {pw.trialTimeline.replace('{yearlyPrice}', getDisplayPricing('EUR').yearlyTotal)}
+              </p>
+            )}
+
+            {/* Action de refus explicite (ex. onboarding) : sortie claire, sans piège. */}
+            {dismissLabel && !isPremium && (
+              <button
+                type="button"
+                onClick={onDismiss ?? onClose}
+                className="w-full text-center text-xs text-[#7A7670] underline hover:text-[#1B2A4A] transition-colors py-1"
+              >
+                {dismissLabel}
+              </button>
+            )}
+
             <p className="text-[11px] text-center text-[#7A7670] leading-snug">
               {pw.securePayment}
             </p>
+
+            {/* Toggle de devise discret : la devise est déduite automatiquement,
+                ce contrôle ne sert qu'aux cas limites (carte étrangère, etc.). */}
+            <div className="flex justify-center pt-0.5">
+              <button
+                type="button"
+                onClick={() => setCurrency(currency === 'EUR' ? 'MAD' : 'EUR')}
+                className="text-[11px] text-[#7A7670] underline decoration-dotted hover:text-[#1B2A4A] transition-colors"
+              >
+                {pw.currencyToggle} · {currency === 'EUR' ? 'EUR (€)' : 'MAD (DH)'}
+              </button>
+            </div>
+
+            {/* Liens légaux + restauration/gestion */}
+            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 pt-1 text-[11px] text-[#7A7670]">
+              <Link href="/cgu" className="underline hover:text-[#1B2A4A] transition-colors">
+                {pw.legalCgu}
+              </Link>
+              <span aria-hidden="true">|</span>
+              <Link href="/confidentialite" className="underline hover:text-[#1B2A4A] transition-colors">
+                {pw.legalPrivacy}
+              </Link>
+              {isPremium && (
+                <>
+                  <span aria-hidden="true">|</span>
+                  <button
+                    type="button"
+                    onClick={handleManageSubscription}
+                    disabled={loading}
+                    className="underline hover:text-[#1B2A4A] transition-colors disabled:opacity-60"
+                  >
+                    {pw.manageSubscription}
+                  </button>
+                </>
+              )}
+            </div>
           </div>
 
         </div>
