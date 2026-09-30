@@ -46,7 +46,38 @@
   - Docs/scripts : `docs/CI-MARKER.md`, `docs/dump-*.txt`, `docs/literals-page.txt`, `docs/scope-page.txt`, `docs/tr-dump-*.txt`, `docs/verify.json`, `scripts/find-hardcoded.py`, `scripts/fix-arabic.js`, `scripts/patch-page-hook.py`, `scripts/patch-page-i18n.py`, `scripts/patch-paywall-keys.py`, `scripts/patch-ui-home-keys.py`, `scripts/replace-theme.js`, `scripts/verify-fixes.py`, `supabase/archive/`.
 - **CI finale** : `npm ci` ✓ · `typecheck` ✓ · `lint` ✓ (0 erreur) · `build` ✓.
 
+## Vague 4 — `any` réellement supprimés (2026-09-29)
+
+> ⚠️ **Correction du bilan de la vague 3.** Elle annonçait « Vague D : `no-explicit-any` 106 → 0 ».
+> C'était faux : 5 fichiers ouvraient par `/* eslint-disable @typescript-eslint/no-explicit-any */`,
+> ce qui masquait **7 `any`** à chaque exécution du lint. `npx eslint` affichait bien 0/0 — mais 0/0
+> *parce que* la règle était désactivée localement. Le compte de 106 → 0 mesurait la disparition des
+> *rapports*, pas celle des `any`.
+>
+> **Leçon :** un `eslint-disable` en tête de fichier rend le compteur de warnings trompeur. Pour
+> auditer, ne pas se fier à `eslint` seul — chercher aussi les directives :
+> `grep -rn "eslint-disable" src/`.
+
+- **Vraie suppression des `any`** (`a39846e`) :
+  - `src/lib/errors.ts` (nouveau) : `getErrorMessage(err: unknown)`. Un `catch` reçoit `unknown` :
+    lire `.message` obligeait à annoter en `any`, ce qui désactivait le contrôle de type sur le
+    reste de la route.
+  - `stripe/{webhook,checkout,portal}` : `catch (err: any)` → `catch (err: unknown)` +
+    `getErrorMessage()`. Comportement inchangé (le message FR de repli est conservé).
+  - `api/tts` : `'data'` typé `Buffer` (le `Buffer.from(chunk)` était une copie inutile),
+    `'error'` typé `Error`.
+  - `api/roleplay/chat` : `messages` typés `CoreMessage` (`ai@3.4.30`) ; le total de caractères ne
+    compte plus que le contenu `string` (un message multimodal n'est plus mal compté).
+  - `store/useAppStore` : `eslint-disable-next-line` orphelin supprimé ; omission de
+    `devUnlockAll` via `const { devUnlockAll: _devUnlockAll, ...rest }`, avec la convention `_`
+    configurée dans `eslint.config.mjs` (plutôt que de laisser une suppression).
+- **État réel** : `grep -rn "as any|: any|eslint-disable" src/` → **aucun résultat**.
+- **CI** : `eslint` 0/0 · `tsc --noEmit` ✓ · `next build` ✓.
+
 ## Vague 3 — Zéro warning ESLint (2026-09-29)
+
+> ⚠️ Le « 106 → 0 » ci-dessous comptait les avertissements *rapportés* : 7 `any` restaient masqués
+> par des `eslint-disable` en tête de fichier. Voir la **vague 4** pour la suppression réelle.
 
 - **ESLint : 0 erreur / 0 warning** (136 → 106 → 0).
   - **Vague A** (`no-unused-vars`) : imports/composants/constantes morts supprimés.
