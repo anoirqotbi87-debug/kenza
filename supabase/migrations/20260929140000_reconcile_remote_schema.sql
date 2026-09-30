@@ -248,6 +248,11 @@ $$;
 -- Rattachement de la source d'acquisition au retour d'un OAuth (Google).
 -- Le paramètre est un JSON unique, ce qui correspond à l'appel
 -- `supabase.rpc('claim_attribution', { p: {...} })` côté client.
+--
+-- Cette fonction n'existe que sur le distant : elle est ici versionnée à
+-- l'identique, avec un search_path explicite (la version distante ne le fixe pas,
+-- ce qui est un risque pour une fonction SECURITY DEFINER). `left()` et la
+-- validation par regex reprennent les garde-fous de la version distante.
 CREATE OR REPLACE FUNCTION public.claim_attribution(p jsonb)
 RETURNS void
 LANGUAGE plpgsql
@@ -261,20 +266,20 @@ BEGIN
 
   INSERT INTO public.user_attribution (
     user_id, anonymous_id, utm_source, utm_medium, utm_campaign,
-    utm_content, utm_term, referrer, landing_page, first_seen_at, signup_at
+    utm_content, utm_term, referrer, landing_page, first_seen_at
   )
   VALUES (
     auth.uid(),
-    p->>'anonymous_id',
-    p->>'utm_source',
-    p->>'utm_medium',
-    p->>'utm_campaign',
-    p->>'utm_content',
-    p->>'utm_term',
-    p->>'referrer',
-    p->>'landing_page',
-    NULLIF(p->>'first_seen_at', '')::timestamptz,
-    now()
+    left(nullif(p->>'anonymous_id', ''), 100),
+    left(nullif(p->>'utm_source', ''),   200),
+    left(nullif(p->>'utm_medium', ''),   200),
+    left(nullif(p->>'utm_campaign', ''), 200),
+    left(nullif(p->>'utm_content', ''),  200),
+    left(nullif(p->>'utm_term', ''),     200),
+    left(nullif(p->>'referrer', ''),     1000),
+    left(nullif(p->>'landing_page', ''), 1000),
+    CASE WHEN (p->>'first_seen_at') ~ '^\d{4}-\d{2}-\d{2}'
+         THEN (p->>'first_seen_at')::timestamptz END
   )
   ON CONFLICT (user_id) DO UPDATE SET
     anonymous_id = EXCLUDED.anonymous_id,
@@ -295,50 +300,59 @@ GRANT EXECUTE ON FUNCTION public.claim_attribution(jsonb) TO authenticated;
 -- 4. Création de profil + attribution à l'inscription
 -- -----------------------------------------------------------------------------
 
--- Remplace la version du dépôt, qui ne capturait pas la source d'acquisition :
--- l'app transmet anonymous_id / utm_* dans les métadonnées d'inscription.
+-- Version déployée sur le distant, reproduite ici à l'identique (elle n'existait
+-- dans aucun fichier de migration : la perdre aurait cassé le suivi d'attribution).
 --
--- ATTENTION : cette définition écrase celle du distant. Avant d'appliquer, si le
--- trigger y a été enrichi à la main, comparer avec :
---   select pg_get_functiondef('public.handle_new_user'::regproc);
+-- Elle ne touche QUE des colonnes présentes sur le distant : username, hearts,
+-- last_activity_date et stripe_* ne sont pas dans les migrations locales, et
+-- unlocked_badges / streak_freezes gardent leurs valeurs par défaut.
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public, pg_temp
-AS $$
-BEGIN
-  INSERT INTO public.profiles (id, xp, streak_days, streak_freezes, unlocked_badges)
-  VALUES (new.id, 0, 1, 1, '{}')
-  ON CONFLICT (id) DO NOTHING;
+SET search_path TO ''
+AS $function$
+declare
+  m jsonb := coalesce(new.raw_user_meta_data, '{}'::jsonb);
+  anon text := nullif(m->>'anonymous_id', '');
+begin
+  insert into public.profiles (id, username, xp, streak_days, hearts, script_preference)
+  values (
+    new.id,
+    coalesce(new.raw_user_meta_data->>'full_name', split_part(new.email, '@', 1)),
+    0, 0, 3, 'duo'
+  );
 
-  -- L'attribution ne doit jamais faire échouer une inscription.
-  BEGIN
-    INSERT INTO public.user_attribution (
-      user_id, anonymous_id, utm_source, utm_medium, utm_campaign,
-      utm_content, utm_term, referrer, landing_page, first_seen_at, signup_at
+  begin
+    insert into public.user_attribution
+      (user_id, anonymous_id, utm_source, utm_medium, utm_campaign, utm_content, utm_term,
+       referrer, landing_page, first_seen_at)
+    values (
+      new.id, anon,
+      left(nullif(m->>'utm_source',''),   200),
+      left(nullif(m->>'utm_medium',''),   200),
+      left(nullif(m->>'utm_campaign',''), 200),
+      left(nullif(m->>'utm_content',''),  200),
+      left(nullif(m->>'utm_term',''),     200),
+      left(nullif(m->>'referrer',''),     1000),
+      left(nullif(m->>'landing_page',''), 1000),
+      case when (m->>'first_seen_at') ~ '^\d{4}-\d{2}-\d{2}' then (m->>'first_seen_at')::timestamptz end
     )
-    SELECT
-      new.id,
-      new.raw_user_meta_data->>'anonymous_id',
-      new.raw_user_meta_data->>'utm_source',
-      new.raw_user_meta_data->>'utm_medium',
-      new.raw_user_meta_data->>'utm_campaign',
-      new.raw_user_meta_data->>'utm_content',
-      new.raw_user_meta_data->>'utm_term',
-      new.raw_user_meta_data->>'referrer',
-      new.raw_user_meta_data->>'landing_page',
-      NULLIF(new.raw_user_meta_data->>'first_seen_at', '')::timestamptz,
-      now()
-    WHERE new.raw_user_meta_data ? 'anonymous_id'
-    ON CONFLICT (user_id) DO NOTHING;
-  EXCEPTION WHEN OTHERS THEN
-    NULL;
-  END;
+    on conflict (user_id) do nothing;
 
-  RETURN new;
-END;
-$$;
+    if anon is not null and char_length(anon) between 8 and 100 then
+      update public.funnel_events set user_id = new.id
+       where anonymous_id = anon and user_id is null;
+      insert into public.funnel_events (anonymous_id, user_id, event_name, page_path)
+      values (anon, new.id, 'signup_completed', left(nullif(m->>'landing_page',''), 1000));
+    end if;
+  exception when others then
+    raise warning 'handle_new_user tracking error: %', sqlerrm;
+  end;
+
+  return new;
+end;
+$function$;
 
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
