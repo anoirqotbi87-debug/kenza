@@ -32,18 +32,14 @@ export const syncService = {
       if (profileError) console.error("Error migrating profile:", profileError);
 
       // 2. Migrate Lesson Progress
+      // Plus d'upsert direct : les privileges INSERT/UPDATE sont retires au client sur
+      // lesson_progress (elle gate les certificats). On passe par le RPC SECURITY DEFINER
+      // complete_lessons_bulk, qui ecrit user_id = auth.uid() cote serveur.
       if (store.completedLessons.length > 0) {
-        const lessonInserts = store.completedLessons.map(lessonId => ({
-          user_id: userId,
-          lesson_id: lessonId,
-          completed: true,
-          completed_at: new Date().toISOString()
-        }));
+        const { error: lessonError } = await supabase.rpc('complete_lessons_bulk', {
+          p_lesson_ids: store.completedLessons
+        });
 
-        const { error: lessonError } = await supabase
-          .from('lesson_progress')
-          .upsert(lessonInserts, { onConflict: 'user_id,lesson_id' });
-          
         if (lessonError) console.error("Error migrating lessons:", lessonError);
       }
 
