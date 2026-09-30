@@ -33,7 +33,21 @@ export const medecinFes: DialogueScenario = {
       speakerRole: 'Apprenant',
       arabicText: 'كيضرني راسي بزاف و فيا السخانة.',
       arabiziText: 'Kayderrni rasi bezzaf w fiya s-skhana.',
-      translationFr: 'J\'ai très mal à la tête et j\'ai de la fièvre.'
+      translationFr: 'J\'ai très mal à la tête et j\'ai de la fièvre.',
+      expectedPhrases: {
+        primaryArabizi: 'Kayderrni rasi bezzaf w fiya s-skhana.',
+        primaryArabic: 'كيضرني راسي بزاف و فيا السخانة.',
+        acceptedVariants: [
+          'kayderrni rasi bezzaf w fiya s-skhana',
+          'kayderrni rasi bezzaf',
+          'fiya s-skhana w kayderrni rasi'
+        ],
+        hints: [
+          'kayderrni',
+          'rasi',
+          's-skhana'
+        ]
+      }
     },
     {
       id: 't3',
@@ -50,7 +64,21 @@ export const medecinFes: DialogueScenario = {
       speakerRole: 'Apprenant',
       arabicText: 'واخا أ الطبيب، شنو عندي؟',
       arabiziText: 'Wakha a t-tbib, chno 3endi?',
-      translationFr: 'D\'accord docteur, qu\'est-ce que j\'ai ?'
+      translationFr: 'D\'accord docteur, qu\'est-ce que j\'ai ?',
+      expectedPhrases: {
+        primaryArabizi: 'Wakha a t-tbib, chno 3endi?',
+        primaryArabic: 'واخا أ الطبيب، شنو عندي؟',
+        acceptedVariants: [
+          'wakha a t-tbib, chno 3endi',
+          'chno 3endi a t-tbib',
+          'chno 3endi'
+        ],
+        hints: [
+          'wakha',
+          'chno',
+          '3endi'
+        ]
+      }
     },
     {
       id: 't5',
@@ -67,7 +95,21 @@ export const medecinFes: DialogueScenario = {
       speakerRole: 'Apprenant',
       arabicText: 'شكرا بزاف أ الطبيب، شحال تيسوا هاد الدوا؟',
       arabiziText: 'Choukrane bezzaf a t-tbib, ch7al tayswa had d-dwa?',
-      translationFr: 'Merci beaucoup docteur, combien coûte ce médicament ?'
+      translationFr: 'Merci beaucoup docteur, combien coûte ce médicament ?',
+      expectedPhrases: {
+        primaryArabizi: 'Choukrane bezzaf a t-tbib, ch7al tayswa had d-dwa?',
+        primaryArabic: 'شكرا بزاف أ الطبيب، شحال تيسوا هاد الدوا؟',
+        acceptedVariants: [
+          'choukrane bezzaf a t-tbib, ch7al tayswa had d-dwa',
+          'ch7al tayswa had d-dwa',
+          'ch7al tayswa'
+        ],
+        hints: [
+          'choukrane',
+          'ch7al',
+          'd-dwa'
+        ]
+      }
     }
   ]
 };

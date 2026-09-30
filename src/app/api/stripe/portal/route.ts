@@ -30,11 +30,12 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (!stripe) {
-      // Simulation mode
-      return NextResponse.json({
-        simulated: true,
-        message: 'Portail client en mode démo.',
-      });
+      // Stripe non configure : on le dit franchement. Un `simulated: true` laissait
+      // croire a un portail ouvert alors que rien ne s'est passe.
+      return NextResponse.json(
+        { error: 'BILLING_PORTAL_UNAVAILABLE' },
+        { status: 503 }
+      );
     }
 
     const customerId = profile?.stripe_customer_id;

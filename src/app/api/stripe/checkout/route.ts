@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe, PRICING_CONFIG } from '@/lib/stripe';
+import { stripe } from '@/lib/stripe';
+import { PRICING_CONFIG, TRIAL_PERIOD_DAYS } from '@/config/pricing';
 import { getErrorMessage } from '@/lib/errors';
 import { createClient } from '@supabase/supabase-js';
 import { safeRedirectOrigin } from '@/lib/allowedOrigins';
@@ -52,6 +53,11 @@ export async function POST(req: NextRequest) {
     const cycleKey = (billingCycle === 'monthly' ? 'monthly' : 'yearly') as 'monthly' | 'yearly';
     const planConfig = PRICING_CONFIG[currKey][cycleKey];
 
+    // Essai gratuit : uniquement sur l'annuel. Le mensuel est facturé immédiatement.
+    // C'est la seule source de vérité du trial — le client ne peut pas l'activer.
+    const subscriptionData =
+      cycleKey === 'yearly' ? { trial_period_days: TRIAL_PERIOD_DAYS } : undefined;
+
     // Sécurité : allowlist stricte de l'origine (jamais de header brut injecté tel quel)
     const origin = safeRedirectOrigin(req.headers.get('origin') || req.headers.get('referer'));
 
@@ -61,6 +67,7 @@ export async function POST(req: NextRequest) {
       mode: 'subscription',
       customer_email: customerEmail,
       client_reference_id: userId || undefined,
+      ...(subscriptionData ? { subscription_data: subscriptionData } : {}),
       line_items: [
         {
           price_data: {

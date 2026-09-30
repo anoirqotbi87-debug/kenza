@@ -28,6 +28,11 @@ export interface Lesson {
   level: number;
   description: MultiLangText | string;
   steps: LessonStep[];
+  /**
+   * Verrou premium explicite au niveau de la leçon. Optionnel : le découpage
+   * gratuit/payant se décide d'abord par module (`@/lib/premiumModules`).
+   */
+  isPremium?: boolean;
 }
 
 export interface LessonStep {
