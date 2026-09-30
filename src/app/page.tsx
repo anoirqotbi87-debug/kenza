@@ -45,6 +45,7 @@ import { playAudio } from "@/lib/audio";
 import { getDateLocale } from "@/lib/i18n/utils";
 import { supabase } from "@/lib/supabase";
 import { fetchPremiumStatus } from "@/lib/premium";
+import { confirmPremiumAfterCheckout } from "@/lib/stripeReturn";
 import { openBillingPortal } from "@/lib/billingPortal";
 import { shouldShowOnboardingPaywall } from "@/lib/monetizationGates";
 import {
@@ -290,22 +291,27 @@ export default function Home() {
     return () => subscription.unsubscribe();
   }, [setUser, setIsPremium, resetData]);
 
-  // Check URL params (e.g. Stripe callback)
+  // Retour de Stripe. Le premium n'est JAMAIS accordé sur la seule foi de l'URL : le
+  // paramètre `upgrade=success` est forgeable, et l'accorder débloquait le contenu Pro
+  // (modules 3 à 7, roleplay sans quota, pack audio hors-ligne) sans paiement. Seule la
+  // relecture de `profiles.is_premium` décide — le webhook Stripe est le seul écrivain.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const searchParams = new URLSearchParams(window.location.search);
     if (searchParams.get("upgrade") !== "success") return;
     const timer = window.setTimeout(async () => {
-      // Affichage optimiste au retour de Stripe, mais uniquement en complément de la
-      // relecture en base : c'est elle qui décide, et elle corrige le flag si le webhook
-      // n'a pas encore traité l'événement.
-      setIsPremium(true);
-      showToast(t.modules.home.proActivated);
       window.history.replaceState({}, document.title, window.location.pathname);
       const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        setIsPremium(await fetchPremiumStatus(session.user.id));
+      if (!session?.user) {
+        // Aucun compte : rien à créditer. Le retour Stripe ne concerne que l'acheteur.
+        return;
       }
+      // Le webhook peut n'avoir pas encore traité l'événement (arrivée quasi simultanée
+      // du navigateur et de Stripe). `confirmPremiumAfterCheckout` retente brièvement,
+      // mais ne débloque que sur confirmation en base.
+      const active = await confirmPremiumAfterCheckout(() => fetchPremiumStatus(session.user.id));
+      setIsPremium(active);
+      showToast(active ? t.modules.home.proActivated : t.modules.home.proPending);
     }, 0);
     return () => window.clearTimeout(timer);
   }, [setIsPremium, showToast, t]);
@@ -944,6 +950,10 @@ export default function Home() {
           source={activePricingSource}
           dismissLabel={activePricingSource === "onboarding" ? t.modules.paywall.onboardingDismiss : undefined}
           onDismiss={activePricingSource === "onboarding" ? continueWithFreeVersion : undefined}
+          onRequireSignIn={() => {
+            closePaywall();
+            setAuthMode("signup");
+          }}
         />
       )}
 

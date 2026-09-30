@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { NextRequest } from 'next/server';
 
 const sessionsCreate = vi.fn();
+const getUser = vi.fn();
 
 // Le module stripe reel exige STRIPE_SECRET_KEY : on l'intercepte pour observer
 // exactement ce que la route transmet a l'API Stripe.
@@ -9,12 +10,20 @@ vi.mock('@/lib/stripe', () => ({
   stripe: { checkout: { sessions: { create: sessionsCreate } } },
 }));
 
+// Supabase est mocke : la route exige un utilisateur authentifie (un invite ne peut pas
+// s'abonner, le webhook n'aurait personne a crediter).
+vi.mock('@supabase/supabase-js', () => ({
+  createClient: () => ({ auth: { getUser } }),
+}));
+
 const { POST } = await import('./route');
 
-function post(body: Record<string, unknown>): Promise<Response> {
+const AUTH = { Authorization: 'Bearer fake-jwt-token' };
+
+function post(body: Record<string, unknown>, headers: Record<string, string> = AUTH): Promise<Response> {
   const req = new Request('http://localhost/api/stripe/checkout', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...headers },
     body: JSON.stringify(body),
   });
   return POST(req as unknown as NextRequest);
@@ -27,6 +36,29 @@ function lastCreateArg() {
 beforeEach(() => {
   sessionsCreate.mockReset();
   sessionsCreate.mockResolvedValue({ url: 'https://checkout.stripe.test/session' });
+  getUser.mockReset();
+  getUser.mockResolvedValue({ data: { user: { id: 'user-1', email: 'eleve@kenza.test' } }, error: null });
+});
+
+describe('checkout — compte obligatoire', () => {
+  it('sans Authorization : refuse en 401 sans appeler Stripe', async () => {
+    const res = await post({ billingCycle: 'yearly', currency: 'EUR' }, {});
+    expect(res.status).toBe(401);
+    expect(sessionsCreate).not.toHaveBeenCalled();
+  });
+
+  it('jeton invalide (aucun utilisateur) : refuse en 401 sans appeler Stripe', async () => {
+    getUser.mockResolvedValue({ data: { user: null }, error: { message: 'invalid token' } });
+    const res = await post({ billingCycle: 'yearly', currency: 'EUR' });
+    expect(res.status).toBe(401);
+    expect(sessionsCreate).not.toHaveBeenCalled();
+  });
+
+  it('utilisateur authentifie : rattache la session a son id, jamais a anonymous', async () => {
+    await post({ billingCycle: 'yearly', currency: 'EUR' });
+    expect(lastCreateArg().metadata.userId).toBe('user-1');
+    expect(lastCreateArg().client_reference_id).toBe('user-1');
+  });
 });
 
 describe('checkout — essai gratuit 7 jours', () => {

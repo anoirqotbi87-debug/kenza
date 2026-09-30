@@ -20,6 +20,11 @@ interface PaywallModalProps {
   dismissLabel?: string;
   /** Callback de l'action de refus. Par défaut, ferme simplement la modale. */
   onDismiss?: () => void;
+  /**
+   * Ouvre l'authentification. Appelé par l'invité qui veut s'abonner : sans compte il n'y
+   * a personne à créditer au retour de Stripe.
+   */
+  onRequireSignIn?: () => void;
 }
 
 export default function PaywallModal({
@@ -27,9 +32,15 @@ export default function PaywallModal({
   source = 'direct',
   dismissLabel,
   onDismiss,
+  onRequireSignIn,
 }: PaywallModalProps) {
   const { t } = useTranslation();
   const isPremium = useAppStore((s) => s.isPremium);
+  const user = useAppStore((s) => s.user);
+  // Un invité ne peut pas s'abonner : la route checkout refuse de créer une session sans
+  // compte (le webhook n'aurait personne à créditer). On le dit ici, plutôt que de laisser
+  // un bouton qui renvoie une erreur serveur.
+  const needsAccount = !user;
   const pw = t.modules.paywall;
   const [billingCycle, setBillingCycle] = useState<'yearly' | 'monthly'>('yearly');
   const [currency, setCurrency] = useState<'EUR' | 'MAD'>('EUR');
@@ -356,7 +367,7 @@ export default function PaywallModal({
           <div className="space-y-3 pt-1">
             <button
               onClick={isPremium ? handleManageSubscription : handleSubscribe}
-              disabled={loading}
+              disabled={loading || (needsAccount && !isPremium)}
               className="w-full py-3.5 sm:py-4 px-6 rounded-full bg-[#C9A05C] hover:bg-[#b88f4b] disabled:opacity-60 disabled:cursor-not-allowed text-[#1B2A4A] font-bold text-sm sm:text-base shadow-md hover:shadow-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-3 group"
             >
               {loading ? (
@@ -366,11 +377,32 @@ export default function PaywallModal({
                 </>
               ) : (
                 <>
-                  <span>{isPremium ? pw.manageSubscription : (isYearly ? pw.trialCta : pw.monthlyCta)}</span>
+                  <span>
+                    {isPremium
+                      ? pw.manageSubscription
+                      : needsAccount
+                      ? pw.guestCta
+                      : isYearly
+                      ? pw.trialCta
+                      : pw.monthlyCta}
+                  </span>
                   <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
                 </>
               )}
             </button>
+
+            {needsAccount && !isPremium && (
+              <button
+                type="button"
+                onClick={() => {
+                  trackEvent('paywall_signin_required', { source });
+                  onRequireSignIn?.();
+                }}
+                className="w-full text-center text-xs text-[#1B2A4A] underline hover:text-[#C9A05C] transition-colors py-1"
+              >
+                {pw.signInCta}
+              </button>
+            )}
 
             {errorMessage && (
               <p className="text-xs text-red-600 font-medium text-center bg-red-50 p-2 rounded-lg border border-red-200">
