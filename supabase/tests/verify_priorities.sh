@@ -101,7 +101,9 @@ echo "== C. claim_checkpoint_reward a 3 args (ancienne signature) =="
 as_auth "SELECT public.claim_checkpoint_reward('B2_final', 100, 'FAKE-CERT');" | sed 's/^/  /'
 
 echo
-echo "== D. 3 fausses lecon_progress puis checkpoint non merite =="
+echo "== D. 3 fausses lecon_progress puis checkpoint inexistant =="
+# Depuis 20260929190000, un checkpoint absent du referentiel est rejete AVANT tout examen
+# des lecons : le message doit etre 'Unknown checkpoint', pas 'Prerequisites not met'.
 as_auth "INSERT INTO public.lesson_progress (user_id, lesson_id, completed, score) VALUES
    (auth.uid(), 'fake_1', false, 1),
    (auth.uid(), 'fake_2', false, 1),
@@ -148,13 +150,17 @@ echo "== F. sync_user_progress (named args, new_badges en JSON array) =="
 as_auth "SELECT public.sync_user_progress(new_xp := 10, new_streak_days := 1, new_streak_freezes := 1, new_badges := '{\"first_lesson\"}'::text[]);" | sed 's/^/  /'
 
 echo
-echo "== G. 3 vraies lecon_progress liees a un checkpoint reel =="
-# Les 3 fausses lignes de D sont supprimees : le scénario G part d'un état propre.
-as_auth "DELETE FROM public.lesson_progress WHERE user_id = auth.uid() AND lesson_id LIKE 'fake_%';" > /dev/null 2>&1
+echo "== G. toutes les lecons reelles du module 5, puis claim_checkpoint_reward('5', 90) =="
+# Les 3 fausses lignes de D sont supprimees : le scenario part d'un etat propre.
+# Le module 5 compte 5 lecons dans checkpoint_lessons (m5_l1_opinion, m5_l2_hypothese,
+# m5_l3_travail, m5_l4_proverbes, m5_checkpoint_b2) : les 5 sont necessaires.
+as_auth "DELETE FROM public.lesson_progress WHERE user_id = auth.uid();" > /dev/null 2>&1
 as_auth "INSERT INTO public.lesson_progress (user_id, lesson_id, completed, score) VALUES
    (auth.uid(), 'm5_l1_opinion', true, 90),
    (auth.uid(), 'm5_l2_hypothese', true, 85),
-   (auth.uid(), 'm5_l3_travail', true, 95);" | sed 's/^/  /'
+   (auth.uid(), 'm5_l3_travail', true, 95),
+   (auth.uid(), 'm5_l4_proverbes', true, 88),
+   (auth.uid(), 'm5_checkpoint_b2', true, 92);" | sed 's/^/  /'
 as_auth "SELECT public.claim_checkpoint_reward('5', 90);" | sed 's/^/  /'
 echo "  -- ligne dans user_checkpoints :"
 $DOCKER exec "$CT" psql -U postgres -q -t -A -c "
