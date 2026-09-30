@@ -22,7 +22,8 @@ export type VocabularyCategory =
   | 'emergency'
   | 'time'
   | 'verb'
-  | 'abstract';
+  | 'abstract'
+  | 'souk';
 
 export type ModuleId = 1 | 2 | 3 | 4;
 

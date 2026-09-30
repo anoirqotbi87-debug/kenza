@@ -1,26 +1,11 @@
 import { module1Lessons } from '../module1';
-import { lessonCafe } from '../lessons/lesson-cafe';
-import { lessonTaxi } from '../lessons/lesson-taxi';
-// On simule l'existence d'autres leçons pour l'UI, bien qu'elles soient à remplir plus tard
-import { Lesson, MultiLangText } from '../../types/curriculum';
-
-export const module2Lessons: Lesson[] = [
-  lessonCafe,
-  lessonTaxi,
-  {
-    id: 'l_module2_souk_1',
-    title: { fr: 'Au Souk', en: 'At the Souk', es: 'En el Zoco', ar: 'في السوق' },
-    level: 2,
-    description: { fr: 'Négociez les prix au marché.', en: 'Negotiate prices at the market.', es: 'Negocia los precios en el mercado.', ar: 'تفاوض على الأسعار في السوق.' },
-    steps: [] // Squelette pour la UI
-  }
-];
-
+import { module2Lessons } from '../module2';
 import { module3Lessons } from '../module3';
 import { module4Lessons } from '../module4';
 import { module5Lessons } from '../module5';
 import { module6Lessons } from '../module6';
 import { module7Lessons } from '../module7';
+import { Lesson, MultiLangText } from '../../types/curriculum';
 
 export const fullCurriculum: Record<string, { title: MultiLangText, lessons: Lesson[] }> = {
   1: { 
