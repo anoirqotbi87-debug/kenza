@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 import { MsEdgeTTS, OUTPUT_FORMAT } from 'msedge-tts';
 import { normalizeDarija } from '../../../lib/tts/darijaPhonetics';
@@ -12,7 +11,7 @@ async function synthesize(text: string, arabicText?: string) {
   const chunks: Buffer[] = [];
 
   return new Promise<NextResponse>((resolve) => {
-    readable.audioStream.on('data', (chunk: any) => chunks.push(Buffer.from(chunk)));
+    readable.audioStream.on('data', (chunk: Buffer) => chunks.push(chunk));
     readable.audioStream.on('end', () => {
       const audioBuffer = Buffer.concat(chunks);
       resolve(new NextResponse(audioBuffer, {
@@ -22,7 +21,7 @@ async function synthesize(text: string, arabicText?: string) {
         },
       }));
     });
-    readable.audioStream.on('error', (err: any) => {
+    readable.audioStream.on('error', (err: Error) => {
       console.error('TTS Stream Error:', err);
       resolve(NextResponse.json({ error: 'TTS_GENERATION_FAILED' }, { status: 500 }));
     });

@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { streamText } from 'ai';
+import { streamText, type CoreMessage } from 'ai';
 import { google } from '@ai-sdk/google';
 import { getSystemPrompt, PersonaId } from '@/lib/ai/prompts';
 import { NextRequest } from 'next/server';
@@ -78,7 +77,10 @@ export async function POST(req: NextRequest) {
       return new Response('Message exceeds maximum length of 500 characters', { status: 400 });
     }
 
-    const totalChars = messages.reduce((sum: number, m: any) => sum + (m.content?.length || 0), 0);
+    const totalChars = messages.reduce(
+      (sum: number, m: CoreMessage) => sum + (typeof m.content === 'string' ? m.content.length : 0),
+      0
+    );
     if (totalChars > 4000) return new Response('Payload too large', { status: 400 });
 
     const systemPrompt = getSystemPrompt(personaId as PersonaId);

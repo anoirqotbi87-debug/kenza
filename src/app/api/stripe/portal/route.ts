@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
+import { getErrorMessage } from '@/lib/errors';
 import { createClient } from '@supabase/supabase-js';
 import { safeRedirectOrigin } from '@/lib/allowedOrigins';
 
@@ -54,10 +54,10 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ url: portalSession.url });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[Stripe Portal Error]:', error);
     return NextResponse.json(
-      { error: error?.message || 'Erreur lors de l’ouverture du portail de facturation' },
+      { error: getErrorMessage(error) || 'Erreur lors de l’ouverture du portail de facturation' },
       { status: 500 }
     );
   }

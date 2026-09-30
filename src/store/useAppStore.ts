@@ -271,8 +271,7 @@ export const useAppStore = create<AppState>()(
       name: 'darija-quest-storage',
       version: 3,
       partialize: (state: AppState) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { devUnlockAll, ...rest } = state;
+        const { devUnlockAll: _devUnlockAll, ...rest } = state;
         return rest;
       },
       migrate: (persistedState: unknown, version: number) => {

@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe, PRICING_CONFIG } from '@/lib/stripe';
+import { getErrorMessage } from '@/lib/errors';
 import { createClient } from '@supabase/supabase-js';
 import { safeRedirectOrigin } from '@/lib/allowedOrigins';
 
@@ -79,10 +79,10 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ url: session.url });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[Stripe Checkout Error]:', error);
     return NextResponse.json(
-      { error: error?.message || 'Erreur lors de la création de la session de paiement' },
+      { error: getErrorMessage(error) || 'Erreur lors de la création de la session de paiement' },
       { status: 500 }
     );
   }

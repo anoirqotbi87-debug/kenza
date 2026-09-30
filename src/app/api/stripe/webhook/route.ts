@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
+import { getErrorMessage } from '@/lib/errors';
 import { createClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
 
@@ -27,8 +27,8 @@ export async function POST(req: NextRequest) {
     let event: Stripe.Event;
     try {
       event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
-    } catch (err: any) {
-      console.error('[Stripe Webhook Signature Error]:', err.message);
+    } catch (err: unknown) {
+      console.error('[Stripe Webhook Signature Error]:', getErrorMessage(err));
       return NextResponse.json({ error: 'Webhook Signature Error' }, { status: 400 });
     }
 
@@ -103,8 +103,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ received: true });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[Stripe Webhook Error]:', err);
-    return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: getErrorMessage(err) || 'Internal Server Error' }, { status: 500 });
   }
 }
