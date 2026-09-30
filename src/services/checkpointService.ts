@@ -15,8 +15,8 @@ export const checkpointService = {
     try {
       await withSessionRefresh(async () => {
         const { data, error } = await supabase.rpc('claim_checkpoint_reward', {
-          checkpoint_id: result.levelId,
-          score: result.score
+          p_checkpoint_id: result.levelId,
+          p_score: result.score
         });
 
         if (error) {

@@ -208,6 +208,9 @@ $$;
 -- L'ancienne surcharge (checkpoint_id, score, certificate_code) est supprimée :
 -- elle laissait le client fournir lui-même son code.
 DROP FUNCTION IF EXISTS public.claim_checkpoint_reward(text, integer, text);
+-- Idem : la 20260929160000 renomme les paramètres de (text, integer) en p_* et
+-- CREATE OR REPLACE ne sait pas renommer un paramètre. Ce DROP garde la chaîne rejouable.
+DROP FUNCTION IF EXISTS public.claim_checkpoint_reward(text, integer);
 
 CREATE OR REPLACE FUNCTION public.claim_checkpoint_reward(
   checkpoint_id text,

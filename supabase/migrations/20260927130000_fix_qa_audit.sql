@@ -4,6 +4,12 @@
 -- Supprime l'ancienne surcharge 3-args (retour void) : elle laissait un client fournir
 -- lui-meme le certificate_code, et CREATE OR REPLACE ne la remplace pas (signature differente).
 DROP FUNCTION IF EXISTS public.claim_checkpoint_reward(text, integer, text);
+-- Même raison pour la signature (text, integer) : la 20260929160000 renomme ses paramètres
+-- en p_checkpoint_id/p_score, et CREATE OR REPLACE refuse de renommer un paramètre
+-- (« cannot change name of input parameter »). Sans ce DROP, un rejeu de la chaîne complète
+-- (scénario db push) échouerait ici. Sans effet sur la prod, où la migration est déjà
+-- appliquée et ne sera pas rejouée.
+DROP FUNCTION IF EXISTS public.claim_checkpoint_reward(text, integer);
 
 CREATE OR REPLACE FUNCTION public.claim_checkpoint_reward(
   checkpoint_id text,
