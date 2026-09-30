@@ -103,6 +103,9 @@ const buildNavItems = (lang: string): { id: View; label: string; icon: LucideIco
   { id: "review", label: trL(lang, tr("Révision du jour", "Today’s review", "Revisión del día", "مراجعة اليوم"), "Today’s review", "Revisión del día", "مراجعة اليوم"), icon: Sparkles },
 ];
 
+/** Numero de lecon sur deux chiffres : « 03 », « 30 ». */
+const pad2 = (value: number) => String(value).padStart(2, "0");
+
 function useLocalizedContent() {
   const uiLanguage = useAppStore((s) => s.uiLanguage);
   const lang = uiLanguage || "fr";
@@ -1075,8 +1078,8 @@ function TodayView({
             </span>
           </div>
           <div className="lesson-number">
-            0{Math.min(completedCount + 1, totalLessons)}{" "}
-            <span>/ 0{totalLessons}</span>
+            {pad2(Math.min(completedCount + 1, totalLessons))}{" "}
+            <span>/ {pad2(totalLessons)}</span>
           </div>
           <div className="next-illustration">
             <Image
