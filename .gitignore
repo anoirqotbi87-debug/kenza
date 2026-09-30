@@ -40,6 +40,8 @@ docs/verify.json
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...sauf le modele, qui documente le format attendu et ne contient aucun secret.
+!.env.example
 
 # vercel
 .vercel

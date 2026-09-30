@@ -17,7 +17,8 @@ L'application est construite avec **Next.js 16**, **React 19**, **Tailwind CSS 4
 
 2. **Configuration des variables d'environnement :**
 
-   Créez un fichier `.env.local` à la racine :
+   Copiez le modèle versionné puis remplissez-le : `cp .env.example .env.local`.
+   Le format attendu de chaque variable y est documenté. Récapitulatif :
 
    ```env
    # Supabase (obligatoire)
@@ -97,9 +98,21 @@ Dans le dashboard Stripe, configurez un endpoint webhook pointant vers `https://
 
 ## 🚀 Déploiement (Vercel)
 
+Procédure complète : **[`DEPLOIEMENT.md`](./DEPLOIEMENT.md)** (variables, webhook Stripe,
+vérifications post-déploiement).
+
 1. Importez le dépôt sur Vercel.
-2. Ajoutez toutes les variables d'environnement listées ci-dessus.
+2. Ajoutez toutes les variables d'environnement listées dans `.env.example`.
 3. **Deploy**.
+
+> ⚠️ Le webhook Stripe est la **seule** voie d'attribution du premium. Sans
+> `STRIPE_WEBHOOK_SECRET`, un paiement réussi n'ouvre aucun accès.
+
+## 💰 Tarifs — source unique
+
+Tous les montants, libellés produits et prix affichés sont définis dans **`src/config/pricing.ts`**.
+Le paywall, les CGU et la route Stripe en dérivent ; aucun prix ne doit être réécrit ailleurs
+(un test le vérifie). Pour modifier un tarif, éditer ce seul fichier puis lancer `npm test`.
 
 ## 📱 Progressive Web App (PWA)
 
