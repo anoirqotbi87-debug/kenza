@@ -57,6 +57,9 @@ Appliquez les scripts SQL **dans l'ordre** (ordre chronologique des fichiers) vi
 5. `20260928120000_rate_limiting.sql` — rate-limiting durable des API
 6. `20260929140000_reconcile_remote_schema.sql` — rattrapage : tables et RPC manquantes,
    tables de suivi (`funnel_events`, `user_attribution`). **Idempotent**, rejouable sans risque.
+7. `20260929150000_schema_parity.sql` — colonnes présentes en production mais absentes du dépôt
+   (`profiles.username`, `hearts`, `stripe_*`, `lesson_progress.id`, `srs_items.id`…). Sans elle,
+   une base neuve est cassée : l'inscription échoue et le portail Stripe aussi.
 
 > ⚠️ **Si vous utilisez la CLI** (`supabase db push`) et non le SQL Editor, la base distante a pu
 > être modifiée hors migration : lancez d'abord `supabase migration list`, purgez les versions
