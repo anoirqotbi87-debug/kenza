@@ -8,9 +8,8 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   xp INTEGER DEFAULT 0,
   streak_days INTEGER DEFAULT 1,
   streak_freezes INTEGER DEFAULT 1,
-  unlocked_badges JSONB DEFAULT '[]'::jsonb,
-  script_preference TEXT DEFAULT 'arabizi',
-  regional_variant TEXT DEFAULT 'casablanca'
+  unlocked_badges TEXT[] DEFAULT '{}',
+  script_preference TEXT DEFAULT 'arabizi'
 );
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
@@ -28,7 +27,7 @@ CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
   INSERT INTO public.profiles (id, xp, streak_days, streak_freezes, unlocked_badges)
-  VALUES (new.id, 0, 1, 1, '[]'::jsonb);
+  VALUES (new.id, 0, 1, 1, '{}');
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
