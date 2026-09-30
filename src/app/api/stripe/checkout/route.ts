@@ -29,7 +29,17 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 2. Si la clé secrète Stripe n'est pas configurée dans l'environnement
+    // 2. Un invité ne peut pas s'abonner : sans compte, le webhook n'aurait aucun
+    // `userId` à créditer (`client_reference_id` vaudrait 'anonymous', cas explicitement
+    // ignoré). On l'arrête avant Stripe plutôt que d'encaisser un paiement perdu.
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Connectez-vous pour vous abonner à Kenza Pro.' },
+        { status: 401 }
+      );
+    }
+
+    // 3. Si la clé secrète Stripe n'est pas configurée dans l'environnement
     if (!stripe) {
       // En production, l'absence de clé est une erreur de configuration : on refuse
       // explicitement plutôt que de renvoyer un succès simulé (qui, combiné au client,
