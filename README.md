@@ -69,6 +69,24 @@ Appliquez les scripts SQL **dans l'ordre** (ordre chronologique des fichiers) vi
 Les tests RLS sont dans `supabase/tests/` (à exécuter manuellement, pas des migrations).
 Les scripts obsolètes sont archivés dans `supabase/archive/` (ne pas exécuter).
 
+### Vérifier la reproductibilité en local
+
+La prod ne peut pas valider les migrations : les blocs conditionnels y sont sautés (les objets
+existent déjà). Deux bugs réels ne se voyaient donc **que** sur une base vierge — un `ALTER COLUMN`
+sur une colonne référencée par une policy, et une surcharge RPC périmée que `CREATE OR REPLACE`
+n'avait pas remplacée.
+
+Pour rejouer les migrations sur un Postgres nu (Docker requis, le conteneur est supprimé à la fin) :
+
+```bash
+bash supabase/tests/replay_migrations.sh
+```
+
+Le script applique `supabase/tests/supabase_shim.sql` (schéma `auth` + rôles PostgREST, de quoi
+satisfaire les migrations), exécute les 7 migrations **deux fois** — le second passage reproduit le
+scénario `supabase db push` — puis vérifie que la RLS est active sur les 7 tables et que chaque RPC
+n'a qu'une seule signature. À lancer après toute modification de migration.
+
 ## 💳 Stripe (Kenza Pro)
 
 - Checkout : `POST /api/stripe/checkout`
