@@ -112,10 +112,8 @@ $DOCKER exec "$CT" psql -U postgres -q -t -A -c "
 
 echo
 echo "############ a. 3 lesson_progress bidon + checkpoint invente ############"
-as_auth "INSERT INTO public.lesson_progress (user_id, lesson_id, completed, score) VALUES
-   (auth.uid(), 'bidon_1', true, 100),
-   (auth.uid(), 'bidon_2', true, 100),
-   (auth.uid(), 'bidon_3', true, 100);" | sed 's/^/  /'
+# Depuis 20260929200000 l'ecriture directe est fermee : on passe par le RPC.
+as_auth "SELECT public.complete_lessons_bulk(ARRAY['bidon_1','bidon_2','bidon_3']);" | sed 's/^/  /'
 echo "  -- claim_checkpoint_reward('n_importe_quoi', 100) :"
 as_auth "SELECT public.claim_checkpoint_reward('n_importe_quoi', 100);" | sed 's/^/  /'
 
@@ -127,21 +125,18 @@ for ck in 1 2 3 4 5 6 7; do
   echo "  --- checkpoint '$ck' ---"
   as_admin "DELETE FROM public.lesson_progress WHERE user_id = '$TEST_UUID';" > /dev/null 2>&1
   as_admin "DELETE FROM public.user_checkpoints WHERE user_id = '$TEST_UUID';" > /dev/null 2>&1
-  # Toutes les lecons du checkpoint sauf une (la derniere par ordre alphabetique).
-  as_auth "INSERT INTO public.lesson_progress (user_id, lesson_id, completed, score)
-    SELECT auth.uid(), lesson_id, true, 90 FROM public.checkpoint_lessons
+  # Toutes les lecons du checkpoint sauf une (la derniere par ordre alphabetique), via le RPC.
+  as_auth "SELECT public.complete_lessons_bulk(ARRAY(
+    SELECT lesson_id FROM public.checkpoint_lessons
      WHERE checkpoint_id = '$ck'
-       AND lesson_id <> (SELECT max(lesson_id) FROM public.checkpoint_lessons WHERE checkpoint_id = '$ck');" \
+       AND lesson_id <> (SELECT max(lesson_id) FROM public.checkpoint_lessons WHERE checkpoint_id = '$ck')));" \
     | sed 's/^/    /'
   echo "    lecon manquante : $( $DOCKER exec "$CT" psql -U postgres -q -t -A -c \
     "SELECT max(lesson_id) FROM public.checkpoint_lessons WHERE checkpoint_id = '$ck';" )"
   echo "    claim (incomplet) :"
   as_auth "SELECT public.claim_checkpoint_reward('$ck', 100);" | sed 's/^/      /'
-  # On complete la derniere lecon manquante.
-  as_auth "INSERT INTO public.lesson_progress (user_id, lesson_id, completed, score)
-    SELECT auth.uid(), max(lesson_id), true, 90 FROM public.checkpoint_lessons
-     WHERE checkpoint_id = '$ck'
-       AND lesson_id NOT IN (SELECT lesson_id FROM public.lesson_progress WHERE user_id = auth.uid());" \
+  # On complete la derniere lecon manquante via le RPC unitaire.
+  as_auth "SELECT public.complete_lesson((SELECT max(lesson_id) FROM public.checkpoint_lessons WHERE checkpoint_id = '$ck'));" \
     | sed 's/^/    /'
   echo "    claim (complet) :"
   as_auth "SELECT public.claim_checkpoint_reward('$ck', 100);" | sed 's/^/      /'
@@ -152,8 +147,8 @@ echo "############ c. cloisonnement : module 2 ne debloque pas le module 5 #####
 as_admin "DELETE FROM public.lesson_progress WHERE user_id = '$TEST_UUID';" > /dev/null 2>&1
 as_admin "DELETE FROM public.user_checkpoints WHERE user_id = '$TEST_UUID';" > /dev/null 2>&1
 echo "  -- lecons du module 2 completees :"
-as_auth "INSERT INTO public.lesson_progress (user_id, lesson_id, completed, score)
-  SELECT auth.uid(), lesson_id, true, 95 FROM public.checkpoint_lessons WHERE checkpoint_id = '2';" \
+as_auth "SELECT public.complete_lessons_bulk(ARRAY(
+  SELECT lesson_id FROM public.checkpoint_lessons WHERE checkpoint_id = '2'));" \
   | sed 's/^/    /'
 $DOCKER exec "$CT" psql -U postgres -q -t -A -c "
   SELECT '    ' || lesson_id FROM public.lesson_progress WHERE user_id = '$TEST_UUID' ORDER BY lesson_id;"
