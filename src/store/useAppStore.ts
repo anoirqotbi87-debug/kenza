@@ -8,6 +8,7 @@ import { UILanguage, translations } from '../lib/i18n/translations';
 import { getLocalTodayDateString, getDaysDifference } from '../utils/dateUtils';
 
 import { srsService } from '../services/srsService';
+import { migrateLegacyLessonIds } from '../data/homeCurriculum';
 interface AppState {
   // User Progress
   user: User | null;
@@ -277,7 +278,7 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'darija-quest-storage',
-      version: 4,
+      version: 5,
       partialize: (state: AppState) => {
         // isPremium est exclu : c'est un droit payant, il ne doit jamais pouvoir être
         // débloqué en éditant le localStorage. Source de vérité unique : profiles.is_premium,
@@ -311,6 +312,15 @@ export const useAppStore = create<AppState>()(
           // la persistance, mais il faut aussi purger la valeur déjà écrite : sinon elle est
           // réhydratée avant la lecture en base et débloque le contenu entre-temps.
           delete (state as { isPremium?: boolean }).isPremium;
+        }
+        if (version < 5) {
+          // L'accueil jouait ses propres lecons (`HomeLesson`) avant de devenir une
+          // vitrine vers /etudier. Ses identifiants doivent être traduits vers le
+          // curriculum central, sinon la progression acquise devient orpheline :
+          // le total « X / N » reste juste, mais les lecons apparaissent à refaire.
+          if (Array.isArray(state.completedLessons)) {
+            state.completedLessons = migrateLegacyLessonIds(state.completedLessons);
+          }
         }
         return state;
       }

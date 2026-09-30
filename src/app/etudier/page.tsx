@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BookOpen, CheckCircle2, Lock, Play } from 'lucide-react';
 import { fullCurriculum } from '@/data/curriculum';
 import type { Lesson, MultiLangText } from '@/types/curriculum';
@@ -33,6 +33,33 @@ export default function EtudierPage() {
     }
     setRunnerLesson(lesson);
   };
+
+  // Deep-link depuis l'accueil : /etudier?lesson=<id> ouvre directement la lecon
+  // demandee. Resolu une seule fois a l'initialisation, puis le parametre est
+  // retire de l'URL pour qu'un rechargement ne rouvre pas l'exercice.
+  const [deepLink] = useState(() => {
+    if (typeof window === 'undefined') return null;
+    const lessonId = new URLSearchParams(window.location.search).get('lesson');
+    if (!lessonId) return null;
+    for (const [key, mod] of Object.entries(fullCurriculum)) {
+      const lesson = mod.lessons.find((item) => item.id === lessonId);
+      if (lesson) return { moduleKey: key, lesson };
+    }
+    return null;
+  });
+  const [deepLinkClosed, setDeepLinkClosed] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (new URLSearchParams(window.location.search).has('lesson')) {
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
+
+  // Le verrou premium reste applique au deep-link : on ne contourne pas le paywall.
+  const deepLinkBlocked = Boolean(deepLink && isModuleLocked(deepLink.moduleKey, isPremium));
+  const openLesson =
+    runnerLesson ?? (!deepLinkClosed && deepLink && !deepLinkBlocked ? deepLink.lesson : null);
 
   return (
     <div dir={isAr ? 'rtl' : 'ltr'} className="min-h-screen bg-[#F7F3EA]">
@@ -90,17 +117,23 @@ export default function EtudierPage() {
         })}
       </main>
 
-      {runnerLesson && (
+      {openLesson && (
         <ExerciseRunner
-          lesson={runnerLesson}
+          lesson={openLesson}
           onComplete={() => {
-            completeLesson(runnerLesson.id);
+            completeLesson(openLesson.id);
             setRunnerLesson(null);
+            setDeepLinkClosed(true);
           }}
-          onClose={() => setRunnerLesson(null)}
+          onClose={() => {
+            setRunnerLesson(null);
+            setDeepLinkClosed(true);
+          }}
         />
       )}
-      {showPaywall && <PaywallModal onClose={() => setShowPaywall(false)} source="module_locked" />}
+      {(showPaywall || deepLinkBlocked) && (
+        <PaywallModal onClose={() => setShowPaywall(false)} source="module_locked" />
+      )}
     </div>
   );
 }

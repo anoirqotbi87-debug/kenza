@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type RefObject } from "react";
 import {
   ArrowDownRight,
-  ArrowLeft,
   ArrowRight,
   Award,
   Bookmark,
@@ -18,7 +17,6 @@ import {
   Headphones,
   Heart,
   Home as HomeIcon,
-  Languages,
   Leaf,
   LockKeyhole,
   Menu,
@@ -49,7 +47,14 @@ import { supabase } from "@/lib/supabase";
 import { fetchPremiumStatus } from "@/lib/premium";
 import { openBillingPortal } from "@/lib/billingPortal";
 import { shouldShowOnboardingPaywall } from "@/lib/monetizationGates";
-import { isPremiumLesson } from "@/data/homeCurriculum";
+import {
+  getModuleSummaries,
+  getNextLesson,
+  getPlayableLessons,
+  type LessonRef,
+} from "@/data/homeCurriculum";
+import { getLocalizedText } from "@/lib/i18n/utils";
+import type { UILanguage } from "@/lib/i18n/translations";
 import { syncService } from "@/lib/syncService";
 import { useCheckpointProgress } from "@/hooks/useCheckpointProgress";
 import CheckpointModal from "@/components/checkpoint/CheckpointModal";
@@ -71,23 +76,6 @@ import SaveProgressCard from "@/components/auth/SaveProgressCard";
 
 export type View = "today" | "path" | "phrases" | "review" | "space";
 
-export type Question = {
-  prompt: string;
-  helper: string;
-  options: string[];
-  answer: string;
-  note: string;
-};
-
-export type HomeLesson = {
-  id: string;
-  title: string;
-  subtitle: string;
-  length: string;
-  status: "done" | "current" | "locked";
-  questions: Question[];
-};
-
 export type Phrase = {
   id: string;
   category: string;
@@ -96,124 +84,6 @@ export type Phrase = {
   meaning: string;
   note: string;
 };
-
-const buildLessons = (lang: string): HomeLesson[] => [
-  {
-    id: "hello",
-    title: trL(lang, tr("Les premiers bonjours", "The first hellos", "Los primeros saludos", "أول التحيات"), "The first hellos", "Los primeros saludos", "أول التحيات"),
-    subtitle: trL(lang, tr("Saluer, se présenter, créer le lien", "Greet, introduce yourself, connect", "Saludar, presentarse, crear el vínculo", "التحية والتعاريف وبناء الرابط"), "Greet, introduce yourself, connect", "Saludar, presentarse, crear el vínculo", "التحية والتعاريف وبناء الرابط"),
-    length: "6 min",
-    status: "current",
-    questions: [
-      {
-        prompt: trL(lang, tr("Comment dit-on « bonjour » en darija ?", "How do you say « hello » in darija?", "¿Cómo se dice «hola» en darija?", "كيف نقول «مرحبا» بالدارجة؟"), "How do you say « hello » in darija?", "¿Cómo se dice «hola» en darija?", "كيف نقول «مرحبا» بالدارجة؟"),
-        helper: trL(lang, tr("Choisis la formule la plus naturelle.", "Choose the most natural phrase.", "Elige la fórmula más natural.", "اختر الصيغة الأكثر طبيعية."), "Choose the most natural phrase.", "Elige la fórmula más natural.", "اختر الصيغة الأكثر طبيعية."),
-        options: ["Salam", "Shukran", "Bslama"],
-        answer: "Salam",
-        note: trL(lang, tr("« Salam » veut dire paix. C’est le bonjour simple, chaleureux et passe-partout.", "« Salam » means peace. The simple, warm, all-purpose hello.", "« Salam » significa paz. Es el saludo simple, cálido y universal.", "«سلام» تعني السلام. تحية بسيطة دافئة تصلح لكل مناسبة."), "« Salam » means peace. The simple, warm, all-purpose hello.", "« Salam » significa paz. Es el saludo simple, cálido y universal.", "«سلام» تعني السلام. تحية بسيطة دافئة تصلح لكل مناسبة."),
-      },
-      {
-        prompt: trL(lang, tr("Tu rencontres quelqu’un pour la première fois. Que dis-tu ?", "You meet someone for the first time. What do you say?", "Conoces a alguien por primera vez. ¿Qué dices?", "تقابل شخصاً لأول مرة. ماذا تقول؟"), "You meet someone for the first time. What do you say?", "Conoces a alguien por primera vez. ¿Qué dices?", "تقابل شخصاً لأول مرة. ماذا تقول؟"),
-        helper: trL(lang, tr("Pense à une formule de bienvenue.", "Think of a welcoming phrase.", "Piensa en una fórmula de bienvenida.", "فكر في صيغة ترحيب."), "Think of a welcoming phrase.", "Piensa en una fórmula de bienvenida.", "فكر في صيغة ترحيب."),
-        options: ["Labas?", "Tsharrafna", "Afak"],
-        answer: "Tsharrafna",
-        note: trL(lang, tr("« Tsharrafna » signifie littéralement « enchanté·e ». Une belle façon de faire connaissance.", "« Tsharrafna » literally means « delighted to meet you ». A lovely way to connect.", "« Tsharrafna » significa literalmente «encantado». Una bonita forma de conocerse.", "«تشرفنا» تعني حرفياً «تشرّفت بلقائك». طريقة جميلة للتعارف."), "« Tsharrafna » literally means « delighted to meet you ». A lovely way to connect.", "« Tsharrafna » significa literalmente «encantado». Una bonita forma de conocerse.", "«تشرفنا» تعني حرفياً «تشرّفت بلقائك». طريقة جميلة للتعارف."),
-      },
-      {
-        prompt: trL(lang, tr("Que signifie « labas? »", "What does « labas? » mean?", "¿Qué significa « labas? »?", "ماذا تعني «لاباس؟»"), "What does « labas? » mean?", "¿Qué significa « labas? »?", "ماذا تعني «لاباس؟»"),
-        helper: trL(lang, tr("Une question qu’on entend partout.", "A question you hear everywhere.", "Una pregunta que se oye por todas partes.", "سؤال تسمعه في كل مكان."), "A question you hear everywhere.", "Una pregunta que se oye por todas partes.", "سؤال تسمعه في كل مكان."),
-        options: [trL(lang, tr("Où vas-tu ?", "Where are you going?", "¿Adónde vas?", "إلى أين تذهب؟"), "Where are you going?", "¿Adónde vas?", "إلى أين تذهب؟")],
-        answer: trL(lang, tr("Ça va ?", "How are you?", "¿Qué tal?", "كيف حالك؟"), "How are you?", "¿Qué tal?", "كيف حالك؟"),
-        note: trL(lang, tr("« Labas? » est le petit « ça va ? » du quotidien. On répond souvent « labas, hamdullah ».", "« Labas? » is the everyday « how are you? ». People often reply « labas, hamdullah ».", "« Labas? » es el «¿qué tal?» del día a día. Suele responderse «labas, hamdullah».", "«لاباس؟» هي «كيف حالك؟» اليومية. غالباً يُجاب «لاباس، الحمد لله»."), "« Labas? » is the everyday « how are you? ». People often reply « labas, hamdullah ».", "« Labas? » es el «¿qué tal?» del día a día. Suele responderse «labas, hamdullah».", "«لاباس؟» هي «كيف حالك؟» اليومية. غالباً يُجاب «لاباس، الحمد لله»."),
-      },
-    ],
-  },
-  {
-    id: "cafe",
-    title: trL(lang, tr("Au café du coin", "At the corner café", "En el café de la esquina", "في مقهى الحي"), "At the corner café", "En el café de la esquina", "في مقهى الحي"),
-    subtitle: trL(lang, tr("Commander un thé à la menthe", "Ordering a mint tea", "Pedir un té a la menta", "طلب شاي بالنعناع"), "Ordering a mint tea", "Pedir un té a la menta", "طلب شاي بالنعناع"),
-    length: "8 min",
-    status: "locked",
-    questions: [
-      {
-        prompt: trL(lang, tr("Comment demander un thé, s’il vous plaît ?", "How do you ask for a tea, please?", "¿Cómo pedir un té, por favor?", "كيف تطلب شاياً، من فضلك؟"), "How do you ask for a tea, please?", "¿Cómo pedir un té, por favor?", "كيف تطلب شاياً، من فضلك؟"),
-        helper: trL(lang, tr("Une formule utile au café.", "A handy phrase at the café.", "Una fórmula útil en el café.", "صيغة مفيدة في المقهى."), "A handy phrase at the café.", "Una fórmula útil en el café.", "صيغة مفيدة في المقهى."),
-        options: ["Atay, afak", "Fin ghadi?", "Smah liya"],
-        answer: "Atay, afak",
-        note: trL(lang, tr("« Atay, afak » : un thé, s’il vous plaît. « Afak » ajoute la politesse.", "« Atay, afak »: a tea, please. « Afak » adds politeness.", "« Atay, afak »: un té, por favor. « Afak » añade cortesía.", "«أتاي، عفاك»: شاي من فضلك. «عفاك» تضيف اللطف."), "« Atay, afak »: a tea, please. « Afak » adds politeness.", "« Atay, afak »: un té, por favor. « Afak » añade cortesía.", "«أتاي، عفاك»: شاي من فضلك. «عفاك» تضيف اللطف."),
-      },
-      {
-        prompt: trL(lang, tr("Qu’est-ce que « bghit » veut dire ?", "What does « bghit » mean?", "¿Qué significa « bghit »?", "ماذا تعني «بغيت»؟"), "What does « bghit » mean?", "¿Qué significa « bghit »?", "ماذا تعني «بغيت»؟"),
-        helper: trL(lang, tr("Un mot très pratique pour commander.", "A very handy word for ordering.", "Una palabra muy práctica para pedir.", "كلمة عملية جداً للطلب."), "A very handy word for ordering.", "Una palabra muy práctica para pedir.", "كلمة عملية جداً للطلب."),
-        options: [trL(lang, tr("Je voudrais", "I would like", "Quisiera", "أريد"), "I would like", "Quisiera", "أريد")],
-        answer: trL(lang, tr("Je voudrais", "I would like", "Quisiera", "أريد"), "I would like", "Quisiera", "أريد"),
-        note: trL(lang, tr("« Bghit » veut dire « je veux » ou « je voudrais », selon le contexte.", "« Bghit » means « I want » or « I would like », depending on context.", "« Bghit » significa «quiero» o «quisiera», según el contexto.", "«بغيت» تعني «أريد» حسب السياق."), "« Bghit » means « I want » or « I would like », depending on context.", "« Bghit » significa «quiero» o «quisiera», según el contexto.", "«بغيت» تعني «أريد» حسب السياق."),
-      },
-    ],
-  },
-  {
-    id: "medina",
-    title: trL(lang, tr("Se repérer dans la médina", "Finding your way in the medina", "Orientarse en la medina", "التعرف على طريقك في المدينة القديمة"), "Finding your way in the medina", "Orientarse en la medina", "التعرف على طريقك في المدينة القديمة"),
-    subtitle: trL(lang, tr("Demander son chemin sans stress", "Asking for directions, stress-free", "Preguntar el camino sin estrés", "اسأل عن الطريق بلا توتر"), "Asking for directions, stress-free", "Preguntar el camino sin estrés", "اسأل عن الطريق بلا توتر"),
-    length: "7 min",
-    status: "locked",
-    questions: [
-      {
-        prompt: trL(lang, tr("Comment demander « où est… ? »", "How to ask « where is…? »", "Cómo preguntar «¿dónde está…?»", "كيف تسأل «أين يوجد…؟»"), "How to ask « where is…? »", "Cómo preguntar «¿dónde está…?»", "كيف تسأل «أين يوجد…؟»"),
-        helper: trL(lang, tr("La phrase qui débloque une promenade.", "The phrase that unlocks a stroll.", "La frase que desbloquea un paseo.", "العبارة التي تفتح لك التنزه."), "The phrase that unlocks a stroll.", "La frase que desbloquea un paseo.", "العبارة التي تفتح لك التنزه."),
-        options: ["Fin kayn…?", "Chhal hadi?", "Mumkin…?"],
-        answer: "Fin kayn…?",
-        note: trL(lang, tr("« Fin kayn…? » signifie « où se trouve… ? ». Ajoute le lieu que tu cherches.", "« Fin kayn…? » means « where is…? ». Add the place you’re looking for.", "« Fin kayn…? » significa «¿dónde está…?». Añade el lugar que buscas.", "«فين كاين…؟» تعني «أين يوجد…؟». أضف المكان الذي تبحث عنه."), "« Fin kayn…? » means « where is…? ». Add the place you’re looking for.", "« Fin kayn…? » significa «¿dónde está…?». Añade el lugar que buscas.", "«فين كاين…؟» تعني «أين يوجد…؟». أضف المكان الذي تبحث عنه."),
-      },
-      {
-        prompt: trL(lang, tr("Que signifie « yallah » ?", "What does « yallah » mean?", "¿Qué significa « yallah »?", "ماذا تعني «يللاه»؟"), "What does « yallah » mean?", "¿Qué significa « yallah »?", "ماذا تعني «يللاه»؟"),
-        helper: trL(lang, tr("Un mot qu’on entend souvent.", "A word you hear often.", "Una palabra que se oye a menudo.", "كلمة تُسمع كثيراً."), "A word you hear often.", "Una palabra que se oye a menudo.", "كلمة تُسمع كثيراً."),
-        options: [trL(lang, tr("Allons-y", "Let’s go", "Vamos", "هيا بنا"), "Let’s go", "Vamos", "هيا بنا"), "Merci beaucoup"],
-        answer: trL(lang, tr("Allons-y", "Let’s go", "Vamos", "هيا بنا"), "Let’s go", "Vamos", "هيا بنا"),
-        note: trL(lang, tr("« Yallah » invite à partir, à avancer, ou simplement à se lancer.", "« Yallah » invites you to leave, move, or simply dive in.", "« Yallah » invita a partir, avanzar o simplemente lanzarse.", "«يللاه» دعوة للانطلاق والتقدم أو البدء."), "« Yallah » invites you to leave, move, or simply dive in.", "« Yallah » invita a partir, avanzar o simplemente lanzarse.", "«يللاه» دعوة للانطلاق والتقدم أو البدء."),
-      },
-    ],
-  },
-  {
-    id: "marrakech",
-    title: trL(lang, tr("Négocier au souk de Marrakech", "Bargaining at the Marrakech souk", "Regatear en el souk de Marrakech", "المفاوضة في سوق مراكش"), "Bargaining at the Marrakech souk", "Regatear en el souk de Marrakech", "المفاوضة في سوق مراكش"),
-    subtitle: trL(lang, tr("Les nombres et les prix (Niveau A2)", "Numbers and prices (Level A2)", "Números y precios (Nivel A2)", "الأرقام والأسعار (مستوى A2)"), "Numbers and prices (Level A2)", "Números y precios (Nivel A2)", "الأرقام والأسعار (مستوى A2)"),
-    length: "9 min",
-    status: "locked",
-    questions: [
-      {
-        prompt: trL(lang, tr("Comment demander « Combien coûte ceci ? »", "How to ask « How much is this? »", "Cómo preguntar «¿Cuánto cuesta esto?»", "كيف تسأل «بشحال هادا؟»"), "How to ask « How much is this? »", "Cómo preguntar «¿Cuánto cuesta esto?»", "كيف تسأل «بشحال هادا؟»"),
-        helper: trL(lang, tr("Expression clé pour entamer la discussion.", "Key phrase to start the conversation.", "Expresión clave para entablar la conversación.", "عبارة مفتاحية لبدء الحوار."), "Key phrase to start the conversation.", "Expresión clave para entablar la conversación.", "عبارة مفتاحية لبدء الحوار."),
-        options: ["Bchhal hada?", "Fin mchiti?", "Labas 3lik?"],
-        answer: "Bchhal hada?",
-        note: tr("« Bchhal hada? » permet de demander le prix de n'importe quel article.", "« Bchhal hada? » lets you ask the price of any item.", "« Bchhal hada? » permite preguntar el precio de cualquier artículo.", "«بشحال هادا؟» تمكنك من السؤال عن سعر أي سلعة."),
-      },
-      {
-        prompt: trL(lang, tr("Que veut dire « Naqas chwiya 3afak » ?", "What does « Naqas chwiya 3afak » mean?", "¿Qué significa « Naqas chwiya 3afak »?", "ماذا تعني «نقّص شوية عفاك»؟"), "What does « Naqas chwiya 3afak » mean?", "¿Qué significa « Naqas chwiya 3afak »?", "ماذا تعني «نقّص شوية عفاك»؟"),
-        helper: trL(lang, tr("La formule cordiale de marchandage.", "The friendly way to bargain.", "La fórmula cordial del regateo.", "الصيغة الودية للمساومة."), "The friendly way to bargain.", "La fórmula cordial del regateo.", "الصيغة الودية للمساومة."),
-        options: [trL(lang, tr("Baisse un peu s'il te plaît", "Lower it a bit, please", "Baja un poco, por favor", "خفّض قليلاً من فضلك"), "Lower it a bit, please", "Baja un poco, por favor", "خفّض قليلاً من فضلك")],
-        answer: trL(lang, tr("Baisse un peu s'il te plaît", "Lower it a bit, please", "Baja un poco, por favor", "خفّض قليلاً من فضلك"), "Lower it a bit, please", "Baja un poco, por favor", "خفّض قليلاً من فضلك"),
-        note: trL(lang, tr("« Naqas chwiya » = réduis un peu. Utilisé avec le sourire !", "« Naqas chwiya » = cut it down a bit. Used with a smile!", "« Naqas chwiya » = reduce un poco. ¡Se usa con una sonrisa!", "«نقّص شوية» = خفّض قليلاً. تُقال بابتسامة!"), "« Naqas chwiya » = cut it down a bit. Used with a smile!", "« Naqas chwiya » = reduce un poco. ¡Se usa con una sonrisa!", "«نقّص شوية» = خفّض قليلاً. تُقال بابتسامة!"),
-      },
-    ],
-  },
-  {
-    id: "tanger",
-    title: trL(lang, tr("Voyage à Tanger (Chamali)", "Trip to Tangier (Chamali)", "Viaje a Tánger (Chamali)", "رحلة إلى طنجة (الشمالي)"), "Trip to Tangier (Chamali)", "Viaje a Tánger (Chamali)", "رحلة إلى طنجة (الشمالي)"),
-    subtitle: trL(lang, tr("Les subtilités régionales (Niveau B2)", "Regional subtleties (Level B2)", "Sutilezas regionales (Nivel B2)", "الفروق الإقليمية (مستوى B2)"), "Regional subtleties (Level B2)", "Sutilezas regionales (Nivel B2)", "الفروق الإقليمية (مستوى B2)"),
-    length: "10 min",
-    status: "locked",
-    questions: [
-      {
-        prompt: trL(lang, tr("À Tanger, comment dit-on « Qu'est-ce que tu veux ? »", "In Tangier, how do you say « What do you want? »", "En Tánger, ¿cómo se dice «¿Qué quieres?»", "في طنجة، كيف تقول «ماذا تريد؟»"), "In Tangier, how do you say « What do you want? »", "En Tánger, ¿cómo se dice «¿Qué quieres?»", "في طنجة، كيف تقول «ماذا تريد؟»"),
-        helper: trL(lang, tr("Remplace le standard « Chno bghiti ».", "Replaces the standard « Chno bghiti ».", "Sustituye al estándar « Chno bghiti ».", "تعوض الصيغة القياسية «شنو بغيتي»."), "Replaces the standard « Chno bghiti ».", "Sustituye al estándar « Chno bghiti ».", "تعوض الصيغة القياسية «شنو بغيتي»."),
-        options: ["Chni katchof?", "Chni katsaksi?", "Chni khassek?"],
-        answer: "Chni khassek?",
-        note: trL(lang, tr("Dans le nord (Chamali), on utilise « Chni » au lieu de « Chno ».", "In the north (Chamali), people use « Chni » instead of « Chno ».", "En el norte (Chamali), se usa « Chni » en lugar de « Chno ».", "في الشمال (الشمالي) يُستخدم «شني» بدل «شنو»."), "In the north (Chamali), people use « Chni » instead of « Chno ».", "En el norte (Chamali), se usa « Chni » en lugar de « Chno ».", "في الشمال (الشمالي) يُستخدم «شني» بدل «شنو»."),
-      },
-    ],
-  },
-];
 
 const buildPhrases = (lang: string): Phrase[] => [
   { id: "salam", category: trL(lang, tr("Saluer", "Greeting", "Saludar", "التحية"), "Greeting", "Saludar", "التحية"), darija: "Salam, labas?", arabic: "سلام، لاباس؟", meaning: trL(lang, tr("Salut, ça va ?", "Hi, how are you?", "Hola, ¿qué tal?", "مرحبا، كيف حالك؟"), "Hi, how are you?", "Hola, ¿qué tal?", "مرحبا، كيف حالك؟"), note: trL(lang, tr("La formule la plus simple pour ouvrir une conversation.", "The simplest way to open a conversation.", "La fórmula más simple para abrir una conversación.", "أبسط صيغة لبدء أي حديث."), "The simplest way to open a conversation.", "La fórmula más simple para abrir una conversación.", "أبسط صيغة لبدء أي حديث.") },
@@ -236,21 +106,16 @@ const buildNavItems = (lang: string): { id: View; label: string; icon: LucideIco
 function useLocalizedContent() {
   const uiLanguage = useAppStore((s) => s.uiLanguage);
   const lang = uiLanguage || "fr";
-  const lessons = useMemo(() => buildLessons(lang), [lang]);
   const phrases = useMemo(() => buildPhrases(lang), [lang]);
   const navItems = useMemo(() => buildNavItems(lang), [lang]);
-  return { lang, lessons, phrases, navItems };
+  return { lang, phrases, navItems };
 }
 
 export default function Home() {
   const [view, setView] = useState<View>("today");
-  const [lessonId, setLessonId] = useState<string | null>(null);
-  const [questionIndex, setQuestionIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [authMode, setAuthMode] = useState<"login" | "signup" | null>(null);
   const [savePromptHidden, setSavePromptHidden] = useState(false);
-  const [lessonJustDone, setLessonJustDone] = useState(false);
   const [category, setCategory] = useState("__all__");
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [favorites, setFavorites] = useState<string[]>(() => {
@@ -297,7 +162,6 @@ export default function Home() {
     streakDays,
     completedLessons,
     addXp,
-    completeLesson,
     user,
     setUser,
     resetData,
@@ -316,7 +180,7 @@ export default function Home() {
 
   const { t } = useTranslation();
   const { isGuest } = useAuthUser();
-  const { lang, lessons, phrases, navItems } = useLocalizedContent();
+  const { lang, phrases, navItems } = useLocalizedContent();
   const navLabel = (id: string) => {
     const key =
       id === "today" ? "home"
@@ -542,11 +406,21 @@ export default function Home() {
   }, [phrases, lang]);
 
   const completedCount = completedLessons.length;
-  const nextLesson =
-    lessons.find((lesson) => !completedLessons.includes(lesson.id)) ??
-    lessons[lessons.length - 1];
-  const activeLesson = lessons.find((lesson) => lesson.id === lessonId) ?? null;
-  const activeQuestion = activeLesson?.questions[questionIndex] ?? null;
+  const nextLesson = useMemo(
+    () => getNextLesson(lang, completedLessons),
+    [lang, completedLessons]
+  );
+
+  /**
+   * Ouvre une lecon du curriculum central sur /etudier, qui heberge l'unique
+   * moteur d'exercices (`ExerciseRunner`). L'accueil ne fait plus jouer de
+   * lecon lui-meme : il oriente.
+   */
+  const openLessonInEtudier = (lessonId?: string) => {
+    track("lesson_started", { lesson_id: lessonId ?? "curriculum", is_first_lesson: completedLessons.length === 0 }, "/etudier");
+    if (typeof window === "undefined") return;
+    window.location.href = lessonId ? `/etudier?lesson=${encodeURIComponent(lessonId)}` : "/etudier";
+  };
 
   // 4. Sécurisation de la liste des catégories
   const categories = useMemo(() => {
@@ -565,60 +439,6 @@ export default function Home() {
     });
   }, [category, search, favoritesOnly, safeFavorites, allPhrases]);
 
-
-  const startLesson = (id: string) => {
-    const lesson = lessons.find((item) => item.id === id);
-    if (!lesson) return;
-
-    // Premium gating check — le decoupage vient de @/lib/premiumModules
-    if (isPremiumLesson(lesson.id) && !isPremium) {
-      setPricingSource("module_locked");
-      return;
-    }
-
-    const index = lessons.findIndex((item) => item.id === id);
-    const canStart =
-      index === 0 ||
-      completedLessons.includes(lessons[index - 1].id) ||
-      completedLessons.includes(id);
-
-    if (!canStart) {
-      showToast(trL(lang, "Termine la leçon précédente pour continuer ton parcours.", "Finish the previous lesson to continue your path.", "Termina la lección anterior para continuar tu recorrido.", "أكمل الدرس السابق لمواصلة مسارك."));
-      return;
-    }
-
-    track("lesson_started", { lesson_id: id, is_first_lesson: completedLessons.length === 0 }, "/lesson");
-    setSavePromptHidden(false);
-    setLessonJustDone(false);
-    setLessonId(id);
-    setQuestionIndex(0);
-    setSelectedAnswer(null);
-  };
-
-  const advanceQuestion = () => {
-    if (!activeLesson || !activeQuestion || !selectedAnswer) return;
-    if (questionIndex < activeLesson.questions.length - 1) {
-      setQuestionIndex((current) => current + 1);
-      setSelectedAnswer(null);
-      return;
-    }
-
-    const firstCompletion = !completedLessons.includes(activeLesson.id);
-    if (firstCompletion) {
-      track("lesson_completed", { lesson_id: activeLesson.id, lessons_completed_total: completedLessons.length + 1 }, "/lesson");
-      setLessonJustDone(true);
-      completeLesson(activeLesson.id);
-      addXp(activeLesson.questions.length * 10);
-    }
-
-    setLessonId(null);
-    setSelectedAnswer(null);
-    showToast(
-      firstCompletion
-        ? trL(lang, `Bravo ! Leçon terminée · +${activeLesson.questions.length * 10} XP`, `Well done! Lesson complete · +${activeLesson.questions.length * 10} XP`, `¡Bravo! Lección completada · +${activeLesson.questions.length * 10} XP`, `أحسنت! أكملت الدرس · +${activeLesson.questions.length * 10} XP`)
-        : trL(lang, "Leçon revue avec succès.", "Lesson reviewed successfully.", "Lección repasada con éxito.", "تمت مراجعة الدرس بنجاح.")
-    );
-  };
 
   const toggleFavorite = (id: string) => {
     const current = Array.isArray(favorites) ? favorites : [];
@@ -699,7 +519,7 @@ export default function Home() {
   const currentHeader = headerTitle[view];
 
   // Invitation a sauvegarder la progression (invites uniquement) apres une lecon
-  const savePromptVariant = isGuest && lessonJustDone && !savePromptHidden
+  const savePromptVariant = isGuest && !savePromptHidden
     ? getSavePromptVariant(completedCount, streakDays)
     : null;
 
@@ -969,9 +789,13 @@ export default function Home() {
               xp={xp}
               streak={streakDays}
               nextLesson={nextLesson}
-              onStart={startLesson}
+              onOpenCurriculum={() => openLessonInEtudier()}
+              onOpenLesson={openLessonInEtudier}
+              onOpenPaywall={() => setPricingSource("module_locked")}
               onNavigate={switchView}
               onOpenRoleplay={() => setShowScenarioSelector(true)}
+              completedLessons={completedLessons}
+              isPremium={isPremium}
             />
           )}
 
@@ -979,7 +803,7 @@ export default function Home() {
           {view === "path" && (
             <PathView
               completedLessons={completedLessons}
-              onStart={startLesson}
+              onOpenLesson={openLessonInEtudier}
               onOpenCheckpoint={(id, name) => setCheckpointOpen({ id, name })}
               onOpenPaywall={() => setPricingSource("module_locked")}
               isPremium={isPremium}
@@ -1069,92 +893,6 @@ export default function Home() {
         })}
       </nav>
 
-      {/* Modale d'Exercice Manus */}
-      {lessonId && activeLesson && activeQuestion && (
-        <div
-          className="modal-scrim"
-          role="presentation"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) setLessonId(null);
-          }}
-        >
-          <section className="lesson-modal" role="dialog" aria-modal="true" aria-labelledby="lesson-title">
-            <div className="lesson-modal-top">
-              <button onClick={() => setLessonId(null)} className="icon-button" aria-label={t.modules.home.closeLesson}>
-                <ArrowLeft size={19} />
-              </button>
-              <div className="lesson-progress-label">
-                <span>{trL(lang, "LEÇON", "LESSON", "LECCIÓN", "درس")} · {activeLesson.length.toUpperCase()}</span>
-                <span>
-                  {questionIndex + 1} / {activeLesson.questions.length}
-                </span>
-              </div>
-              <button onClick={() => setLessonId(null)} className="icon-button" aria-label={tr("Quitter", "Leave", "Salir", "خروج")}>
-                <X size={18} />
-              </button>
-            </div>
-            <div className="lesson-progress-track">
-              <span style={{ width: `${((questionIndex + 1) / activeLesson.questions.length) * 100}%` }} />
-            </div>
-            <div className="lesson-modal-body">
-              <div className="lesson-kicker">
-                <span className="lesson-kicker-icon">
-                  <Languages size={16} />
-                </span>{" "}
-                {activeLesson.title}
-              </div>
-              <h2 id="lesson-title">{activeQuestion.prompt}</h2>
-              <p className="lesson-helper">{activeQuestion.helper}</p>
-              <div className="answer-list">
-                {activeQuestion.options.map((option, index) => {
-                  const isCorrect = selectedAnswer !== null && option === activeQuestion.answer;
-                  const isWrong = selectedAnswer === option && !isCorrect;
-                  const letter = String.fromCharCode(65 + index);
-                  return (
-                    <button
-                      key={option}
-                      onClick={() => {
-                        if (!selectedAnswer) setSelectedAnswer(option);
-                      }}
-                      disabled={Boolean(selectedAnswer)}
-                      className={`answer-option ${selectedAnswer === option ? "answer-selected" : ""} ${
-                        isCorrect ? "answer-correct" : ""
-                      } ${isWrong ? "answer-wrong" : ""}`}
-                    >
-                      <span className="answer-letter">{isCorrect ? <Check size={17} /> : letter}</span>
-                      <span>{option}</span>
-                      {isCorrect && <CheckCircle2 className="answer-check" size={19} />}
-                    </button>
-                  );
-                })}
-              </div>
-              {selectedAnswer && (
-                <div
-                  className={`answer-feedback ${
-                    selectedAnswer === activeQuestion.answer ? "feedback-good" : "feedback-try"
-                  }`}
-                >
-                  <strong>
-                    {selectedAnswer === activeQuestion.answer ? trL(lang, "Bien joué !", "Well done!", "¡Bien hecho!", "أحسنت!") : trL(lang, "Presque — retiens ceci.", "Almost — remember this.", "Casi — recuerda esto.", "تقريبًا — تذكر هذا.")}
-                  </strong>
-                  <span>{activeQuestion.note}</span>
-                </div>
-              )}
-              <button
-                className="primary-button lesson-next"
-                onClick={advanceQuestion}
-                disabled={!selectedAnswer}
-              >
-                {questionIndex === activeLesson.questions.length - 1 ? trL(lang, tr("Terminer la leçon", "Finish the lesson", "Terminar la lección", "أنهِ الدرس"), "Finish the lesson", "Terminar la lección", "أنهِ الدرس") : trL(lang, tr("Continuer", "Continue", "Continuar", "متابعة"), "Continue", "Continuar", "متابعة")}
-                <ArrowRight size={17} />
-              </button>
-              <div className="local-note">
-                <LockKeyhole size={13} /> {trL(lang, tr("Progression enregistrée en direct sur ton profil.", "Progress saved live to your profile.", "Progreso guardado en directo en tu perfil.", "تقدمك يُحفظ مباشرة في ملفك."), "Progress saved live to your profile.", "Progreso guardado en directo en tu perfil.", "تقدمك يُحفظ مباشرة في ملفك.")}
-              </div>
-            </div>
-          </section>
-        </div>
-      )}
 
       {/* Roleplay Scenario Selector */}
       {showScenarioSelector && (
@@ -1262,21 +1000,29 @@ function TodayView({
   xp,
   streak,
   nextLesson,
-  onStart,
+  onOpenCurriculum,
+  onOpenLesson,
+  onOpenPaywall,
   onNavigate,
   onOpenRoleplay,
+  completedLessons,
+  isPremium,
 }: {
   completedCount: number;
   xp: number;
   streak: number;
-  nextLesson: HomeLesson;
-  onStart: (id: string) => void;
+  nextLesson: LessonRef | null;
+  onOpenCurriculum: () => void;
+  onOpenLesson: (lessonId?: string) => void;
+  onOpenPaywall: () => void;
   onNavigate: (view: View) => void;
   onOpenRoleplay: () => void;
+  completedLessons: string[];
+  isPremium: boolean;
 }) {
   const { t } = useTranslation();
-  const { lang, lessons } = useLocalizedContent();
-  const totalLessons = lessons.length;
+  const { lang } = useLocalizedContent();
+  const totalLessons = getPlayableLessons(lang).length;
 
   return (
     <>
@@ -1293,7 +1039,7 @@ function TodayView({
               {trL(lang, "s’ouvre à toi.", "opens up to you.", "se abre a ti.", "تنفتح عليك.")}
             </h2>
             <p>{trL(lang, "Une phrase, une rencontre, une autre façon de voir le Maroc.", "A phrase, an encounter, another way to see Morocco.", "Una frase, un encuentro, otra forma de ver Marruecos.", "عبارة، لقاء، وطريقة أخرى لرؤية المغرب.")}</p>
-            <button className="hero-button" onClick={() => onStart(nextLesson.id)}>
+            <button className="hero-button" onClick={() => onOpenLesson(nextLesson?.id)}>
               {trL(lang, "Continuer à apprendre", "Keep learning", "Seguir aprendiendo", "واصل التعلم")} <ArrowRight size={16} />
             </button>
             <div className="hero-footnote">
@@ -1351,14 +1097,104 @@ function TodayView({
             <div className="tea-leaf leaf-two" />
           </div>
           <div className="next-card-copy">
-            <span className="lesson-pill">{trL(lang, "LEÇON SUIVANTE", "NEXT LESSON", "PRÓXIMA LECCIÓN", "الدرس التالي")} · {nextLesson.length}</span>
-            <h3>{nextLesson.title}</h3>
-            <p>{nextLesson.subtitle}</p>
+            <span className="lesson-pill">
+              {trL(lang, "LEÇON SUIVANTE", "NEXT LESSON", "PRÓXIMA LECCIÓN", "الدرس التالي")}
+              {nextLesson ? ` · ${nextLesson.steps} ${tr("étapes", "steps", "pasos", "خطوات")}` : ""}
+            </span>
+            <h3>
+              {nextLesson
+                ? nextLesson.title
+                : trL(lang, "Parcours terminé", "Journey complete", "Recorrido completado", "أتممت المسار")}
+            </h3>
+            <p>
+              {nextLesson
+                ? `${nextLesson.moduleTitle} · ${tr("Niveau", "Level", "Nivel", "المستوى")} ${nextLesson.level}`
+                : trL(lang, "Revois n’importe quelle leçon depuis le parcours complet.", "Revisit any lesson from the full journey.", "Repasa cualquier lección desde el recorrido completo.", "راجع أي درس من المسار الكامل.")}
+            </p>
           </div>
-          <button className="text-link" onClick={() => onStart(nextLesson.id)}>
+          <button className="text-link" onClick={() => onOpenLesson(nextLesson?.id)}>
             {trL(lang, "C’est parti", "Let’s go", "¡Vamos!", "هيا بنا")} <ArrowRight size={15} />
           </button>
         </article>
+      </div>
+
+      <div className="section-heading">
+        <div>
+          <span className="eyebrow">
+            <span className="eyebrow-line" />
+            {trL(lang, "LE PARCOURS COMPLET", "THE FULL JOURNEY", "EL RECORRIDO COMPLETO", "المسار الكامل")}
+          </span>
+          <h2>{trL(lang, "Sept modules, un seul moteur d’exercices.", "Seven modules, one exercise engine.", "Siete módulos, un solo motor de ejercicios.", "سبع وحدات، محرك تمارين واحد.")}</h2>
+        </div>
+        <button className="plain-link" onClick={onOpenCurriculum}>
+          {trL(lang, "Ouvrir le parcours", "Open the journey", "Abrir el recorrido", "افتح المسار")} <ArrowRight size={15} />
+        </button>
+      </div>
+
+      <div className="quick-grid">
+        {getModuleSummaries().map((mod) => {
+          const locked = !mod.free && !isPremium;
+          return (
+            <button
+              key={mod.key}
+              className="quick-card"
+              onClick={() => (locked ? onOpenPaywall() : onOpenCurriculum())}
+              aria-label={`${tr("Module", "Module", "Módulo", "الوحدة")} ${mod.key} — ${getLocalizedText(mod.title, lang as UILanguage)}`}
+            >
+              <span className="quick-icon">
+                {locked ? <LockKeyhole size={18} /> : <BookOpen size={18} />}
+              </span>
+              <span className="quick-label">
+                {tr("MODULE", "MODULE", "MÓDULO", "الوحدة")} {mod.key}
+                {locked ? (
+                  <span className="current-tag" style={{ background: "#fef3c7", color: "#b45309" }}>
+                    PRO
+                  </span>
+                ) : (
+                  <span className="current-tag">{trL(lang, "GRATUIT", "FREE", "GRATIS", "مجاني")}</span>
+                )}
+              </span>
+              <strong>{getLocalizedText(mod.title, lang as UILanguage)}</strong>
+              <span className="quick-bottom">
+                {mod.lessons} {tr("leçons", "lessons", "lecciones", "دروس")} · {mod.steps} {tr("étapes", "steps", "pasos", "خطوات")} <ArrowRight size={14} />
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="section-heading">
+        <div>
+          <span className="eyebrow">
+            <span className="eyebrow-line" />
+            {trL(lang, "POUR COMMENCER", "TO GET STARTED", "PARA EMPEZAR", "للبدء")}
+          </span>
+          <h2>{trL(lang, "Les leçons ouvertes à tous.", "Lessons open to everyone.", "Las lecciones abiertas a todos.", "دروس متاحة للجميع.")}</h2>
+        </div>
+      </div>
+
+      <div className="quick-grid">
+        {getPlayableLessons(lang)
+          .filter((lesson) => lesson.free)
+          .slice(0, 6)
+          .map((lesson) => {
+            const done = completedLessons.includes(lesson.id);
+            return (
+              <button key={lesson.id} className="quick-card" onClick={() => onOpenLesson(lesson.id)}>
+                <span className="quick-icon">
+                  {done ? <CheckCircle2 size={18} /> : <BookOpen size={18} />}
+                </span>
+                <span className="quick-label">
+                  {tr("MODULE", "MODULE", "MÓDULO", "الوحدة")} {lesson.moduleKey} · {tr("NIVEAU", "LEVEL", "NIVEL", "المستوى")} {lesson.level}
+                </span>
+                <strong>{lesson.title}</strong>
+                <span className="quick-bottom">
+                  {lesson.steps} {tr("étapes", "steps", "pasos", "خطوات")}
+                  {done ? ` · ${tr("terminée", "completed", "completada", "مكتملة")}` : ""} <ArrowRight size={14} />
+                </span>
+              </button>
+            );
+          })}
       </div>
 
       <div className="stat-strip">
@@ -1483,7 +1319,7 @@ function TodayView({
           </h3>
           <p>{trL(lang, "Chaque expression est une petite invitation à aller vers l’autre.", "Every phrase is a small invitation to reach out to others.", "Cada expresión es una pequeña invitación a acercarse al otro.", "كل عبارة دعوة صغيرة للتقرب من الآخر.")}</p>
         </div>
-        <button onClick={() => onNavigate("path")} aria-label={t.modules.home.explorePath}>
+        <button onClick={onOpenCurriculum} aria-label={t.modules.home.explorePath}>
           <ArrowRight size={20} />
         </button>
       </div>
@@ -1496,20 +1332,22 @@ function TodayView({
 // -------------------------------------------------------------
 function PathView({
   completedLessons,
-  onStart,
+  onOpenLesson,
   onOpenCheckpoint,
   onOpenPaywall,
   isPremium,
 }: {
   completedLessons: string[];
-  onStart: (id: string) => void;
+  onOpenLesson: (lessonId?: string) => void;
   onOpenCheckpoint: (id: string, name: string) => void;
   onOpenPaywall: () => void;
   isPremium: boolean;
 }) {
   const { t } = useTranslation();
-  const { lang, lessons } = useLocalizedContent();
+  const { lang } = useLocalizedContent();
   const { hasPassedLevel } = useCheckpointProgress();
+  const lessons = useMemo(() => getPlayableLessons(lang), [lang]);
+  const totalLessons = lessons.length;
 
   return (
     <div className="path-layout">
@@ -1539,47 +1377,45 @@ function PathView({
             <strong>
               {completedLessons.length}{" "}
               <small>
-                {tr("leçon", "lesson", "lección", "درس")}{completedLessons.length > 1 ? tr("s", "s", "s", "") : ""}{tr(" sur ", " of ", " de ", " من ")}{lessons.length}
+                {tr("leçon", "lesson", "lección", "درس")}{completedLessons.length > 1 ? tr("s", "s", "s", "") : ""}{tr(" sur ", " of ", " de ", " من ")}{totalLessons}
               </small>
             </strong>
           </div>
           <div className="path-overall-track">
             <span
               style={{
-                width: `${Math.round((completedLessons.length / lessons.length) * 100)}%`,
+                width: `${totalLessons ? Math.round((completedLessons.length / totalLessons) * 100) : 0}%`,
               }}
             />
           </div>
           <span className="path-percent">
-            {Math.round((completedLessons.length / lessons.length) * 100)}%
+            {totalLessons ? Math.round((completedLessons.length / totalLessons) * 100) : 0}%
           </span>
         </div>
 
         <div className="lesson-roadmap">
           {lessons.map((lesson, index) => {
             const done = completedLessons.includes(lesson.id);
-            const unlocked =
-              index === 0 || completedLessons.includes(lessons[index - 1].id) || done;
-            const isGated = isPremiumLesson(lesson.id) && !isPremium;
-            const locked = !unlocked && !isGated;
+            // Le verrou premium vient de @/lib/premiumModules, via lesson.free.
+            const isGated = !lesson.free && !isPremium;
 
             return (
               <div
-                className={`roadmap-row ${done ? "roadmap-done" : ""} ${locked ? "roadmap-locked" : ""}`}
+                className={`roadmap-row ${done ? "roadmap-done" : ""} ${isGated ? "roadmap-locked" : ""}`}
                 key={lesson.id}
               >
                 <div className="roadmap-track">
                   <div className="roadmap-line" />
                   <button
                     className={`roadmap-node ${done ? "node-done" : ""} ${
-                      !locked && !done ? "node-current" : ""
+                      !isGated && !done ? "node-current" : ""
                     }`}
-                    disabled={locked}
-                    onClick={() => (isGated ? onOpenPaywall() : onStart(lesson.id))}
+                    disabled={isGated}
+                    onClick={() => (isGated ? onOpenPaywall() : onOpenLesson(lesson.id))}
                     aria-label={
                       done
                         ? t.modules.home.reviewLesson.replace("{title}", lesson.title)
-                        : locked
+                        : isGated
                         ? t.modules.home.lessonLocked.replace("{title}", lesson.title)
                         : t.modules.home.startLesson.replace("{title}", lesson.title)
                     }
@@ -1588,8 +1424,6 @@ function PathView({
                       <Check size={16} />
                     ) : isGated ? (
                       <Crown size={14} className="text-[#C9A05C]" />
-                    ) : locked ? (
-                      <LockKeyhole size={14} />
                     ) : (
                       <span>0{index + 1}</span>
                     )}
@@ -1598,21 +1432,16 @@ function PathView({
                 <div className="roadmap-content">
                   <div className="roadmap-meta">
                     <span>
-                      {lesson.length.toUpperCase()} ·{" "}
-                      {index === 0
-                        ? tr("LES ESSENTIELS", "THE ESSENTIALS", "LO ESENCIAL", "الأساسيات")
-                        : index === 1
-                        ? tr("AU QUOTIDIEN", "EVERYDAY LIFE", "LO COTIDIANO", "الحياة اليومية")
-                        : index === 2
-                        ? tr("SE REPÉRER", "FINDING YOUR WAY", "ORIENTARSE", "الاستدلال")
-                        : tr("IMMERSION AVANCÉE", "ADVANCED IMMERSION", "INMERSIÓN AVANZADA", "انغماس متقدم")}
+                      {tr("MODULE", "MODULE", "MÓDULO", "الوحدة")} {lesson.moduleKey} ·{" "}
+                      {tr("NIVEAU", "LEVEL", "NIVEL", "المستوى")} {lesson.level} · {lesson.steps}{" "}
+                      {tr("étapes", "steps", "pasos", "خطوات")}
                     </span>
                     {done && (
                       <span className="done-tag">
                         <CheckCircle2 size={13} /> {tr("TERMINÉE", "COMPLETED", "COMPLETADA", "مكتملة")}
                       </span>
                     )}
-                    {!done && !locked && !isGated && (
+                    {!done && !isGated && (
                       <span className="current-tag">{trL(lang, "À SUIVRE", "TO CONTINUE", "A CONTINUAR", "للمتابعة")}</span>
                     )}
                     {isGated && (
@@ -1622,24 +1451,20 @@ function PathView({
                     )}
                   </div>
                   <h3>{lesson.title}</h3>
-                  <p>{lesson.subtitle}</p>
+                  <p>{lesson.description}</p>
                   <div className="roadmap-footer">
                     <span>
-                      <BookOpen size={14} /> {lesson.questions.length} {tr("exercices", "exercises", "ejercicios", "تمارين")}
+                      <BookOpen size={14} /> {lesson.steps} {tr("étapes", "steps", "pasos", "خطوات")}
                     </span>
                     {isGated ? (
                       <button onClick={onOpenPaywall} style={{ color: "#d69b47" }}>
                         {trL(lang, "Débloquer avec Pro", "Unlock with Pro", "Desbloquear con Pro", "افتح مع برو")} <ArrowRight size={14} />
                       </button>
-                    ) : unlocked ? (
-                      <button onClick={() => onStart(lesson.id)}>
+                    ) : (
+                      <button onClick={() => onOpenLesson(lesson.id)}>
                         {done ? trL(lang, "Revoir", "Review", "Repasar", "مراجعة") : trL(lang, "Commencer", "Start", "Empezar", "ابدأ")}
                         <ArrowRight size={14} />
                       </button>
-                    ) : (
-                      <span className="locked-copy">
-                        <LockKeyhole size={13} /> {trL(lang, "Finis l’étape avant", "Finish the previous step first", "Termina el paso anterior primero", "أكمل الخطوة السابقة أولاً")}
-                      </span>
                     )}
                   </div>
                 </div>
@@ -2008,7 +1833,8 @@ function SpaceView({
   onToast: (message: string) => void;
 }) {
   const { t } = useTranslation();
-  const { lang, lessons } = useLocalizedContent();
+  const { lang } = useLocalizedContent();
+  const totalLessons = useMemo(() => getPlayableLessons(lang).length, [lang]);
   const username =
     user?.user_metadata?.full_name || user?.email?.split("@")[0] || t.common.guest;
 
@@ -2050,7 +1876,7 @@ function SpaceView({
           <span className="mini-kicker">{trL(lang, "LEÇONS", "LESSONS", "LECCIONES", "الدروس")}</span>
           <strong>
             {completedCount}
-            <small> / {lessons.length}</small>
+            <small> / {totalLessons}</small>
           </strong>
           <p>{trL(lang, "Chaque pas compte.", "Every step counts.", "Cada paso cuenta.", "كل خطوة تُحسب.")}</p>
         </article>
