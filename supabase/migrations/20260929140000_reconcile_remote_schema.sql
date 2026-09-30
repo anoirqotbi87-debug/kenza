@@ -154,6 +154,13 @@ $$;
 -- Synchronisation de la progression (XP / streak / badges).
 -- L'UPDATE direct des colonnes sensibles est révoqué plus bas : cette RPC est le
 -- seul chemin d'écriture, avec vérification de delta pour bloquer la triche.
+--
+-- L'ancienne surcharge `jsonb` est supprimée : `CREATE OR REPLACE` ne remplace pas
+-- une signature différente, donc elle survivait à côté de la version `text[]` et
+-- PostgREST, recevant `new_badges: []` (jsonb), choisissait la surcharge jsonb.
+-- Le durcissement (plafond de delta, plafond de badges) était alors contourné.
+DROP FUNCTION IF EXISTS public.sync_user_progress(integer, integer, integer, jsonb);
+
 CREATE OR REPLACE FUNCTION public.sync_user_progress(
   new_xp integer,
   new_streak_days integer,

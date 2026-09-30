@@ -46,8 +46,14 @@ ALTER TABLE public.srs_items      ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_r
 -- 3. srs_items.ease_factor — alignement de type sur le distant
 -- -----------------------------------------------------------------------------
 
--- Le dépôt déclare DOUBLE PRECISION, le distant NUMERIC. Conversion inutile sur le
--- distant (déjà NUMERIC), utile sur une base neuve.
+-- 0001 déclare désormais NUMERIC, comme le distant. Ce bloc ne sert donc qu'aux bases
+-- créées avec l'ancienne définition (DOUBLE PRECISION).
+--
+-- Piège : `ALTER COLUMN ... TYPE` échoue si la colonne est référencée par une policy
+-- (« cannot alter type of a column used in a policy definition »). `ease_factor`
+-- apparaît dans le WITH CHECK de « Users can insert own SRS items ». Sur la prod le
+-- bloc était sauté (colonne déjà NUMERIC), donc le bug ne s'y voyait pas — il ne
+-- surgissait que sur une base neuve. D'où le drop/recreate des deux policies autour.
 DO $$
 BEGIN
   IF EXISTS (
@@ -57,7 +63,22 @@ BEGIN
       AND column_name = 'ease_factor'
       AND data_type = 'double precision'
   ) THEN
+    DROP POLICY IF EXISTS "Users can insert own SRS items" ON public.srs_items;
+    DROP POLICY IF EXISTS "Users can update own SRS items" ON public.srs_items;
+
     ALTER TABLE public.srs_items ALTER COLUMN ease_factor TYPE NUMERIC;
+
+    -- Reprise exacte des définitions de 20260927090000.
+    CREATE POLICY "Users can update own SRS items"
+      ON public.srs_items
+      FOR UPDATE
+      USING (auth.uid() = user_id)
+      WITH CHECK (ease_factor >= 1.3 AND interval >= 0 AND repetition >= 0 AND state IN ('new', 'learning', 'review', 'relearning'));
+
+    CREATE POLICY "Users can insert own SRS items"
+      ON public.srs_items
+      FOR INSERT
+      WITH CHECK (auth.uid() = user_id AND ease_factor >= 1.3 AND interval >= 0 AND repetition >= 0 AND state IN ('new', 'learning', 'review', 'relearning'));
   END IF;
 END $$;
 

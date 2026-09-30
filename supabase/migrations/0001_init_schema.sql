@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS public.srs_items (
   word_id TEXT NOT NULL,
   interval INTEGER DEFAULT 0,
   repetition INTEGER DEFAULT 0,
-  ease_factor DOUBLE PRECISION DEFAULT 2.5,
+  ease_factor NUMERIC DEFAULT 2.5,
   due_date TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
   state TEXT DEFAULT 'new',
   PRIMARY KEY (user_id, word_id)
