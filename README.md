@@ -55,8 +55,15 @@ Appliquez les scripts SQL **dans l'ordre** (ordre chronologique des fichiers) vi
 3. `20260927130000_fix_qa_audit.sql` — durcissement des RPC (prérequis, certificats générés côté serveur)
 4. `20260927235000_monetization_quotas.sql` — quotas IA + abonnements Kenza Pro
 5. `20260928120000_rate_limiting.sql` — rate-limiting durable des API
-6. `20260928130000_rls_regression_tests.sql` — script de tests manuel (optionnel)
+6. `20260929140000_reconcile_remote_schema.sql` — rattrapage : tables et RPC manquantes,
+   tables de suivi (`funnel_events`, `user_attribution`). **Idempotent**, rejouable sans risque.
 
+> ⚠️ **Si vous utilisez la CLI** (`supabase db push`) et non le SQL Editor, la base distante a pu
+> être modifiée hors migration : lancez d'abord `supabase migration list`, purgez les versions
+> orphelines avec `supabase migration repair --status reverted <version>`, puis
+> `supabase db push --include-all`.
+
+Les tests RLS sont dans `supabase/tests/` (à exécuter manuellement, pas des migrations).
 Les scripts obsolètes sont archivés dans `supabase/archive/` (ne pas exécuter).
 
 ## 💳 Stripe (Kenza Pro)
