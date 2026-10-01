@@ -23,9 +23,16 @@ export type VocabularyCategory =
   | 'time'
   | 'verb'
   | 'abstract'
-  | 'souk';
+  | 'souk'
+  // Modules 5 a 7
+  | 'debate'
+  | 'work'
+  | 'proverb'
+  | 'grammar'
+  | 'narration'
+  | 'dialect';
 
-export type ModuleId = 1 | 2 | 3 | 4;
+export type ModuleId = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 export interface ModuleVocabularyItem {
   id: string;
