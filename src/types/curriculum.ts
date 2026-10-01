@@ -82,6 +82,15 @@ export interface Exercise {
   dialogueChoices?: DialogueChoice[];
   sentenceTemplate?: string;
   answer?: string | string[] | Record<string, string>;
+  /**
+   * Autres reponses valides, en plus de `answer`.
+   *
+   * La Darija admet souvent plusieurs formes justes (synonymes, variantes
+   * regionales). Sans ce champ, une seule est acceptee et une bonne reponse peut
+   * etre comptee fausse. Chaque entree est l'`id` d'une option de l'exercice.
+   * `answer` reste la reponse de reference, mise en avant dans la correction.
+   */
+  acceptedAnswers?: string[];
   explanation?: MultiLangText | string;
   culturalNote?: MultiLangText | string;
 }

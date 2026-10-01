@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Exercise, Notation, MultiLangText } from '../../../types/curriculum';
 import { shuffle } from '../../../lib/shuffle';
+import { isAcceptedOrder } from '../../../lib/exerciseAnswers';
 import { getExerciseText } from '../../../lib/i18n/utils';
 import { useTranslation } from '../../../store/useAppStore';
 
@@ -96,7 +97,7 @@ export default function ReorderExercise({ exercise, preferredNotation, onUpdate,
       {/* Drop zone */}
       <div className={`
         min-h-[100px] p-4 rounded-2xl border-2 border-dashed flex flex-wrap gap-2 items-center justify-center
-        ${isAnswerChecked ? (JSON.stringify(orderedWords.map(w => w.id)) === JSON.stringify(exercise.answer) ? 'border-green-500 bg-green-50' : 'border-red-500 bg-red-50') : 'border-slate-300 bg-slate-50'}
+        ${isAnswerChecked ? (isAcceptedOrder(exercise, orderedWords.map(w => w.id)) ? 'border-green-500 bg-green-50' : 'border-red-500 bg-red-50') : 'border-slate-300 bg-slate-50'}
       `}>
         {orderedWords.map((word, idx) => (
           <button

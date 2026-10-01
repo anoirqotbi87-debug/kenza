@@ -4,6 +4,7 @@ import React from 'react';
 import { Exercise, Notation, MultiLangText } from '../../../types/curriculum';
 
 import { getExerciseText } from '../../../lib/i18n/utils';
+import { getAcceptedAnswers } from '../../../lib/exerciseAnswers';
 import { useTranslation } from '../../../store/useAppStore';
 import { trackEvent } from '../../../utils/analytics';
 
@@ -62,8 +63,9 @@ function McqOption({
   const [showExplanation, setShowExplanation] = React.useState(false);
 
   const optionId = typeof option === 'string' ? option : option.id;
-  const isCorrectOption = isAnswerChecked && optionId === exercise.answer;
-  const isWrongSelection = isAnswerChecked && isSelected && optionId !== exercise.answer;
+  const accepted = getAcceptedAnswers(exercise);
+  const isCorrectOption = isAnswerChecked && !!optionId && accepted.some((id) => id.toLowerCase() === optionId.toLowerCase());
+  const isWrongSelection = isAnswerChecked && isSelected && !isCorrectOption;
 
   return (
     <div className="flex flex-col">

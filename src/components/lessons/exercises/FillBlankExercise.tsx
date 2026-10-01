@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Exercise, Notation, MultiLangText } from '../../../types/curriculum';
 
 import { getExerciseText } from '../../../lib/i18n/utils';
+import { getAcceptedAnswers } from '../../../lib/exerciseAnswers';
 import { useTranslation } from '../../../store/useAppStore';
 
 type NotationItem = string | {
@@ -42,6 +43,13 @@ export default function FillBlankExercise({ exercise, preferredNotation, onUpdat
   };
 
   const selectedWordOption = exercise.options?.find(o => o.id === selectedWordId);
+
+  // Correction visuelle : toutes les bonnes reponses sont vertes, pas seulement
+  // la reponse de reference. Sinon un apprenant ayant choisi une variante juste
+  // voit sa reponse affichee en rouge.
+  const accepted = getAcceptedAnswers(exercise);
+  const isAccepted = (id: string | null) =>
+    !!id && accepted.some(a => a.toLowerCase() === id.toLowerCase());
   
   // Render the sentence with the blank
   const renderSentence = () => {
@@ -58,8 +66,8 @@ export default function FillBlankExercise({ exercise, preferredNotation, onUpdat
         <div className={`
           min-w-[120px] h-12 border-b-4 flex items-center justify-center px-4 transition-all
           ${selectedWordId ? 'border-blue-500 text-blue-600' : 'border-slate-300 text-transparent'}
-          ${isAnswerChecked && selectedWordId === exercise.answer ? 'border-green-500 text-green-600 bg-green-50' : ''}
-          ${isAnswerChecked && selectedWordId && selectedWordId !== exercise.answer ? 'border-red-500 text-red-600 bg-red-50' : ''}
+          ${isAnswerChecked && isAccepted(selectedWordId) ? 'border-green-500 text-green-600 bg-green-50' : ''}
+          ${isAnswerChecked && selectedWordId && !isAccepted(selectedWordId) ? 'border-red-500 text-red-600 bg-red-50' : ''}
         `}>
           {selectedWordOption ? getTextForNotation(selectedWordOption, preferredNotation) : '_____'}
         </div>
@@ -82,8 +90,8 @@ export default function FillBlankExercise({ exercise, preferredNotation, onUpdat
             className={`
               px-6 py-3 rounded-2xl border-2 text-lg font-bold transition-all shadow-sm
               ${selectedWordId === opt.id && !isAnswerChecked ? 'border-blue-500 bg-blue-50 scale-105' : 'border-slate-200 bg-white hover:border-slate-300'}
-              ${isAnswerChecked && opt.id === exercise.answer ? 'border-green-500 bg-green-50 text-green-700' : ''}
-              ${isAnswerChecked && selectedWordId === opt.id && opt.id !== exercise.answer ? 'border-red-500 bg-red-50 text-red-700' : ''}
+              ${isAnswerChecked && isAccepted(opt.id) ? 'border-green-500 bg-green-50 text-green-700' : ''}
+              ${isAnswerChecked && selectedWordId === opt.id && !isAccepted(opt.id) ? 'border-red-500 bg-red-50 text-red-700' : ''}
             `}
           >
             {getTextForNotation(opt, preferredNotation)}

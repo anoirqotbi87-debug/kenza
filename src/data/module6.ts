@@ -232,6 +232,7 @@ export const module6Lessons: Lesson[] = [
             { id: 'opt3', text: 'ek', isCorrect: false }
           ],
           answer: 'opt1',
+          acceptedAnswers: ['opt2'],
           explanation: { 
             fr: 'Les deux sont possibles ! On entend souvent 3tii-ni (donne-moi) ou 3tii-liya (donne à moi).', 
             en: 'Both are possible! You often hear 3tii-ni (give me) or 3tii-liya (give to me).', 
