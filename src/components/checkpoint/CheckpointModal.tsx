@@ -167,10 +167,10 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
             <span>—</span>
             <span>Examen {levelId.toUpperCase()}</span>
           </div>
-          <h2 className="font-serif text-xl sm:text-2xl text-[#7A7670] font-normal">
+          <h2 className="font-display text-xl sm:text-2xl text-[#7A7670] font-normal">
             Comment dit-on en Darija :
           </h2>
-          <div className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#1B2A4A] mt-2">
+          <div className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-[#1B2A4A] mt-2">
             « {currentQ.prompt} »
           </div>
         </div>
@@ -195,7 +195,7 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
                 `}
               >
                 {(preferredNotation === 'arabizi' || preferredNotation === 'duo') && (
-                  <span className="font-serif font-bold text-lg text-[#1B2A4A]">{opt.arabizi}</span>
+                  <span className="font-display font-bold text-lg text-[#1B2A4A]">{opt.arabizi}</span>
                 )}
                 {(preferredNotation === 'arabic' || preferredNotation === 'duo') && (
                   <span className="font-arabic text-xl text-[#7A7670]">{opt.arabic}</span>
@@ -218,7 +218,7 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
                 {isCorrect ? <Check className="w-5 h-5 stroke-[2.5]" /> : <X className="w-5 h-5" />}
               </div>
               <div>
-                <span className="font-serif text-lg">{isCorrect ? 'Excellente réponse !' : 'Incorrect'}</span>
+                <span className="font-display text-lg">{isCorrect ? 'Excellente réponse !' : 'Incorrect'}</span>
                 {!isCorrect && (
                   <div className="text-xs font-medium mt-0.5 opacity-80 flex items-center gap-2">
                     Réponse correcte : {currentQ.arabizi}

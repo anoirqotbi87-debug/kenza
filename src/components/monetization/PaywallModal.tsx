@@ -221,7 +221,7 @@ export default function PaywallModal({
             </div>
 
             {/* Titre Serif */}
-            <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-normal text-[#FDFCF8] leading-tight">
+            <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-normal text-[#FDFCF8] leading-tight">
               {headerInfo.title}
             </h2>
 
@@ -266,7 +266,7 @@ export default function PaywallModal({
               </span>
             </div>
 
-            <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#1B2A4A]">
+            <h3 className="font-display text-xl sm:text-2xl font-bold text-[#1B2A4A]">
               {pw.chooseCadence}
             </h3>
             <p className="text-xs text-[#7A7670] mt-0.5">
@@ -298,13 +298,13 @@ export default function PaywallModal({
                     {billingCycle === 'yearly' && <div className="w-2 h-2 rounded-full bg-[#1B2A4A]" />}
                   </div>
                   <div>
-                    <h4 className="font-serif text-base font-bold text-[#1B2A4A]">{pw.yearly}</h4>
+                    <h4 className="font-display text-base font-bold text-[#1B2A4A]">{pw.yearly}</h4>
                     <p className="text-xs text-[#7A7670]">{pw.billed.replace('{total}', currentPricing.yearlyTotal)}</p>
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <div className="font-serif text-xl sm:text-2xl font-bold text-[#1B2A4A]">
+                  <div className="font-display text-xl sm:text-2xl font-bold text-[#1B2A4A]">
                     {currentPricing.yearlyPerMonth}
                   </div>
                   <div className="text-[10px] uppercase tracking-wider text-[#7A7670] font-semibold">{pw.perMonth}</div>
@@ -329,13 +329,13 @@ export default function PaywallModal({
                     {billingCycle === 'monthly' && <div className="w-2 h-2 rounded-full bg-[#1B2A4A]" />}
                   </div>
                   <div>
-                    <h4 className="font-serif text-base font-bold text-[#1B2A4A]">{pw.monthly}</h4>
+                    <h4 className="font-display text-base font-bold text-[#1B2A4A]">{pw.monthly}</h4>
                     <p className="text-xs text-[#7A7670]">{pw.monthlyDesc}</p>
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <div className="font-serif text-xl sm:text-2xl font-bold text-[#1B2A4A]">
+                  <div className="font-display text-xl sm:text-2xl font-bold text-[#1B2A4A]">
                     {currentPricing.monthlyPrice}
                   </div>
                   <div className="text-[10px] uppercase tracking-wider text-[#7A7670] font-semibold">{pw.perMonth}</div>

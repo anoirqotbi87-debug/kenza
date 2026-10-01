@@ -12,7 +12,7 @@
   --paper: #f7f5ef;
   --paper-deep: #efece2;
   --white: #fffefa;
-  --muted-ink: #7e8588;
+  --muted-ink: #6b7174;
   --line: #e7e3d9;
   --green: #4d806d;
   --red: #b65d4b;
@@ -53,7 +53,7 @@ body {
     radial-gradient(ellipse at 95% 0%, rgba(214, 155, 71, 0.055), transparent 30rem),
     var(--paper);
   font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 14px;
+  font-size: 15px;
 }
 button, input { font: inherit; }
 button { color: inherit; }
@@ -61,10 +61,10 @@ button:focus-visible, input:focus-visible { outline: 3px solid rgba(214, 155, 71
 ::selection { color: var(--ink); background: #ead7ad; }
 
 /* Polices exactes de Manus */
-.font-serif {
+.font-display {
   font-family: "DM Serif Display", Georgia, serif !important;
 }
-.font-sans {
+.font-body {
   font-family: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif !important;
 }
 .font-arabic, [dir="rtl"], [lang="ar"] {
@@ -86,8 +86,8 @@ button:focus-visible, input:focus-visible { outline: 3px solid rgba(214, 155, 71
 .brand-mark span { font-family: "Noto Sans Arabic", sans-serif; font-size: 20px; line-height: 1; transform: translateY(-1px); }
 .brand-mark i { position: absolute; width: 8px; height: 8px; border: 1px solid #ddb578; border-radius: 2px; right: 5px; bottom: 5px; transform: rotate(45deg); }
 .brand-name { display: block; color: var(--navy); font-family: "DM Serif Display", serif; font-size: 18px; letter-spacing: .17em; line-height: 1.05; }
-.brand-tagline { display: block; margin-top: 4px; color: #8a8b83; font-size: 9px; letter-spacing: .045em; }
-.sidebar-label { padding: 0 12px 10px; color: #a0a096; font-size: 9px; font-weight: 700; letter-spacing: .14em; }
+.brand-tagline { display: block; margin-top: 4px; color: #8a8b83; font-size: 11px; letter-spacing: .045em; }
+.sidebar-label { padding: 0 12px 10px; color: #a0a096; font-size: 11px; font-weight: 700; letter-spacing: .14em; }
 .sidebar-label-spaced { margin-top: 14px; }
 .side-nav { display: grid; gap: 4px; }
 .nav-item { width: 100%; min-height: 43px; padding: 0 12px; display: flex; align-items: center; gap: 12px; border: 0; border-radius: 11px; color: #727c82; background: transparent; text-align: left; font-size: 12px; font-weight: 500; transition: background .18s cubic-bezier(.23,1,.32,1), color .18s, transform .16s; cursor: pointer; }
@@ -759,3 +759,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid rgba(214, 155, 71
   .lang-btn { padding: 2px 3px; white-space: nowrap; }
   .lang-sep { display: none; }
 }
+
+ @ m e d i a   ( p r e f e r s - r e d u c e d - m o t i o n :   r e d u c e )   {   * ,   * : : b e f o r e ,   * : : a f t e r   {   a n i m a t i o n - d u r a t i o n :   0 . 0 1 m s   ! i m p o r t a n t ;   a n i m a t i o n - i t e r a t i o n - c o u n t :   1   ! i m p o r t a n t ;   t r a n s i t i o n - d u r a t i o n :   0 . 0 1 m s   ! i m p o r t a n t ;   s c r o l l - b e h a v i o r :   a u t o   ! i m p o r t a n t ;   }   } 
+  
+ 

@@ -209,7 +209,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
       }
       return (
         <div className="flex flex-col items-center justify-center h-full space-y-8 text-center animate-in fade-in zoom-in duration-300">
-          <h2 className="font-serif text-3xl font-bold text-[#1B2A4A]">{getLocalizedText(step.content.title, lang)}</h2>
+          <h2 className="font-display text-3xl font-bold text-[#1B2A4A]">{getLocalizedText(step.content.title, lang)}</h2>
           
           <div className="bg-[#FDFCF8] p-8 rounded-3xl w-full max-w-md shadow-md border border-[#E8E2D5] relative">
             {(step.content.arabic || step.content.audioUrl) && (
@@ -383,7 +383,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
                   {isCorrect ? <Check className="w-6 h-6 stroke-[2.5]" /> : <X className="w-6 h-6" />}
                 </div>
                 <div>
-                  <h3 className="font-serif font-bold text-2xl">{isCorrect ? t.lessons.excellent : t.lessons.oops}</h3>
+                  <h3 className="font-display font-bold text-2xl">{isCorrect ? t.lessons.excellent : t.lessons.oops}</h3>
                   {step.type === 'exercise' && step.exercise?.explanation && (
                     <p className="text-sm font-medium opacity-90 mt-1">{getLocalizedText(step.exercise.explanation, lang)}</p>
                   )}

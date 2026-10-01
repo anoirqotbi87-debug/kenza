@@ -64,7 +64,7 @@ export default function SRSDashboard() {
       </div>
 
       {/* Title */}
-      <h2 className="font-serif text-3xl sm:text-4xl font-normal text-[#1B2A4A] mb-3">
+      <h2 className="font-display text-3xl sm:text-4xl font-normal text-[#1B2A4A] mb-3">
         {t.srs?.smartReviewsTitle || "Révision Intelligente"}
       </h2>
 
@@ -75,7 +75,7 @@ export default function SRSDashboard() {
       {/* Counter card */}
       <div className="bg-[#F7F3EA] border border-[#E8E2D5] rounded-2xl p-6 w-full max-w-sm mb-8 flex justify-between items-center">
         <div className="text-left">
-          <div className="font-serif text-4xl font-bold text-[#1B2A4A]">{dueCards.length}</div>
+          <div className="font-display text-4xl font-bold text-[#1B2A4A]">{dueCards.length}</div>
           <div className="text-xs text-[#7A7670] font-medium mt-1">
             {t.srs?.cardsToReview || "expressions prêtes pour aujourd'hui"}
           </div>

@@ -15,12 +15,12 @@ export default function CguPage() {
           <Link href="/" className="text-xs text-[#7A7670] underline hover:text-[#1B2A4A]">
             ← Retour à Kenza
           </Link>
-          <h1 className="font-serif text-3xl font-bold">Conditions Générales d&apos;Utilisation</h1>
+          <h1 className="font-display text-3xl font-bold">Conditions Générales d&apos;Utilisation</h1>
           <p className="text-sm text-[#7A7670]">Dernière mise à jour : septembre 2026</p>
         </header>
 
         <section className="space-y-3">
-          <h2 className="font-serif text-xl font-bold">1. Objet</h2>
+          <h2 className="font-display text-xl font-bold">1. Objet</h2>
           <p className="text-sm leading-relaxed">
             Kenza est une application d&apos;apprentissage du dialecte marocain (darija). L&apos;accès aux
             modules 1 et 2 est gratuit. L&apos;accès aux modules 3 à 7 ainsi qu&apos;aux fonctionnalités
@@ -29,7 +29,7 @@ export default function CguPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-serif text-xl font-bold">2. Abonnements et tarifs</h2>
+          <h2 className="font-display text-xl font-bold">2. Abonnements et tarifs</h2>
           <ul className="text-sm leading-relaxed list-disc pl-5 space-y-1">
             <li>
               Formule annuelle : {formatPriceInBothCurrencies('yearly')}, avec {TRIAL_PERIOD_DAYS} jours
@@ -47,7 +47,7 @@ export default function CguPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-serif text-xl font-bold">3. Reconduction automatique</h2>
+          <h2 className="font-display text-xl font-bold">3. Reconduction automatique</h2>
           <p className="text-sm leading-relaxed">
             Les abonnements sont à reconduction automatique : ils se renouvellent à échéance
             (mensuelle ou annuelle) sauf résiliation avant la date de renouvellement.
@@ -55,7 +55,7 @@ export default function CguPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-serif text-xl font-bold">4. Résiliation</h2>
+          <h2 className="font-display text-xl font-bold">4. Résiliation</h2>
           <p className="text-sm leading-relaxed">
             Vous pouvez résilier à tout moment, sans frais, depuis l&apos;espace « Gérer mon
             abonnement » de votre profil. Cette action ouvre le portail de facturation sécurisé de
@@ -65,7 +65,7 @@ export default function CguPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-serif text-xl font-bold">5. Paiement</h2>
+          <h2 className="font-display text-xl font-bold">5. Paiement</h2>
           <p className="text-sm leading-relaxed">
             Les paiements sont traités par Stripe. Kenza ne stocke aucune donnée bancaire : les
             informations de carte sont saisies directement sur l&apos;interface sécurisée du
@@ -74,7 +74,7 @@ export default function CguPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-serif text-xl font-bold">6. Droit de rétractation</h2>
+          <h2 className="font-display text-xl font-bold">6. Droit de rétractation</h2>
           <p className="text-sm leading-relaxed">
             Conformément à la réglementation applicable aux contenus numériques, l&apos;accès
             immédiat au service peut limiter le droit de rétractation une fois l&apos;abonnement

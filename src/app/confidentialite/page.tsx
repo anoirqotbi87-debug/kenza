@@ -14,12 +14,12 @@ export default function ConfidentialitePage() {
           <Link href="/" className="text-xs text-[#7A7670] underline hover:text-[#1B2A4A]">
             ← Retour à Kenza
           </Link>
-          <h1 className="font-serif text-3xl font-bold">Politique de confidentialité</h1>
+          <h1 className="font-display text-3xl font-bold">Politique de confidentialité</h1>
           <p className="text-sm text-[#7A7670]">Dernière mise à jour : septembre 2026</p>
         </header>
 
         <section className="space-y-3">
-          <h2 className="font-serif text-xl font-bold">1. Données collectées</h2>
+          <h2 className="font-display text-xl font-bold">1. Données collectées</h2>
           <p className="text-sm leading-relaxed">
             Kenza collecte votre adresse e-mail et un identifiant de compte lors de l&apos;inscription,
             ainsi que votre progression d&apos;apprentissage (leçons terminées, révisions, points).
@@ -29,7 +29,7 @@ export default function ConfidentialitePage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-serif text-xl font-bold">2. Authentification (Supabase)</h2>
+          <h2 className="font-display text-xl font-bold">2. Authentification (Supabase)</h2>
           <p className="text-sm leading-relaxed">
             L&apos;authentification et le stockage de vos données sont assurés par Supabase. Votre mot
             de passe n&apos;est jamais accessible en clair : il est géré par le service
@@ -40,7 +40,7 @@ export default function ConfidentialitePage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-serif text-xl font-bold">3. Paiements (Stripe)</h2>
+          <h2 className="font-display text-xl font-bold">3. Paiements (Stripe)</h2>
           <p className="text-sm leading-relaxed">
             Les paiements et abonnements sont traités par Stripe. Vos données de carte bancaire sont
             saisies directement sur l&apos;interface sécurisée de Stripe et ne transitent jamais par
@@ -50,7 +50,7 @@ export default function ConfidentialitePage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-serif text-xl font-bold">4. Stockage local</h2>
+          <h2 className="font-display text-xl font-bold">4. Stockage local</h2>
           <p className="text-sm leading-relaxed">
             Certaines données de progression sont conservées localement sur votre appareil pour
             permettre l&apos;utilisation hors-ligne. Le statut d&apos;abonnement, lui, n&apos;est jamais
@@ -59,7 +59,7 @@ export default function ConfidentialitePage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-serif text-xl font-bold">5. Vos droits</h2>
+          <h2 className="font-display text-xl font-bold">5. Vos droits</h2>
           <p className="text-sm leading-relaxed">
             Vous pouvez demander l&apos;accès, la correction ou la suppression de vos données à tout
             moment en nous contactant à l&apos;adresse ci-dessous. La suppression du compte entraîne

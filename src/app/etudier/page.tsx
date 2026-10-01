@@ -89,7 +89,7 @@ export default function EtudierPage() {
           return (
             <section key={key} className={`bg-[#FDFCF8] rounded-2xl border border-[#E8E2D5] p-6 shadow-xs ${isPremiumModule ? 'opacity-90' : ''}`}>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-serif text-xl font-bold text-[#1B2A4A]">
+                <h2 className="font-display text-xl font-bold text-[#1B2A4A]">
                   {tp.module || 'Module'} {key} — {localized(mod.title)}
                 </h2>
                 {isPremiumModule && (

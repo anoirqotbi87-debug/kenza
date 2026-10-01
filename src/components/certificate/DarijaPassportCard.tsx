@@ -91,7 +91,7 @@ export default function DarijaPassportCard({ data }: DarijaPassportCardProps) {
 
         <div className="absolute inset-0 p-5 sm:p-6 flex flex-col justify-between text-[#FDFCF8]">
           <div className="text-center">
-            <h3 className="font-serif font-bold text-[#C9A05C] tracking-[0.25em] text-lg sm:text-xl drop-shadow-xs uppercase">
+            <h3 className="font-display font-bold text-[#C9A05C] tracking-[0.25em] text-lg sm:text-xl drop-shadow-xs uppercase">
               {pp.passportTitle}
             </h3>
             <div className="text-[#E8E2D5]/70 text-xs sm:text-sm font-arabic mt-0.5">
@@ -102,7 +102,7 @@ export default function DarijaPassportCard({ data }: DarijaPassportCardProps) {
           <div className="flex justify-between items-end">
             <div>
               <div className="text-[#E8E2D5]/60 text-[10px] sm:text-xs mb-0.5 uppercase tracking-widest font-semibold">{pp.holder}</div>
-              <div className="font-serif font-bold text-xl sm:text-2xl truncate max-w-[200px] text-[#FDFCF8]">
+              <div className="font-display font-bold text-xl sm:text-2xl truncate max-w-[200px] text-[#FDFCF8]">
                 {data.userName || pp.guest}
               </div>
               
@@ -112,7 +112,7 @@ export default function DarijaPassportCard({ data }: DarijaPassportCardProps) {
 
             <div className="flex flex-col items-center justify-center bg-[#1B2A4A] border-2 border-[#C9A05C] rounded-full w-18 h-18 sm:w-20 sm:h-20 shadow-lg relative shrink-0">
               <Award className="absolute -top-3 text-[#C9A05C] w-5 h-5 sm:w-6 sm:h-6" />
-              <div className="font-serif font-bold text-[#C9A05C] text-lg sm:text-xl leading-none">{data.score}%</div>
+              <div className="font-display font-bold text-[#C9A05C] text-lg sm:text-xl leading-none">{data.score}%</div>
               <div className="text-[9px] text-[#E8E2D5]/70 mt-1 font-bold tracking-wider">{pp.score}</div>
             </div>
           </div>
