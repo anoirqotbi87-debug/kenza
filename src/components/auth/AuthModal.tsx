@@ -256,7 +256,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 'l
               onClick={() => handleOAuth('google')} 
               className="flex-1 bg-[#FDFCF8] border border-[#E8E2D5] hover:bg-[#F7F3EA] text-[#1B2A4A] font-bold py-2.5 rounded-full transition-colors flex items-center justify-center gap-2 text-xs shadow-xs"
             >
-              <Image src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width={16} height={16} className="w-4 h-4" unoptimized />
+              <Image src="/icons/google-color.svg" alt="Google" width={16} height={16} className="w-4 h-4" unoptimized />
               <span>{t.auth.google}</span>
             </button>
           </div>
