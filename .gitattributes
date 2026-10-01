@@ -1,0 +1,30 @@
+# Normalisation des fins de ligne et de l'encodage.
+#
+# Sans ce fichier, un contributeur sous Windows peut réécrire un fichier
+# entier en CRLF (761 CRLF observés sur globals.css dans d45a84b), gonflant
+# le diff et masquant les vrais changements.
+#
+# `text=auto eol=lf` force LF dans le dépôt quel que soit l'OS de l'auteur.
+# Les binaires sont explicitement exclus : sans cela, un `text=auto` mal
+# détecté peut altérer PNG/JPG/ICO.
+* text=auto eol=lf
+
+# Binaires : jamais de conversion de fins de ligne.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.pdf binary
+*.mp3 binary
+*.mp4 binary
+*.zip binary
+
+# Fichiers générés : exclus du diff et du langage détecté.
+public/sw.js linguist-generated=true
+public/sw.js.map linguist-generated=true
