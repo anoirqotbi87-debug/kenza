@@ -84,7 +84,7 @@ export default function ParlerPage() {
         ) : (
           <section className="bg-[#FDFCF8] rounded-3xl p-5 sm:p-7 shadow-xs border border-[#E8E2D5] space-y-5">
             <div>
-              <h2 className="font-serif text-xl font-bold text-[#1B2A4A]">
+              <h2 className="font-display text-xl font-bold text-[#1B2A4A]">
                 {t.modules.scenario.dialoguesTitle || 'Dialogues scénarisés'}
               </h2>
               <p className="text-sm text-[#7A7670] mt-1">
