@@ -318,7 +318,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!toast) return;
-    const timer = window.setTimeout(() => setToast(""), 3500);
+    const timer = window.setTimeout(() => setToast(""), 5500);
     return () => window.clearTimeout(timer);
   }, [toast]);
 

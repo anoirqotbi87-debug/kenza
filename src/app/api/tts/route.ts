@@ -64,6 +64,9 @@ export async function POST(req: NextRequest) {
     }
     // Rate limiting durable : 30 requêtes/min par IP
     const rate = await checkRateLimit(`tts:ip:${getClientIp(req)}`, 30, 60 * 1000);
+    if (rate.error) {
+      return NextResponse.json({ error: 'SERVICE_UNAVAILABLE' }, { status: 503 });
+    }
     if (!rate.allowed) {
       return NextResponse.json({ error: 'RATE_LIMITED' }, { status: 429 });
     }
@@ -114,6 +117,9 @@ export async function GET(req: NextRequest) {
 
     // Rate limiting durable : 30 requêtes/min par IP
     const rate = await checkRateLimit(`tts:ip:${getClientIp(req)}`, 30, 60 * 1000);
+    if (rate.error) {
+      return NextResponse.json({ error: 'SERVICE_UNAVAILABLE' }, { status: 503 });
+    }
     if (!rate.allowed) {
       return NextResponse.json({ error: 'RATE_LIMITED' }, { status: 429 });
     }
