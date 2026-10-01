@@ -358,6 +358,22 @@ export const module5Lessons: Lesson[] = [
           answer: 'o3',
           explanation: { fr: 'Li fate mate = Ce qui est passé est passé.', en: 'Li fate mate = What is past is past.', es: 'Li fate mate = Lo pasado, pasado está.', ar: 'اللي فات مات.' }
         }
+      },
+      {
+        id: 'm5_l4_s6',
+        type: 'exercise',
+        exercise: {
+          id: 'ex_m5_l4_2',
+          type: 'mcq',
+          prompt: { fr: 'Que signifie « Khelli l-bir b ghettah » ?', en: 'What does "Khelli l-bir b ghettah" mean?', es: '¿Qué significa «Khelli l-bir b ghettah»?', ar: 'ماذا تعني «خلي البير بغطاه»؟' },
+          options: [
+            { id: 'o1', text: 'Garde le secret / n\'en parle pas', isCorrect: true },
+            { id: 'o2', text: 'Tourne la page', isCorrect: false },
+            { id: 'o3', text: 'Pas à pas', isCorrect: false }
+          ],
+          answer: 'o1',
+          explanation: { fr: 'Littéralement « laisse le puits avec son couvercle » : on n\'ouvre pas un sujet délicat.', en: 'Literally "leave the well with its lid": do not open a delicate subject.', es: 'Literalmente «deja el pozo con su tapa»: no se abre un tema delicado.', ar: 'حرفياً «اترك البئر بغطائه»: لا تفتح موضوعاً حساساً.' }
+        }
       }
     ]
   },
