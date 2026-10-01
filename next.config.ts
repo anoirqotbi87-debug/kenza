@@ -14,7 +14,13 @@ const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains' },
-  { key: 'Content-Security-Policy-Report-Only', value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' wss: https:; frame-src 'self' https://js.stripe.com https://hooks.stripe.com;" }
+  // `report-uri` seul, sans `report-to` : quand les deux sont présents, Chrome
+  // donne la priorité à la Reporting API, qui regroupe les rapports et diffère
+  // leur envoi (vérifié : aucune livraison en 90 s, contre une livraison
+  // immédiate avec `report-uri` seul). Pour une fenêtre d'observation, la
+  // livraison immédiate prime. `report-to` pourra être ajouté une fois la
+  // collecte validée en production.
+  { key: 'Content-Security-Policy-Report-Only', value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' wss: https:; frame-src 'self' https://js.stripe.com https://hooks.stripe.com; report-uri /api/csp-report;" }
 ];
 
 const nextConfig: NextConfig = {
