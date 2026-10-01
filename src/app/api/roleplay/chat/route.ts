@@ -100,10 +100,18 @@ export async function POST(req: NextRequest) {
         messages,
         temperature: 0.7,
         maxTokens: 300, // Short responses
+        maxRetries: 0, // Pas de retry : 6 s de backoff par modele
       });
     } catch (modelErr: unknown) {
       const errMsg = modelErr instanceof Error ? modelErr.message : String(modelErr);
-      const isAuthError = errMsg.includes('403') || errMsg.includes('PERMISSION_DENIED') || errMsg.includes('API_KEY_INVALID');
+      // Le message d'un 403 Google est « Your project has been denied access... » : il ne
+      // contient ni « 403 » ni « PERMISSION_DENIED ». Seul `statusCode` est fiable.
+      const modelStatus = (modelErr as { statusCode?: number } | undefined)?.statusCode;
+      const isAuthError =
+        modelStatus === 401 ||
+        modelStatus === 403 ||
+        errMsg.includes('PERMISSION_DENIED') ||
+        errMsg.includes('API_KEY_INVALID');
 
       if (isAuthError) {
         console.error('[AI Roleplay] Google AI Studio authentication error (403/PERMISSION_DENIED):', errMsg);
@@ -121,6 +129,7 @@ export async function POST(req: NextRequest) {
         messages,
         temperature: 0.7,
         maxTokens: 300,
+        maxRetries: 0,
       });
     }
 
@@ -128,7 +137,17 @@ export async function POST(req: NextRequest) {
     return result.toDataStreamResponse();
   } catch (error: unknown) {
     const errMsg = error instanceof Error ? error.message : String(error);
-    console.error('API Roleplay Chat Error:', errMsg);
+    const status = (error as { statusCode?: number } | undefined)?.statusCode;
+    console.error('API Roleplay Chat Error:', errMsg, '| upstream status:', status);
+
+    // 429 (quota/rate limit) et 5xx sont transitoires : 503 le dit, 500 non.
+    if (status === 429 || (status !== undefined && status >= 500)) {
+      return new Response(JSON.stringify({ error: 'AI_UNAVAILABLE' }), {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     return new Response(JSON.stringify({ error: 'INTERNAL_ERROR', message: errMsg }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
