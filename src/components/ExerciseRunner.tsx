@@ -13,7 +13,7 @@ import { playAudio } from '../lib/audio';
 import { track } from '../lib/tracking';
 import ConjugationTable from './grammar/ConjugationTable';
 import { getLocalizedText } from '../lib/i18n/utils';
-import { isAcceptedAnswer } from '../lib/exerciseAnswers';
+import { isAcceptedAnswer, isAcceptedOrder } from '../lib/exerciseAnswers';
 import { renderArabiziWithBadges } from './ui/PhoneticBadge';
 import confetti from 'canvas-confetti';
 
@@ -69,14 +69,12 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
     if (step.type !== 'exercise' || !step.exercise) return;
 
     let correct = false;
-    const { type, answer } = step.exercise;
+    const { type } = step.exercise;
 
     if (type === 'mcq') {
-      correct = selectedMcqId === answer;
+      correct = isAcceptedAnswer(step.exercise, selectedMcqId);
     } else if (type === 'reorder') {
-      const answerArr = answer as string[];
-      correct = orderedWords.length === answerArr.length && 
-                orderedWords.every((id, idx) => id === answerArr[idx]);
+      correct = isAcceptedOrder(step.exercise, orderedWords);
     } else if (type === 'fill-blank') {
       correct = isAcceptedAnswer(step.exercise, selectedBlankId);
     } else if (type === 'matching' || type === 'match') {

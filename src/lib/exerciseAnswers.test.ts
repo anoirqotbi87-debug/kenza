@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getAcceptedAnswers, isAcceptedAnswer } from './exerciseAnswers';
+import { getAcceptedAnswers, isAcceptedAnswer, isAcceptedOrder } from './exerciseAnswers';
 import { allLessonsList } from '../data/curriculum';
 import type { Exercise } from '../types/curriculum';
 
@@ -91,6 +91,27 @@ describe('isAcceptedAnswer — validation de la reponse de l apprenant', () => {
     const ambigu = exercise({ answer: 'opt1', acceptedAnswers: ['opt2'] });
     expect(isAcceptedAnswer(ambigu, 'opt1')).toBe(true);
     expect(isAcceptedAnswer(ambigu, 'opt2')).toBe(true);
+  });
+});
+
+describe('isAcceptedOrder — validation des exercices reorder', () => {
+  const ex = exercise({ type: 'reorder', answer: ['w1', 'w2', 'w3'] });
+
+  it('accepte l ordre attendu', () => {
+    expect(isAcceptedOrder(ex, ['w1', 'w2', 'w3'])).toBe(true);
+  });
+
+  it('refuse un ordre different', () => {
+    expect(isAcceptedOrder(ex, ['w2', 'w1', 'w3'])).toBe(false);
+  });
+
+  it('refuse une suite incomplete ou trop longue', () => {
+    expect(isAcceptedOrder(ex, ['w1', 'w2'])).toBe(false);
+    expect(isAcceptedOrder(ex, ['w1', 'w2', 'w3', 'w4'])).toBe(false);
+  });
+
+  it('refuse un exercice dont la reponse n est pas une suite', () => {
+    expect(isAcceptedOrder(exercise({ answer: 'opt1' }), ['opt1'])).toBe(false);
   });
 });
 

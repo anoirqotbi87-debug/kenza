@@ -34,3 +34,17 @@ export function isAcceptedAnswer(exercise: Exercise, selectedId: string | null |
   const selected = selectedId.trim().toLowerCase();
   return getAcceptedAnswers(exercise).some((id) => id.toLowerCase() === selected);
 }
+
+/**
+ * L'ordre propose est-il celui attendu ? Sert aux exercices `reorder`, ou
+ * `answer` est la suite d'ids dans le bon ordre. L'ordre fait la reponse : on
+ * compare donc position par position, et non comme un ensemble.
+ *
+ * Partage par la validation du runner et par la correction visuelle, pour que
+ * « compte juste » et « affiche juste » ne puissent pas diverger.
+ */
+export function isAcceptedOrder(exercise: Exercise, orderedIds: string[]): boolean {
+  if (!Array.isArray(exercise.answer)) return false;
+  const expected = exercise.answer as string[];
+  return orderedIds.length === expected.length && orderedIds.every((id, i) => id === expected[i]);
+}
