@@ -22,9 +22,15 @@ export const metadata: Metadata = {
   }
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+import { cookies } from "next/headers";
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get('kenza-lang')?.value || 'fr';
+  const dir = lang === 'ar' ? 'rtl' : 'ltr';
+
   return (
-    <html lang="fr" dir="ltr" className={`${dmSans.variable} ${dmSerif.variable} ${notoArabic.variable}`}>
+    <html lang={lang} dir={dir} className={`${dmSans.variable} ${dmSerif.variable} ${notoArabic.variable}`}>
       <head>
         <meta name="theme-color" content="#f7f5ef" />
       </head>

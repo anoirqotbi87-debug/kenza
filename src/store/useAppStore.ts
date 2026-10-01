@@ -197,7 +197,13 @@ export const useAppStore = create<AppState>()(
 
       setAudioSpeed: (speed: number) => set({ audioSpeed: speed }),
       
-      setLanguage: (lang: UILanguage) => set({ uiLanguage: (lang || 'fr').toLowerCase() as UILanguage }),
+      setLanguage: (lang: UILanguage) => {
+        const value = (lang || 'fr').toLowerCase() as UILanguage;
+        if (typeof document !== 'undefined') {
+          document.cookie = `kenza-lang=${value}; path=/; max-age=31536000`;
+        }
+        set({ uiLanguage: value });
+      },
       
       addCardsToSRS: (wordIds: string[]) => set((state: AppState) => {
         const newDeck = { ...state.srsDeck };
