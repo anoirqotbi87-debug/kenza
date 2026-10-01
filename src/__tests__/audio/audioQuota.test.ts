@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import {
   FREE_DAILY_AUDIO_LIMIT,
   audioQuotaStorageKey,
-  readAudioQuota,
   hasAudioQuota,
   recordAudioPlay,
   remainingAudioQuota,

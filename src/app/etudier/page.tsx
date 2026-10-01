@@ -11,9 +11,12 @@ import { isModuleLocked } from '@/lib/premiumModules';
 import ExerciseRunner from '@/components/ExerciseRunner';
 import PaywallModal from '@/components/monetization/PaywallModal';
 import PageHeader from '@/components/ui/PageHeader';
+import { usePremiumStatus } from '@/hooks/usePremiumStatus';
+import { syncService } from '@/lib/syncService';
 
 export default function EtudierPage() {
   const { uiLanguage, completedLessons, completeLesson, isPremium } = useAppStore();
+  const { isPremiumReady } = usePremiumStatus();
   const { t } = useTranslation();
   const [runnerLesson, setRunnerLesson] = useState<Lesson | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
@@ -27,6 +30,7 @@ export default function EtudierPage() {
   const localized = (text: MultiLangText | string | undefined) => getLocalizedText(text, lang as UILanguage);
 
   const handleStart = (moduleKey: string, lesson: Lesson) => {
+    if (!isPremiumReady && isModuleLocked(moduleKey, false)) return;
     if (isModuleLocked(moduleKey, isPremium)) {
       setShowPaywall(true);
       return;
@@ -34,32 +38,43 @@ export default function EtudierPage() {
     setRunnerLesson(lesson);
   };
 
-  // Deep-link depuis l'accueil : /etudier?lesson=<id> ouvre directement la lecon
-  // demandee. Resolu une seule fois a l'initialisation, puis le parametre est
-  // retire de l'URL pour qu'un rechargement ne rouvre pas l'exercice.
-  const [deepLink] = useState(() => {
-    if (typeof window === 'undefined') return null;
-    const lessonId = new URLSearchParams(window.location.search).get('lesson');
-    if (!lessonId) return null;
-    for (const [key, mod] of Object.entries(fullCurriculum)) {
-      const lesson = mod.lessons.find((item) => item.id === lessonId);
-      if (lesson) return { moduleKey: key, lesson };
-    }
-    return null;
-  });
+  // Le query param se lit après hydratation : pendant le rendu serveur, `window`
+  // n’existe pas et un initialiseur useState ne serait jamais relancé côté client.
+  const [deepLink, setDeepLink] = useState<{ moduleKey: string; lesson: Lesson } | null>(null);
   const [deepLinkClosed, setDeepLinkClosed] = useState(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (new URLSearchParams(window.location.search).has('lesson')) {
+    const params = new URLSearchParams(window.location.search);
+    const lessonId = params.get('lesson');
+    let foundLesson: { moduleKey: string; lesson: Lesson } | null = null;
+    if (lessonId) {
+      for (const [key, mod] of Object.entries(fullCurriculum)) {
+        const lesson = mod.lessons.find((item) => item.id === lessonId);
+        if (lesson) {
+          foundLesson = { moduleKey: key, lesson };
+          break;
+        }
+      }
+    }
+    if (params.has('lesson')) {
       window.history.replaceState({}, '', window.location.pathname);
     }
+    // Décaler l’écriture d’état à la file d’événements évite de rendre le HTML
+    // serveur différent du premier rendu client, tout en gardant le deep-link.
+    const timer = window.setTimeout(() => setDeepLink(foundLesson), 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   // Le verrou premium reste applique au deep-link : on ne contourne pas le paywall.
-  const deepLinkBlocked = Boolean(deepLink && isModuleLocked(deepLink.moduleKey, isPremium));
+  const deepLinkRequiresPremium = Boolean(deepLink && isModuleLocked(deepLink.moduleKey, false));
+  const deepLinkAccessReady = !deepLinkRequiresPremium || isPremiumReady;
+  const deepLinkBlocked = Boolean(
+    deepLink && !deepLinkClosed && deepLinkAccessReady && isModuleLocked(deepLink.moduleKey, isPremium)
+  );
   const openLesson =
-    runnerLesson ?? (!deepLinkClosed && deepLink && !deepLinkBlocked ? deepLink.lesson : null);
+    runnerLesson ??
+    (!deepLinkClosed && deepLink && deepLinkAccessReady && !deepLinkBlocked ? deepLink.lesson : null);
 
   return (
     <div dir={isAr ? 'rtl' : 'ltr'} className="min-h-screen bg-[#F7F3EA]">
@@ -70,7 +85,7 @@ export default function EtudierPage() {
 
       <main className="max-w-4xl mx-auto p-6 space-y-8">
         {Object.entries(fullCurriculum).map(([key, mod]) => {
-          const isPremiumModule = isModuleLocked(key, isPremium);
+          const isPremiumModule = isModuleLocked(key, false) && (!isPremiumReady || !isPremium);
           return (
             <section key={key} className={`bg-[#FDFCF8] rounded-2xl border border-[#E8E2D5] p-6 shadow-xs ${isPremiumModule ? 'opacity-90' : ''}`}>
               <div className="flex items-center justify-between mb-4">
@@ -90,7 +105,8 @@ export default function EtudierPage() {
                     <button
                       key={lesson.id}
                       onClick={() => handleStart(key, lesson)}
-                      className="text-left bg-[#F7F3EA] border border-[#E8E2D5] rounded-xl p-4 hover:border-[#C9A05C] transition-colors group"
+                      disabled={!isPremiumReady && isModuleLocked(key, false)}
+                      className="text-left bg-[#F7F3EA] border border-[#E8E2D5] rounded-xl p-4 hover:border-[#C9A05C] disabled:cursor-wait transition-colors group"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
@@ -122,6 +138,7 @@ export default function EtudierPage() {
           lesson={openLesson}
           onComplete={() => {
             completeLesson(openLesson.id);
+            void syncService.persistLessonCompletion(openLesson.id);
             setRunnerLesson(null);
             setDeepLinkClosed(true);
           }}
@@ -132,7 +149,13 @@ export default function EtudierPage() {
         />
       )}
       {(showPaywall || deepLinkBlocked) && (
-        <PaywallModal onClose={() => setShowPaywall(false)} source="module_locked" />
+        <PaywallModal
+          onClose={() => {
+            setShowPaywall(false);
+            setDeepLinkClosed(true);
+          }}
+          source="module_locked"
+        />
       )}
     </div>
   );

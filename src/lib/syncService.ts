@@ -118,9 +118,19 @@ export const syncService = {
       .eq('completed', true);
 
     if (lessons) {
-      useAppStore.setState({
-        completedLessons: lessons.map(l => l.lesson_id)
-      });
+      const cloudLessonIds = lessons.map((lesson) => lesson.lesson_id);
+      const cloudLessonSet = new Set(cloudLessonIds);
+      const localLessonIds = useAppStore.getState().completedLessons;
+      const mergedLessonIds = Array.from(new Set([...cloudLessonIds, ...localLessonIds]));
+      useAppStore.setState({ completedLessons: mergedLessonIds });
+
+      const localOnlyLessons = localLessonIds.filter((lessonId) => !cloudLessonSet.has(lessonId));
+      if (localOnlyLessons.length > 0) {
+        const { error: lessonError } = await supabase.rpc('complete_lessons_bulk', {
+          p_lesson_ids: localOnlyLessons,
+        });
+        if (lessonError) console.error('Error syncing local lesson progress:', lessonError);
+      }
     }
 
     // 3. Fetch SRS
@@ -143,6 +153,36 @@ export const syncService = {
         };
       });
       useAppStore.setState({ srsDeck: newDeck });
+    }
+  },
+
+  /** Persiste une leçon terminée via le RPC RLS-safe, puis synchronise l’XP du store. */
+  async persistLessonCompletion(lessonId: string): Promise<boolean> {
+    try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) console.warn('Unable to read session for lesson completion:', sessionError.message);
+      if (!session?.user) return false;
+
+      const { error: lessonError } = await supabase.rpc('complete_lesson', {
+        p_lesson_id: lessonId,
+      });
+      if (lessonError) {
+        console.error('Error syncing lesson completion:', lessonError);
+        return false;
+      }
+
+      const store = useAppStore.getState();
+      const { error: progressError } = await supabase.rpc('sync_user_progress', {
+        new_xp: store.xp,
+        new_streak_days: store.streakDays,
+        new_streak_freezes: store.streakFreezes,
+        new_badges: store.unlockedBadges,
+      });
+      if (progressError) console.error('Error syncing profile progress:', progressError);
+      return true;
+    } catch (error) {
+      console.error('Unable to persist lesson completion:', error);
+      return false;
     }
   },
   

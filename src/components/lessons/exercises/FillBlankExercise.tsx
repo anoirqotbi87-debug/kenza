@@ -47,7 +47,9 @@ export default function FillBlankExercise({ exercise, preferredNotation, onUpdat
   const renderSentence = () => {
     if (!exercise.sentenceTemplate) return null;
     
-    const parts = exercise.sentenceTemplate.split('{blank}');
+    // Les modules historiques utilisent ___ ; les nouveaux contenus peuvent
+    // utiliser le token explicite {blank}. Les deux représentent un seul trou.
+    const parts = exercise.sentenceTemplate.split(/\{blank\}|_{3,}/);
     
     return (
       <div className="text-3xl font-bold text-slate-700 flex flex-wrap items-center justify-center gap-3">

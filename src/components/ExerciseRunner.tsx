@@ -188,7 +188,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
 
   const renderContent = () => {
     // 1. Learning screens
-    if (step.type === 'learning' || (step.type as string) === 'concept') {
+    if (step.type === 'learning' || step.type === 'grammar' || (step.type as string) === 'concept') {
       if (!step.content) {
         return (
           <div className="flex flex-col items-center justify-center h-full space-y-8 text-center animate-in fade-in zoom-in duration-300">
