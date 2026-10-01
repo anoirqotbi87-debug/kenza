@@ -7,33 +7,22 @@ import {
   getCulturalNotesForModule,
 } from './index';
 import type { ModuleId } from './types';
+import { allLessonsList } from '../curriculum';
 
-const MODULES: ModuleId[] = [1, 2, 3, 4];
+const MODULES: ModuleId[] = [1, 2, 3, 4, 5, 6, 7];
 const LANGS = ['fr', 'en', 'es', 'ar'] as const;
 
-/** Ids de leçons réellement présents dans le curriculum, pour vérifier `source`. */
-const KNOWN_SOURCES = new Set([
-  'l1_phonetics_1',
-  'l2_greetings_1',
-  'l3_greetings_2',
-  'l4_greetings_3',
-  'l5_politeness_1',
-  'l6_pronouns_1',
-  'l_module2_cafe_1',
-  'l_module2_taxi_1',
-  'l_module2_souk_1',
-  'm3_l1_checkin',
-  'm3_l2_maintenance',
-  'm3_l3_pharmacie',
-  'm3_l4_orientation',
-  'm4_l1_passe',
-  'm4_l2_present',
-  'm4_l3_futur_negation',
-  'm4_l4_modaux',
-]);
+/**
+ * Ids de leçons réellement présents dans le curriculum.
+ *
+ * Dérivés de la source, et non recopiés à la main : une liste figée dérive
+ * silencieusement du curriculum, et une leçon renommée ferait passer le test
+ * pour un test de données alors qu'il ne vérifie plus rien.
+ */
+const KNOWN_SOURCES = new Set(allLessonsList.map((l) => l.id));
 
 describe('vocabulaire — integrite des donnees', () => {
-  it('chaque module 1 a 4 a du vocabulaire', () => {
+  it('chaque module 1 a 7 a du vocabulaire', () => {
     for (const m of MODULES) {
       expect(vocabularyByModule[m].length, `module ${m} vide`).toBeGreaterThan(0);
     }
@@ -131,6 +120,41 @@ describe('vocabulaire — exemples et notes culturelles', () => {
   });
 });
 
+describe('vocabulaire — modules 5 a 7', () => {
+  // Ces trois modules portaient le curriculum sans aucun lexique : un apprenant
+  // arrivé en fin de parcours n'avait aucun mot à réviser. On fige ici une
+  // densité minimale, pour que le corpus ne puisse pas se vider en silence.
+  const NEW_MODULES: ModuleId[] = [5, 6, 7];
+
+  it('chaque nouveau module expose au moins huit mots', () => {
+    for (const m of NEW_MODULES) {
+      expect(vocabularyByModule[m].length, `module ${m}`).toBeGreaterThanOrEqual(8);
+    }
+  });
+
+  it('les mots sont rattaches au bon module et tracables vers une lecon', () => {
+    for (const m of NEW_MODULES) {
+      for (const v of vocabularyByModule[m]) {
+        expect(v.module, v.id).toBe(m);
+        expect(KNOWN_SOURCES.has(v.source), `${v.id} -> ${v.source}`).toBe(true);
+      }
+    }
+  });
+
+  it('les categories propres aux nouveaux modules sont representees', () => {
+    const categories = new Set(allVocabulary.filter((v) => NEW_MODULES.includes(v.module)).map((v) => v.category));
+    for (const expected of ['debate', 'work', 'proverb', 'grammar', 'narration', 'dialect'] as const) {
+      expect(categories.has(expected), `categorie ${expected} absente`).toBe(true);
+    }
+  });
+
+  it('chaque nouveau module porte au moins une note culturelle', () => {
+    for (const m of NEW_MODULES) {
+      expect(getCulturalNotesForModule(m).length, `module ${m}`).toBeGreaterThan(0);
+    }
+  });
+});
+
 describe('vocabulaire — API d acces', () => {
   it('getVocabularyForModule renvoie la liste du module', () => {
     expect(getVocabularyForModule(1)).toBe(vocabularyByModule[1]);
@@ -142,7 +166,7 @@ describe('vocabulaire — API d acces', () => {
     expect(politeness.every((v) => v.category === 'politeness')).toBe(true);
   });
 
-  it('allVocabulary couvre exactement les modules 1 a 4', () => {
+  it('allVocabulary couvre exactement les modules 1 a 7', () => {
     const total = MODULES.reduce((sum, m) => sum + vocabularyByModule[m].length, 0);
     expect(allVocabulary.length).toBe(total);
     expect(new Set(allVocabulary.map((v) => v.module))).toEqual(new Set(MODULES));
