@@ -189,7 +189,7 @@ export default function SpeechTrainer() {
           <span>—</span>
           <span>Pratique Orale</span>
         </div>
-        <h1 className="font-serif text-3xl sm:text-4xl text-[#1B2A4A] font-normal">
+        <h1 className="font-display text-3xl sm:text-4xl text-[#1B2A4A] font-normal">
           Perfectionnez votre accent
         </h1>
         <p className="text-xs sm:text-sm text-[#7A7670]">
@@ -225,7 +225,7 @@ export default function SpeechTrainer() {
                 <span>Lisez à voix haute</span>
               </div>
               <div className="text-4xl sm:text-5xl font-arabic text-[#1B2A4A] mb-3 leading-tight">{currentExercise.arabic}</div>
-              <div className="font-serif text-2xl font-bold text-[#1B2A4A]">{currentExercise.arabizi}</div>
+              <div className="font-display text-2xl font-bold text-[#1B2A4A]">{currentExercise.arabizi}</div>
               <div className="text-[#7A7670] text-sm mt-1">{currentExercise.translation[lang as keyof typeof currentExercise.translation] || currentExercise.translation.fr}</div>
               
               <div className="mt-6 flex items-center justify-center gap-3">
@@ -333,7 +333,7 @@ export default function SpeechTrainer() {
                       </button>
                     )}
                     <div>
-                      <p className="font-serif font-bold text-base">{msg.textArabizi}</p>
+                      <p className="font-display font-bold text-base">{msg.textArabizi}</p>
                       <p className={`font-arabic text-lg mt-0.5 ${msg.sender === 'user' ? 'text-[#E8E2D5]' : 'text-[#7A7670]'}`}>{msg.textArabic}</p>
                     </div>
                   </div>
@@ -361,7 +361,7 @@ export default function SpeechTrainer() {
                     className="p-3 bg-[#F7F3EA] hover:bg-[#E8E2D5]/70 border border-[#E8E2D5] rounded-2xl text-left transition-colors group flex items-center justify-between"
                   >
                     <div>
-                      <div className="font-serif font-bold text-sm text-[#1B2A4A]">{choice.arabizi}</div>
+                      <div className="font-display font-bold text-sm text-[#1B2A4A]">{choice.arabizi}</div>
                       <div className="text-xs text-[#7A7670]">{choice.translation}</div>
                     </div>
                     <ArrowRight className="w-4 h-4 text-[#C9A05C] opacity-0 group-hover:opacity-100 transition-opacity" />

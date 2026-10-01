@@ -46,7 +46,7 @@ export default function GrammairePage() {
 
       <main className="max-w-4xl mx-auto p-6 space-y-8">
         <section className="bg-[#FDFCF8] rounded-2xl border border-[#E8E2D5] p-6 shadow-xs">
-          <h2 className="font-serif text-xl font-bold text-[#1B2A4A] mb-4">
+          <h2 className="font-display text-xl font-bold text-[#1B2A4A] mb-4">
             {tp.conjugationTable || 'Tableau de conjugaison'}
           </h2>
           {moduleLocked ? (
@@ -66,7 +66,7 @@ export default function GrammairePage() {
         </section>
 
         <section className="bg-[#FDFCF8] rounded-2xl border border-[#E8E2D5] p-6 shadow-xs">
-          <h2 className="font-serif text-xl font-bold text-[#1B2A4A] mb-4">
+          <h2 className="font-display text-xl font-bold text-[#1B2A4A] mb-4">
             {tp.grammarLessons || 'Leçons de grammaire (Module 4)'}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

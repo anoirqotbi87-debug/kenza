@@ -152,7 +152,7 @@ export default function RoleplayChat({
             {persona.name.charAt(0)}
           </div>
           <div>
-            <h3 className="font-serif font-bold text-sm text-[#1B2A4A]">{persona.name}</h3>
+            <h3 className="font-display font-bold text-sm text-[#1B2A4A]">{persona.name}</h3>
             <p className="text-[11px] text-[#7A7670]">{persona.context}</p>
           </div>
         </div>
@@ -171,7 +171,7 @@ export default function RoleplayChat({
         {messages.length === 0 && (
           <div className="p-6 text-center space-y-2 bg-[#F7F3EA]/60 rounded-2xl border border-[#E8E2D5] max-w-sm mx-auto my-8">
             <Sparkles className="w-6 h-6 text-[#C9A05C] mx-auto" />
-            <p className="font-serif font-bold text-sm text-[#1B2A4A]">
+            <p className="font-display font-bold text-sm text-[#1B2A4A]">
               Commencez votre échange en Darija
             </p>
             <p className="text-xs text-[#7A7670]">
@@ -232,7 +232,7 @@ export default function RoleplayChat({
 
                     {/* Arabizi phonetics */}
                     {parsed?.arz && (
-                      <p className="font-serif font-bold text-sm text-[#1B2A4A]">
+                      <p className="font-display font-bold text-sm text-[#1B2A4A]">
                         {parsed.arz}
                       </p>
                     )}

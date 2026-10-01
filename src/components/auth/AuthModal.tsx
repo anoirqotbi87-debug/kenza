@@ -7,6 +7,7 @@ import { syncService } from '../../lib/syncService';
 import Image from 'next/image';
 import { signUpWithTracking, track } from '../../lib/tracking';
 import { useTranslation } from '../../store/useAppStore';
+import { useDialog } from '../../hooks/useDialog';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -16,6 +17,7 @@ interface AuthModalProps {
 }
 
 export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 'login' }: AuthModalProps) {
+  const { dialogRef } = useDialog(isOpen, onClose);
   const [isLogin, setIsLogin] = useState(initialMode === 'login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -143,7 +145,14 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 'l
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-[#1B2A4A]/60 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="bg-[#FDFCF8] rounded-3xl w-full max-w-md overflow-hidden shadow-2xl border border-[#E8E2D5] relative animate-in zoom-in-95 duration-200">
+      <div 
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="auth-modal-title"
+        className="bg-[#FDFCF8] rounded-3xl w-full max-w-md overflow-hidden shadow-2xl border border-[#E8E2D5] relative animate-in zoom-in-95 duration-200"
+        tabIndex={-1}
+      >
         <button 
           onClick={onClose}
           className="absolute top-4 right-4 p-2 text-[#7A7670] hover:text-[#1B2A4A] bg-[#F7F3EA] hover:bg-[#E8E2D5] border border-[#E8E2D5] rounded-full transition-colors z-10 shadow-xs"
@@ -156,7 +165,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 'l
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#C9A05C]/20 border border-[#C9A05C]/40 text-[#C9A05C] text-2xl mb-3 shadow-xs">
               🐪
             </div>
-            <h2 className="font-serif tracking-[0.2em] text-2xl font-extrabold text-[#1B2A4A] uppercase flex justify-center items-center gap-2">
+            <h2 id="auth-modal-title" className="font-display tracking-[0.2em] text-2xl font-extrabold text-[#1B2A4A] uppercase flex justify-center items-center gap-2">
               KENZA <span className="font-arabic text-base font-bold text-[#C9A05C] lowercase">كنزة</span>
             </h2>
             <p className="text-xs text-[#7A7670] mt-1 font-medium">

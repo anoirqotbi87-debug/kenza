@@ -90,9 +90,9 @@ export default function CheckpointResult({ levelId, levelName, score, totalQuest
                   <span>—</span>
                   <span>Palier Officiel Validé</span>
                 </div>
-                <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#1B2A4A]">Félicitations !</h2>
+                <h2 className="font-display text-3xl sm:text-4xl font-bold text-[#1B2A4A]">Félicitations !</h2>
                 <p className="text-xs sm:text-sm text-[#7A7670] mt-1.5 max-w-md mx-auto">
-                  Vous avez validé le <strong className="text-[#1B2A4A] font-serif">{levelName}</strong> avec un score remarquable de <strong className="text-[#1B2A4A]">{percentage}%</strong>.
+                  Vous avez validé le <strong className="text-[#1B2A4A] font-display">{levelName}</strong> avec un score remarquable de <strong className="text-[#1B2A4A]">{percentage}%</strong>.
                 </p>
               </div>
               
@@ -114,14 +114,14 @@ export default function CheckpointResult({ levelId, levelName, score, totalQuest
                   <span>—</span>
                   <span>Résultat du Palier</span>
                 </div>
-                <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#1B2A4A]">Presque au but !</h2>
+                <h2 className="font-display text-3xl sm:text-4xl font-bold text-[#1B2A4A]">Presque au but !</h2>
                 <p className="text-xs sm:text-sm text-[#7A7670] mt-1.5 max-w-md mx-auto">
                   Vous avez obtenu <strong className="text-[#1B2A4A]">{percentage}%</strong>. Un score de <strong>80%</strong> minimum est requis pour certifier ce palier.
                 </p>
               </div>
               
               <div className="bg-[#F7F3EA] rounded-2xl p-5 sm:p-6 text-left border border-[#E8E2D5] max-w-md mx-auto">
-                <h4 className="font-serif font-bold text-sm text-[#1B2A4A] mb-2">Recommandations de révision :</h4>
+                <h4 className="font-display font-bold text-sm text-[#1B2A4A] mb-2">Recommandations de révision :</h4>
                 <ul className="list-disc list-inside text-[#7A7670] space-y-1.5 text-xs">
                   <li>Révisez les cartes de vocabulaire dans l'onglet <strong>Réviser</strong>.</li>
                   <li>Écoutez les phrases avec l'audio natif pour affiner votre oreille.</li>

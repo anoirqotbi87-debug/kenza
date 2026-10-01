@@ -47,7 +47,7 @@ export default function PageHeader({ badge, title, backHref = '/', actions }: Pa
           <p className="text-[#C9A05C] text-[10px] sm:text-xs font-bold tracking-[0.22em] uppercase truncate">
             {badge}
           </p>
-          <h1 className="font-serif text-xl sm:text-2xl font-bold truncate">{title}</h1>
+          <h1 className="font-display text-xl sm:text-2xl font-bold truncate">{title}</h1>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">

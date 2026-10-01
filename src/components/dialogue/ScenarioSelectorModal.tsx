@@ -83,7 +83,7 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
               <span>—</span>
               <span>Immersion Active</span>
             </div>
-            <h2 className="font-serif text-2xl font-bold flex items-center gap-2">
+            <h2 className="font-display text-2xl font-bold flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-[#C9A05C]" />
               {modalTitle}
             </h2>
@@ -107,7 +107,7 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
               <div className="w-16 h-16 bg-[#C9A05C]/15 text-[#C9A05C] rounded-full flex items-center justify-center mb-4">
                 <WifiOff className="w-8 h-8" />
               </div>
-              <h3 className="font-serif text-xl font-bold text-[#1B2A4A] mb-2">
+              <h3 className="font-display text-xl font-bold text-[#1B2A4A] mb-2">
                 {sc.internetRequired}
               </h3>
               <p className="text-xs text-[#7A7670] mb-6 max-w-md leading-relaxed">
@@ -185,7 +185,7 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
                       )}
                     </div>
 
-                    <h3 className="font-serif text-lg font-bold text-[#1B2A4A] mb-1 leading-snug">
+                    <h3 className="font-display text-lg font-bold text-[#1B2A4A] mb-1 leading-snug">
                       {persona.name}
                     </h3>
                     
@@ -214,7 +214,7 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
           {/* Section 2 : Dialogues scénarisés — situations réelles */}
           <div className="mt-8">
             <div className="mb-3">
-              <h3 className="font-serif text-lg font-bold text-[#1B2A4A]">{dialoguesTitle}</h3>
+              <h3 className="font-display text-lg font-bold text-[#1B2A4A]">{dialoguesTitle}</h3>
               <p className="text-xs text-[#7A7670] mt-0.5">{dialoguesDesc}</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -242,7 +242,7 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
                           </div>
                         )}
                       </div>
-                      <h4 className="font-serif text-base font-bold text-[#1B2A4A] mb-1 leading-snug">{s.title}</h4>
+                      <h4 className="font-display text-base font-bold text-[#1B2A4A] mb-1 leading-snug">{s.title}</h4>
                       <p className="text-xs text-[#7A7670] flex items-center gap-1.5">
                         <MapPin className="w-3.5 h-3.5 text-[#C9A05C]" />
                         <span>{s.location} · {s.turns?.length || 0} tours</span>
@@ -261,7 +261,7 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
 
           {/* Section 3 : Explorer plus */}
           <div className="mt-8">
-            <h3 className="font-serif text-lg font-bold text-[#1B2A4A] mb-3">{exploreTitle}</h3>
+            <h3 className="font-display text-lg font-bold text-[#1B2A4A] mb-3">{exploreTitle}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {explorerLinks.map(({ href, icon: Icon, label }) => (
                 <Link

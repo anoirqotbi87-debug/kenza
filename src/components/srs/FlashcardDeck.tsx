@@ -62,7 +62,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
 
   if (!wordData) {
     return (
-      <div className="text-center p-12 text-[#7A7670] font-serif">
+      <div className="text-center p-12 text-[#7A7670] font-display">
         {t.dashboard?.loading || "Chargement..."}
       </div>
     );
@@ -122,10 +122,10 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
           <div className="absolute inset-0 backface-hidden bg-[#FDFCF8] rounded-[28px] shadow-sm border border-[#E8E2D5] p-8 flex flex-col items-center justify-between text-center select-none overflow-hidden">
             
             {/* Petits astérisques discrets aux angles */}
-            <span className="absolute top-4 left-4 text-[#C9A05C]/50 text-xs font-serif pointer-events-none select-none">✦</span>
-            <span className="absolute top-4 right-4 text-[#C9A05C]/50 text-xs font-serif pointer-events-none select-none">✦</span>
-            <span className="absolute bottom-4 left-4 text-[#C9A05C]/50 text-xs font-serif pointer-events-none select-none">✦</span>
-            <span className="absolute bottom-4 right-4 text-[#C9A05C]/50 text-xs font-serif pointer-events-none select-none">✦</span>
+            <span className="absolute top-4 left-4 text-[#C9A05C]/50 text-xs font-display pointer-events-none select-none">✦</span>
+            <span className="absolute top-4 right-4 text-[#C9A05C]/50 text-xs font-display pointer-events-none select-none">✦</span>
+            <span className="absolute bottom-4 left-4 text-[#C9A05C]/50 text-xs font-display pointer-events-none select-none">✦</span>
+            <span className="absolute bottom-4 right-4 text-[#C9A05C]/50 text-xs font-display pointer-events-none select-none">✦</span>
 
             {/* Kicker supérieur */}
             <div className="flex items-center gap-2 text-[#C9A05C] text-xs font-bold tracking-[0.22em] uppercase">
@@ -139,7 +139,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
                 <CardIllustration illustration={wordData.illustration} />
               </div>
               
-              <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-[#1B2A4A] tracking-tight">
+              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-normal text-[#1B2A4A] tracking-tight">
                 {getLocalizedText(wordData.translation, lang)}
               </h2>
             </div>
@@ -157,10 +157,10 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
             style={{ transform: 'rotateX(180deg)' }}
           >
             {/* Petits astérisques discrets aux angles */}
-            <span className="absolute top-4 left-4 text-[#C9A05C]/50 text-xs font-serif pointer-events-none select-none">✦</span>
-            <span className="absolute top-4 right-4 text-[#C9A05C]/50 text-xs font-serif pointer-events-none select-none">✦</span>
-            <span className="absolute bottom-4 left-4 text-[#C9A05C]/50 text-xs font-serif pointer-events-none select-none">✦</span>
-            <span className="absolute bottom-4 right-4 text-[#C9A05C]/50 text-xs font-serif pointer-events-none select-none">✦</span>
+            <span className="absolute top-4 left-4 text-[#C9A05C]/50 text-xs font-display pointer-events-none select-none">✦</span>
+            <span className="absolute top-4 right-4 text-[#C9A05C]/50 text-xs font-display pointer-events-none select-none">✦</span>
+            <span className="absolute bottom-4 left-4 text-[#C9A05C]/50 text-xs font-display pointer-events-none select-none">✦</span>
+            <span className="absolute bottom-4 right-4 text-[#C9A05C]/50 text-xs font-display pointer-events-none select-none">✦</span>
 
             {/* Bouton audio écouteurs ronds */}
             <button 
@@ -184,7 +184,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
               
               {/* Display Logic Based on Notation Preference */}
               {(preferredNotation === 'arabizi' || preferredNotation === 'duo') && (
-                <div className="font-serif text-4xl sm:text-5xl font-bold text-[#1B2A4A] tracking-tight">
+                <div className="font-display text-4xl sm:text-5xl font-bold text-[#1B2A4A] tracking-tight">
                   {formatArabizi(wordData.arabizi)}
                 </div>
               )}
@@ -199,7 +199,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
               {wordData.example && (
                 <div className="mt-4 p-3.5 bg-[#F7F3EA] rounded-2xl border border-[#E8E2D5] text-left text-xs space-y-1">
                   <div className="text-[#C9A05C] font-bold text-[10px] tracking-wider uppercase">En contexte</div>
-                  <div className="font-serif font-bold text-sm text-[#1B2A4A]">
+                  <div className="font-display font-bold text-sm text-[#1B2A4A]">
                     {preferredNotation === 'arabic' ? wordData.example.arabic : wordData.example.arabizi}
                   </div>
                   <div className="text-[#7A7670] italic">
@@ -231,7 +231,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
           onClick={(e) => { e.stopPropagation(); handleGrade('again'); }}
           className="py-3.5 px-3 bg-[#FDFCF8] hover:bg-red-50 border border-red-200 text-red-700 rounded-2xl transition-all shadow-xs flex flex-col items-center justify-center active:scale-95 group"
         >
-          <span className="font-serif font-bold text-sm sm:text-base group-hover:scale-105 transition-transform">
+          <span className="font-display font-bold text-sm sm:text-base group-hover:scale-105 transition-transform">
             {t.srs?.again || "Encore"}
           </span>
           <span className="text-[11px] font-semibold text-red-500/80 mt-0.5">
@@ -244,7 +244,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
           onClick={(e) => { e.stopPropagation(); handleGrade('hard'); }}
           className="py-3.5 px-3 bg-[#FDFCF8] hover:bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl transition-all shadow-xs flex flex-col items-center justify-center active:scale-95 group"
         >
-          <span className="font-serif font-bold text-sm sm:text-base group-hover:scale-105 transition-transform">
+          <span className="font-display font-bold text-sm sm:text-base group-hover:scale-105 transition-transform">
             {t.srs?.hard || "Difficile"}
           </span>
           <span className="text-[11px] font-semibold text-amber-600 mt-0.5">
@@ -257,7 +257,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
           onClick={(e) => { e.stopPropagation(); handleGrade('good'); }}
           className="py-3.5 px-3 bg-[#FDFCF8] hover:bg-[#7A9174]/10 border border-[#7A9174]/50 text-[#7A9174] rounded-2xl transition-all shadow-xs flex flex-col items-center justify-center active:scale-95 group"
         >
-          <span className="font-serif font-bold text-sm sm:text-base group-hover:scale-105 transition-transform">
+          <span className="font-display font-bold text-sm sm:text-base group-hover:scale-105 transition-transform">
             {t.srs?.good || "Bien"}
           </span>
           <span className="text-[11px] font-semibold text-[#7A9174] mt-0.5">
@@ -270,7 +270,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
           onClick={(e) => { e.stopPropagation(); handleGrade('easy'); }}
           className="py-3.5 px-3 bg-[#FDFCF8] hover:bg-[#1B2A4A]/5 border border-[#1B2A4A]/30 text-[#1B2A4A] rounded-2xl transition-all shadow-xs flex flex-col items-center justify-center active:scale-95 group"
         >
-          <span className="font-serif font-bold text-sm sm:text-base group-hover:scale-105 transition-transform">
+          <span className="font-display font-bold text-sm sm:text-base group-hover:scale-105 transition-transform">
             {t.srs?.easy || "Facile"}
           </span>
           <span className="text-[11px] font-semibold text-[#C9A05C] mt-0.5">

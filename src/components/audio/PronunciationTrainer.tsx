@@ -176,7 +176,7 @@ export default function PronunciationTrainer({
         <div className="text-3xl sm:text-4xl font-arabic text-[#1B2A4A] leading-relaxed select-all">
           {currentExercise.arabic}
         </div>
-        <div className="font-serif text-xl sm:text-2xl font-bold text-[#1B2A4A]">
+        <div className="font-display text-xl sm:text-2xl font-bold text-[#1B2A4A]">
           {currentExercise.arabizi}
         </div>
         <div className="text-xs sm:text-sm text-[#7A7670] italic">
@@ -298,7 +298,7 @@ export default function PronunciationTrainer({
                   </div>
                 </div>
               </div>
-              <div className="text-xl font-bold font-serif text-[#1B2A4A]">
+              <div className="text-xl font-bold font-display text-[#1B2A4A]">
                 {evaluation.score}%
               </div>
             </div>
