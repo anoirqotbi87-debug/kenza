@@ -61,7 +61,9 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const { messages, personaId } = await req.json();
+    const body = await req.json();
+    const messages = body?.messages;
+    const personaParam = (body?.personaId || body?.persona) as PersonaId;
 
     // 4. Payload Validation
     if (!messages || !Array.isArray(messages)) {
@@ -83,9 +85,9 @@ export async function POST(req: NextRequest) {
     );
     if (totalChars > 4000) return new Response('Payload too large', { status: 400 });
 
-    const systemPrompt = getSystemPrompt(personaId as PersonaId);
+    const systemPrompt = getSystemPrompt(personaParam);
     if (!systemPrompt) {
-      return new Response('Invalid personaId', { status: 400 });
+      return new Response('Invalid persona or personaId', { status: 400 });
     }
 
     // Call the Gemini model using Vercel AI SDK
@@ -99,8 +101,19 @@ export async function POST(req: NextRequest) {
         temperature: 0.7,
         maxTokens: 300, // Short responses
       });
-    } catch (modelErr) {
-      console.warn(`[AI Roleplay] Primary model ${primaryModel} failed, trying fallback:`, modelErr);
+    } catch (modelErr: unknown) {
+      const errMsg = modelErr instanceof Error ? modelErr.message : String(modelErr);
+      const isAuthError = errMsg.includes('403') || errMsg.includes('PERMISSION_DENIED') || errMsg.includes('API_KEY_INVALID');
+
+      if (isAuthError) {
+        console.error('[AI Roleplay] Google AI Studio authentication error (403/PERMISSION_DENIED):', errMsg);
+        return new Response(JSON.stringify({
+          error: 'AI_AUTH_FAILED',
+          message: 'Google AI Studio authentication error. Check GOOGLE_GENERATIVE_AI_API_KEY.'
+        }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+      }
+
+      console.warn(`[AI Roleplay] Primary model ${primaryModel} failed (${errMsg}), trying fallback:`);
       const fallbackModel = primaryModel === 'gemini-3.8-flash' ? 'gemini-1.5-flash' : 'gemini-3.8-flash';
       result = await streamText({
         model: google(fallbackModel),
@@ -113,8 +126,12 @@ export async function POST(req: NextRequest) {
 
     // Return the streaming response
     return result.toDataStreamResponse();
-  } catch (error) {
-    console.error('API Roleplay Chat Error:', error);
-    return new Response('Internal Server Error', { status: 500 });
+  } catch (error: unknown) {
+    const errMsg = error instanceof Error ? error.message : String(error);
+    console.error('API Roleplay Chat Error:', errMsg);
+    return new Response(JSON.stringify({ error: 'INTERNAL_ERROR', message: errMsg }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 }
