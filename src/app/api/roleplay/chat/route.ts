@@ -4,22 +4,41 @@ import { getSystemPrompt, PersonaId } from '@/lib/ai/prompts';
 import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
+import { isAllowedOrigin } from '@/lib/allowedOrigins';
+import crypto from 'crypto';
 
-export const maxDuration = 30; // Allow max 30 seconds for streaming
+export const maxDuration = 30;
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Origin Check
+    const origin = req.headers.get('origin');
+    const referer = req.headers.get('referer');
     const fetchSite = req.headers.get('sec-fetch-site');
 
+    if (!origin && !referer && !fetchSite) {
+      return new Response('Forbidden: Missing origin headers', { status: 403 });
+    }
     if (fetchSite && fetchSite !== 'same-origin' && fetchSite !== 'same-site') {
       return new Response('Forbidden: Cross-site request blocked', { status: 403 });
+    }
+    if (origin && !isAllowedOrigin(origin)) {
+      return new Response('Forbidden: Origin not allowed', { status: 403 });
+    }
+    if (referer) {
+      try {
+        const refUrl = new URL(referer);
+        if (!isAllowedOrigin(refUrl.origin)) return new Response('Forbidden: Referer not allowed', { status: 403 });
+      } catch {
+        return new Response('Forbidden: Invalid referer', { status: 403 });
+      }
     }
 
     const ip = getClientIp(req);
 
-    // 2. Rate Limiting durable (Supabase) : 10 req/min par IP
     const perMinute = await checkRateLimit(`roleplay:ip:${ip}`, 10, 60 * 1000);
+    if (perMinute.error) {
+      return new Response('Service Unavailable (DB)', { status: 503 });
+    }
     if (!perMinute.allowed) {
       return new Response('Too Many Requests', { status: 429 });
     }
@@ -50,8 +69,12 @@ export async function POST(req: NextRequest) {
         }
       }
     } else {
-      // Mode Invité : quota de découverte 3 messages par IP et par jour (durable)
-      const guestQuota = await checkRateLimit(`roleplay:guest:${ip}`, 3, 24 * 60 * 60 * 1000);
+      const userAgent = req.headers.get('user-agent') || '';
+      const fingerprint = crypto.createHash('sha256').update(`${userAgent}${ip}`).digest('hex').substring(0, 16);
+      const guestQuota = await checkRateLimit(`roleplay:guest:${ip}:${fingerprint}`, 3, 24 * 60 * 60 * 1000);
+      if (guestQuota.error) {
+        return new Response('Service Unavailable (DB)', { status: 503 });
+      }
       if (!guestQuota.allowed) {
         return new Response(JSON.stringify({
           error: 'QUOTA_EXCEEDED',

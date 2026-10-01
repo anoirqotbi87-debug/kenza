@@ -3,6 +3,7 @@ import { MsEdgeTTS, OUTPUT_FORMAT } from 'msedge-tts';
 import { normalizeDarija } from '@/lib/tts/darijaPhonetics';
 import { buildSsml, TtsVoice, TtsSpeed } from '@/lib/tts/ssml';
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
+import { isAllowedOrigin } from '@/lib/allowedOrigins';
 
 async function synthesize(
   text: string,
@@ -40,12 +41,27 @@ async function synthesize(
 
 export async function POST(req: NextRequest) {
   try {
-    // Basic Security: Check referer or sec-fetch-site
+    const origin = req.headers.get('origin');
+    const referer = req.headers.get('referer');
     const secFetchSite = req.headers.get('sec-fetch-site');
+
+    if (!origin && !referer && !secFetchSite) {
+      return NextResponse.json({ error: 'UNAUTHORIZED_ORIGIN' }, { status: 403 });
+    }
     if (secFetchSite && secFetchSite !== 'same-origin' && secFetchSite !== 'same-site') {
       return NextResponse.json({ error: 'UNAUTHORIZED_ORIGIN' }, { status: 403 });
     }
-
+    if (origin && !isAllowedOrigin(origin)) {
+      return NextResponse.json({ error: 'UNAUTHORIZED_ORIGIN' }, { status: 403 });
+    }
+    if (referer) {
+      try {
+        const refUrl = new URL(referer);
+        if (!isAllowedOrigin(refUrl.origin)) return NextResponse.json({ error: 'UNAUTHORIZED_ORIGIN' }, { status: 403 });
+      } catch {
+        return NextResponse.json({ error: 'UNAUTHORIZED_ORIGIN' }, { status: 403 });
+      }
+    }
     // Rate limiting durable : 30 requêtes/min par IP
     const rate = await checkRateLimit(`tts:ip:${getClientIp(req)}`, 30, 60 * 1000);
     if (!rate.allowed) {
@@ -74,9 +90,26 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
+    const origin = req.headers.get('origin');
+    const referer = req.headers.get('referer');
     const secFetchSite = req.headers.get('sec-fetch-site');
+
+    if (!origin && !referer && !secFetchSite) {
+      return NextResponse.json({ error: 'UNAUTHORIZED_ORIGIN' }, { status: 403 });
+    }
     if (secFetchSite && secFetchSite !== 'same-origin' && secFetchSite !== 'same-site') {
       return NextResponse.json({ error: 'UNAUTHORIZED_ORIGIN' }, { status: 403 });
+    }
+    if (origin && !isAllowedOrigin(origin)) {
+      return NextResponse.json({ error: 'UNAUTHORIZED_ORIGIN' }, { status: 403 });
+    }
+    if (referer) {
+      try {
+        const refUrl = new URL(referer);
+        if (!isAllowedOrigin(refUrl.origin)) return NextResponse.json({ error: 'UNAUTHORIZED_ORIGIN' }, { status: 403 });
+      } catch {
+        return NextResponse.json({ error: 'UNAUTHORIZED_ORIGIN' }, { status: 403 });
+      }
     }
 
     // Rate limiting durable : 30 requêtes/min par IP
