@@ -90,55 +90,32 @@ export async function POST(req: NextRequest) {
       return new Response('Invalid persona or personaId', { status: 400 });
     }
 
-    // Call the Gemini model using Vercel AI SDK
+    // Appel direct : pas de repli, on échoue vite et on laisse le catch classer l'erreur.
     const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
-    let result;
-    try {
-      result = await streamText({
-        model: google(primaryModel),
-        system: systemPrompt,
-        messages,
-        temperature: 0.7,
-        maxTokens: 300, // Short responses
-        maxRetries: 0, // Pas de retry : 6 s de backoff par modele
-      });
-    } catch (modelErr: unknown) {
-      const errMsg = modelErr instanceof Error ? modelErr.message : String(modelErr);
-      // Le message d'un 403 Google est « Your project has been denied access... » : il ne
-      // contient ni « 403 » ni « PERMISSION_DENIED ». Seul `statusCode` est fiable.
-      const modelStatus = (modelErr as { statusCode?: number } | undefined)?.statusCode;
-      const isAuthError =
-        modelStatus === 401 ||
-        modelStatus === 403 ||
-        errMsg.includes('PERMISSION_DENIED') ||
-        errMsg.includes('API_KEY_INVALID');
-
-      if (isAuthError) {
-        console.error('[AI Roleplay] Google AI Studio authentication error (403/PERMISSION_DENIED):', errMsg);
-        return new Response(JSON.stringify({
-          error: 'AI_AUTH_FAILED',
-          message: 'Google AI Studio authentication error. Check GOOGLE_GENERATIVE_AI_API_KEY.'
-        }), { status: 500, headers: { 'Content-Type': 'application/json' } });
-      }
-
-      console.warn(`[AI Roleplay] Primary model ${primaryModel} failed (${errMsg}), trying fallback:`);
-      const fallbackModel = primaryModel === 'gemini-3.8-flash' ? 'gemini-1.5-flash' : 'gemini-3.8-flash';
-      result = await streamText({
-        model: google(fallbackModel),
-        system: systemPrompt,
-        messages,
-        temperature: 0.7,
-        maxTokens: 300,
-        maxRetries: 0,
-      });
-    }
+    const result = await streamText({
+      model: google(primaryModel),
+      system: systemPrompt,
+      messages,
+      temperature: 0.7,
+      maxTokens: 300, // Short responses
+      maxRetries: 0, // Pas de retry : 6 s de backoff par modele, pour rien
+    });
 
     // Return the streaming response
     return result.toDataStreamResponse();
   } catch (error: unknown) {
     const errMsg = error instanceof Error ? error.message : String(error);
+    // Le message d'un 403 Google est « Your project has been denied access... » : il ne
+    // contient ni « 403 » ni « PERMISSION_DENIED ». Seul `statusCode` est fiable.
     const status = (error as { statusCode?: number } | undefined)?.statusCode;
     console.error('API Roleplay Chat Error:', errMsg, '| upstream status:', status);
+
+    if (status === 401 || status === 403) {
+      return new Response(JSON.stringify({
+        error: 'AI_AUTH_FAILED',
+        message: 'Google AI Studio authentication error. Check GOOGLE_GENERATIVE_AI_API_KEY.'
+      }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    }
 
     // 429 (quota/rate limit) et 5xx sont transitoires : 503 le dit, 500 non.
     if (status === 429 || (status !== undefined && status >= 500)) {
