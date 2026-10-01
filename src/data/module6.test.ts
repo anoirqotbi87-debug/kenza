@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { module6Lessons } from './module6';
 import { fullCurriculum, allLessonsList } from './curriculum';
+import { isAcceptedAnswer } from '../lib/exerciseAnswers';
 import type { MultiLangText } from '../types/curriculum';
 
 const LANGS = ['fr', 'en', 'es', 'ar'] as const;
@@ -144,17 +145,19 @@ describe('module 6 — integrite des etapes', () => {
     }
   });
 
-  it('chaque exercice a trou a une seule bonne reponse', () => {
-    // Sauf l'exercice des pronoms affixes du module 6 (voir module6.test.ts) :
-    // deux formes y sont legitimes (« 3tii-ni » et « 3tii-liya »), et le runner
-    // ne lit que `answer`. Exception actee, pas masquee.
+  it('chaque exercice a trou accepte toutes ses bonnes reponses', () => {
+    // Certains exercices ont plusieurs reponses justes : variantes regionales ou
+    // synonymes (ex. « 3tii-ni » et « 3tii-liya »). `acceptedAnswers` doit alors
+    // couvrir chaque option marquee `isCorrect`, sinon une bonne reponse est
+    // comptee fausse par le runner.
     for (const lesson of lessons) {
       for (const step of lesson.steps) {
         const ex = step.exercise;
         if (!ex || ex.type !== 'fill-blank') continue;
         const where = `${lesson.id}.${step.id}`;
-        if (where === 'l_mod6_2.s5_exercise_fill_2') continue;
-        expect(ex.options!.filter((o) => o.isCorrect).length, `${where} deux bonnes reponses`).toBe(1);
+        for (const option of ex.options!.filter((o) => o.isCorrect)) {
+          expect(isAcceptedAnswer(ex, option.id), `${where} refuse ${option.id}`).toBe(true);
+        }
       }
     }
   });

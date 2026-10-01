@@ -13,6 +13,7 @@ import { playAudio } from '../lib/audio';
 import { track } from '../lib/tracking';
 import ConjugationTable from './grammar/ConjugationTable';
 import { getLocalizedText } from '../lib/i18n/utils';
+import { isAcceptedAnswer } from '../lib/exerciseAnswers';
 import { renderArabiziWithBadges } from './ui/PhoneticBadge';
 import confetti from 'canvas-confetti';
 
@@ -77,7 +78,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
       correct = orderedWords.length === answerArr.length && 
                 orderedWords.every((id, idx) => id === answerArr[idx]);
     } else if (type === 'fill-blank') {
-      correct = selectedBlankId === answer;
+      correct = isAcceptedAnswer(step.exercise, selectedBlankId);
     } else if (type === 'matching' || type === 'match') {
       const correctMapping = step.exercise.pairs?.reduce((acc, p) => {
         acc[p.id] = p.id;

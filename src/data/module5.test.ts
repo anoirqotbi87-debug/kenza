@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { module5Lessons } from './module5';
 import { fullCurriculum, allLessonsList } from './curriculum';
+import { isAcceptedAnswer } from '../lib/exerciseAnswers';
 import type { MultiLangText } from '../types/curriculum';
 
 const LANGS = ['fr', 'en', 'es', 'ar'] as const;
@@ -120,16 +121,18 @@ describe('module 5 — integrite des etapes', () => {
     }
   });
 
-  it('aucun QCM ni exercice a trou ne porte deux bonnes reponses', () => {
-    // Une option `isCorrect` que le runner n'accepte pas (il ne lit que `answer`)
-    // fait passer une bonne reponse pour une faute. Les `reorder` sont exclus :
-    // ils marquent legitimement toutes leurs tuiles `isCorrect`.
+  it('aucune bonne reponse n est refusee par le runner', () => {
+    // Une option `isCorrect` non couverte par `answer`/`acceptedAnswers` ferait
+    // passer une bonne reponse pour une faute. Les `reorder` sont exclus : ils
+    // marquent legitimement toutes leurs tuiles `isCorrect`.
     for (const lesson of lessons) {
       for (const step of lesson.steps) {
         const ex = step.exercise;
         if (!ex || (ex.type !== 'mcq' && ex.type !== 'fill-blank')) continue;
         const where = `${lesson.id}.${step.id}`;
-        expect(ex.options!.filter((o) => o.isCorrect).length, `${where} deux bonnes reponses`).toBe(1);
+        for (const option of ex.options!.filter((o) => o.isCorrect)) {
+          expect(isAcceptedAnswer(ex, option.id), `${where} refuse ${option.id}`).toBe(true);
+        }
       }
     }
   });
