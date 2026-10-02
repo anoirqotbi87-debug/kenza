@@ -142,6 +142,7 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
       {/* Header Progress */}
       <div className="bg-[#FDFCF8] px-4 py-4 flex items-center gap-4 shadow-xs border-b border-[#E8E2D5] relative z-10">
         <button 
+        aria-label={t.common.close}
           onClick={onClose} 
           className="p-2 text-[#7A7670] hover:text-[#1B2A4A] hover:bg-[#E8E2D5]/50 rounded-full transition-colors"
         >

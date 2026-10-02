@@ -90,7 +90,7 @@ export default function InstallPwaBanner() {
           </button>
         )}
       </div>
-      <button onClick={handleDismiss} className="p-1 hover:bg-slate-700 rounded-full shrink-0">
+      <button aria-label={t.common.close} onClick={handleDismiss} className="p-1 hover:bg-slate-700 rounded-full shrink-0">
         <X className="w-4 h-4 text-slate-400" />
       </button>
     </div>

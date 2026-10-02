@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import { DialogueScenario } from '../../types/dialogue';
 import { useDialogueRunner } from '../../hooks/useDialogueRunner';
-import { useAppStore } from '../../store/useAppStore';
+import { useAppStore, useTranslation } from '../../store/useAppStore';
 import DialogueBubble from './DialogueBubble';
 import DialogueUserInput from './DialogueUserInput';
 import DialogueSummaryModal from './DialogueSummaryModal';
@@ -16,6 +16,7 @@ interface DialogueViewProps {
 
 export default function DialogueView({ scenario, onExit }: DialogueViewProps) {
   const { soundEnabled, toggleSound, addXp } = useAppStore();
+  const { t } = useTranslation();
   const {
     state,
     currentTurn,
@@ -48,6 +49,7 @@ export default function DialogueView({ scenario, onExit }: DialogueViewProps) {
       <div className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-sm z-10">
         <div className="flex items-center gap-3">
           <button 
+          aria-label={t.common.back}
             onClick={onExit}
             className="p-2 hover:bg-slate-100 rounded-full transition-colors"
           >
