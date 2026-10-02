@@ -152,7 +152,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
       {/* HEADER */}
       <div className="bg-[#FDFCF8] px-4 py-3.5 flex items-center justify-between shadow-xs border-b border-[#E8E2D5] z-10 sticky top-0">
         <div className="flex items-center gap-3">
-          <button onClick={onClose} className="p-2 -ml-2 rounded-full hover:bg-[#E8E2D5]/50 text-[#7A7670] hover:text-[#1B2A4A] transition-colors">
+          <button aria-label={t.common.back} onClick={onClose} className="p-2 -ml-2 rounded-full hover:bg-[#E8E2D5]/50 text-[#7A7670] hover:text-[#1B2A4A] transition-colors">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
           </button>
           <div>

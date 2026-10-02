@@ -154,6 +154,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 'l
         tabIndex={-1}
       >
         <button 
+        aria-label={t.common.close}
           onClick={onClose}
           className="absolute top-4 right-4 p-2 text-[#7A7670] hover:text-[#1B2A4A] bg-[#F7F3EA] hover:bg-[#E8E2D5] border border-[#E8E2D5] rounded-full transition-colors z-10 shadow-xs"
         >

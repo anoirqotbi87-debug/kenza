@@ -253,6 +253,7 @@ export default function SpeechTrainer() {
             {/* Zone d'enregistrement */}
             <div className="flex flex-col items-center gap-3">
               <button
+              aria-label={isListening ? t.modules.speech.listening : t.modules.speech.pressMic}
                 onClick={toggleListening}
                 className={`
                   w-20 h-20 rounded-full flex items-center justify-center shadow-lg transition-all duration-300

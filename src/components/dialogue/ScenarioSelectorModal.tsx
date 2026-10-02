@@ -92,6 +92,7 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
             </p>
           </div>
           <button 
+          aria-label={t.common.close}
             onClick={onClose}
             className="p-2 hover:bg-white/10 rounded-full text-[#E8E2D5] hover:text-[#FDFCF8] transition-colors"
           >
