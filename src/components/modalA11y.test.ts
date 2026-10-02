@@ -137,6 +137,38 @@ describe('audit UI — contraste du texte secondaire (point 9)', () => {
       expect(block, `${selector} n'utilise pas var(--muted-ink)`).toContain('var(--muted-ink)');
     }
   });
+
+  /**
+   * Chaque texte du panneau latéral est vérifié contre SON fond réel, pas contre `--paper` :
+   * la carte d'objectif a son propre dégradé et le compteur de navigation sa propre pastille.
+   * Comparer tout au même fond donnerait des chiffres faux dans les deux sens.
+   */
+  const SIDEBAR_TEXT: Array<[string, string, string, string]> = [
+    // sélecteur, fond réel (pire cas du dégradé), seuil, intitulé
+    ['.sidebar-label', PAPER, '4.5', 'libellé de section'],
+    ['.brand-tagline', PAPER, '4.5', 'accroche de marque'],
+    ['.sidebar-footer', PAPER, '4.5', 'pied de panneau'],
+    ['.nav-item', PAPER, '4.5', 'entrée de navigation'],
+    ['.goal-topline', '#faf6ec', '4.5', 'ligne d\'objectif'],
+    ['.goal-topline span:last-child', '#faf6ec', '4.5', 'compteur d\'objectif'],
+    ['.goal-link', '#faf6ec', '4.5', 'lien d\'objectif'],
+    ['.nav-count', '#f2e4c5', '4.5', 'badge de révision'],
+  ];
+
+  it.each(SIDEBAR_TEXT)('%s : %s atteint AA sur son fond réel', (selector, background, threshold, label) => {
+    const start = css.indexOf(`${selector} {`);
+    expect(start, `${selector} introuvable dans globals.css`).toBeGreaterThan(-1);
+    const block = css.slice(start, css.indexOf('}', start));
+    const declared = block.match(/color:\s*(#[0-9a-f]{6}|var\(--[a-z-]+\))/i);
+    expect(declared, `${selector} ne déclare aucune couleur de texte`).not.toBeNull();
+
+    const raw = declared![1];
+    const color = raw.startsWith('var(')
+      ? css.match(new RegExp(`--${raw.slice(6, -1)}:\\s*(#[0-9a-f]{6})`, 'i'))![1]
+      : raw;
+
+    expect(contrastRatio(color, background), `${label} (${selector}, ${color} sur ${background})`).toBeGreaterThanOrEqual(Number(threshold));
+  });
 });
 
 describe('audit UI — annonce des messages temporaires (point 12)', () => {
