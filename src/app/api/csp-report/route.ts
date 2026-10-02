@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 import { getErrorMessage } from '@/lib/errors';
+import { persistCspViolations, type CspViolation } from '@/lib/cspPersistence';
 
 /** Un rapport CSP légitime fait quelques centaines d'octets. */
 const MAX_BODY_BYTES = 8 * 1024;
@@ -22,11 +23,7 @@ function sanitize(value: unknown): string {
   return value.replace(CONTROL_CHARS, ' ').slice(0, MAX_FIELD_LENGTH);
 }
 
-type Violation = {
-  directive: string;
-  blockedUri: string;
-  documentUri: string;
-};
+type Violation = CspViolation;
 
 /** Extrait les violations des deux formats : `csp-report` (legacy) et Reporting API. */
 function extractViolations(payload: unknown): Violation[] {
@@ -57,13 +54,18 @@ function extractViolations(payload: unknown): Violation[] {
  * Le contrôle d'origine fail-closed des autres routes n'est **pas** appliqué
  * ici : un navigateur n'envoie ni `Origin` ni `Referer` sur un rapport CSP, donc
  * l'appliquer rejetterait 100 % des rapports légitimes. Le corps est en revanche
- * traité comme une entrée hostile : taille bornée, champs filtrés, aucune
- * persistance.
+ * traité comme une entrée hostile : taille bornée, champs filtrés, caractères de
+ * contrôle neutralisés avant journalisation.
+ *
+ * Les violations sont persistées dans `csp_violations` (service_role) pour la fenêtre
+ * d'observation de 48 h : la rétention des logs Vercel (1 h en Hobby, 24 h en Pro) ne
+ * permet pas de couvrir cette durée. L'écriture est planifiée via `after()` : elle
+ * s'exécute une fois la réponse envoyée, donc sans ajouter de latence au navigateur.
  *
  * Le rate limiting est volontairement **fail-open** (contrairement à `/api/tts`) :
- * ce point de collecte ne fait aucun travail coûteux et n'écrit rien en base, et
- * le rendre fail-closed le rendrait aveugle au moment précis où l'infrastructure
- * vacille — soit exactement le défaut que ce collecteur corrige.
+ * ce point de collecte ne fait aucun travail coûteux pour le client, et le rendre
+ * fail-closed le rendrait aveugle au moment précis où l'infrastructure vacille —
+ * soit exactement le défaut que ce collecteur corrige.
  */
 export async function POST(req: NextRequest) {
   try {
@@ -86,8 +88,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'INVALID_JSON' }, { status: 400 });
     }
 
-    for (const violation of extractViolations(payload)) {
+    const violations = extractViolations(payload);
+    for (const violation of violations) {
       console.warn('[CSP Violation]', JSON.stringify(violation));
+    }
+
+    if (violations.length > 0) {
+      // Tache de fond : `after()` s'execute apres l'envoi de la reponse, donc la
+      // persistance ne retarde pas le navigateur.
+      after(() => persistCspViolations(violations));
     }
 
     return new NextResponse(null, { status: 204 });
