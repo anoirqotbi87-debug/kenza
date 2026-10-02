@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.kenza.darija",
+      "sha256_cert_fingerprints": [
+        "52:A1:F2:80:68:92:DD:7D:5F:21:4C:B7:A8:CB:83:AD:74:93:DF:08:25:B0:D1:E1:D2:BC:E1:48:63:91:60:B6"
+      ]
+    }
+  }
+]
