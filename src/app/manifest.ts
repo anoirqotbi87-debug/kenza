@@ -11,6 +11,9 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: '#FFFFFF',
     theme_color: '#0B2545',
     dir: 'auto',
+    // `purpose` n'accepte qu'UNE valeur ici : le type `MetadataRoute.Manifest` de Next est plus
+    // strict que la spec W3C, qui autorise « any maskable ». La valeur combinee est declaree
+    // dans public/manifest.json, que Bubblewrap lit (webManifestUrl).
     icons: [
       {
         src: '/icons/icon-192x192.png',
