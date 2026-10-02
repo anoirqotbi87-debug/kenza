@@ -2,10 +2,12 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
+  // start_url de la TWA : servir la racine en 200 (rewrite) plutot qu'en 307.
+  // Une redirection ferait apparaitre la barre d'adresse de Chrome au lancement.
   if (request.nextUrl.pathname === '/fr') {
     const url = request.nextUrl.clone();
     url.pathname = '/';
-    const response = NextResponse.redirect(url);
+    const response = NextResponse.rewrite(url);
     response.cookies.set('kenza-lang', 'fr', { path: '/', maxAge: 31536000 });
     return response;
   }

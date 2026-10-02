@@ -1,11 +1,13 @@
 {
   "name": "Kenza — Apprendre le Darija",
   "short_name": "Kenza",
+  "description": "Plateforme interactive d'apprentissage de la Darija",
   "start_url": "/fr",
   "display": "standalone",
   "orientation": "portrait",
-  "theme_color": "#0B2545",
   "background_color": "#FFFFFF",
+  "theme_color": "#0B2545",
+  "dir": "auto",
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
