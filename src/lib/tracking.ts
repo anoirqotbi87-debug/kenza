@@ -1,6 +1,7 @@
 // Suivi des sources d'acquisition et du parcours utilisateur (tables Supabase : funnel_events, user_attribution).
 // Ne bloque jamais l'application : toutes les erreurs de suivi sont silencieuses.
 import { supabase } from './supabase';
+import type { Json } from '../types/database.types';
 
 const ANON_KEY = 'kenza_anon_id';
 const TOUCH_KEY = 'kenza_first_touch';
@@ -87,7 +88,7 @@ export async function track(eventName: string, properties: Record<string, unknow
       utm_campaign: params.get('utm_campaign') ?? touch.utm_campaign ?? null,
       utm_content: params.get('utm_content') ?? touch.utm_content ?? null,
       utm_term: params.get('utm_term') ?? touch.utm_term ?? null,
-      properties,
+      properties: properties as Json,
     });
   } catch {
     /* le suivi ne doit jamais casser l'app */

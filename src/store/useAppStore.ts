@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { User } from '@supabase/supabase-js';
 import { persist } from 'zustand/middleware';
 import { Notation } from '../types/curriculum';
+export type { Notation };
 import { SRSCard, ReviewGrade, CustomVocabularyItem } from '../types/srs';
 
 import { UILanguage, translations } from '../lib/i18n/translations';

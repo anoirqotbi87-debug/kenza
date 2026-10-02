@@ -1,5 +1,5 @@
 import { supabase, withSessionRefresh } from './supabase';
-import { useAppStore } from '../store/useAppStore';
+import { useAppStore, type Notation } from '../store/useAppStore';
 import { SRSCard } from '../types/srs';
 
 export const syncService = {
@@ -102,11 +102,11 @@ export const syncService = {
       const mergedBadges = Array.from(new Set([...cloudBadges, ...localBadges]));
 
       useAppStore.setState({
-        xp: profile.xp,
-        streakDays: profile.streak_days,
+        xp: profile.xp ?? 0,
+        streakDays: profile.streak_days ?? 0,
         streakFreezes: profile.streak_freezes ?? 1,
         unlockedBadges: mergedBadges,
-        preferredNotation: profile.script_preference
+        preferredNotation: (profile.script_preference as Notation) ?? 'arabizi'
       });
     }
 
@@ -145,11 +145,11 @@ export const syncService = {
         newDeck[item.word_id] = {
           id: `card_${item.word_id}`,
           wordId: item.word_id,
-          interval: item.interval,
-          repetition: item.repetition,
-          easeFactor: Number(item.ease_factor),
-          dueDate: item.due_date,
-          state: item.state as SRSCard['state']
+          interval: item.interval ?? 0,
+          repetition: item.repetition ?? 0,
+          easeFactor: Number(item.ease_factor) || 2.5,
+          dueDate: item.due_date ?? new Date().toISOString(),
+          state: (item.state as SRSCard['state']) || 'new'
         };
       });
       useAppStore.setState({ srsDeck: newDeck });
