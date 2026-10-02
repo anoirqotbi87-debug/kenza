@@ -32,47 +32,6 @@ export type Database = {
         }
         Relationships: []
       }
-      bookings: {
-        Row: {
-          created_at: string | null
-          end_date: string
-          external_uid: string | null
-          guest_name: string
-          id: string
-          property_id: string | null
-          source: string | null
-          start_date: string
-        }
-        Insert: {
-          created_at?: string | null
-          end_date: string
-          external_uid?: string | null
-          guest_name: string
-          id?: string
-          property_id?: string | null
-          source?: string | null
-          start_date: string
-        }
-        Update: {
-          created_at?: string | null
-          end_date?: string
-          external_uid?: string | null
-          guest_name?: string
-          id?: string
-          property_id?: string | null
-          source?: string | null
-          start_date?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "bookings_property_id_fkey"
-            columns: ["property_id"]
-            isOneToOne: false
-            referencedRelation: "properties"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       checkpoint_lessons: {
         Row: {
           checkpoint_id: string
@@ -87,41 +46,6 @@ export type Database = {
           lesson_id?: string
         }
         Relationships: []
-      }
-      cleaning_reports: {
-        Row: {
-          created_at: string | null
-          id: string
-          notes: string | null
-          property_id: string | null
-          report_date: string
-          status: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          notes?: string | null
-          property_id?: string | null
-          report_date: string
-          status: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          notes?: string | null
-          property_id?: string | null
-          report_date?: string
-          status?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "cleaning_reports_property_id_fkey"
-            columns: ["property_id"]
-            isOneToOne: false
-            referencedRelation: "properties"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       csp_violations: {
         Row: {
@@ -146,41 +70,6 @@ export type Database = {
           id?: number
         }
         Relationships: []
-      }
-      financial_statements: {
-        Row: {
-          created_at: string | null
-          id: string
-          period: string
-          property_id: string | null
-          total_expenses: number
-          total_revenue: number
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          period: string
-          property_id?: string | null
-          total_expenses: number
-          total_revenue: number
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          period?: string
-          property_id?: string | null
-          total_expenses?: number
-          total_revenue?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "financial_statements_property_id_fkey"
-            columns: ["property_id"]
-            isOneToOne: false
-            referencedRelation: "properties"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       funnel_events: {
         Row: {
@@ -227,45 +116,6 @@ export type Database = {
           utm_medium?: string | null
           utm_source?: string | null
           utm_term?: string | null
-        }
-        Relationships: []
-      }
-      leads: {
-        Row: {
-          created_at: string | null
-          email: string | null
-          formula: string | null
-          id: string
-          message: string | null
-          name: string
-          phone: string | null
-          property_type: string | null
-          status: string | null
-          zone: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          email?: string | null
-          formula?: string | null
-          id?: string
-          message?: string | null
-          name: string
-          phone?: string | null
-          property_type?: string | null
-          status?: string | null
-          zone?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          email?: string | null
-          formula?: string | null
-          id?: string
-          message?: string | null
-          name?: string
-          phone?: string | null
-          property_type?: string | null
-          status?: string | null
-          zone?: string | null
         }
         Relationships: []
       }
@@ -361,42 +211,6 @@ export type Database = {
           updated_at?: string
           username?: string | null
           xp?: number | null
-        }
-        Relationships: []
-      }
-      properties: {
-        Row: {
-          address: string | null
-          airbnb_ical_url: string | null
-          booking_ical_url: string | null
-          created_at: string | null
-          ical_feed_token: string | null
-          id: string
-          last_ical_sync: string | null
-          owner_id: string
-          title: string
-        }
-        Insert: {
-          address?: string | null
-          airbnb_ical_url?: string | null
-          booking_ical_url?: string | null
-          created_at?: string | null
-          ical_feed_token?: string | null
-          id?: string
-          last_ical_sync?: string | null
-          owner_id: string
-          title: string
-        }
-        Update: {
-          address?: string | null
-          airbnb_ical_url?: string | null
-          booking_ical_url?: string | null
-          created_at?: string | null
-          ical_feed_token?: string | null
-          id?: string
-          last_ical_sync?: string | null
-          owner_id?: string
-          title?: string
         }
         Relationships: []
       }
@@ -526,6 +340,7 @@ export type Database = {
         Returns: string
       }
       clean_probe_csp_violations: { Args: never; Returns: number }
+      cleanup_external_schema: { Args: never; Returns: string }
       complete_lesson: {
         Args: { p_lesson_id: string; p_score?: number }
         Returns: undefined
