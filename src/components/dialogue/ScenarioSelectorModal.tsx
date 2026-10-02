@@ -6,6 +6,7 @@ import type { DialogueScenario } from '../../types/dialogue';
 import DialogueView from './DialogueView';
 import Link from 'next/link';
 import { useAppStore, useTranslation } from '../../store/useAppStore';
+import { useDialog } from '../../hooks/useDialog';
 import { useNetwork } from '../../hooks/useNetwork';
 
 interface ScenarioSelectorModalProps {
@@ -16,6 +17,7 @@ interface ScenarioSelectorModalProps {
 }
 
 export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePremium, onStartSrs }: ScenarioSelectorModalProps) {
+  const { dialogRef } = useDialog(true, onClose);
   const { isPremium } = useAppStore();
   const { t } = useTranslation();
   const sc = t.modules.scenario;
@@ -72,7 +74,15 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#1B2A4A]/60 backdrop-blur-sm flex items-center justify-center p-4" dir={isAr ? 'rtl' : 'ltr'}>
+    <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="scenario-selector-title"
+      tabIndex={-1}
+      className="fixed inset-0 z-50 bg-[#1B2A4A]/60 backdrop-blur-sm flex items-center justify-center p-4"
+      dir={isAr ? 'rtl' : 'ltr'}
+    >
       <div className="bg-[#FDFCF8] rounded-[28px] w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border border-[#E8E2D5] animate-in zoom-in-95 duration-200">
         
         {/* Header */}
@@ -83,7 +93,7 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
               <span>—</span>
               <span>Immersion Active</span>
             </div>
-            <h2 className="font-display text-2xl font-bold flex items-center gap-2">
+            <h2 id="scenario-selector-title" className="font-display text-2xl font-bold flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-[#C9A05C]" />
               {modalTitle}
             </h2>

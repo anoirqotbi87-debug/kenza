@@ -15,6 +15,7 @@ import ConjugationTable from './grammar/ConjugationTable';
 import { getLocalizedText } from '../lib/i18n/utils';
 import { isAcceptedAnswer, isAcceptedOrder } from '../lib/exerciseAnswers';
 import { renderArabiziWithBadges } from './ui/PhoneticBadge';
+import { useDialog } from '../hooks/useDialog';
 import confetti from 'canvas-confetti';
 
 interface ExerciseRunnerProps {
@@ -45,14 +46,25 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
 
   const { preferredNotation, addXp, soundEnabled, audioSpeed, setAudioSpeed } = useAppStore();
 
+  // Le runner occupe tout l'ecran : c'est un dialogue modal au sens ARIA.
+  // Appel inconditionnel, avant les retours anticipes (regles des Hooks).
+  const { dialogRef } = useDialog(true, onClose);
+
   // --- Crash guard placé APRÈS tous les hooks (règles des Hooks React) ---
   if (!lesson || !Array.isArray(lesson.steps) || lesson.steps.length === 0) {
     console.error("[ExerciseRunner Crash Guard] Leçon manquante ou sans steps :", lesson);
     return (
-      <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="exercise-runner-title"
+        tabIndex={-1}
+        className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4"
+      >
         <div className="bg-white rounded-2xl p-6 max-w-md w-full text-center shadow-xl">
           <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">⚠️</div>
-          <h3 className="text-lg font-bold text-slate-800 mb-2">{t.lessons.unavailable}</h3>
+          <h3 id="exercise-runner-title" className="text-lg font-bold text-slate-800 mb-2">{t.lessons.unavailable}</h3>
           <p className="text-sm text-slate-500 mb-4">{t.lessons.unavailableDesc}</p>
           <button onClick={onClose} className="w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl hover:bg-blue-700">
             {t.lessons.backToDashboard}
@@ -143,9 +155,16 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
 
   if (lives === 0 && !isLessonFinished) {
     return (
-      <div className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-4 text-center">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="exercise-runner-title"
+        tabIndex={-1}
+        className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-4 text-center"
+      >
         <HeartCrack className="w-24 h-24 text-red-500 mb-6" />
-        <h2 className="text-3xl font-bold text-slate-800 mb-4">{t.lessons.gameOver}</h2>
+        <h2 id="exercise-runner-title" className="text-3xl font-bold text-slate-800 mb-4">{t.lessons.gameOver}</h2>
         <button onClick={onClose} className="px-8 py-4 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-2xl font-bold text-lg">
           {t.lessons.retry}
         </button>
@@ -155,11 +174,18 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
 
   if (isLessonFinished) {
     return (
-      <div className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-4 text-center animate-in fade-in zoom-in duration-300">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="exercise-runner-title"
+        tabIndex={-1}
+        className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-4 text-center animate-in fade-in zoom-in duration-300"
+      >
         <div className="w-32 h-32 bg-amber-100 rounded-full flex items-center justify-center mb-8 shadow-inner border-4 border-amber-50">
           <Trophy className="w-16 h-16 text-amber-500" />
         </div>
-        <h2 className="text-4xl font-black text-amber-500 mb-2">{t.lessons.congrats}</h2>
+        <h2 id="exercise-runner-title" className="text-4xl font-black text-amber-500 mb-2">{t.lessons.congrats}</h2>
 
         <div className={`flex gap-8 ${finishExtra ? 'mb-6' : 'mb-12'}`}>
           <div className="bg-blue-50 border border-blue-100 p-6 rounded-3xl min-w-[140px]">
@@ -326,7 +352,19 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
   };
 
   return (
-    <div className="fixed inset-0 bg-[#F7F3EA] text-[#1B2A4A] z-50 flex flex-col">
+    <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="exercise-runner-title"
+      tabIndex={-1}
+      className="fixed inset-0 bg-[#F7F3EA] text-[#1B2A4A] z-50 flex flex-col"
+    >
+      {/* Titre du dialogue : nomme la modale pour les lecteurs d'ecran.
+          `sr-only` le masque visuellement : aucun changement de rendu. */}
+      <h2 id="exercise-runner-title" className="sr-only">
+        {typeof lesson.title === 'string' ? lesson.title : getLocalizedText(lesson.title, lang)}
+      </h2>
       {/* Header */}
       <header className="p-4 bg-[#FDFCF8] border-b border-[#E8E2D5] flex items-center gap-6 max-w-5xl mx-auto w-full shadow-xs">
         <button
