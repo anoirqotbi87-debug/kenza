@@ -3,13 +3,20 @@
 import { useState } from 'react';
 import { ArrowRight, Check, Clock, Compass, Heart, Plane, Sparkles } from 'lucide-react';
 import { useAppStore, useTranslation } from '../../store/useAppStore';
+import { useDialog } from '../../hooks/useDialog';
 
 /**
  * Questionnaire d'entrée (2 étapes) menant à l'écran de fin qui déclenche le
  * paywall personnalisé. Les réponses alimentent `completeOnboarding`, dont
  * dépend le Trigger 1.
  */
+const noop = () => {};
+
 export default function OnboardingModal({ onComplete }: { onComplete: () => void }) {
+  // Cette modale n'a pas de sortie par Escape : ses seuls chemins de sortie sont les boutons
+  // qu'elle affiche. On passe donc un `onClose` inerte — sinon une frappe d'Escape pendant la
+  // personnalisation la ferait disparaitre, alors que rien ne le permettait avant.
+  const { dialogRef } = useDialog(true, noop);
   const { t } = useTranslation();
   const onb = t.onboarding;
   const completeOnboarding = useAppStore((s) => s.completeOnboarding);
@@ -33,14 +40,17 @@ export default function OnboardingModal({ onComplete }: { onComplete: () => void
   return (
     <div className="fixed inset-0 z-[110] bg-[#1B2A4A]/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
       <div
+        ref={dialogRef}
         className="bg-[#FDFCF8] rounded-3xl w-full max-w-lg shadow-2xl border border-[#E8E2D5] p-6 sm:p-8 my-auto"
         role="dialog"
         aria-modal="true"
+        aria-labelledby="onboarding-modal-title"
+        tabIndex={-1}
       >
         <span className="text-xs font-bold tracking-[0.2em] uppercase text-[#C9A05C]">
           — {onb.kicker}
         </span>
-        <h2 className="font-display text-2xl sm:text-3xl text-[#1B2A4A] mt-2 mb-1">{onb.title}</h2>
+        <h2 id="onboarding-modal-title" className="font-display text-2xl sm:text-3xl text-[#1B2A4A] mt-2 mb-1">{onb.title}</h2>
         <p className="text-[11px] text-[#7A7670] mb-6">
           {onb.step.replace('{current}', String(step + 1)).replace('{total}', '2')}
         </p>

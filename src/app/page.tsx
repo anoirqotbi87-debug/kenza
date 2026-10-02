@@ -532,10 +532,25 @@ export default function Home() {
     ? getSavePromptVariant(completedCount, streakDays)
     : null;
 
+  // Arrière-plan inerte pendant qu'un dialogue est ouvert : les éléments de fond sont
+  // retirés de l'ordre de tabulation ET de l'arbre d'accessibilité (React 19 rend `inert`
+  // en attribut natif). On ne peut pas poser `aria-hidden` sur `.app-shell` : les modales
+  // sont ses enfants, elles seraient masquées avec lui.
+  const backgroundInert =
+    showScenarioSelector ||
+    activePersonaId !== null ||
+    checkpointOpen !== null ||
+    onboardingOpen ||
+    activePricingSource !== null ||
+    authMode !== null;
+
   return (
     <div className="app-shell">
       {/* Sidebar Desktop & Mobile Slideout */}
-      <aside className={`sidebar ${mobileMenuOpen ? "sidebar-open" : ""}`}>
+      <aside
+        className={`sidebar ${mobileMenuOpen ? "sidebar-open" : ""}`}
+        inert={backgroundInert}
+      >
         <div className="brand-lockup">
           <div className="brand-mark" aria-hidden="true">
             <span>ك</span>
@@ -655,7 +670,7 @@ export default function Home() {
       )}
 
       {/* Main Area */}
-      <main className="main-area">
+      <main className="main-area" inert={backgroundInert}>
         <header className="topbar">
           <button
             className="icon-button mobile-menu-trigger"
@@ -876,7 +891,11 @@ export default function Home() {
       </main>
 
       {/* Mobile Bottom Navigation (Visible sous 900px) */}
-      <nav className="mobile-bottom-nav" aria-label={tr("Navigation mobile", "Mobile navigation", "Navegación móvil", "التنقل على الهاتف")}>
+      <nav
+        className="mobile-bottom-nav"
+        aria-label={tr("Navigation mobile", "Mobile navigation", "Navegación móvil", "التنقل على الهاتف")}
+        inert={backgroundInert}
+      >
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
