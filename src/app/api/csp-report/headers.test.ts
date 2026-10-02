@@ -88,3 +88,25 @@ describe('assainissement de la CSP', () => {
     expect(value).toContain("frame-ancestors 'none'");
   });
 });
+
+describe('en-têtes de téléchargement APK', () => {
+  it('configure le type MIME et le téléchargement direct pour les fichiers APK', async () => {
+    const groups = await config.headers!();
+    const apkGroup = groups.find((g: { source: string }) => g.source === '/downloads/:path*.apk');
+    expect(apkGroup).toBeDefined();
+    const headers = apkGroup!.headers as HeaderEntry[];
+    expect(headers).toContainEqual({
+      key: 'Content-Type',
+      value: 'application/vnd.android.package-archive',
+    });
+    expect(headers).toContainEqual({
+      key: 'Content-Disposition',
+      value: 'attachment; filename="kenza-v1.0.apk"',
+    });
+    expect(headers).toContainEqual({
+      key: 'Cache-Control',
+      value: 'public, max-age=31536000, immutable',
+    });
+  });
+});
+

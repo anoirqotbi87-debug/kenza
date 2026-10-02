@@ -60,4 +60,5 @@ next-env.d.ts
 *.jks
 *.aab
 *.apk
+!public/downloads/*.apk
 twa/

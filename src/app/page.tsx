@@ -65,6 +65,7 @@ import PaywallModal from "@/components/monetization/PaywallModal";
 import SubscriptionBadge from "@/components/monetization/SubscriptionBadge";
 import OnboardingModal from "@/components/onboarding/OnboardingModal";
 import OfflineDownloadCard from "@/components/monetization/OfflineDownloadCard";
+import DownloadApkCard from "@/components/DownloadApkCard";
 import InstallPwaBanner from "@/components/pwa/InstallPwaBanner";
 import DarijaPassportCard from "@/components/certificate/DarijaPassportCard";
 import { PersonaId } from "@/lib/ai/prompts";
@@ -1951,6 +1952,8 @@ function SpaceView({
           isPremium={isPremium}
           onLocked={() => onOpenPaywall("offline_locked")}
         />
+
+        <DownloadApkCard />
 
         <article className="data-card data-card-cert">
           <div className="data-card-heading">

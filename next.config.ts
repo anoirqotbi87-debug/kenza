@@ -72,6 +72,23 @@ const nextConfig: NextConfig = {
         source: '/(.*)',
         headers: securityHeaders,
       },
+      {
+        source: '/downloads/:path*.apk',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/vnd.android.package-archive',
+          },
+          {
+            key: 'Content-Disposition',
+            value: 'attachment; filename="kenza-v1.0.apk"',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
     ];
   },
 };
