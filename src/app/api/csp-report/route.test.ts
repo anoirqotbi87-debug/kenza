@@ -2,11 +2,23 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { NextRequest } from 'next/server';
 
 const checkRateLimitMock = vi.fn();
+const persistMock = vi.fn();
 
 vi.mock('@/lib/rateLimit', () => ({
   checkRateLimit: (...args: unknown[]) => checkRateLimitMock(...args),
   getClientIp: () => '127.0.0.1',
 }));
+
+vi.mock('@/lib/cspPersistence', () => ({
+  persistCspViolations: (...args: unknown[]) => persistMock(...args),
+}));
+
+// `after()` de Next lève hors contexte de requête (E468) : on exécute la tâche
+// immédiatement pour pouvoir observer la persistance depuis un test unitaire.
+vi.mock('next/server', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('next/server')>();
+  return { ...actual, after: (task: () => unknown) => { void task(); } };
+});
 
 const { POST } = await import('./route');
 
@@ -34,6 +46,7 @@ let warnSpy: ReturnType<typeof vi.spyOn>;
 beforeEach(() => {
   checkRateLimitMock.mockReset();
   checkRateLimitMock.mockResolvedValue({ allowed: true });
+  persistMock.mockReset();
   warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 });
 
@@ -112,5 +125,56 @@ describe('/api/csp-report robustesse', () => {
     const res = await report(LEGACY);
     expect(res.status).toBe(204);
     expect(warnSpy.mock.calls.map((c) => String(c[0])).join(' ')).toContain('indisponible');
+  });
+});
+
+describe('/api/csp-report persistance (fenêtre 48 h)', () => {
+  it('persiste une violation avec ses trois champs', async () => {
+    await report(LEGACY);
+    expect(persistMock).toHaveBeenCalledTimes(1);
+    expect(persistMock.mock.calls[0][0]).toEqual([
+      {
+        directive: 'script-src-elem',
+        blockedUri: 'https://evil.example.com/x.js',
+        documentUri: 'https://kenza-dusky.vercel.app/etudier',
+      },
+    ]);
+  });
+
+  it('persiste un lot entier en un seul appel', async () => {
+    await report([
+      LEGACY,
+      { type: 'csp-violation', body: { 'effective-directive': 'img-src', 'blocked-uri': 'https://a.example.com/p.gif' } },
+    ]);
+    expect(persistMock).toHaveBeenCalledTimes(1);
+    expect(persistMock.mock.calls[0][0]).toHaveLength(2);
+  });
+
+  it('ne persiste RIEN quand le corps ne contient aucune violation', async () => {
+    const res = await report(null);
+    expect(res.status).toBe(204);
+    expect(persistMock).not.toHaveBeenCalled();
+  });
+
+  it('ne persiste rien si le rapport est rejeté (400/413/429)', async () => {
+    await report(null, 'pas du json');
+    checkRateLimitMock.mockResolvedValue({ allowed: false });
+    await report(LEGACY);
+    expect(persistMock).not.toHaveBeenCalled();
+  });
+
+  it('persiste des champs assainis (caractères de contrôle neutralisés)', async () => {
+    await report({
+      'csp-report': { 'effective-directive': 'script-src', 'blocked-uri': 'evil\nFAKE\r\nx' },
+    });
+    const [violation] = persistMock.mock.calls[0][0] as Array<{ blockedUri: string }>;
+    expect(violation.blockedUri).not.toContain('\n');
+    expect(violation.blockedUri).not.toContain('\r');
+  });
+
+  it('fail-open : la panne de persistance ne change PAS le statut de la réponse', async () => {
+    persistMock.mockRejectedValue(new Error('SUPABASE_DOWN'));
+    const res = await report(LEGACY);
+    expect(res.status).toBe(204);
   });
 });
