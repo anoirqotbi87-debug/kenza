@@ -339,8 +339,6 @@ export type Database = {
         Args: { p_checkpoint_id: string; p_score: number }
         Returns: string
       }
-      clean_probe_csp_violations: { Args: never; Returns: number }
-      cleanup_external_schema: { Args: never; Returns: string }
       complete_lesson: {
         Args: { p_lesson_id: string; p_score?: number }
         Returns: undefined

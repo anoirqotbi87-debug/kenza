@@ -35,4 +35,6 @@ Toutes les migrations dans `supabase/migrations/` sont idempotentes (`IF NOT EXI
 - `20261002130616_csp_violations.sql`
 - `20261002135828_clean_probe_csp_violations.sql`
 - `20261002135842_revoke_clean_probe_csp_violations.sql`
-- `20261002232000_cleanup_concierge_tables.sql`
+- `20261002221949_cleanup_external_schema.sql`
+- `20261002222009_revoke_cleanup_external_schema.sql`
+- `20261002234900_drop_temp_maintenance_functions.sql`
