@@ -8,6 +8,7 @@ export interface SRSCard {
   easeFactor: number; // Ease factor for SM-2 (default 2.5)
   dueDate: string; // ISO String timestamp
   state: 'new' | 'learning' | 'review';
+  updatedAt?: string;
 }
 
 export type ReviewGrade = 'again' | 'hard' | 'good' | 'easy';

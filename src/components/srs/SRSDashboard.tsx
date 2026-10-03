@@ -8,17 +8,25 @@ import { Sparkles, ArrowRight, ArrowLeft } from 'lucide-react';
 import { SRSCard } from '../../types/srs';
 
 export default function SRSDashboard() {
-  const { getDueCards, addCardsToSRS, srsDeck } = useAppStore();
+  const { getDueCards, addCardsToSRS, activateNewCards, srsDeck } = useAppStore();
   const { t } = useTranslation();
   const [isReviewing, setIsReviewing] = useState(false);
   const [dueCards, setDueCards] = useState<SRSCard[]>(() => getDueCards());
 
-  // Init SRS with all words if empty
+  // Init SRS with all words if empty and activate initial batch of 5 words
   useEffect(() => {
     if (Object.keys(srsDeck).length === 0) {
       addCardsToSRS(srsVocabulary.map((v) => v.id));
+      activateNewCards(5);
+      setDueCards(getDueCards());
+    } else {
+      const activeCount = Object.values(srsDeck).filter(c => c.state !== 'new').length;
+      if (activeCount === 0) {
+        activateNewCards(5);
+        setDueCards(getDueCards());
+      }
     }
-  }, [srsDeck, addCardsToSRS]);
+  }, [srsDeck, addCardsToSRS, activateNewCards, getDueCards]);
 
   // Refresh the due list when returning to the dashboard (not when opening it).
   const [prevIsReviewing, setPrevIsReviewing] = useState(isReviewing);
@@ -97,6 +105,19 @@ export default function SRSDashboard() {
         <span>{dueCards.length > 0 ? (t.srs?.startSession || "Lancer la session de révision") : (t.srs?.allCaughtUp || "Tout est à jour !")}</span>
         <ArrowRight className="w-4 h-4" />
       </button>
+
+      {dueCards.length === 0 && Object.values(srsDeck).some((c) => c.state === 'new') && (
+        <button
+          type="button"
+          onClick={() => {
+            activateNewCards(5);
+            setDueCards(getDueCards());
+          }}
+          className="mt-4 text-xs font-bold text-[#1B2A4A] hover:text-[#C9A05C] transition-colors underline underline-offset-4"
+        >
+          + Apprendre 5 nouvelles expressions
+        </button>
+      )}
     </div>
   );
 }
