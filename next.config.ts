@@ -66,6 +66,14 @@ const nextConfig: NextConfig = {
   // `bufferutil.mask` (`b.mask is not a function`) : /api/tts ne répondait
   // jamais. On garde ces paquets hors du bundle serveur.
   serverExternalPackages: ['msedge-tts', 'ws'],
+  async rewrites() {
+    return [
+      {
+        source: '/roleplay',
+        destination: '/parler',
+      },
+    ];
+  },
   async headers() {
     return [
       {
