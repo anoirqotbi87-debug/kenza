@@ -34,6 +34,7 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
       case 'taxi': return '🚕';
       case 'cafe': return '☕';
       case 'souk': return '🛒';
+      case 'medecin': return '🩺';
       default: return '👋';
     }
   };
@@ -210,7 +211,7 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
      <div className="pt-4 mt-3 border-t border-[#E8E2D5]/60 flex justify-between items-center text-xs">
                     <div className="flex items-center gap-1.5 text-[#7A7670]">
                       <MapPin className="w-3.5 h-3.5 text-[#C9A05C]" />
-                      <span className="font-medium">{persona.id === 'taxi' ? 'Fès Médina' : persona.id === 'souk' ? 'Grand Souk' : 'Café Populaire'}</span>
+                      <span className="font-medium">{persona.id === 'taxi' ? 'Fès Médina' : persona.id === 'souk' ? 'Grand Souk' : persona.id === 'medecin' ? 'Cabinet Médical' : 'Café Populaire'}</span>
                     </div>
 
                     <div className="w-8 h-8 rounded-full bg-[#1B2A4A] text-[#FDFCF8] flex items-center justify-center group-hover:bg-[#C9A05C] group-hover:text-[#1B2A4A] transition-colors shadow-xs">

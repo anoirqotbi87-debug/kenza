@@ -76,7 +76,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
   const handlePlayVoice = (text: string, arabic?: string, speed: 'normal' | 'slow' = 'normal') => {
     playAudio(text, arabic, soundEnabled, speed === 'slow' ? 0.75 : 1.0, {
       speed,
-      voice: personaId === 'cafe' || personaId === 'taxi' || personaId === 'souk' ? 'male' : 'female',
+      voice: personaId === 'cafe' || personaId === 'taxi' || personaId === 'souk' || personaId === 'medecin' ? 'male' : 'female',
     });
   };
 
@@ -129,7 +129,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
       arabizi: arz || '',
       translation: { fr: fr || '', en: fr || '', es: fr || '', ar: ar || '' },
       category: `roleplay_${personaId}`,
-      illustration: { iconName: personaId === 'taxi' ? 'Car' : personaId === 'cafe' ? 'Coffee' : 'ShoppingBag' }
+      illustration: { iconName: personaId === 'taxi' ? 'Car' : personaId === 'cafe' ? 'Coffee' : personaId === 'medecin' ? 'Stethoscope' : 'ShoppingBag' }
     });
     
     setToastMessage(rp.addedToSrs);
@@ -170,7 +170,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
           </button>
           <div>
             <h2 id="ai-roleplay-title" className="font-display font-bold text-[#1B2A4A] flex items-center gap-2 text-base sm:text-lg">
-              {personaId === 'taxi' ? '🚕' : personaId === 'cafe' ? '☕' : '🏺'} {persona.name}
+              {personaId === 'taxi' ? '🚕' : personaId === 'cafe' ? '☕' : personaId === 'medecin' ? '🩺' : '🏺'} {persona.name}
             </h2>
             <p className="text-xs text-[#7A7670] line-clamp-1">{persona.context}</p>
           </div>
@@ -188,7 +188,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center p-6 opacity-75">
             <div className="w-16 h-16 rounded-full bg-[#C9A05C]/15 border border-[#C9A05C]/30 flex items-center justify-center mb-4 text-3xl">
-              {personaId === 'taxi' ? '🚕' : personaId === 'cafe' ? '☕' : '🏺'}
+              {personaId === 'taxi' ? '🚕' : personaId === 'cafe' ? '☕' : personaId === 'medecin' ? '🩺' : '🏺'}
             </div>
             <p className="text-[#1B2A4A] font-medium text-sm">L'agent est prêt. Envoyez "Salam" pour commencer !</p>
           </div>
