@@ -1,5 +1,5 @@
 import { streamText, type CoreMessage } from 'ai';
-import { google } from '@ai-sdk/google';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { getSystemPrompt, PersonaId } from '@/lib/ai/prompts';
 import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
@@ -18,7 +18,9 @@ export async function POST(req: NextRequest) {
     if (!origin && !referer && !fetchSite) {
       return new Response('Forbidden: Missing origin headers', { status: 403 });
     }
-    if (fetchSite && fetchSite !== 'same-origin' && fetchSite !== 'same-site') {
+    // Bloquer uniquement les requêtes explicitement cross-site.
+    // Autoriser same-origin, same-site et 'none' (PWA standalone, WebView mobile, requêtes directes).
+    if (fetchSite === 'cross-site') {
       return new Response('Forbidden: Cross-site request blocked', { status: 403 });
     }
     if (origin && !isAllowedOrigin(origin)) {
@@ -113,8 +115,20 @@ export async function POST(req: NextRequest) {
       return new Response('Invalid persona or personaId', { status: 400 });
     }
 
-    // Appel direct : pas de repli, on échoue vite et on laisse le catch classer l'erreur.
-    const primaryModel = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+    const apiKey =
+      process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
+      process.env.GEMINI_API_KEY ||
+      (process.env.NODE_ENV === 'test' ? 'test-api-key' : '');
+    if (!apiKey) {
+      console.error('[Roleplay Chat] Missing Google Gemini API key');
+      return new Response(JSON.stringify({
+        error: 'AI_SERVICE_UNAVAILABLE',
+        message: 'Service IA momentanément indisponible (clé API non configurée).'
+      }), { status: 503, headers: { 'Content-Type': 'application/json' } });
+    }
+
+    const google = createGoogleGenerativeAI({ apiKey });
+    const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
     const result = await streamText({
       model: google(primaryModel),
       system: systemPrompt,
@@ -131,13 +145,22 @@ export async function POST(req: NextRequest) {
     const status = (error as { statusCode?: number } | undefined)?.statusCode;
     console.error('API Roleplay Chat Error:', errMsg, '| upstream status:', status);
 
-    // Sur erreur 401/403 (clé invalide / permission) ou 429 (quota) ou 5xx : renvoyer immédiatement HTTP 503 avec un message clair, SANS retry côté serveur
-    if (status === 401 || status === 403 || status === 429 || (status !== undefined && status >= 500)) {
+    // Sur erreur 401/403 (clé invalide / permission), 404 (modèle non supporté), 429 (quota) ou 5xx : renvoyer immédiatement HTTP 503
+    if (
+      status === 401 ||
+      status === 403 ||
+      status === 404 ||
+      status === 429 ||
+      (status !== undefined && status >= 500) ||
+      errMsg.includes('not found') ||
+      errMsg.includes('quota') ||
+      errMsg.includes('API key')
+    ) {
       return new Response(JSON.stringify({
         error: 'AI_SERVICE_UNAVAILABLE',
         message: status === 401 || status === 403
           ? 'Service IA momentanément indisponible (authentification ou clé Google API).'
-          : 'Service IA temporairement surchargé. Veuillez réessayer dans un instant.'
+          : 'Service IA temporairement indisponible. Veuillez réessayer dans un instant.'
       }), { status: 503, headers: { 'Content-Type': 'application/json' } });
     }
 

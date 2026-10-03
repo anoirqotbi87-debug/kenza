@@ -15,6 +15,7 @@ vi.mock('ai', () => ({
 
 vi.mock('@ai-sdk/google', () => ({
   google: vi.fn(),
+  createGoogleGenerativeAI: () => vi.fn(),
 }));
 
 vi.mock('@supabase/supabase-js', () => ({
