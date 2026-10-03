@@ -30,7 +30,9 @@ export function useAudioPrefetch(items: PrefetchItem[] = []) {
   }, []);
 
   const prefetchAll = useCallback(async (list: PrefetchItem[]) => {
-    for (const item of list) {
+    // Précharger les 3 à 5 prochains audios (0 ms de latence, préserve les quotas)
+    const queue = list.slice(0, 5);
+    for (const item of queue) {
       try {
         await prefetchSingle(item);
       } catch {

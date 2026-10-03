@@ -103,6 +103,13 @@ describe('Phoneme Matcher & Pronunciation Scoring (Darija)', () => {
       expect(result.badge.text).toContain('7');
     });
 
+    it('recognizes 5 as Arabizi variant of kh (خ)', () => {
+      const result = evaluatePronunciation('sba7 l-5ir', 'sba7 l-khir', 'صباح الخير');
+      expect(result.score).toBeGreaterThanOrEqual(80);
+      expect(result.tier).toBe('excellent');
+      expect(result.detectedPhonemes).toContain('kh');
+    });
+
     it('gives 🔴 Needs Work tier when pronunciation is distant', () => {
       const result = evaluatePronunciation('bonjour monsieur', '3afak bzzaf', 'عافاك بزاف');
       expect(result.score).toBeLessThan(50);

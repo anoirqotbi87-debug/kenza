@@ -5,6 +5,13 @@ import { buildSsml, TtsVoice, TtsSpeed } from '@/lib/tts/ssml';
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 import { isAllowedOrigin } from '@/lib/allowedOrigins';
 
+export type TTSRequest = {
+  text: string;
+  voice?: 'female' | 'male';
+  speed?: 'normal' | 'slow';
+  arabicText?: string;
+};
+
 async function synthesize(
   text: string,
   arabicText?: string,
