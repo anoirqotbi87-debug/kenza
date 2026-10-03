@@ -124,6 +124,7 @@ export function normalizeDarija(text: string, arabicText?: string): string {
     .replace(/3/g, 'ع')
     .replace(/7/g, 'ح')
     .replace(/9/g, 'ق')
+    .replace(/5/g, 'خ')
     .replace(/kh/gi, 'خ')
     .replace(/gh/gi, 'غ');
 }

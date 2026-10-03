@@ -102,14 +102,16 @@ export default function RoleplayChat({
     },
   });
 
-  // Zero-cost native browser speech recognition
+  const [recognitionLang, setRecognitionLang] = useState<'ar-MA' | 'fr-FR'>('ar-MA');
+
+  // Zero-cost native browser speech recognition (ar-MA / fr-FR)
   const {
     isSupported,
     isListening,
     transcript,
     startListening,
     stopListening,
-  } = useVoiceRecognition('ar-MA', 8000);
+  } = useVoiceRecognition(recognitionLang, 8000);
 
   // Sync vocal transcript directly to input field
   useEffect(() => {
@@ -134,7 +136,7 @@ export default function RoleplayChat({
   const handlePlayVoice = (text: string, arabic?: string, speed: 'normal' | 'slow' = 'normal') => {
     playAudio(text, arabic, soundEnabled, speed === 'slow' ? 0.75 : 1.0, {
       speed,
-      voice: personaId === 'cafe' ? 'male' : 'female',
+      voice: personaId === 'cafe' || personaId === 'taxi' || personaId === 'souk' || personaId === 'medecin' ? 'male' : 'female',
     });
   };
 
@@ -277,25 +279,41 @@ export default function RoleplayChat({
 
       {/* Input bar with integrated microphone */}
       <div className="p-3 bg-[#F7F3EA] border-t border-[#E8E2D5]">
-        <form onSubmit={handleSubmit} className="flex items-center gap-2">
-          {/* Micro button */}
+        <form
+          onSubmit={(e) => {
+            if (isListening) stopListening();
+            handleSubmit(e);
+          }}
+          className="flex items-center gap-2"
+        >
+          {/* Micro button & language toggle */}
           {isSupported && (
-            <button
-              type="button"
-              onClick={handleMicToggle}
-              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-                isListening
-                  ? 'bg-red-500 text-white animate-pulse ring-4 ring-red-200'
-                  : 'bg-[#FDFCF8] border border-[#E8E2D5] text-[#1B2A4A] hover:bg-[#E8E2D5]/50'
-              }`}
-              title={isListening ? 'Arrêter la dictée vocale' : 'Parler au micro'}
-            >
-              {isListening ? (
-                <MicOff className="w-4 h-4" />
-              ) : (
-                <Mic className="w-4 h-4 text-[#C9A05C]" />
-              )}
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={handleMicToggle}
+                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                  isListening
+                    ? 'bg-red-500 text-white animate-pulse ring-4 ring-red-200'
+                    : 'bg-[#FDFCF8] border border-[#E8E2D5] text-[#1B2A4A] hover:bg-[#E8E2D5]/50'
+                }`}
+                title={isListening ? 'Arrêter la dictée vocale' : 'Parler au micro'}
+              >
+                {isListening ? (
+                  <MicOff className="w-4 h-4" />
+                ) : (
+                  <Mic className="w-4 h-4 text-[#C9A05C]" />
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setRecognitionLang((prev) => (prev === 'ar-MA' ? 'fr-FR' : 'ar-MA'))}
+                className="px-1.5 py-1 text-[10px] font-bold text-[#7A7670] hover:text-[#1B2A4A] rounded-md bg-[#FDFCF8] border border-[#E8E2D5]"
+                title="Basculer la langue du micro (ar-MA / fr-FR)"
+              >
+                {recognitionLang === 'ar-MA' ? 'AR' : 'FR'}
+              </button>
+            </div>
           )}
 
           {/* Text Input */}

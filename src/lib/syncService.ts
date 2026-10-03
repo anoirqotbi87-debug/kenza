@@ -133,26 +133,63 @@ export const syncService = {
       }
     }
 
-    // 3. Fetch SRS
+    // 3. Fetch SRS & Merge intelligently with local progress
     const { data: srsItems } = await supabase
       .from('srs_items')
       .select('*')
       .eq('user_id', userId);
 
     if (srsItems) {
-      const newDeck: Record<string, SRSCard> = {};
+      const localDeck = { ...useAppStore.getState().srsDeck };
+      const mergedDeck: Record<string, SRSCard> = { ...localDeck };
+
       srsItems.forEach(item => {
-        newDeck[item.word_id] = {
-          id: `card_${item.word_id}`,
-          wordId: item.word_id,
-          interval: item.interval ?? 0,
-          repetition: item.repetition ?? 0,
-          easeFactor: Number(item.ease_factor) || 2.5,
-          dueDate: item.due_date ?? new Date().toISOString(),
-          state: (item.state as SRSCard['state']) || 'new'
-        };
+        const localCard = localDeck[item.word_id];
+        // Si la carte locale possède une progression supérieure, on conserve la locale
+        const localIsMoreAdvanced =
+          localCard &&
+          (localCard.repetition > (item.repetition ?? 0) ||
+           (localCard.repetition === (item.repetition ?? 0) && localCard.interval > (item.interval ?? 0)));
+
+        if (!localIsMoreAdvanced) {
+          mergedDeck[item.word_id] = {
+            id: `card_${item.word_id}`,
+            wordId: item.word_id,
+            interval: item.interval ?? 0,
+            repetition: item.repetition ?? 0,
+            easeFactor: Number(item.ease_factor) || 2.5,
+            dueDate: item.due_date ?? new Date().toISOString(),
+            state: (item.state as SRSCard['state']) || 'new',
+            updatedAt: new Date().toISOString(),
+          };
+        }
       });
-      useAppStore.setState({ srsDeck: newDeck });
+
+      // Synchroniser en arrière-plan vers le cloud les cartes locales plus avancées
+      const cloudWordMap = new Map(srsItems.map(i => [i.word_id, i]));
+      const toSyncToCloud = Object.values(mergedDeck).filter(card => {
+        if (card.state === 'new') return false;
+        const cloudItem = cloudWordMap.get(card.wordId);
+        if (!cloudItem) return true;
+        return card.repetition > (cloudItem.repetition ?? 0) || card.interval > (cloudItem.interval ?? 0);
+      });
+
+      if (toSyncToCloud.length > 0) {
+        const payload = toSyncToCloud.map(card => ({
+          user_id: userId,
+          word_id: card.wordId,
+          interval: card.interval,
+          repetition: card.repetition,
+          ease_factor: card.easeFactor,
+          due_date: card.dueDate,
+          state: card.state,
+        }));
+        supabase.from('srs_items').upsert(payload, { onConflict: 'user_id,word_id' }).then(({ error }) => {
+          if (error) console.warn('[SRS Merge Cloud Sync Error]:', error.message);
+        });
+      }
+
+      useAppStore.setState({ srsDeck: mergedDeck });
     }
   },
 
