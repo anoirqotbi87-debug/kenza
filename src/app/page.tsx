@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useAppStore, useTranslation } from "@/store/useAppStore";
 import type { User } from "@supabase/supabase-js";
 
@@ -154,6 +155,13 @@ export default function Home() {
     }
   }, [showToast]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
+    setMobileMenuOpen(false);
+  }
+
   const [prevView, setPrevView] = useState<View>(view);
   if (prevView !== view) {
     setPrevView(view);
@@ -590,23 +598,26 @@ export default function Home() {
 
         <div className="sidebar-label">{trL(lang, "EXPLORER", "EXPLORE", "EXPLORAR", "استكشف")}</div>
         <nav className="side-nav" aria-label={trL(lang, "Ressources d'étude", "Study resources", "Recursos de estudio", "موارد الدراسة")}>
-          <a href="/etudier" className="nav-item">
+          <a href="/etudier" onClick={() => setMobileMenuOpen(false)} className="nav-item">
             <span>{trL(lang, "Étudier — Modules complets", "Study — Full modules", "Estudiar — Módulos completos", "الدراسة — الوحدات الكاملة")}</span>
           </a>
-          <a href="/grammaire" className="nav-item">
+          <a href="/grammaire" onClick={() => setMobileMenuOpen(false)} className="nav-item">
             <span>{trL(lang, "Grammaire active", "Active grammar", "Gramática activa", "القواعد النشطة")}</span>
           </a>
-          <a href="/parler" className="nav-item">
+          <a href="/parler" onClick={() => setMobileMenuOpen(false)} className="nav-item">
             <span>{trL(lang, "Pratique orale", "Speaking practice", "Práctica oral", "تدريب النطق")}</span>
           </a>
-          <a href="/revisions" className="nav-item">
+          <a href="/revisions" onClick={() => setMobileMenuOpen(false)} className="nav-item">
             <span>{trL(lang, "Révisions SRS", "SRS review", "Repaso SRS", "مراجعة SRS")}</span>
           </a>
         </nav>
 
         <div className="sidebar-label sidebar-label-spaced">{t.side.oral || tr("PRATIQUE ORALE & IA", "SPEAKING & AI", "PRÁCTICA ORAL E IA", "المحادثة والذكاء الاصطناعي")}</div>
         <button
-          onClick={() => setShowScenarioSelector(true)}
+          onClick={() => {
+            setMobileMenuOpen(false);
+            setShowScenarioSelector(true);
+          }}
           className="nav-item"
         >
           <MessageCircle size={19} strokeWidth={1.8} />

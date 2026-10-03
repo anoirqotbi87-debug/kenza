@@ -84,7 +84,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full max-w-2xl mx-auto py-4 perspective-1000">
+    <div className="flex flex-col items-center justify-center w-full max-w-2xl mx-auto py-4 [perspective:1000px]">
       
       {/* Progress header */}
       <div className="w-full mb-6 flex justify-between items-center text-xs font-semibold text-[#7A7670] px-2">
@@ -110,16 +110,16 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
 
       {/* 3D Flip Card Container */}
       <div 
-        className="relative w-full h-[380px] sm:h-[400px] cursor-pointer"
+        className="relative w-full h-[380px] sm:h-[400px] cursor-pointer [perspective:1000px]"
         onClick={() => setIsFlipped(prev => !prev)}
       >
         <motion.div
-          className="w-full h-full relative preserve-3d"
-          animate={{ rotateX: isFlipped ? 180 : 0 }}
+          className="w-full h-full relative [transform-style:preserve-3d]"
+          animate={{ rotateY: isFlipped ? 180 : 0 }}
           transition={{ duration: 0.6, type: 'spring', stiffness: 220, damping: 20 }}
         >
           {/* Front of Flashcard */}
-          <div className="absolute inset-0 backface-hidden bg-[#FDFCF8] rounded-[28px] shadow-sm border border-[#E8E2D5] p-8 flex flex-col items-center justify-between text-center select-none overflow-hidden">
+          <div className="absolute inset-0 [backface-visibility:hidden] [-webkit-backface-visibility:hidden] bg-[#FDFCF8] rounded-[28px] shadow-sm border border-[#E8E2D5] p-8 flex flex-col items-center justify-between text-center select-none overflow-hidden">
             
             {/* Petits astérisques discrets aux angles */}
             <span className="absolute top-4 left-4 text-[#C9A05C]/50 text-xs font-display pointer-events-none select-none">✦</span>
@@ -153,8 +153,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
 
           {/* Back of Flashcard */}
           <div 
-            className="absolute inset-0 backface-hidden bg-[#FDFCF8] rounded-[28px] shadow-md border border-[#E8E2D5] p-8 flex flex-col items-center justify-between text-center select-none overflow-hidden"
-            style={{ transform: 'rotateX(180deg)' }}
+            className="absolute inset-0 [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)] bg-[#FDFCF8] rounded-[28px] shadow-md border border-[#E8E2D5] p-8 flex flex-col items-center justify-between text-center select-none overflow-hidden"
           >
             {/* Petits astérisques discrets aux angles */}
             <span className="absolute top-4 left-4 text-[#C9A05C]/50 text-xs font-display pointer-events-none select-none">✦</span>
