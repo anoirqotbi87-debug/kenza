@@ -11,33 +11,32 @@ export default function SRSDashboard() {
   const { getDueCards, addCardsToSRS, activateNewCards, srsDeck } = useAppStore();
   const { t } = useTranslation();
   const [isReviewing, setIsReviewing] = useState(false);
-  const [dueCards, setDueCards] = useState<SRSCard[]>(() => getDueCards());
+  const [sessionCards, setSessionCards] = useState<SRSCard[]>([]);
 
   // Init SRS with all words if empty and activate initial batch of 5 words
   useEffect(() => {
     if (Object.keys(srsDeck).length === 0) {
       addCardsToSRS(srsVocabulary.map((v) => v.id));
       activateNewCards(5);
-      setDueCards(getDueCards());
     } else {
-      const activeCount = Object.values(srsDeck).filter(c => c.state !== 'new').length;
+      const activeCount = Object.values(srsDeck).filter((c) => c.state !== 'new').length;
       if (activeCount === 0) {
         activateNewCards(5);
-        setDueCards(getDueCards());
       }
     }
-  }, [srsDeck, addCardsToSRS, activateNewCards, getDueCards]);
+  }, [srsDeck, addCardsToSRS, activateNewCards]);
 
-  // Refresh the due list when returning to the dashboard (not when opening it).
-  const [prevIsReviewing, setPrevIsReviewing] = useState(isReviewing);
-  if (prevIsReviewing !== isReviewing) {
-    setPrevIsReviewing(isReviewing);
-    if (!isReviewing) {
-      setDueCards(getDueCards());
+  const currentDueCards = getDueCards();
+
+  const handleStartReview = () => {
+    const due = getDueCards();
+    if (due.length > 0) {
+      setSessionCards(due);
+      setIsReviewing(true);
     }
-  }
+  };
 
-  if (isReviewing && dueCards.length > 0) {
+  if (isReviewing && sessionCards.length > 0) {
     return (
       <div className="w-full max-w-3xl mx-auto space-y-4">
         <button
@@ -49,7 +48,7 @@ export default function SRSDashboard() {
         </button>
 
         <FlashcardDeck
-          cards={dueCards}
+          cards={sessionCards}
           vocabulary={srsVocabulary}
           onComplete={() => setIsReviewing(false)}
         />
@@ -83,13 +82,13 @@ export default function SRSDashboard() {
       {/* Counter card */}
       <div className="bg-[#F7F3EA] border border-[#E8E2D5] rounded-2xl p-6 w-full max-w-sm mb-8 flex justify-between items-center">
         <div className="text-left">
-          <div className="font-display text-4xl font-bold text-[#1B2A4A]">{dueCards.length}</div>
+          <div className="font-display text-4xl font-bold text-[#1B2A4A]">{currentDueCards.length}</div>
           <div className="text-xs text-[#7A7670] font-medium mt-1">
             {t.srs?.cardsToReview || "expressions prêtes pour aujourd'hui"}
           </div>
         </div>
 
-        {dueCards.length > 0 ? (
+        {currentDueCards.length > 0 ? (
           <div className="w-4 h-4 rounded-full bg-[#C9A05C] shadow-[0_0_8px_rgba(201,160,92,0.6)] animate-pulse" />
         ) : (
           <div className="w-4 h-4 rounded-full bg-[#7A9174]" />
@@ -98,21 +97,18 @@ export default function SRSDashboard() {
 
       {/* Action button */}
       <button
-        onClick={() => setIsReviewing(true)}
-        disabled={dueCards.length === 0}
+        onClick={handleStartReview}
+        disabled={currentDueCards.length === 0}
         className="w-full max-w-sm py-4 px-6 bg-[#C9A05C] hover:bg-[#b88f4b] disabled:bg-[#E8E2D5] disabled:text-[#7A7670] text-[#1B2A4A] rounded-full font-bold text-sm shadow-md hover:shadow-lg transition-all flex justify-center items-center gap-3 active:scale-95"
       >
-        <span>{dueCards.length > 0 ? (t.srs?.startSession || "Lancer la session de révision") : (t.srs?.allCaughtUp || "Tout est à jour !")}</span>
+        <span>{currentDueCards.length > 0 ? (t.srs?.startSession || "Lancer la session de révision") : (t.srs?.allCaughtUp || "Tout est à jour !")}</span>
         <ArrowRight className="w-4 h-4" />
       </button>
 
-      {dueCards.length === 0 && Object.values(srsDeck).some((c) => c.state === 'new') && (
+      {currentDueCards.length === 0 && Object.values(srsDeck).some((c) => c.state === 'new') && (
         <button
           type="button"
-          onClick={() => {
-            activateNewCards(5);
-            setDueCards(getDueCards());
-          }}
+          onClick={() => activateNewCards(5)}
           className="mt-4 text-xs font-bold text-[#1B2A4A] hover:text-[#C9A05C] transition-colors underline underline-offset-4"
         >
           + Apprendre 5 nouvelles expressions

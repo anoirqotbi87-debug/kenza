@@ -166,4 +166,44 @@ describe('/api/roleplay/chat security & rate limit', () => {
     const res = await POST(req as unknown as NextRequest);
     expect(res.status).toBe(200);
   });
+
+  it('renvoie immédiatement HTTP 503 en cas d’erreur 403 upstream (permission/clé invalide)', async () => {
+    checkRateLimitMock.mockResolvedValue({ allowed: true });
+    const authErr = new Error('Permission denied');
+    (authErr as unknown as { statusCode: number }).statusCode = 403;
+    streamTextMock.mockRejectedValueOnce(authErr);
+
+    const req = new Request('http://localhost/api/roleplay/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        origin: 'http://localhost:3000',
+      },
+      body: JSON.stringify({ messages: [{ role: 'user', content: 'Salam' }], personaId: 'cafe' }),
+    });
+    const res = await POST(req as unknown as NextRequest);
+    expect(res.status).toBe(503);
+    const data = await res.json();
+    expect(data.error).toBe('AI_SERVICE_UNAVAILABLE');
+  });
+
+  it('renvoie immédiatement HTTP 503 en cas d’erreur 429 upstream (quota LLM épuisé)', async () => {
+    checkRateLimitMock.mockResolvedValue({ allowed: true });
+    const quotaErr = new Error('Resource exhausted');
+    (quotaErr as unknown as { statusCode: number }).statusCode = 429;
+    streamTextMock.mockRejectedValueOnce(quotaErr);
+
+    const req = new Request('http://localhost/api/roleplay/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        origin: 'http://localhost:3000',
+      },
+      body: JSON.stringify({ messages: [{ role: 'user', content: 'Salam' }], personaId: 'cafe' }),
+    });
+    const res = await POST(req as unknown as NextRequest);
+    expect(res.status).toBe(503);
+    const data = await res.json();
+    expect(data.error).toBe('AI_SERVICE_UNAVAILABLE');
+  });
 });
