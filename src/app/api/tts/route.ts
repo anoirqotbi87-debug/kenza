@@ -80,6 +80,9 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json().catch(() => ({}));
     const { text, arabicText, voice, speed } = body;
+    const normalizedArabic = typeof arabicText === 'string' && arabicText.trim().length > 0
+      ? arabicText.trim()
+      : undefined;
 
     if (!text || typeof text !== 'string' || text.trim().length === 0) {
       return NextResponse.json({ error: 'INVALID_TEXT' }, { status: 400 });
@@ -91,7 +94,7 @@ export async function POST(req: NextRequest) {
     const ttsVoice: TtsVoice = voice === 'male' ? 'male' : 'female';
     const ttsSpeed: TtsSpeed = speed === 'slow' ? 'slow' : 'normal';
 
-    return await synthesize(text, arabicText, ttsVoice, ttsSpeed);
+    return await synthesize(text, normalizedArabic, ttsVoice, ttsSpeed);
   } catch (error) {
     console.error('API TTS Error:', error);
     return NextResponse.json({ error: 'TTS_GENERATION_FAILED' }, { status: 500 });
@@ -136,6 +139,9 @@ export async function GET(req: NextRequest) {
     const arabicText = searchParams.get('arabicText') || undefined;
     const voiceParam = searchParams.get('voice');
     const speedParam = searchParams.get('speed');
+    const normalizedArabic = typeof arabicText === 'string' && arabicText.trim().length > 0
+      ? arabicText.trim()
+      : undefined;
 
     if (!text || text.trim().length === 0) {
       return NextResponse.json({ error: 'INVALID_TEXT' }, { status: 400 });
@@ -147,7 +153,7 @@ export async function GET(req: NextRequest) {
     const ttsVoice: TtsVoice = voiceParam === 'male' ? 'male' : 'female';
     const ttsSpeed: TtsSpeed = speedParam === 'slow' ? 'slow' : 'normal';
 
-    return await synthesize(text, arabicText, ttsVoice, ttsSpeed);
+    return await synthesize(text, normalizedArabic, ttsVoice, ttsSpeed);
   } catch (error) {
     console.error('API TTS Error:', error);
     return NextResponse.json({ error: 'TTS_GENERATION_FAILED' }, { status: 500 });
