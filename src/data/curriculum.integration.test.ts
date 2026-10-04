@@ -4,7 +4,7 @@ import { getPlayableLessons } from './homeCurriculum';
 import type { ExerciseType, LessonStep } from '@/types/curriculum';
 
 const STEP_TYPES: LessonStep['type'][] = ['learning', 'exercise', 'grammar'];
-const EXERCISE_TYPES: ExerciseType[] = ['mcq', 'reorder', 'match', 'matching', 'fill-blank', 'dialogue'];
+const EXERCISE_TYPES: ExerciseType[] = ['mcq', 'reorder', 'scramble', 'match', 'matching', 'fill-blank', 'dialogue', 'roleplay_challenge'];
 
 const lessonSteps = Object.values(fullCurriculum).flatMap((module) => module.lessons);
 
@@ -55,7 +55,7 @@ describe('curriculum — intégration des pages et du moteur d’exercices', () 
           expect(ids, `${where} réponse MCQ absente des options`).toContain(exercise.answer);
         }
 
-        if (exercise.type === 'reorder') {
+        if (exercise.type === 'reorder' || exercise.type === 'scramble') {
           const optionIds = exercise.options?.map((option) => option.id) ?? [];
           expect(Array.isArray(exercise.answer), `${where} réponse reorder non ordonnée`).toBe(true);
           const answerIds = exercise.answer as string[];
@@ -76,7 +76,7 @@ describe('curriculum — intégration des pages et du moteur d’exercices', () 
           expect(new Set(pairIds).size, `${where} IDs de paires dupliqués`).toBe(pairIds.length);
         }
 
-        if (exercise.type === 'dialogue') {
+        if (exercise.type === 'dialogue' || exercise.type === 'roleplay_challenge') {
           expect(exercise.npcStartLine, `${where} sans réplique de départ`).toBeDefined();
           expect(exercise.dialogueChoices?.length ?? 0, `${where} sans choix`).toBeGreaterThan(1);
           expect(exercise.dialogueChoices?.some((choice) => choice.isOptimal), `${where} sans choix optimal`).toBe(true);
