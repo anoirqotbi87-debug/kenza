@@ -16,7 +16,7 @@ export const srsVocabulary: VocabularySRSData[] = [
     illustration: { iconName: 'Handshake' },
     example: {
       arabizi: 'Salam, labas?',
-      arabic: 'السلام، لاباس؟',
+      arabic: 'السَّلَامْ، لَابَاسْ؟',
       translation: {
         fr: 'Bonjour, ça va ?',
         en: 'Hello, how are you?',
@@ -39,7 +39,7 @@ export const srsVocabulary: VocabularySRSData[] = [
     illustration: { iconName: 'Sun' },
     example: {
       arabizi: 'Sba7 l-khir a khoya',
-      arabic: 'صباح الخير ا خويا',
+      arabic: 'صْبَاحْ الخِيرْ ا خُويَا',
       translation: {
         fr: 'Bonjour mon frère',
         en: 'Good morning brother',
@@ -62,7 +62,7 @@ export const srsVocabulary: VocabularySRSData[] = [
     illustration: { iconName: 'Moon' },
     example: {
       arabizi: 'Msa l-khir a lalla',
-      arabic: 'مسا الخير ا لالة',
+      arabic: 'مْسَا الخِيرْ ا لَالَّة',
       translation: {
         fr: 'Bonsoir madame',
         en: 'Good evening madam',
@@ -85,7 +85,7 @@ export const srsVocabulary: VocabularySRSData[] = [
     illustration: { iconName: 'Smile' },
     example: {
       arabizi: 'Labas 3lik?',
-      arabic: 'لاباس عليك؟',
+      arabic: 'لَابَاسْ عَلِيكْ؟',
       translation: {
         fr: 'Est-ce que ça va ?',
         en: 'Are you okay?',
@@ -108,7 +108,7 @@ export const srsVocabulary: VocabularySRSData[] = [
     illustration: { iconName: 'User' },
     example: {
       arabizi: 'Kif dayer m3a s-saha?',
-      arabic: 'كيف داير مع الصحة؟',
+      arabic: 'كِيفْ دَايِرْ مْعَا الصَّحَّة؟',
       translation: {
         fr: 'Comment va la santé ?',
         en: 'How is your health?',
@@ -131,7 +131,7 @@ export const srsVocabulary: VocabularySRSData[] = [
     illustration: { iconName: 'User' },
     example: {
       arabizi: 'Kif dayra a lalla?',
-      arabic: 'كيف دايرة ا لالة؟',
+      arabic: 'كِيفْ دَايْرَة ا لَالَّة؟',
       translation: {
         fr: 'Comment vas-tu madame ?',
         en: 'How are you madam?',
@@ -154,7 +154,7 @@ export const srsVocabulary: VocabularySRSData[] = [
     illustration: { iconName: 'Heart' },
     example: {
       arabizi: 'Labas, hamdullah',
-      arabic: 'لاباس، الحمد لله',
+      arabic: 'لَابَاسْ، الحَمْدْ لِلَّه',
       translation: {
         fr: 'Ça va, Dieu merci',
         en: 'Fine, thank God',
@@ -177,7 +177,7 @@ export const srsVocabulary: VocabularySRSData[] = [
     illustration: { iconName: 'ThumbsUp' },
     example: {
       arabizi: 'Shukran bzzaf',
-      arabic: 'شكرا بزاف',
+      arabic: 'شُكْرًا بَزَّافْ',
       translation: {
         fr: 'Merci beaucoup',
         en: 'Thank you very much',

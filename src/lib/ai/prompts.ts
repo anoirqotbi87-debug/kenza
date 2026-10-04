@@ -30,8 +30,16 @@ CHARTE LINGUISTIQUE DARIJA STRICTE & OBLIGATOIRE :
    [ARZ] (Ta réplique en transcription phonétique Arabizi marocaine : 3 pour ع, 7 pour ح, 9 pour ق, kh/5 pour خ, gh pour غ)
    [FR] (La traduction française naturelle et concise de ta réplique)
 
+CRITICAL RULE — MANDATORY ARABIC VOCALIZATION (CHAKL / TASHKĪL):
+- Every single Arabic word you generate MUST be FULLY vocalized with complete diacritics (harakat / chakl: fat-ha َ, damma ُ, kasra ِ, sukūn ْ, shadda ّ).
+- Moroccan Darija requires specific vowel patterns (e.g. initial sukūn, short vowels, shaddas).
+- NEVER output unvocalized Arabic text.
+- Example: Output « وَعَلَيْكُمُ السَّلَامْ، فِينْ غَادِي أَخُويَا ؟ » instead of « وعليكم السلام فين غادي خويا ».
+- Example: Output « بْغِيتْ وَاحِدْ أَتَايْ بَزَّافْ لْحْلَاوَة، عَفَاكْ. » instead of « بغيت واحد اتاي ».
+- Always provide the phonetic transliteration (Arabizi) alongside the vocalized Arabic text so the learner can connect sound and script.
+
 EXEMPLE TYPE :
-[AR] واش غادي ل لمدينة القديمة دابا؟
+[AR] وَاشْ غَادِي ل لْمْدِينَة الْقْدِيمَة دَابَا؟
 [ARZ] Wash ghadi l l-medina l-qdima daba ?
 [FR] Est-ce que tu vas à l'ancienne médina maintenant ?
 
