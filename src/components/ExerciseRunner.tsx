@@ -85,7 +85,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
 
     if (type === 'mcq') {
       correct = isAcceptedAnswer(step.exercise, selectedMcqId);
-    } else if (type === 'reorder') {
+    } else if (type === 'reorder' || type === 'scramble') {
       correct = isAcceptedOrder(step.exercise, orderedWords);
     } else if (type === 'fill-blank') {
       correct = isAcceptedAnswer(step.exercise, selectedBlankId);
@@ -290,7 +290,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
             />
           )}
 
-          {step.exercise.type === 'reorder' && (
+          {(step.exercise.type === 'reorder' || step.exercise.type === 'scramble') && (
             <ReorderExercise 
               key={step.exercise.id}
               exercise={step.exercise} 
@@ -319,7 +319,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
             />
           )}
 
-          {step.exercise.type === 'dialogue' && (
+          {(step.exercise.type === 'dialogue' || step.exercise.type === 'roleplay_challenge') && (
             <ScenarioDialogue
               exercise={step.exercise}
               preferredNotation={preferredNotation}
@@ -345,7 +345,8 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
   const isCheckDisabled = () => {
     if (!step.exercise) return false;
     if (step.exercise.type === 'mcq') return !selectedMcqId;
-    if (step.exercise.type === 'reorder') return orderedWords.length === 0;
+    if (step.exercise.type === 'reorder' || step.exercise.type === 'scramble') return orderedWords.length === 0;
+    if (step.exercise.type === 'dialogue' || step.exercise.type === 'roleplay_challenge') return true;
     if (step.exercise.type === 'fill-blank') return !selectedBlankId;
     if (step.exercise.type === 'matching' || step.exercise.type === 'match') return Object.keys(matches).length !== (step.exercise.pairs?.length || 0);
     return false;

@@ -33,7 +33,7 @@ export const lessonTaxi: Lesson = {
           ar: 'الطاكسيات الصغيرة ضرورية. انتبه، يجب عليهم دائماً تشغيل العداد!'
         },
         arabizi: 'Khdem l-kuntur',
-        arabic: 'خدم الكونتور',
+        arabic: 'خَدَّمْ الكُونْتُورْ',
         translation: {
           fr: 'Allumez le compteur',
           en: 'Turn on the meter',
@@ -68,7 +68,7 @@ export const lessonTaxi: Lesson = {
         },
         npcStartLine: {
           arabizi: 'Fin ghadi a khouya?',
-          arabic: 'فين غادي أ خويا؟',
+          arabic: 'فِينْ غَادِيْ أَ خُويَا؟',
           translation: {
             fr: 'Où vas-tu mon frère ?',
             en: 'Where are you going, my brother?',
@@ -83,7 +83,7 @@ export const lessonTaxi: Lesson = {
             id: 'c1',
             text: { 
               arabizi: 'Ghadi l Bab Boujloud. Khdem l-kuntur 3afak.', 
-              arabic: 'غادي ل باب بوجلود. خدم الكونتور عفاك.', 
+              arabic: 'غَادِيْ لْ بَابْ بُوجْلُودْ. خَدَّمْ الكُونْتُورْ عَفَاكْ.', 
               translation: {
                 fr: 'Je vais à Bab Boujloud. Allume le compteur s\'il te plaît.',
                 en: 'I am going to Bab Boujloud. Turn on the meter, please.',
@@ -104,7 +104,7 @@ export const lessonTaxi: Lesson = {
             id: 'c2',
             text: { 
               arabizi: 'Bab Boujloud. B sh7al?', 
-              arabic: 'باب بوجلود. ب شحال؟', 
+              arabic: 'بَابْ بُوجْلُودْ. بْ شْحَالْ؟', 
               translation: {
                 fr: 'Bab Boujloud. Pour combien ?',
                 en: 'Bab Boujloud. For how much?',
@@ -125,7 +125,7 @@ export const lessonTaxi: Lesson = {
             id: 'c3',
             text: { 
               arabizi: 'Ma bghitch.', 
-              arabic: 'ما بغيتش.', 
+              arabic: 'مَا بْغِيتْشْ.', 
               translation: {
                 fr: 'Je ne veux pas.',
                 en: 'I do not want.',

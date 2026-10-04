@@ -23,7 +23,7 @@ export const lessonCafe: Lesson = {
         title: { fr: 'Vocabulaire du Café', en: 'Cafe Vocabulary', es: 'Vocabulario del Café', ar: 'مفردات المقهى' },
         description: { fr: 'La culture du café est centrale au Maroc.', en: 'Cafe culture is central in Morocco.', es: 'La cultura del café es central en Marruecos.', ar: 'ثقافة المقاهي أساسية في المغرب.' },
         arabizi: '9hwa / Atay',
-        arabic: 'قهوة / أتاي',
+        arabic: 'قَهْوَةْ / أَتَايْ',
         translation: { fr: 'Café / Thé', en: 'Coffee / Tea', es: 'Café / Té', ar: 'قهوة / شاي' },
         culturalNote: { fr: 'Le thé à la menthe (Atay b ne3na3) est la boisson nationale.', en: 'Mint tea is the national drink.', es: 'El té a la menta es la bebida nacional.', ar: 'الشاي بالنعناع هو المشروب الوطني.' }
       }

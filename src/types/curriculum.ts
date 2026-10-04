@@ -13,7 +13,22 @@ export interface UserProfile {
   preferredNotation: Notation;
 }
 
-export type ExerciseType = 'mcq' | 'reorder' | 'match' | 'matching' | 'fill-blank' | 'dialogue';
+/**
+ * Types d'exercices du moteur.
+ *
+ * - `mcq` : question a choix unique.
+ * - `reorder` : remettre des tuiles dans l'ordre (reconstitution de phrase).
+ * - `scramble` : alias pedagogique de `reorder` : blocs melanges a reconstituer
+ *   en phrase syntaxiquement exacte (rendu et validation identiques).
+ * - `match` / `matching` : associer des paires (darija <=> traduction).
+ * - `fill-blank` : completer un trou dans une phrase.
+ * - `dialogue` : scenario dialogue multi-choix (ronde avec l'IA).
+ * - `roleplay_challenge` : epreuve de cloture de module, mise en situation
+ *   avec un persona Roleplay (Driss au cafe, Hassan au souk...). Meme structure
+ *   que `dialogue`, mais signale la passerelle vers l'onglet Parler.
+ */
+
+export type ExerciseType = 'mcq' | 'reorder' | 'scramble' | 'match' | 'matching' | 'fill-blank' | 'dialogue' | 'roleplay_challenge';
 
 export interface MultiLangText {
   fr: string;

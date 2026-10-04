@@ -14,7 +14,7 @@ export const module1Lessons: Lesson[] = [
           title: { fr: 'Le son 3 (ع)', en: 'The 3 sound (ع)', es: 'El sonido 3 (ع)', ar: 'الصوت 3 (ع)' },
           description: { fr: 'Un son guttural venant du fond de la gorge. Imaginez que vous êtes chez le docteur et que vous dites "Aaaah".', en: 'A guttural sound from the back of the throat.', es: 'Un sonido gutural desde el fondo de la garganta.', ar: 'صوت حلقي من مؤخرة الحلق.' },
           arabizi: '3afak',
-          arabic: 'عفاك',
+          arabic: 'عَفَاكْ',
           translation: { fr: 'S\'il te plaît', en: 'Please', es: 'Por favor', ar: 'من فضلك' },
           culturalNote: { fr: 'Le son 3 est essentiel pour dire s\'il te plaît (3afak).', en: 'The 3 sound is essential for saying please (3afak).', es: 'El sonido 3 es esencial para decir por favor (3afak).', ar: 'الصوت 3 أساسي لقول من فضلك (عفاك).' }
         }
@@ -26,7 +26,7 @@ export const module1Lessons: Lesson[] = [
           title: { fr: 'Le son 7 (ح)', en: 'The 7 sound (ح)', es: 'El sonido 7 (ح)', ar: 'الصوت 7 (ح)' },
           description: { fr: 'Un souffle chaud expiré du fond de la gorge, comme si vous souffliez sur des lunettes pour les nettoyer. C\'est un H très appuyé.', en: 'A warm breath pushed from deep in the throat, like fogging up glasses.', es: 'Un aliento cálido desde el fondo de la garganta, como empañar unas gafas.', ar: 'نفس حار من عمق الحلق، كأنك تنفخ على نظارة لتنظيفها.' },
           arabizi: 'sba7 l-khir',
-          arabic: 'صباح الخير',
+          arabic: 'صْبَاحْ الْخِيرْ',
           translation: { fr: 'Bonjour (le matin)', en: 'Good morning', es: 'Buenos días', ar: 'صباح الخير' },
           culturalNote: { fr: 'On dit « sba7 l-khir » le matin, et « msa l-khir » le soir.', en: 'Say "sba7 l-khir" in the morning and "msa l-khir" in the evening.', es: 'Se dice «sba7 l-khir» por la mañana y «msa l-khir» por la noche.', ar: 'نقول «صباح الخير» في الصباح و«مسا الخير» في المساء.' }
         }
@@ -38,7 +38,7 @@ export const module1Lessons: Lesson[] = [
           title: { fr: 'Le son 9 (ق)', en: 'The 9 sound (ق)', es: 'El sonido 9 (ق)', ar: 'الصوت 9 (ق)' },
           description: { fr: 'Une occlusive produite tout au fond de la bouche, au niveau de la luette. Plus profonde qu\'un K français.', en: 'A stop produced far back in the mouth, at the uvula. Deeper than a French K.', es: 'Una oclusiva producida al fondo de la boca, en la úvula. Más profunda que una K francesa.', ar: 'صوت انفجاري يُنطق في أعماق الفم عند اللهاة، أعمق من الكاف الفرنسية.' },
           arabizi: '9hwa',
-          arabic: 'قهوة',
+          arabic: 'قَهْوَةْ',
           translation: { fr: 'Café', en: 'Coffee', es: 'Café', ar: 'قهوة' },
           culturalNote: { fr: '« 9hwa » désigne le café, souvent servi très fort et sucré. Le 9 est le son le plus identitaire de la Darija.', en: '"9hwa" is coffee, often served strong and sweet. The 9 is the most distinctive Darija sound.', es: '«9hwa» es el café, a menudo muy fuerte y dulce. El 9 es el sonido más característico del Darija.', ar: '«قهوة» تُقدَّم غالباً قوية وحلوة. الصوت 9 هو الأكثر تميزاً في الدارجة.' }
         }
@@ -50,7 +50,7 @@ export const module1Lessons: Lesson[] = [
           title: { fr: 'Le son kh (خ)', en: 'The kh sound (خ)', es: 'El sonido kh (خ)', ar: 'الصوت خ' },
           description: { fr: 'Un son râpeux, comme un frottement au fond de la gorge — exactement la « jota » espagnole (ou le « ch » allemand de « Bach »).', en: 'A raspy sound, like friction at the back of the throat — the Spanish "jota".', es: 'Un sonido rasposo, como la «jota» española.', ar: 'صوت خشن، مثل الاحتكاك في مؤخرة الحلق.' },
           arabizi: 'khobz',
-          arabic: 'خبز',
+          arabic: 'خُبْزْ',
           translation: { fr: 'Pain', en: 'Bread', es: 'Pan', ar: 'خبز' },
           culturalNote: { fr: 'Le kh et le gh sont la paire la plus confondue : kh râpe (خبز, pain), gh roule (غادي, aller).', en: 'kh and gh are the most confused pair: kh rasps, gh rolls.', es: 'kh y gh son la pareja más confundida: kh raspa, gh rueda.', ar: 'خ و غ هما الأكثر التباساً: خ خشن، غ يرتعد.' }
         }
@@ -62,7 +62,7 @@ export const module1Lessons: Lesson[] = [
           title: { fr: 'Le son gh (غ)', en: 'The gh sound (غ)', es: 'El sonido gh (غ)', ar: 'الصوت غ' },
           description: { fr: 'Le même frottement que kh, mais avec la voix : c\'est le R parisien râpeux (« Paris »).', en: 'The same friction as kh, but voiced: it is the French guttural R.', es: 'La misma fricción que kh, pero sonora: es la R gutural francesa.', ar: 'نفس احتكاك خ لكن مع الصوت: هو الراء الفرنسية.' },
           arabizi: 'ghadi',
-          arabic: 'غادي',
+          arabic: 'غَادِيْ',
           translation: { fr: 'Je vais / (futur proche)', en: 'I am going / (near future)', es: 'Voy / (futuro próximo)', ar: 'سوف / (المستقبل القريب)' },
           culturalNote: { fr: '« ghadi » sert aussi à former le futur : « ghadi nemshi » = je vais partir.', en: '"ghadi" also builds the future: "ghadi nemshi" = I will go.', es: '«ghadi» también forma el futuro: «ghadi nemshi» = iré.', ar: '«غادي» تُستعمل أيضاً لبناء المستقبل: «غادي نمشي».' }
         }
@@ -129,7 +129,7 @@ export const module1Lessons: Lesson[] = [
           title: { fr: 'Bonjour', en: 'Hello', es: 'Hola', ar: 'مرحباً' },
           description: { fr: 'La salutation la plus courante au Maroc. Forme courte de « Salam u 3alaykum ».', en: 'The most common greeting in Morocco. Short form of "Salam u 3alaykum".', es: 'El saludo más común en Marruecos. Forma corta de «Salam u 3alaykum».', ar: 'التحية الأكثر شيوعاً في المغرب. اختصار «السلام عليكم».' },
           arabizi: 'Salam',
-          arabic: 'سلام',
+          arabic: 'سَلَامْ',
           translation: { fr: 'Bonjour / Paix', en: 'Hello / Peace', es: 'Hola / Paz', ar: 'مرحباً / سلام' }
         }
       },
@@ -140,7 +140,7 @@ export const module1Lessons: Lesson[] = [
           title: { fr: 'La paix sur vous', en: 'Peace be upon you', es: 'La paz sea con usted', ar: 'السلام عليكم' },
           description: { fr: 'La salutation complète. On l\'emploie en entrant dans un lieu, même chez le commerçant.', en: 'The full greeting. Used when entering a place, even a shop.', es: 'El saludo completo. Se usa al entrar en un lugar.', ar: 'التحية الكاملة. تُستعمل عند دخول المكان.' },
           arabizi: 'Salam u 3alaykum',
-          arabic: 'السلام عليكم',
+          arabic: 'السَّلَامُ عَلَيْكُمْ',
           translation: { fr: 'Que la paix soit sur vous', en: 'Peace be upon you', es: 'La paz sea con usted', ar: 'السلام عليكم' }
         }
       },
@@ -151,7 +151,7 @@ export const module1Lessons: Lesson[] = [
           title: { fr: 'Et sur vous la paix', en: 'And upon you peace', es: 'Y sobre usted la paz', ar: 'وعليكم السلام' },
           description: { fr: 'La réponse rituelle. Ne pas répondre est perçu comme un manque de politesse.', en: 'The ritual reply. Not replying is seen as impolite.', es: 'La respuesta ritual. No responder se considera descortés.', ar: 'الرد الواجب. عدم الرد يُعتبر قلة أدب.' },
           arabizi: 'Wa 3alaykum salam',
-          arabic: 'وعليكم السلام',
+          arabic: 'وَعَلَيْكُمُ السَّلَامْ',
           translation: { fr: 'Et sur vous la paix', en: 'And upon you peace', es: 'Y sobre usted la paz', ar: 'وعليكم السلام' }
         }
       },
@@ -175,7 +175,7 @@ export const module1Lessons: Lesson[] = [
         type: 'exercise',
         exercise: {
           id: 'ex_m1_reorder_reply',
-          type: 'reorder',
+          type: 'scramble',
           prompt: { fr: 'Reconstituez la réponse dans le bon ordre.', en: 'Rebuild the reply in the right order.', es: 'Reconstruye la respuesta en el orden correcto.', ar: 'أعد ترتيب الرد بالترتيب الصحيح.' },
           options: [
             { id: 'w_wa', text: 'Wa', isCorrect: true },
@@ -201,7 +201,7 @@ export const module1Lessons: Lesson[] = [
           title: { fr: 'Ça va ?', en: 'How are you?', es: '¿Qué tal?', ar: 'لاباس؟' },
           description: { fr: 'La façon standard de demander comment va quelqu\'un.', en: 'The standard way to ask how someone is.', es: 'La forma estándar de preguntar cómo está alguien.', ar: 'الطريقة القياسية للسؤال عن الحال.' },
           arabizi: 'Labas?',
-          arabic: 'لاباس؟',
+          arabic: 'لَابَاسْ؟',
           translation: { fr: 'Ça va ?', en: 'How are you?', es: '¿Qué tal?', ar: 'كيف حالك؟' }
         }
       },
@@ -212,7 +212,7 @@ export const module1Lessons: Lesson[] = [
           title: { fr: 'Comment vas-tu ? (à un homme)', en: 'How are you? (to a man)', es: '¿Cómo estás? (a un hombre)', ar: 'كيف حالك؟ (لرجل)' },
           description: { fr: 'Forme adressée à un homme. Le son final r marque le masculin.', en: 'Form addressed to a man. The final r marks the masculine.', es: 'Forma dirigida a un hombre.', ar: 'صيغة موجهة للرجل.' },
           arabizi: 'Kidayr?',
-          arabic: 'كيدير؟',
+          arabic: 'كِيدَايِرْ؟',
           translation: { fr: 'Comment vas-tu ? (m)', en: 'How are you? (m)', es: '¿Cómo estás? (m)', ar: 'كيف حالك؟ (مذكر)' }
         }
       },
@@ -223,7 +223,7 @@ export const module1Lessons: Lesson[] = [
           title: { fr: 'Comment vas-tu ? (à une femme)', en: 'How are you? (to a woman)', es: '¿Cómo estás? (a una mujer)', ar: 'كيف حالك؟ (لامرأة)' },
           description: { fr: 'Forme adressée à une femme : on ajoute un a final à « Kidayr ».', en: 'Form addressed to a woman: add a final a to "Kidayr".', es: 'Forma dirigida a una mujer: se añade una a final.', ar: 'صيغة موجهة للمرأة: نضيف ألفاً في النهاية.' },
           arabizi: 'Kidayra?',
-          arabic: 'كيديرة؟',
+          arabic: 'كِيدَايْرَةْ؟',
           translation: { fr: 'Comment vas-tu ? (f)', en: 'How are you? (f)', es: '¿Cómo estás? (f)', ar: 'كيف حالك؟ (مؤنث)' }
         }
       },
@@ -273,7 +273,7 @@ export const module1Lessons: Lesson[] = [
           title: { fr: 'Dieu Merci', en: 'Thank God', es: 'Gracias a Dios', ar: 'الحمد لله' },
           description: { fr: 'On répond toujours par « Labas, l7amdullah ». Le son 7 est appuyé.', en: 'We always reply with "Labas, l7amdullah".', es: 'Siempre respondemos con «Labas, l7amdullah».', ar: 'نرد دائماً بـ «لاباس، الحمد لله».' },
           arabizi: 'l7amdullah',
-          arabic: 'الحمد لله',
+          arabic: 'الْحَمْدُ لِلَّهْ',
           translation: { fr: 'Dieu merci', en: 'Thank God', es: 'Gracias a Dios', ar: 'الحمد لله' }
         }
       },
@@ -284,7 +284,7 @@ export const module1Lessons: Lesson[] = [
           title: { fr: 'Bien', en: 'Fine', es: 'Bien', ar: 'بخير' },
           description: { fr: 'Réponse courte et positive. On la complète souvent par « rbi ykhellik » (que Dieu te garde).', en: 'A short positive reply, often completed by "rbi ykhellik" (may God keep you).', es: 'Respuesta corta y positiva, a menudo completada con «rbi ykhellik».', ar: 'رد قصير وإيجابي، غالباً نكمله بـ «ربي يخليك».' },
           arabizi: 'Bikhir, rbi ykhellik',
-          arabic: 'بخير، ربي يخليك',
+          arabic: 'بْخِيرْ، رَبِّي يْخَلِّيكْ',
           translation: { fr: 'Bien, que Dieu te garde', en: 'Fine, may God keep you', es: 'Bien, que Dios te guarde', ar: 'بخير، ربي يخليك' }
         }
       },
@@ -295,7 +295,7 @@ export const module1Lessons: Lesson[] = [
           title: { fr: 'Tout va bien ?', en: 'Is everything fine?', es: '¿Todo bien?', ar: 'كلشي بخير؟' },
           description: { fr: 'Question de relance pour prendre des nouvelles de la famille ou du travail.', en: 'A follow-up question about family or work.', es: 'Pregunta de seguimiento sobre la familia o el trabajo.', ar: 'سؤال متابعة عن العائلة أو العمل.' },
           arabizi: 'Kullshi bikhir?',
-          arabic: 'كلشي بخير؟',
+          arabic: 'كُلْشِي بْخِيرْ؟',
           translation: { fr: 'Tout va bien ?', en: 'Is everything fine?', es: '¿Todo bien?', ar: 'كلشي بخير؟' }
         }
       },
@@ -345,7 +345,7 @@ export const module1Lessons: Lesson[] = [
           title: { fr: 'Merci beaucoup', en: 'Thank you very much', es: 'Muchas gracias', ar: 'شكرا بزاف' },
           description: { fr: '« Shokran » seul suffit ; « bzzaf » (beaucoup) renforce le remerciement.', en: '"Shokran" alone is enough; "bzzaf" (a lot) strengthens it.', es: '«Shokran» solo basta; «bzzaf» lo refuerza.', ar: '«شكرا» وحدها تكفي؛ «بزاف» تؤكد الشكر.' },
           arabizi: 'Shokran bzzaf',
-          arabic: 'شكرا بزاف',
+          arabic: 'شُكْرًا بْزَّافْ',
           translation: { fr: 'Merci beaucoup', en: 'Thank you very much', es: 'Muchas gracias', ar: 'شكرا بزاف' }
         }
       },
@@ -356,7 +356,7 @@ export const module1Lessons: Lesson[] = [
           title: { fr: 'De rien', en: 'You are welcome', es: 'De nada', ar: 'بلا جميل' },
           description: { fr: 'Littéralement « sans faveur » : on répond aux remerciements.', en: 'Literally "without favor": the reply to thanks.', es: 'Literalmente «sin favor»: la respuesta a las gracias.', ar: 'حرفياً «بدون جميل»: الرد على الشكر.' },
           arabizi: 'Bla jmil',
-          arabic: 'بلا جميل',
+          arabic: 'بْلَا جْمِيلْ',
           translation: { fr: 'De rien', en: 'You are welcome', es: 'De nada', ar: 'عفواً' }
         }
       },
@@ -367,7 +367,7 @@ export const module1Lessons: Lesson[] = [
           title: { fr: 'Excuse-moi', en: 'Excuse me', es: 'Perdóname', ar: 'سمح لي' },
           description: { fr: 'Pour s\'excuser ou attirer l\'attention. À une femme on dit « Semhi li ».', en: 'To apologize or draw attention. To a woman, say "Semhi li".', es: 'Para disculparse o llamar la atención. A una mujer: «Semhi li».', ar: 'للاعتذار أو لفت الانتباه. للمرأة نقول «سمحي لي».' },
           arabizi: 'Smeh li',
-          arabic: 'سمح لي',
+          arabic: 'سْمَحْ لِيْ',
           translation: { fr: 'Excuse-moi', en: 'Excuse me', es: 'Perdóname', ar: 'سمح لي' }
         }
       },
@@ -400,8 +400,111 @@ export const module1Lessons: Lesson[] = [
           ],
           explanation: { fr: 'Shokran remercie, Bla jmil répond au remerciement, Smeh li s\'excuse.', en: 'Shokran thanks, Bla jmil replies to thanks, Smeh li apologizes.', es: 'Shokran agradece, Bla jmil responde, Smeh li se disculpa.', ar: 'شكرا للشكر، بلا جميل للرد، سمح لي للاعتذار.' }
         }
+        },
+        {
+          id: 's6_boss_challenge',
+        type: 'exercise',
+        exercise: {
+          id: 'ex_m1_boss_driss',
+          type: 'roleplay_challenge',
+          prompt: {
+            fr: 'Épreuve finale : relevez le défi « Au café avec Driss » puis enchaînez sur l\'onglet Parler.',
+            en: 'Final challenge: take on the "Cafe with Driss" challenge, then continue on the Parler tab.',
+            es: 'Desafio final: supera el reto «En el cafe con Driss» y luego continua en la pestana Parler.',
+            ar: 'التحدي الختامي: خض مغامرة «في المقهى مع دريس» ثم انتقل إلى تبويب Parler.'
+          },
+          dialogueContext: {
+            fr: 'Vous entrez au Cafe du Coin. Driss, le serveur, vous accueille.',
+            en: 'You walk into the Corner Cafe. Driss, the waiter, welcomes you.',
+            es: 'Entras al Cafe de la Esquina. Driss, el camarero, te da la bienvenida.',
+            ar: 'تدخل إلى مقهى الزاوية. النادل دريس يرحب بك.'
+          },
+          npcStartLine: {
+            arabizi: 'Salamu 3alaykom ! Ach 7abb l-khatr a sidi ?',
+            arabic: 'السَّلَامُ عَلَيْكُمْ ! آشْ حَبّْ الخَاطْرْ أَ سِيدِيْ ؟',
+            translation: {
+              fr: 'Bonjour ! Que desirez-vous, monsieur ?',
+              en: 'Hello! What would you like, sir?',
+              es: 'Hola! Que desea, senor?',
+              ar: 'مرحبا! ماذا تريد يا سيدي؟'
+            }
+          },
+          answer: '',
+          explanation: {
+            fr: 'Vous repondez rituellement a la salutation, puis vous commandez poliment. Ce defi vous prepare au dialogue ouvert avec Driss dans l\'onglet Parler.',
+            en: 'You reply to the greeting ritually, then order politely. This challenge prepares you for the open dialogue with Driss on the Parler tab.',
+            es: 'Respondes al saludo ritualmente y luego pides con cortesia. Este reto te prepara para el dialogo abierto con Driss.',
+            ar: 'ترد على التحية ثم تطلب بأدب. هذا التحدي يهيئك للحوار المفتوح مع دريس في تبويب Parler.'
+          },
+          dialogueChoices: [
+            {
+              id: 'boss_c1',
+              text: {
+                arabizi: 'Wa 3alaykum salam ! 3afak, bghit wa7ed atay b-ne3na3.',
+                arabic: 'وَعَلَيْكُمُ السَّلَامْ ! عَفَاكْ، بْغِيتْ وَاحْدْ أَتَايْ بْ نَعْنَاعْ.',
+                translation: {
+                  fr: 'Et sur vous la paix ! S\'il vous plait, je veux un the a la menthe.',
+                  en: 'And upon you peace! Please, I would like a mint tea.',
+                  es: 'Y sobre usted la paz! Por favor, quiero un te de menta.',
+                  ar: 'وعليكم السلام! من فضلك، أريد شاياً بالنعناع.'
+                }
+              },
+              isOptimal: true,
+              nextNpcLine: 'Wa 3alaykum. Mezyan, ghadi njib lik wa7ed atay skhoun !',
+              feedback: {
+                fr: 'Parfait ! Vous repondez a la salutation puis commandez avec « 3afak ».',
+                en: 'Perfect! You answer the greeting then order with "3afak".',
+                es: 'Perfecto! Respondes al saludo y pides con «3afak».',
+                ar: 'ممتاز! ترد على التحية ثم تطلب بكلمة «عفاك».'
+              }
+            },
+            {
+              id: 'boss_c2',
+              text: {
+                arabizi: 'Shokran bzzaf !',
+                arabic: 'شُكْرًا بْزَّافْ !',
+                translation: {
+                  fr: 'Merci beaucoup !',
+                  en: 'Thank you very much!',
+                  es: 'Muchas gracias!',
+                  ar: 'شكرا جزيلا!'
+                }
+              },
+              isOptimal: false,
+              nextNpcLine: 'Bla jmil a sidi, walakin ach 7abb l-khatr ?',
+              feedback: {
+                fr: 'Pas encore : Driss vient de vous souhaiter la bienvenue. Remerciez apres la commande, pas avant.',
+                en: 'Not yet: Driss just welcomed you. Thank after ordering, not before.',
+                es: 'Todavia no: Driss te ha dado la bienvenida. Agradece despues de pedir.',
+                ar: 'ليس بعد: دريس رحب بك فقط. اشكر بعد الطلب، ليس قبله.'
+              }
+            },
+            {
+              id: 'boss_c3',
+              text: {
+                arabizi: 'Smeh li, ma fhemtch.',
+                arabic: 'سْمَحْ لِيْ، مَا فْهِمْتْشْ.',
+                translation: {
+                  fr: 'Excusez-moi, je n\'ai pas compris.',
+                  en: 'Excuse me, I did not understand.',
+                  es: 'Perdon, no he entendido.',
+                  ar: 'اعذرني، لم أفهم.'
+                }
+              },
+              isOptimal: false,
+              nextNpcLine: 'Ma 3reftch. N3awed: ach 7abb l-khatr a sidi ?',
+              feedback: {
+                fr: '« Smeh li » excuse une incomprehension, mais ici Driss vous a accueilli : repondez d\'abord a la salutation.',
+                en: '"Smeh li" excuses a misunderstanding, but here Driss welcomed you: reply to the greeting first.',
+                es: '«Smeh li» disculpa, pero aqui Driss te saludo: responde primero al saludo.',
+                ar: '«سمح لي» للاعتذار، لكن دريس رحب بك: رد على التحية أولا.'
+              }
+            }
+          ]
+        }
       }
-    ]
+    ],
+
   },
   {
     id: 'l6_pronouns_1',
@@ -416,7 +519,7 @@ export const module1Lessons: Lesson[] = [
           title: { fr: 'Moi / Je', en: 'I / Me', es: 'Yo', ar: 'أنا' },
           description: { fr: 'Le pronom pour la première personne.', en: 'First-person pronoun.', es: 'Pronombre de primera persona.', ar: 'ضمير المتكلم.' },
           arabizi: 'Ana',
-          arabic: 'أنا',
+          arabic: 'أَنَا',
           translation: { fr: 'Je', en: 'I', es: 'Yo', ar: 'أنا' }
         }
       },
@@ -427,7 +530,7 @@ export const module1Lessons: Lesson[] = [
           title: { fr: 'Toi / Tu (masculin et féminin)', en: 'You (male and female)', es: 'Tú (masculino y femenino)', ar: 'أنتَ وأنتِ' },
           description: { fr: '« Nta » pour un homme, « Nti » pour une femme.', en: '"Nta" for a man, "Nti" for a woman.', es: '«Nta» para un hombre, «Nti» para una mujer.', ar: '«نتا» للرجل، «نتي» للمرأة.' },
           arabizi: 'Nta / Nti',
-          arabic: 'نتا / نتي',
+          arabic: 'نْتَا / نْتِيْ',
           translation: { fr: 'Tu (m) / Tu (f)', en: 'You (m) / You (f)', es: 'Tú (m) / Tú (f)', ar: 'أنتَ / أنتِ' }
         }
       },
@@ -438,7 +541,7 @@ export const module1Lessons: Lesson[] = [
           title: { fr: 'Il et Elle', en: 'He and She', es: 'Él y Ella', ar: 'هو وهي' },
           description: { fr: '« Huwa » pour lui, « Hiya » pour elle.', en: '"Huwa" for him, "Hiya" for her.', es: '«Huwa» para él, «Hiya» para ella.', ar: '«هو» له، «هي» لها.' },
           arabizi: 'Huwa / Hiya',
-          arabic: 'هو / هي',
+          arabic: 'هُوَاْ / هِيَاْ',
           translation: { fr: 'Il / Elle', en: 'He / She', es: 'Él / Ella', ar: 'هو / هي' }
         }
       },
@@ -449,7 +552,7 @@ export const module1Lessons: Lesson[] = [
           title: { fr: 'Nous et Vous', en: 'We and You (plural)', es: 'Nosotros y Ustedes', ar: 'حنا وأنتوما' },
           description: { fr: '« Hna » pour nous, « Ntuma » pour vous (plusieurs personnes).', en: '"Hna" for we, "Ntuma" for you (several people).', es: '«Hna» para nosotros, «Ntuma» para ustedes.', ar: '«حنا» لنا، «نتوما» لكم.' },
           arabizi: 'Hna / Ntuma',
-          arabic: 'حنا / نتوما',
+          arabic: 'حْنَا / نْتُومَاْ',
           translation: { fr: 'Nous / Vous', en: 'We / You (pl)', es: 'Nosotros / Ustedes', ar: 'نحن / أنتم' }
         }
       },
