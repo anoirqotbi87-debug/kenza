@@ -77,8 +77,8 @@ export default function ConfidentialitePage() {
           </p>
           <p>
             Contact :{' '}
-            <a href="mailto:support@kenza.app" className="underline hover:text-[#1B2A4A]">
-              support@kenza.app
+            <a href="mailto:anoirqotbi87@gmail.com" className="underline hover:text-[#1B2A4A]">
+              anoirqotbi87@gmail.com
             </a>
           </p>
         </footer>

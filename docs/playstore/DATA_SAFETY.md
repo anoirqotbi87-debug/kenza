@@ -30,5 +30,4 @@ Synthèse des réponses à cocher sur la Google Play Console pour Kenza(app.kenz
 - ⚠️ **État constaté (2026-10-03) : `/privacy` → 404 en prod** ; la page existe sous
   `/confidentialite` (https://kenza-dusky.vercel.app/confidentialite, contenu conforme — données, Supabase, Stripe,
   droits & suppression)。 → Décision requise (alias `/privacy` ou URL `/confidentialite` dans la fiche) avant upload。
-- 📧 **Email de contact côté app** : `support@kenza.app` (page policy) — le prompt Play Store indique
-  `anoirqotbi87@gmail.com`(support listing)。 À harmoniser chez le propriétaire。
+- 📧 **Email de contact unique (app, politique et listing Play Store)** : `anoirqotbi87@gmail.com`。
