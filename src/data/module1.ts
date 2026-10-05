@@ -137,12 +137,14 @@ export const module1Lessons: Lesson[] = [
         id: 'm1_l2_tip_salutations',
         type: 'culture_tip',
         cultureTip: {
-          title: 'Lah ykhelef — l’art de répondre',
+          title: 'L’art des salutations — et les nouvelles de la famille',
           badge: '🇳🇦 Code social marocain',
-          content: '→ On n’enchaîne pas seulement les salutations : on y répond toujours. « Lah ykhelef » (que Dieu te rende la pareille( est la réponse obligée quand on te dit « merci ». Refuser une salutation, c’est refuser la personne.',
+          content: 'On n’enchaîne pas seulement les salutations : on y répond toujours. Quand on te dit « Salam », tu réponds « Wa 3alaykum salam ». On enchaîne aussitôt avec les nouvelles rituelles : « Kif dayer ? » (toi, au masculin( ou « Kif dayra ? » (à une femme( puis « Wa l-3ayla ? » — on demande toujours des nouvelles de la famille, c’est la politesse du pays. « Lah ykhelef » (que Dieu te rende la pareille( est la réponse obligée quand on te dit « merci ».',
           expressions: [
             { darija: 'Salam u 3alaykum', arabicWithTashkeel: 'السَّلَامُ عَلَيْكُمْ', french: 'Que la paix soit sur toi' },
             { darija: 'Wa 3alaykum salam', arabicWithTashkeel: 'وَعَلَيْكُمُ السَّلَامْ', french: 'Et sur toi la paix' },
+            { darija: 'Kif dayer ?', arabicWithTashkeel: 'كِيفْ دَايِرْ؟', french: 'Comment vas-tu ? (au masculin)' },
+            { darija: 'Wa l-3ayla ?', arabicWithTashkeel: 'وَ الْعَايْلَةْ؟', french: 'Et la famille, comment va-t-elle ?' },
             { darija: 'Lah ykhelef', arabicWithTashkeel: 'اللّٰه يْخَلِّفْ', french: 'Que Dieu te rende la pareille' },
           ],
         },

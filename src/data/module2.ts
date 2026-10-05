@@ -56,10 +56,12 @@ export const module2Lessons: Lesson[] = [
         cultureTip: {
           title: 'Marchander, un jeu respectueux',
           badge: '🇳🇦 L’art du souk',
-          content: 'Au souk, le prix affiché n’est qu’un point de départ. On marchande avec le sourire, jamais avec agressivité. La danse est codée : on s’exclame (« L-la !»(, on menace poliment de partir(« Bslama »(, et la poignée de main finale scelle l’accord. Refuser de marchander est perçu comme une impolitesse.',
+          content: 'Au souk, le prix affiché n’est qu’un point de départ. On marchande avec le sourire, jamais avec agressivité. La danse est codée : on demande le prix sans brusquer (« Chhal akher taman ? »(, on s’exclame (« L-la !»(,, on menace poliment de partir(« Bslama »(, et on bénit le vendeur quand l’accord est trouvé (« Lah y3awen »(. Refuser de marchander est perçu comme une impolitesse.',
           expressions: [
+            { darija: 'Chhal akher taman ?', arabicWithTashkeel: 'شْحَالْ آخِرْ ثَمَنْ؟', french: 'Quel est le dernier prix ?' },
             { darija: 'Bch7al hada ?', arabicWithTashkeel: 'بْشْحَالْ هَادَا؟', french: 'Combien ça coûte ?' },
             { darija: 'L-la, ghali bzzaf.', arabicWithTashkeel: 'لَّا، غَالِي بْزَّافْ', french: 'Non, c’est trop cher.' },
+            { darija: 'Lah y3awen', arabicWithTashkeel: 'اللّٰه يْعَاوِنْ', french: 'Que Dieu t’assiste(merci au vendeur(' },
             { darija: 'Bslama !', arabicWithTashkeel: 'بْسْلَامَةْ', french: 'Au revoir(menace polie de partir(' },
           ],
         },
