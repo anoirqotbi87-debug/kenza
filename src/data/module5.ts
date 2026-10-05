@@ -29,7 +29,7 @@ export const module5Lessons: Lesson[] = [
             ar: 'في رأيي، بان لي بلي...، زعما.'
           },
           arabizi: 'F ra2yi, had l-mouchkil s3ib.',
-          arabic: 'في رأيي، هاد المشكل صعيب.',
+          arabic: 'فْ رَأْيِيْ، هَادْ المُشْكِلْ صْعِيبْ.',
           translation: { fr: 'À mon avis, ce problème est difficile.', en: 'In my opinion, this problem is difficult.', es: 'En mi opinión, este problema es difícil.', ar: 'في رأيي، هذه المشكلة صعبة.' }
         }
       },
@@ -61,7 +61,7 @@ export const module5Lessons: Lesson[] = [
             ar: 'متفق معاك ضد ماشي بالضرورة، عندك الحق ولكن...'
           },
           arabizi: '3endek l-heqq walakin machi b daroura.',
-          arabic: 'عندك الحق ولكن ماشي بالضرورة.',
+          arabic: 'عَنْدَكْ الحَقّْ وَلَكِنْ مَاشِي بْالضَّرُورَةْ.',
           translation: { fr: 'Tu as raison mais ce n\'est pas forcément ça.', en: 'You are right but not necessarily.', es: 'Tienes razón pero no necesariamente.', ar: 'عندك الحق ولكن ليس بالضرورة.' }
         }
       },
@@ -93,7 +93,7 @@ export const module5Lessons: Lesson[] = [
             ar: 'من جهة أخرى، كيما كان الحال.'
           },
           arabizi: 'Kima kan l-7al, gha-nmchiw.',
-          arabic: 'كيما كان الحال، غانمشيو.',
+          arabic: 'كِيمَا كَانْ الحَالْ، غَادِي نْمْشِيُوْ.',
           translation: { fr: 'De toute façon, nous irons.', en: 'Anyway, we will go.', es: 'De todas formas, iremos.', ar: 'على أي حال، سنذهب.' }
         }
       }
@@ -127,7 +127,7 @@ export const module5Lessons: Lesson[] = [
             ar: 'نستخدم "إلا" لشرط ممكن: إلا + ماضي/مضارع + مستقبل.'
           },
           arabizi: 'Ila 3ndek l-weqt, gha-nmchiw.',
-          arabic: 'إلا عندك الوقت، غانمشيو.',
+          arabic: 'إِلَا عَنْدَكْ الوَقْتْ، غَادِي نْمْشِيُوْ.',
           translation: { fr: 'Si tu as le temps, nous irons.', en: 'If you have time, we will go.', es: 'Si tienes tiempo, iremos.', ar: 'إذا كان لديك وقت، سنذهب.' }
         }
       },
@@ -159,7 +159,7 @@ export const module5Lessons: Lesson[] = [
             ar: 'نستخدم "كون" للمستحيل أو الندم. كون + ماضي + كون + ماضي.'
           },
           arabizi: 'Kon 3reft, kon jite bekri.',
-          arabic: 'كون عرفت، كون جيت بكري.',
+          arabic: 'كُونْ عْرَفْتْ، كُنْتْ جِيتْ بْكْرِيْ.',
           translation: { fr: 'Si j\'avais su, je serais venu plus tôt.', en: 'If I had known, I would have come earlier.', es: 'Si hubiera sabido, habría venido antes.', ar: 'لو كنت أعرف، لكنت جئت باكراً.' }
         }
       },
@@ -209,7 +209,7 @@ export const module5Lessons: Lesson[] = [
             ar: 'اجتماع، موظف، مشروع، شركة، موعد.'
           },
           arabizi: '3ndi ijtimā3 f charika.',
-          arabic: 'عندي اجتماع ف الشركة.',
+          arabic: 'عَنْدِي إِجْتِمَاعْ فْ الشَّرِكَةْ.',
           translation: { fr: 'J\'ai une réunion à l\'entreprise.', en: 'I have a meeting at the company.', es: 'Tengo una reunión en la empresa.', ar: 'لدي اجتماع في الشركة.' }
         }
       },
@@ -241,7 +241,7 @@ export const module5Lessons: Lesson[] = [
             ar: 'تفاهمنا على الخدمة. غانصيفط ليك الإيميل ف العشية.'
           },
           arabizi: 'Tfehemna 3la l-khedma, gha-nsift lik l-email.',
-          arabic: 'تفاهمنا على الخدمة، غانصيفط ليك الإيميل.',
+          arabic: 'تْفَاهَمْنَا عْلَى الخِدْمَةْ، غَادِي نْصِيْفَطْ لِيكْ الإِيمِيلْ.',
           translation: { fr: 'Nous nous sommes entendus sur le travail, je t\'enverrai l\'email.', en: 'We agreed on the work, I will send you the email.', es: 'Acordamos el trabajo, te enviaré el correo.', ar: 'اتفقنا على العمل، سأرسل لك الإيميل.' }
         }
       },
@@ -291,7 +291,7 @@ export const module5Lessons: Lesson[] = [
             ar: 'دقة بدقة (خطوة بخطوة).'
           },
           arabizi: 'T3elem l-lugha dqqa b dqqa.',
-          arabic: 'تعلم اللغة دقة بدقة.',
+          arabic: 'تْعَلَّمْ اللُّغَةْ دَقَّةْ بْ دَقَّةْ.',
           translation: { fr: 'Apprends la langue pas à pas.', en: 'Learn the language step by step.', es: 'Aprende el idioma paso a paso.', ar: 'تعلم اللغة خطوة بخطوة.' }
         }
       },
@@ -307,7 +307,7 @@ export const module5Lessons: Lesson[] = [
             ar: 'اللي فات مات (ما مضى قد مضى).'
           },
           arabizi: 'Nsaw l-mouchkil, li fate mate.',
-          arabic: 'نساو المشكل، اللي فات مات.',
+          arabic: 'نْسَاوْ المُشْكِلْ، اللِّي فَاتْ مَاتْ.',
           translation: { fr: 'Oubliez le problème, ce qui est passé est passé.', en: 'Forget the problem, what is past is past.', es: 'Olviden el problema, lo pasado, pasado está.', ar: 'انسوا المشكلة، اللي فات مات.' }
         }
       },
@@ -323,7 +323,7 @@ export const module5Lessons: Lesson[] = [
             ar: 'خلي البير بغطاه (احتفظ بالسر / لا تفتح هذا الموضوع).'
           },
           arabizi: 'Mn l-ahsan khelli l-bir b ghettah.',
-          arabic: 'من الأحسن خلي البير بغطاه.',
+          arabic: 'مِنْ الأَحْسَنْ خَلِّي البِيرْ بْ غْطَاهْ.',
           translation: { fr: 'Il vaut mieux ne pas en parler.', en: 'It is better not to talk about it.', es: 'Es mejor no hablar de ello.', ar: 'من الأفضل عدم الحديث عن ذلك.' }
         }
       },
@@ -339,7 +339,7 @@ export const module5Lessons: Lesson[] = [
             ar: 'المرقة بلا ملحة (بدون طعم — مجازاً لشيء أو شخص ممل).'
           },
           arabizi: 'Had l-film ki l-mregga bla melha.',
-          arabic: 'هاد الفيلم كي المرقة بلا ملحة.',
+          arabic: 'هَادْ الفِيلْمْ كِيْ المَرْقَةْ بْلَا مَلْحَةْ.',
           translation: { fr: 'Ce film est ennuyeux (comme un bouillon sans sel).', en: 'This movie is boring.', es: 'Esta película es aburrida.', ar: 'هذا الفيلم ممل.' }
         }
       },
@@ -373,6 +373,136 @@ export const module5Lessons: Lesson[] = [
           ],
           answer: 'o1',
           explanation: { fr: 'Littéralement « laisse le puits avec son couvercle » : on n\'ouvre pas un sujet délicat.', en: 'Literally "leave the well with its lid": do not open a delicate subject.', es: 'Literalmente «deja el pozo con su tapa»: no se abre un tema delicado.', ar: 'حرفياً «اترك البئر بغطائه»: لا تفتح موضوعاً حساساً.' }
+        }
+      },
+      {
+        id: 'm5_l4_s7',
+        type: 'exercise',
+        exercise: {
+          id: 'ex_m5_l4_scramble',
+          type: 'scramble',
+          prompt: {
+            fr: 'Reconstituez : « Bienvenue chez nous, à la maison »',
+            en: 'Reorder: "Welcome, in our home"',
+            es: 'Reconstruye: "Bienvenido, en nuestra casa"',
+            ar: 'أعد ترتيب: "مرحبا بك عندنا في الدار"'
+          },
+          options: [
+            { id: 'w1', text: 'Merhba', isCorrect: true },
+            { id: 'w2', text: 'bik', isCorrect: true },
+            { id: 'w3', text: '3endna', isCorrect: true },
+            { id: 'w4', text: 'f', isCorrect: true },
+            { id: 'w5', text: 'd-dar', isCorrect: true }
+          ],
+          answer: ['w1', 'w2', 'w3', 'w4', 'w5'],
+          explanation: {
+            fr: 'Structure : accueil (Merhba)+ complément (bik)+ lieu (3endna f d-dar)..',
+            en: 'Structure: welcome (Merhba)+ complement (bik)+ place (3endna f d-dar)..',
+            es: 'Estructura: bienvenida (Merhba)+ complemento (bik)+ lugar (3endna f d-dar)..',
+            ar: 'التركيب: ترحيب (مرحبا)+ متمم (بيك)+ مكان (عندنا ف الدار)..'
+          }
+        }
+      },
+      {
+        id: 'm5_boss_challenge',
+        type: 'exercise',
+        exercise: {
+          id: 'ex_m5_boss_habitant',
+          type: 'roleplay_challenge',
+          prompt: {
+            fr: 'Épreuve finale : relevez le défi « Chez l\'Habitant » puis enchaînez sur l\'onglet Parler. Un ami marocain vous invite chez lui à Tanger.',
+            en: 'Final challenge: take on the "At a Moroccan Home" challenge, then move on to the Parler tab. A Moroccan friend invites you to his home in Tangier.',
+            es: 'Desafio final: supera el reto «En casa de un marroquí» y luego continúa en la pestana Parler. Un amigo marroquí te invita a su casa en Tánger.',
+            ar: 'التحدي الختامي: خض مغامرة «في بيت مغربي» ثم انتقل إلى تبويب Parler. صديق مغربي يدعوك إلى بيته في طنجة.'
+          },
+          dialogueContext: {
+            fr: 'Vous arrivez chez la famille de votre ami. La mère vous accueille avec une grande hospitalité. Vous saluez, prenez des nouvelles et remerciez.',
+            en: 'You arrive at your friend famhome. The mother welcomes you with great hospitality. You greet, ask for news and thank.',
+            es: 'Llegas a casa de la familia de tu amigo. La madre te recibe con gran hospitalidad. Saludas, preguntas por las noticias y agradeces.',
+            ar: 'تصل إلى بيت عائلة صديقك. تستقبلك الأم بحفاوة كبيرة. تسلم، تطمئن وتشكر.'
+          },
+          npcStartLine: {
+            arabizi: 'Merhba bik ! Ahlen w sahlen ! Kifash l-hal w l-3a2ila ?',
+            arabic: 'مَرْحْبَا بِيكْ ! أَهْلًا وْ سَهْلًا ! كِيفَاشْ لْحَالْ وْ لْعَائِلَةْ ؟',
+            translation: {
+              fr: 'Bienvenue ! Soyez le bienvenu ! Comment vont la santé et la famille ?',
+              en: 'Welcome! Welcome! How are you and your family doing?',
+              es: '¡Bienvenido! ¡Bienvenido! ¿Cómo están tú y tu familia?',
+              ar: 'مرحبا بك! أهلا وسهلا! كيف الحال والعائلة؟'
+            }
+          },
+          answer: '',
+          explanation: {
+            fr: 'Vous répondez aux salutations, demandez des nouvelles de la famille et remerciez pour l\'hospitalité. Ce défi vous prépare au dialogue ouvert chez l\'habitant dans l\'onglet Parler.',
+            en: 'You reply to the greetings, ask for family news and thank for the hospitality. This challenge prepares you for the open home-dialogue on the Parler tab.',
+            es: 'Respondes a los saludos, preguntas por las noticias de la familia y agradeces la hospitalidad. Este reto te prepara para el dialogo abierto en casa del anfitrión.',
+            ar: 'ترد على التحيات، تطمئن على العائلة وتشكر على كرم الضيافة. هذا التحدي يهيئك للحوار المفتوح في بيت المضيف.'
+          },
+          dialogueChoices: [
+            {
+              id: 'boss_c1',
+              text: {
+                arabizi: 'Merhba bik ! Lla ykhellef 3likoum ! Ka2ila bkhir, l-7amdulillah. Kifash nta w l-3a2ila ?',
+                arabic: 'مَرْحْبَا بِيكْ ! اللهْ يْخَلِّفْ عْلِيكُمْ ! كَاعِيلَةْ بْخِيرْ، لْحَمْدُولِلّٰهْ. كِيفَاشْ نْتَا وْ لْعَائِلَةْ ؟',
+                translation: {
+                  fr: 'Bienvenue ! Que Dieu vous récompense ! La famille va bien, Dieu merci. Et toi et ta famille ?',
+                  en: 'Welcome! May God reward you! The family is fine, thank God. How about you and your family?',
+                  es: '¡Bienvenido! ¡Dios te recompense! La familia está bien, gracias a Dios. ¿Y tú y tu familia?',
+                  ar: 'مرحبا بك! الله يخلف عليكم! العائلة بخير، الحمد لله. وكيف أنت وعائلتك؟'
+                }
+              },
+              isOptimal: true,
+              nextNpcLine: 'Lla ykhellef 3lik ! L-3a2ila kamla bkhir. Dkhoul, 3la r-rass w l-3ayn !',
+              feedback: {
+                fr: 'Impeccable ! Vous répondez à l\'hospitalité, donnez des nouvelles et rendez la politesse en prenant des nouvelles à votre tour.',
+                en: 'Impeccable! You answer the hospitality, share news and return the courtesy by asking back.',
+                es: '¡Impecable! Respondes a la hospitalidad, das noticias y devuelves la cortesía preguntando a tu vez.',
+                ar: 'ممتاز! ترد على كرم الضيافة، تطمئن وترد المجاملة بسؤالك.'
+              }
+            },
+            {
+              id: 'boss_c2',
+              text: {
+                arabizi: 'Shokran bzzaf !',
+                arabic: 'شُكْرًا بْزَّافْ !',
+                translation: {
+                  fr: 'Merci beaucoup !',
+                  en: 'Thank you very much!',
+                  es: '¡Muchas gracias!',
+                  ar: 'شكرا جزيلا!'
+                }
+              },
+              isOptimal: false,
+              nextNpcLine: 'Bla jmil ! Walakin kifash l-3a2ila dyalk ?',
+              feedback: {
+                fr: 'La mère vient de vous souhaiter la bienvenue et de demander de vos nouvelles. Il faut répondre et enchaîner, pas seulement remercier.',
+                en: 'The mother just welcomed you and asked how you are. You should respond and keep the conversation going, not just thank.',
+                es: 'La madre te dio la bienvenida y preguntó por ti. Debes responder y continuar la conversación, no solo agradecer.',
+                ar: 'رحبت بك الأم وسألت عن حالك. يجب أن تجيب وتواصل، ليس فقط تشكر.'
+              }
+            },
+            {
+              id: 'boss_c3',
+              text: {
+                arabizi: 'Smeh li, khassni nemchi daba.',
+                arabic: 'سْمَحْ لِيْ، خَصْنِي نْمْشِيْ دَابَا.',
+                translation: {
+                  fr: 'Excusez-moi, je dois partir maintenant.',
+                  en: 'Excuse me, I have to leave now.',
+                  es: 'Perdón, tengo que irme ahora.',
+                  ar: 'اعذرني، يجب أن أذهب الآن.'
+                }
+              },
+              isOptimal: false,
+              nextNpcLine: 'Daba ? Bareh dkhalti ! Koul chi mezyan. Jlous chwiya w nshoufou l-khedma.',
+              feedback: {
+                fr: 'Vous venez tout juste d\'arriver : il est trop tôt pour partir. Installez-vous, l\'hospitalité marocaine veut qu\'on reste au moins boire un thé.',
+                en: 'You have just arrived: too early to leave. Sit down, Moroccan hospitality wants you to stay at least for tea.',
+                es: 'Acabas de llegar: demasiado pronto para irte. Siéntate, la hospitalidad marroquí requiere quedarse al menos para tomar té.',
+                ar: 'وصلت للتو: من المبكر جدا أن تغادر. اجلس، كرم الضيافة المغربية يقتضي البقاء على الأقل لشاي.'
+              }
+            }
+          ]
         }
       }
     ]
