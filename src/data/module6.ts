@@ -19,7 +19,7 @@ export const module6Lessons: Lesson[] = [
             ar: 'في الماضي مع أنا/أنت/نحن، يتقلص الحرف الأوسط "أ" إلى "و" أو "ي" (مثل: شاف -> شفت، قال -> قلت). لكن مع "هو"، يبقى كما هو (هو شاف).' 
           },
           arabizi: 'Ana chof-t / Huwa chaf',
-          arabic: 'أنا شفت / هو شاف',
+          arabic: 'أَنَا شَفْتْ / هُوْ شَافْ',
           translation: { fr: 'J\'ai vu / Il a vu', en: 'I saw / He saw', es: 'Yo vi / Él vio', ar: 'أنا رأيت / هو رأى' },
           culturalNote: { fr: 'Règle d\'or : "Au passé avec Ana/Nta, le grand A central se contracte en O ou U".', en: 'Golden rule: "In the past with Ana/Nta, the large central A contracts to O or U".', es: 'Regla de oro: "En el pasado con Ana/Nta, la gran A central se contrae a O o U".', ar: 'القاعدة الذهبية: "في الماضي مع أنا/أنت، الحرف الأوسط يتقلص".' }
         }
@@ -124,7 +124,7 @@ export const module6Lessons: Lesson[] = [
             ar: 'التعبير الشهير "شكون قالها ليك؟" يعني "من قال لك ذلك؟". هذه الأفعال ذات الحروف المتغيرة تشبه قليلاً الإسبانية.' 
           },
           arabizi: 'Chkoun galha lik? / Fin ghadi?',
-          arabic: 'شكون قالها ليك؟ / فين غادي؟',
+          arabic: 'شْكُونْ قَالْهَا لِيكْ؟ / فِينْ غَادِيْ؟',
           translation: { fr: 'Qui te l\'a dit ? / Où vas-tu ?', en: 'Who told you? / Where are you going?', es: '¿Quién te lo dijo? / ¿A dónde vas?', ar: 'من قال لك ذلك؟ / إلى أين أنت ذاهب؟' }
         }
       }
@@ -148,7 +148,7 @@ export const module6Lessons: Lesson[] = [
             ar: 'في الدارجة، تلتصق الضمائر بنهاية الفعل. المباشرة: -ك، -ه، -ها. غير المباشرة: -ليك، -ليه، -ليها.' 
           },
           arabizi: 'Chof-t-u (Je l\'ai vu) / Guel-t-lih (Je lui ai dit)',
-          arabic: 'شفتو / قلت ليه',
+          arabic: 'شَفْتُو / قُلْتْ لِيهْ',
           translation: { fr: 'Direct vs Indirect', en: 'Direct vs Indirect', es: 'Directo vs Indirecto', ar: 'مباشر مقابل غير مباشر' },
           culturalNote: { fr: 'Règle d\'or : "Les petits pronoms s\'agglutinent toujours à la fin du verbe".', en: 'Golden rule: "Pronouns always attach to the end of the verb".', es: 'Regla de oro: "Los pronombres siempre se pegan al final del verbo".', ar: 'القاعدة الذهبية: "الضمائر تلتصق دائماً في نهاية الفعل".' }
         }
@@ -253,7 +253,7 @@ export const module6Lessons: Lesson[] = [
             ar: 'صديق: "واش شفتي علي اليوم؟"\n\nأنت: "إيه، شفتو فالسوق وقلت ليه يجي عندنا."' 
           },
           arabizi: 'Chef-t-u (Je l\'ai vu) / Guel-t-lih (Je lui ai dit)',
-          arabic: 'شفتو / قلت ليه',
+          arabic: 'شَفْتُو / قُلْتْ لِيهْ',
           translation: { fr: 'Observez l\'agglutination', en: 'Notice the agglutination', es: 'Observa la aglutinación', ar: 'لاحظ الالتصاق' }
         }
       }
@@ -277,7 +277,7 @@ export const module6Lessons: Lesson[] = [
             ar: 'إيلا (ممكن): شرط مستقبلي ممكن (إيلا + فعل -> غادي...). كون (غير واقعي): شرط خيالي أو ندم على الماضي (كون + ماضي -> كون + ماضي).' 
           },
           arabizi: 'Ila jiti, ghadi n-chufek / Koun jiti, koun chef-t-ek',
-          arabic: 'إيلا جيتي، غادي نشوفك / كون جيتي، كون شفتك',
+          arabic: 'إِيلَا جِيتِيْ، غَادِيْ نْشُوفَكْ / كُونْ جِيتِيْ، كُونْ شَفْتِكْ',
           translation: { fr: 'Si tu viens, je te verrai / Si tu étais venu, je t\'aurais vu', en: 'If you come, I will see you / If you had come, I would have seen you', es: 'Si vienes, te veré / Si hubieras venido, te habría visto', ar: 'إذا جئت، سأراك / لو جئت، لرأيتك' },
           culturalNote: { fr: 'Règle d\'or : "Koun exprime toujours le regret de ce qui ne s\'est pas produit !"', en: 'Golden rule: "Koun always expresses the regret of what did not happen!"', es: 'Regla de oro: "¡Koun siempre expresa el arrepentimiento de lo que no sucedió!"', ar: 'القاعدة الذهبية: "كون تعبر دائماً عن الندم على ما لم يحدث!"' }
         }
@@ -382,7 +382,7 @@ export const module6Lessons: Lesson[] = [
             ar: 'رشيد: "إيلا ساليتي الخدمة بكري، أجي نتلاقاو فالقهوة."\nعمر: "واخا، ولكن كون علمتيني البارح، كون خويت راسي اليوم!"' 
           },
           arabizi: 'Ila (Promesse) vs Koun (Regret)',
-          arabic: 'إيلا مقابل كون',
+          arabic: 'إِيلَا مُقَابِلْ كُونْ',
           translation: { fr: 'Décryptage de la condition', en: 'Condition decoding', es: 'Decodificación de la condición', ar: 'فك تشفير الشرط' }
         }
       }
@@ -406,7 +406,7 @@ export const module6Lessons: Lesson[] = [
             ar: 'الكلمات الرئيسية: الكرا، الضمان، الفراش، الما والضو، مول الدار.' 
           },
           arabizi: 'Sh7al l-kra f ch-her?',
-          arabic: 'شحال الكرا فالشهر؟',
+          arabic: 'شْحَالْ لْكْرَا فْ الشَّهْرْ؟',
           translation: { fr: 'Combien coûte le loyer par mois ?', en: 'How much is the rent per month?', es: '¿Cuánto es el alquiler al mes?', ar: 'كم الإيجار في الشهر؟' },
           culturalNote: { fr: 'Le propriétaire est souvent appelé "Moul d-dar" (le maître de la maison).', en: 'The landlord is often called "Moul d-dar" (master of the house).', es: 'El propietario a menudo se llama "Moul d-dar" (el amo de la casa).', ar: 'غالباً ما يُطلق على صاحب المنزل اسم "مول الدار".' }
         }
@@ -492,8 +492,67 @@ export const module6Lessons: Lesson[] = [
             ar: 'أنت: "عجباتني الدار، ولكن الكرا غالي شوية. واش ممكن تنقص 500 درهم؟"\nمول الدار: "واخا أسيدي، نخليها ليك بـ 4000 درهم مع ضمان ديال شهر."' 
           },
           arabizi: 'T-nqess 500 DH? (Baisser 500 DH ?)',
-          arabic: 'تنقص 500 درهم؟',
+          arabic: 'تَنْقُصْ 500 دْرْهَمْ؟',
           translation: { fr: 'La négociation au Maroc est courante pour le loyer.', en: 'Negotiation in Morocco is common for rent.', es: 'La negociación en Marruecos es común para el alquiler.', ar: 'المفاوضة شائعة في المغرب للإيجار.' }
+        }
+      },
+      {
+        id: 's6_exercise_scramble',
+        type: 'exercise',
+        exercise: {
+          id: 'ex_m6_l4_scramble',
+          type: 'scramble',
+          prompt: { fr: 'Reconstituez : « Je dois payer un mois de caution »', en: 'Reorder: "I have to pay a one-month deposit"', es: 'Reconstruye: "Debo pagar un mes de fianza"', ar: 'أعد ترتيب: "خاصني نخلص شهر ديال الضمان"' },
+          options: [
+            { id: 'w1', text: 'Khasni', isCorrect: true },
+            { id: 'w2', text: 'n-khelles', isCorrect: true },
+            { id: 'w3', text: 'dman', isCorrect: true },
+            { id: 'w4', text: 'dyal', isCorrect: true },
+            { id: 'w5', text: 'ch-her', isCorrect: true }
+          ],
+          answer: ['w1', 'w2', 'w3', 'w4', 'w5'],
+          explanation: {
+            fr: 'Structure : verbe (Khasni)+ infinitif (n-khelles)+ objet (dman)+ possessif (dyal)+ complément (ch-her)..',
+            en: 'Structure: verb (Khasni)+ infinitive (n-khelles)+ object (dman)+ possessive (dyal)+ complement (ch-her)..',
+            es: 'Estructura: verbo (Khasni)+ infinitivo (n-khelles)+ objeto (dman)+ posesivo (dyal)+ complemento (ch-her)..',
+            ar: 'التركيب: فعل(خاصني)+ مصدر(نخلص)+ مفعول(الضمان)+ ملكية(ديال)+ متمم(الشهر)..'
+          }
+        }
+      },
+      {
+        id: 's7_boss_medecin',
+        type: 'exercise',
+        exercise: {
+          id: 'ex_m6_boss_medecin',
+          type: 'roleplay_challenge',
+          prompt: { fr: 'Épreuve finale : relevez le défi « Chez le Médecin » puis enchaînez sur l\'onglet Parler. Vous consultez le Dr Amine à son cabinet.', en: "Final challenge: take on the 'At the Doctor' challenge, then move on to the Parler tab. You consult Dr Amine at his office.", es: 'Desafio final: supera el reto «En el Médico» y luego continúa en la pestana Parler. Consultas al Dr Amine en su consulta.', ar: 'التحدي الختامي: خض مغامرة «عند الطبيب» ثم انتقل إلى تبويب Parler. تستشير الدكتور أمين في عيادته.' },
+          dialogueContext: { fr: "Vous entrez au cabinet du Dr Amine. Vous décrivez vos symptômes et comprenez le diagnostic et la posologie.", en: "You enter Dr Amine's office. You describe your symptoms and understand the diagnosis and the dosage.", es: 'Entras a la consulta del Dr Amine. Describes tus síntomas y comprendes el diagnóstico y la posología.', ar: 'تدخل إلى عيادة الدكتور أمين. تصف أعراضك وتفهم التشخيص والجرعة.' },
+          npcStartLine: { arabizi: 'Tfeddel a sidi ! Chnou kat7ess l-youm ?', arabic: 'تْفَضَّلْ أَ سِيدِيْ ! شْنُو كَتْحَسْ لْيُومْ ؟', translation: { fr: "Entrez monsieur ! Qu'est-ce que vous ressentez aujourd'hui ?", en: "Come in sir! What are you feeling today?", es: '¡Pase señor! ¿Qué siente hoy?', ar: 'تفضل سيدي! بماذا تشعر اليوم؟' } },
+          answer: '',
+          explanation: { fr: "Vous décrivez vos symptômes avec précision et demandez la posologie. Ce défi vous prépare au dialogue médical ouvert dans l'onglet Parler.", en: "You describe your symptoms accurately and ask for the dosage. This challenge prepares you for the open medical dialogue on the Parler tab.", es: 'Describes tus síntomas con precisión y preguntas por la posología. Este reto te prepara para el diálogo médico abierto en la pestana Parler.', ar: 'تصف أعراضك بدقة وتسأل عن الجرعة. هذا التحدي يهيئك للحوار الطبي المفتوح في تبويب Parler.' },
+          dialogueChoices: [
+            {
+              id: 'boss_c1',
+              text: { arabizi: 'S-slam 3likoum docteur ! 3endi l-hraq f r-rass w f l-me3da, w fiya s-skhana. Wash momkin ta3tini chi dwa ?', arabic: 'السَّلَامْ عْلِيكُمْ دُوكْتُورْ ! عَنْدِيْ لْحْرَاقْ فْ رَّاسِيْ وْ فْ لْمَعْدَةْ، وْ فِيَّا السَّخَانَةْ. وَاَشْ مُمْكِنْ تَعْطِينِيْ شِيْ دْوَا ؟', translation: { fr: "Bonjour docteur ! J'ai des brûlures à l'estomac et à la tête, et j'ai de la fièvre. Pouvez-vous me donner un médicament ?", en: "Hello doctor! I have heartburn and a headache,and I have fever. Can you give me some medicine?", es: '¡Hola doctor! Tengo acidez y dolor de cabeza, y tengo fiebre. ¿Puede darme alguna medicina?', ar: 'السلام عليكم دكتور! عندي حرقة في المعدة والرأس، وعندي سخانة. هل يمكنك إعطائي دواء؟' } },
+              isOptimal: true,
+              nextNpcLine: 'Kolo had d-dwa 2 mratt f n-nhar, 3la r-rass w l-me3da.',
+              feedback: { fr: "Impeccable ! Vous décrivez précisément vos symptômes et demandez un traitement. Le médecin vous donne la posologie.", en: "Impeccable! You describe your symptoms precisely and ask foratreatment. The doctor gives you the dosage.", es: '¡Impecable! Describes tus síntomas con precisión y pides un tratamiento. El médico te da la posología.', ar: 'ممتاز! تصف أعراضك بدقة وتطلب علاجاً. يعطيك الطبيب الجرعة.' }
+            },
+            {
+              id: 'boss_c2',
+              text: { arabizi: 'L-hamdulillah, ana mzyan bezzaf. Wash nta?', arabic: 'لْحَمْدُولِلّٰهْ، أَنَا مْزْيَانْ بْزَّافْ. وَاشْ نْتَا ؟', translation: { fr: "Dieu merci, je vais très bien. Et vous ?", en: "Thank God, I am doing very well. And you?", es: 'Gracias a Dios, estoy muy bien. ¿Y usted?', ar: 'الحمد لله، أنا بخير جدا. وأنت؟' } },
+              isOptimal: false,
+              nextNpcLine: 'Wa lakin ana nchouf m3ak chi 7aja, sme7 liya.',
+              feedback: { fr: "Presque ! Le médecin attend que vous décriviez vos symptômes, pas que vous disiez que tout va bien. Reformulez.", en: "Almost! The doctor expects you to describe your symptoms, not to say all is well. Rephrase.", es: '¡Casi! El médico espera que describas tus síntomas, no que digas que todo va bien. Reformula.', ar: 'تقريباً! الطبيب ينتظر أن تصف أعراضك، لا أن تقول أن كل شيء بخير. أعد الصياغة.' }
+            },
+            {
+              id: 'boss_c3',
+              text: { arabizi: 'Sme7 liya docteur, walakin 3andi l-me3da mchit.', arabic: 'سْمَحْ لِيَّةْ دُوكْتُورْ، وَلَاكِنْ عْنْدِيْ لْمَعْدَةْ مْشِيتْ.', translation: { fr: "Pardon docteur, mais mon estomac est parti.", en: "Excuse me doctor, but my stomach is gone.", es: 'Perdón doctor, pero mi estómago se ha ido.', ar: 'سامحني دكتور، لكن معدتي ذهبت.' } },
+              isOptimal: false,
+              nextNpcLine: '7na hna l-me3da, a sidi. Kolo fhamni chwiya.',
+              feedback: { fr: "Attention : en darija « l-me3da mchit » exprime une douleur vive, pas une disparition. Décrivez plutôt la douleur et sa localisation.", en: "Careful:in Darija 'l-me3da mchit' describes sharp pain, not a disappearance. Describe the pain and its location instead.", es: 'Cuidado:en darija «l-me3da mchit» describe un dolor agudo, no un desaparecimiento. Describe el dolor y su ubicación.', ar: 'انتبه: في الدارجة « لمعدة مشيت » تعبر عن ألم حاد، لا عن اختفاء. صف الألم ومكانه بدلاً من ذلك.' }
+            }
+          ]
         }
       }
     ]
