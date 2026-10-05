@@ -133,6 +133,20 @@ export const module1Lessons: Lesson[] = [
           translation: { fr: 'Bonjour / Paix', en: 'Hello / Peace', es: 'Hola / Paz', ar: 'مرحباً / سلام' }
         }
       },
+  {
+        id: 'm1_l2_tip_salutations',
+        type: 'culture_tip',
+        cultureTip: {
+          title: 'Lah ykhelef — l’art de répondre',
+          badge: '🇳🇦 Code social marocain',
+          content: '→ On n’enchaîne pas seulement les salutations : on y répond toujours. « Lah ykhelef » (que Dieu te rende la pareille( est la réponse obligée quand on te dit « merci ». Refuser une salutation, c’est refuser la personne.',
+          expressions: [
+            { darija: 'Salam u 3alaykum', arabicWithTashkeel: 'السَّلَامُ عَلَيْكُمْ', french: 'Que la paix soit sur toi' },
+            { darija: 'Wa 3alaykum salam', arabicWithTashkeel: 'وَعَلَيْكُمُ السَّلَامْ', french: 'Et sur toi la paix' },
+            { darija: 'Lah ykhelef', arabicWithTashkeel: 'اللّٰه يْخَلِّفْ', french: 'Que Dieu te rende la pareille' },
+          ],
+        },
+      },
       {
         id: 's2_learn_salam_3alaykum',
         type: 'learning',
@@ -348,6 +362,20 @@ export const module1Lessons: Lesson[] = [
           arabic: 'شُكْرًا بْزَّافْ',
           translation: { fr: 'Merci beaucoup', en: 'Thank you very much', es: 'Muchas gracias', ar: 'شكرا بزاف' }
         }
+      },
+  {
+        id: 'm1_l5_tip_mots_magiques',
+        type: 'culture_tip',
+        cultureTip: {
+          title: '3afak, l’épine dorsale de la politesse',
+          badge: '🇳🇦 Les mots magiques',
+          content: '« 3afak »(s’il te plaît( est le mot que tu entendras le plus souvent, du souk au taxi. Pour remercier, on ne dit pas seulement « merci » : on bénit. « Bssa7a » après un repas ou un achat, ou « Allah y3tik l-3afya »(que Dieu te donne la force( après un effort.',
+          expressions: [
+            { darija: '3afak', arabicWithTashkeel: 'عَفَاكْ', french: 'S’il te plaît' },
+            { darija: 'Bssa7a', arabicWithTashkeel: 'بْصَحَّةْ', french: 'À ta santé' },
+            { darija: 'Allah y3tik l-3afya', arabicWithTashkeel: 'اللّٰه يْعْطِيكْ العَافْيَةْ', french: 'Que Dieu te donne la force' },
+          ],
+        },
       },
       {
         id: 's2_learn_bla_jmil',

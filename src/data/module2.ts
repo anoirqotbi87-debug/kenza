@@ -50,6 +50,20 @@ export const module2Lessons: Lesson[] = [
           },
         },
       },
+  {
+        id: 'm2_souk_tip_negociation',
+        type: 'culture_tip',
+        cultureTip: {
+          title: 'Marchander, un jeu respectueux',
+          badge: '🇳🇦 L’art du souk',
+          content: 'Au souk, le prix affiché n’est qu’un point de départ. On marchande avec le sourire, jamais avec agressivité. La danse est codée : on s’exclame (« L-la !»(, on menace poliment de partir(« Bslama »(, et la poignée de main finale scelle l’accord. Refuser de marchander est perçu comme une impolitesse.',
+          expressions: [
+            { darija: 'Bch7al hada ?', arabicWithTashkeel: 'بْشْحَالْ هَادَا؟', french: 'Combien ça coûte ?' },
+            { darija: 'L-la, ghali bzzaf.', arabicWithTashkeel: 'لَّا، غَالِي بْزَّافْ', french: 'Non, c’est trop cher.' },
+            { darija: 'Bslama !', arabicWithTashkeel: 'بْسْلَامَةْ', french: 'Au revoir(menace polie de partir(' },
+          ],
+        },
+      },
       {
         id: 'm2_l3_s2',
         type: 'exercise',
@@ -504,6 +518,21 @@ export const module2Lessons: Lesson[] = [
           ],
         },
       },
+  {
+        id: 'm2_souk_tip_hospitalite',
+        type: 'culture_tip',
+        cultureTip: {
+          title: 'L’hospitalité et le refus doux',
+          badge: '🇳🇦 Code social — gestes',
+          content: 'Quand un Marocain t’offre quelque chose — thé, repas, service — refuser brutalement est perçu comme une offense. On décline avec la main posée sur le cœur, en disant « Allah ybarek fik »(que Dieu te bénisse( ou « La, shokran, bzzaf de l’honneur ». Ce geste de la main sur le cœur accompagne aussi le « merci » sincère.',
+          expressions: [
+            { darija: 'Allah ybarek fik', arabicWithTashkeel: 'اللّٰه يْبَارِكْ فِيكْ', french: 'Que Dieu te bénisse' },
+            { darija: 'Bzzaf de l’honneur', arabicWithTashkeel: 'بْزَّافْ دْ لُونُورْ', french: 'C’est trop d’honneur(refus poli(' },
+            { darija: 'La, shokran', arabicWithTashkeel: 'لَا، شُكْرًا', french: 'Non merci(poli(' },
+          ],
+        },
+      },
+
     ],
   },
 ];

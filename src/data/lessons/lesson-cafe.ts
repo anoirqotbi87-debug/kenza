@@ -29,6 +29,20 @@ export const lessonCafe: Lesson = {
       }
     },
     {
+      id: 'm2_cafe_tip_commander',
+      type: 'culture_tip',
+      cultureTip: {
+        title: 'Noss-noss, k7la ou thé b rezza',
+        badge: '🇳🇦 Rituel du café',
+        content: 'Commander est un mini-rituel. « 9hwa » est le café ; « 9hwa k7la »(café noir( se boit court et très sucré par défaut ; « Noss-noss » = moitié café, moitié lait ; « Atay b rezza » = thé avec des feuilles fraîches de menthe. Le serveur s’attend à ce que tu prennes ton temps.',
+        expressions: [
+          { darija: '9hwa k7la', arabicWithTashkeel: 'قَهْوَةْ كَحْلَةْ', french: 'Café noir' },
+          { darija: 'Noss-noss', arabicWithTashkeel: 'نَصْ نَصْ', french: 'Moitié café, moitié lait' },
+          { darija: 'Atay b rezza', arabicWithTashkeel: 'أَتَايْ بْ رَزَّةْ', french: 'Thé à la menthe' },
+        ],
+      },
+    },
+    {
       id: 's3_matching',
       type: 'exercise',
       exercise: {
