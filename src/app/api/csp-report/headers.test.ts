@@ -20,20 +20,20 @@ async function headersFor(): Promise<HeaderEntry[]> {
 }
 
 async function csp(): Promise<string> {
-  const header = (await headersFor()).find((h) => h.key === 'Content-Security-Policy-Report-Only');
+  const header = (await headersFor()).find((h) => h.key === 'Content-Security-Policy');
   expect(header).toBeDefined();
   return header!.value;
 }
 
 describe('en-têtes de sécurité (next.config.ts)', () => {
-  it('la CSP Report-Only déclare un endpoint de collecte', async () => {
+  it('la CSP déclare un endpoint de collecte', async () => {
     expect(await csp()).toContain('report-uri /api/csp-report');
   });
 
-  it('la CSP reste en mode Report-Only (aucun blocage en production)', async () => {
+  it('la CSP est en mode bloquant (aucun Report-Only en production)', async () => {
     const keys = (await headersFor()).map((h) => h.key);
-    expect(keys).toContain('Content-Security-Policy-Report-Only');
-    expect(keys).not.toContain('Content-Security-Policy');
+    expect(keys).toContain('Content-Security-Policy');
+    expect(keys).not.toContain('Content-Security-Policy-Report-Only');
   });
 
   it('les en-têtes de sécurité de base sont toujours présents', async () => {

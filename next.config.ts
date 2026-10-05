@@ -53,7 +53,7 @@ const securityHeaders = [
   // immédiate avec `report-uri` seul). Pour une fenêtre d'observation, la
   // livraison immédiate prime. `report-to` pourra être ajouté une fois la
   // collecte validée en production.
-  { key: 'Content-Security-Policy-Report-Only', value: contentSecurityPolicy }
+  { key: 'Content-Security-Policy', value: contentSecurityPolicy }
 ];
 
 const nextConfig: NextConfig = {
