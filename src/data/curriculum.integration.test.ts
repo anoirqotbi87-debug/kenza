@@ -3,7 +3,7 @@ import { fullCurriculum, allLessonsList } from './curriculum';
 import { getPlayableLessons } from './homeCurriculum';
 import type { ExerciseType, LessonStep } from '@/types/curriculum';
 
-const STEP_TYPES: LessonStep['type'][] = ['learning', 'exercise', 'grammar'];
+const STEP_TYPES: LessonStep['type'][] = ['learning', 'exercise', 'grammar', 'culture_tip'];
 const EXERCISE_TYPES: ExerciseType[] = ['mcq', 'reorder', 'scramble', 'match', 'matching', 'fill-blank', 'dialogue', 'roleplay_challenge'];
 
 const lessonSteps = Object.values(fullCurriculum).flatMap((module) => module.lessons);

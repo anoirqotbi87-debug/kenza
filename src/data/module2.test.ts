@@ -14,7 +14,7 @@ type Lang = (typeof LANGS)[number];
 function textOf(value: MultiLangText | string, lang: Lang): string {
   return typeof value === 'string' ? value : value[lang];
 }
-const LESSON_TYPES = ['learning', 'exercise', 'grammar'];
+const LESSON_TYPES = ['learning', 'exercise', 'grammar', 'culture_tip'];
 const EXERCISE_TYPES = ['mcq', 'reorder', 'scramble', 'match', 'matching', 'fill-blank', 'dialogue', 'roleplay_challenge'];
 
 /** La leçon de négociation du souk, objet de ce lot. */

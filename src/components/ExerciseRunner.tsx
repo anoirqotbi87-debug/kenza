@@ -267,6 +267,69 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
       );
     }
 
+    // 1.5. Culture tips — encarts d'immersion culturelle (codes sociaux marocains)
+    if ((step.type as string) === 'culture_tip') {
+      const tip = step.cultureTip;
+      if (!tip) {
+        return null;
+      }
+      return (
+        <div className="w-full max-w-lg mx-auto">
+          <div className="bg-[#FDFCF8] rounded-3xl border-2 border-[#C9A05C]/50 shadow-md overflow-hidden animate-in fade-in zoom-in duration-300">
+            <div className="bg-gradient-to-r from-[#C9A05C]/15 to-[#F7F3EA] px-6 py-4 border-b border-[#C9A05C]/20 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#C9A05C]/20 text-[#C9A05C] flex items-center justify-center text-xl shrink-0">
+                💡
+              </div>
+              <div>
+                {tip.badge && (
+                  <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-[#B8860B] bg-[#C9A05C]/15 px-2.5 py-0.5 rounded-full mb-1">
+                    {tip.badge}
+                  </span>
+                )}
+                <h2 className="font-display text-xl font-bold text-[#1B2A4A] leading-tight">{tip.title}</h2>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-5">
+              <p className="text-[#4A463F] leading-relaxed text-sm">{tip.content}</p>
+
+              <div className="space-y-3">
+                <p className="text-xs font-bold uppercase tracking-wider text-[#B8860B]">
+                  Expressions à retenir
+                </p>
+                {tip.expressions.map((ex) => {
+                  const arabicText = ex.arabicWithTashkeel;
+                  const isRtl = /[\u0600-\u06FF]/.test(arabicText);
+                  return (
+                    <div key={`${ex.darija}_${ex.french}`} className="bg-[#F7F3EA] border border-[#E8E2D5] rounded-2xl p-4 flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p dir={isRtl ? 'rtl' : 'ltr'} className="font-arabic text-lg font-bold text-[#1B2A4A] leading-relaxed">
+                          {ex.arabicWithTashkeel}
+                        </p>
+                        <p className="font-display font-bold text-[#1B2A4A] text-sm">
+                          {ex.darija}
+                        </p>
+                        <p className="text-xs text-[#7A7670] italic">{ex.french}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handlePlayAudio(arabicText, arabicText)}
+                        className="p-3 rounded-full bg-[#1B2A4A] text-[#FDFCF8] hover:bg-[#1B2A4A]/90 transition-colors shrink-0 shadow-sm"
+                        title="Écouter l'expression"
+                        aria-label="Écouter l'expression"
+                      >
+                        <Volume2 className="w-5 h-5 text-[#C9A05C]" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     // 2. Exercises
     if (step.type === 'exercise' && step.exercise) {
       return (
