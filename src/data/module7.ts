@@ -19,7 +19,7 @@ export const module7Lessons: Lesson[] = [
             ar: 'لسرد قصة، استخدم: فواحد النهار (في يوم من الأيام)، فاللول (في البداية)، من بعد (ثم)، مللي / فاش (عندما)، وفي اللخر (في النهاية).' 
           },
           arabizi: 'F wa7ed n-nhar... Men be3d...',
-          arabic: 'فواحد النهار... من بعد...',
+          arabic: 'فْ وَاحْدْ النْهَارْ... مَنْ بَعْدْ...',
           translation: { fr: 'Un jour... Ensuite...', en: 'One day... Then...', es: 'Un día... Luego...', ar: 'في يوم ما... ثم...' },
           culturalNote: { fr: 'Les Marocains sont de grands conteurs (7layqia). Bien utiliser ces connecteurs rendra votre Darija très fluide.', en: 'Moroccans are great storytellers (7layqia). Using these connectors will make your Darija very fluent.', es: 'Los marroquíes son grandes narradores (7layqia). Usar estos conectores hará que tu Darija sea muy fluida.', ar: 'المغاربة رواة قصص رائعون. استخدام هذه الروابط سيجعل دارجتك سلسة جداً.' }
         }
@@ -84,7 +84,7 @@ export const module7Lessons: Lesson[] = [
             ar: 'أنت: "فواحد النهار، كنت فالمدينة ديال فاس. فاللول، تلفت فالدروبة... مللي سولت واحد السيد، نعت ليا الطريق. في اللخر، وصلت بخير!"\nصديق: "المدينة ديال فاس كبيرة بزاف، عادي تتلف فيها!"' 
           },
           arabizi: 'Melli swwel-t... F l-lekher wsel-t',
-          arabic: 'مللي سولت... في اللخر وصلت',
+          arabic: 'مَلِّيْ سُولْتْ... فِيْ لْلَخَرْ وْصَلْتْ',
           translation: { fr: 'L\'art de raconter une histoire', en: 'The art of storytelling', es: 'El arte de contar historias', ar: 'فن سرد القصص' }
         }
       }
@@ -108,7 +108,7 @@ export const module7Lessons: Lesson[] = [
             ar: 'الدارجة غنية بالأمثال:\n- "اللي فات مات" (اطوِ الصفحة)\n- "ضربة بضربة كتبنى الدار" (الصبر مفتاح الفرج)\n- "الزربات ماتات" (في التأني السلامة).' 
           },
           arabizi: 'Lli fat mat / Zrbat matat',
-          arabic: 'اللي فات مات / الزربات ماتات',
+          arabic: 'اللِّيْ فَاتْ مَاتْ / الزَّرْبَاتْ مَاتَاتْ',
           translation: { fr: 'Les classiques de la sagesse', en: 'Classics of wisdom', es: 'Clásicos de la sabiduría', ar: 'كلاسيكيات الحكمة' },
           culturalNote: { fr: 'Citer un proverbe au bon moment impressionnera toujours les Marocains et montre votre maîtrise du contexte culturel.', en: 'Quoting a proverb at the right time will always impress Moroccans and shows your mastery of the cultural context.', es: 'Citar un proverbio en el momento adecuado siempre impresionará a los marroquíes y demuestra tu dominio del contexto cultural.', ar: 'استشهادك بمثل في الوقت المناسب سيبهر المغاربة دائماً ويدل على فهمك للثقافة.' }
         }
@@ -197,7 +197,7 @@ export const module7Lessons: Lesson[] = [
             ar: 'الشمال (شمالي): القاف واضحة جداً. يقولون "عيل/عيلة" (ولد/بنت) و"فاين ماشي؟" (أين تذهب؟).\nالوسط/فاس: تُنطق القاف غالباً كهمزة ("قهوة" -> "أهوة").\nالشاوية/كازا: تصبح القاف أحياناً "گاف" ("قال" -> "گال").' 
           },
           arabizi: '3ayel (Nord) / Daba (Centre)',
-          arabic: 'عيل / دابا',
+          arabic: 'عَايَلْ / دَابَا',
           translation: { fr: 'Richesse des dialectes', en: 'Richness of dialects', es: 'Riqueza de dialectos', ar: 'غنى اللهجات' }
         }
       },
@@ -234,8 +234,68 @@ export const module7Lessons: Lesson[] = [
             ar: 'طنجاوي: "فاين ماشي أ العيل؟"\nكازاوي: "غادي للدار أخويا، ونتا فين غادي؟"' 
           },
           arabizi: 'Fayn machi? vs Fin ghadi?',
-          arabic: 'فاين ماشي؟ / فين غادي؟',
+          arabic: 'فَايْنْ مَاشِيْ؟ / فِينْ غَادِيْ؟',
           translation: { fr: 'Deux façons de dire "Où vas-tu ?"', en: 'Two ways to say "Where are you going?"', es: 'Dos formas de decir "¿A dónde vas?"', ar: 'طريقتان لقول "إلى أين تذهب؟"' }
+        }
+      },
+      {
+        id: 's4_exercise_scramble',
+        type: 'exercise',
+        exercise: {
+          id: 'ex_m7_l4_scramble',
+          type: 'scramble',
+          prompt: { fr: 'Reconstituez : « Combien coûte le loyer de cet appartement par mois ? »', en: 'Reorder: "How much is the rent for this apartment per month?"', es: 'Reconstruye: "¿Cuánto es el alquiler de este apartamento al mes?"', ar: 'أعد ترتيب: "شحال الكرا ديال هاد الشقة فالشهر؟"' },
+          options: [
+            { id: 'w1', text: 'Chhal', isCorrect: true },
+            { id: 'w2', text: 'l-kra', isCorrect: true },
+            { id: 'w3', text: 'd had', isCorrect: true },
+            { id: 'w4', text: 'ch-cheqqa', isCorrect: true },
+            { id: 'w5', text: 'f', isCorrect: true },
+            { id: 'w6', text: 'ch-chher?', isCorrect: true }
+          ],
+          answer: ['w1', 'w2', 'w3', 'w4', 'w5', 'w6'],
+          explanation: {
+            fr: 'Structure : interrogatif (Chhal)+ nom (l-kra)+ complément (d had)+ objet (ch-cheqqa)+ préposition (f)+ complément de temps (ch-chher.).',
+            en: 'Structure: question word (Chhal)+ noun (l-kra)+ complement (d had)+ object (ch-cheqqa)+ preposition (f)+ time complement (ch-chher.).',
+            es: 'Estructura: interrogativo (Chhal)+ sustantivo (l-kra)+ complemento (d had)+ objeto (ch-cheqqa)+ preposición (f)+ complemento temporal (ch-chher.).',
+            ar: 'التركيب: أداة استفهام(شحال)+ اسم(الكرا)+ متمم(د هاد)+ مفعول(الشقة)+ حرف جر(ف)+ متمم زمني(الشهر.)..'
+          }
+        }
+      },
+      {
+        id: 's5_boss_riad',
+        type: 'exercise',
+        exercise: {
+          id: 'ex_m7_boss_riad',
+          type: 'roleplay_challenge',
+          prompt: { fr: "Épreuve finale du parcours : relevez le défi « Riad à Fès » puis enchaînez sur l'onglet Parler. Vous faites le check-in dans un riad, faites l'état des lieux et négociez.", en: "Final challenge of the course: take on the 'Riad in Fes' challenge, then move on to the Parler tab. You check in to a riad, do the inventory and negotiate.", es: 'Desafio final del curso: supera el reto «Riad en Fez» y luego continúaen la pestana Parler. Te registras en un riad, haces el inventario y negocias.', ar: 'التحدي الختامي للمسار: خض مغامرة «رياض في فاس» ثم انتقل إلى تبويب Parler. تسجل الدخول في رياض، وتجرد الحالة وتتفاوض.' },
+          dialogueContext: { fr: "Vous arrivez au Riad Yasmine à Fès. Le gérant vous accueille et vous fait visiter la chambre, l'état des lieux (wifi, eau chaude), puis la négociation du prix de la nuit.", en: "You arrive at Riad Yasmine in Fes. The manager welcomes you, shows youthe room, the inventory(wifi, hot water), then negotiates the price per night.", es: 'Llegas al Riad Yasmineen Fez. El gerente te recibe, te enseña la habitación, el inventario(wifi, agua caliente) y luego negocia el precio por noche.', ar: 'تصل إلى رياض ياسمين في فاس. يستقبلك المدير ويريك الغرفة وجرد الحالة(الواي فاي، الماء الساخن)ثم يفاوض على سعر الليلة.' },
+          npcStartLine: { arabizi: 'Merhba bik f Riad Yasmine ! Bghiti chi ghourfa wla wahda m3a t-tarrass ?', arabic: 'مَرْحْبَا بِيكْ فْ رِيَاضْ يَاسْمِينْ ! بْغِيتِيْ شِيْ غُورْفَةْ وَالَّا وَاحْدَةْ مْعَا تْرَّاسْ ؟', translation: { fr: 'Bienvenue au Riad Yasmine ! Voulez-vous une chambre avec terrasse ?', en: 'Welcome to Riad Yasmine! Would you like a room with a roof terrace?', es: '¡Bienvenido al Riad Yasmine! ¿Quieres una habitación con terraza?', ar: 'مرحبا بك في رياض ياسمين! هل تريد غرفة مع تراس؟' } },
+          answer: '',
+          explanation: { fr: "Vous répondez à l'accueil, posez les questions d'état des lieux (wifi, eau( et négociez poliment le prix. Ce défi final consolide tout le parcours et vous lance dans les dialogues ouverts de l'onglet Parler.", en: "You answer the welcome, ask inventory questions(wifi, water(and negotiate the price politely. This final challenge consolidates the wholeroad and launches you into the open dialogues of the Parler tab.", es: 'Respondes al recibimiento, haces preguntas del inventario(wifi, agua( y negocias el precio con cortesía. Este reto final consolida todo el recorrido y te lanza a los diálogos abiertos de la pestana Parler.', ar: 'ترد على الترحيب، وتسأل عن جرد الحالة(الواي فاي، الماء( وتتفاوض على السعر باحترام. هذا التحدي الختامي يرسخ كل المسار ويطلقك نحو الحوارات المفتوحة في تبويب Parler.' },
+          dialogueChoices: [
+            {
+              id: 'boss_c1',
+              text: { arabizi: 'Merhba ! Ya3ni fiha chi ghourfa m3a t-tarrass w l-wifi khdam ?', arabic: 'مَرْحْبَا ! يَعْنِيْ فِيهَا شِيْ غُورْفَةْ مْعَا تْرَّاسْ وْ لْوَايْ فَايْ خْدَامْ ؟', translation: { fr: "Bienvenue ! Cela signifie-t-il qu'il y a une chambre avec terrasse et que le wifi fonctionne ?", en: "Welcome! Does this mean there is a room withaterrace and the wifi works?", es: '¡Bienvenido! ¿Significa que hay una habitación con terraza y que el wifi funciona?', ar: 'مرحبا! هل يعني ذلك وجود غرفة مع تراس وأن الواي فاي يعمل؟' } },
+              isOptimal: true,
+              nextNpcLine: 'Na3am, w t-tarrass fiha mniyya bzzaf. W l-ma skhoun mawjoud 24 s3a.',
+              feedback: { fr: "Excellent ! Vous confirmez l'accueil, précisez vos besoins(terrasse) et vérifiez les équipements (wifi).", en: "Excellent! You confirm the welcome, specify your needs (terrace) and check the equipment (wifi).", es: '¡Excelente! Confirmas el recibimiento, precisas tus necesidades (terraza) y verificas los equipos (wifi).', ar: 'ممتاز! تؤكد الترحيب، تحدد احتياجاتك(الترس) وتتحقق من التجهيزات(الواي فاي).' }
+            },
+            {
+              id: 'boss_c2',
+              text: { arabizi: 'Daba, t9der t-nqess liya f l-kra, 3la 7sab belli ana ghadi nbed marrat?', arabic: 'دَابَا، تْقَدَّرْ تْنَقَّصْ لِيَّا فْ لْكْرَا، عْلَا حْسَابْ بَلِّيْ أَنَا غَادِيْ نْبَدْ مَرَّاتْ ؟', translation: { fr: "Maintenant, pouvez-vous baisser le prix, vu que je vais rester plusieurs fois ?", en: "Now, can you lower the price, since I will stay several times?", es: 'Ahora, ¿puedes bajar el precio, ya que me voy a quedar varias veces?', ar: 'الآن، هل يمكنك تخفيض السعر، بما أنني سأبقى عدة مرات؟' } },
+              isOptimal: false,
+              nextNpcLine: 'Wakha a sidi, n-3tik 10% t-khfid 7seb.',
+              feedback: { fr: "Très bien — la négociation commence ! En revanche, pensez d'abord à confirmer l'état des lieux avant de discuter du prix.", en: "Very good — negotiation begins! However, first confirm the inventory before discussing the price.", es: 'Muy bien — ¡comienza la negociación! Sin embargo, primero confirma el inventario antes de discutir el precio.', ar: 'جيد جدا — تبدأ المفاوضة! لكن، ثبّت حالة المكان أولاً قبل مناقشة السعر.' }
+            },
+            {
+              id: 'boss_c3',
+              text: { arabizi: 'Wakha, nakhodha. 3tini s-swaret d bab d-dar. Shokran !', arabic: 'وَاخَا، نَاخْدَهَا. عْطِينِيْ السَّوَارَتْ دْ بَابْ الدَّارْ. شُكْرًا !', translation: { fr: "D'accord, je la prends. Donnez-moi les clés de la porte. Merci !", en: "Ok, I will take it. Give me the keys of the door. Thank you!", es: 'Ok, la tomo. Dame las llaves de la puerta. ¡Gracias!', ar: 'حسنا، سآخذها. أعطني مفاتيح باب الدار. شكرا!' } },
+              isOptimal: false,
+              nextNpcLine: 'Sme7li, walakin qbel hadak khassek tfhem 3la l-3adad dyal liyali w l-kra.',
+              feedback: { fr: "Un peu pressé ! Avant de prendre les clés, vérifiez la durée du séjour et le prix convenu.", en: "A bit hasty! Before taking the keys, confirm the length of stay and the agreed price.", es: '¡Un poco apresurado! Antes de tomar las llaves, confirma duración de la estancia y el precio acordado.', ar: 'مستعجل قليلا! قبل أخذ المفاتيح، ثبّت مدة الإقامة والسعر المتفق عليه.' }
+            }
+          ]
         }
       }
     ]

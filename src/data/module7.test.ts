@@ -12,7 +12,7 @@ function textOf(value: MultiLangText | string, lang: Lang): string {
 }
 
 const LESSON_TYPES = ['learning', 'exercise', 'grammar'];
-const EXERCISE_TYPES = ['mcq', 'reorder', 'match', 'matching', 'fill-blank', 'dialogue'];
+const EXERCISE_TYPES = ['mcq', 'reorder', 'scramble', 'match', 'matching', 'fill-blank', 'dialogue', 'roleplay_challenge'];
 const ARABIC = /[\u0600-\u06FF]/;
 
 /**
