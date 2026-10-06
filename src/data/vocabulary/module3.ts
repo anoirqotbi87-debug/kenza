@@ -8,7 +8,7 @@ export const module3Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m3_sarout',
     arabizi: 'S-sarout',
-    arabic: 'الساروت',
+    arabic: 'السَّارُوتْ',
     translation: { fr: 'La clé', en: 'The key', es: 'La llave', ar: 'الساروت' },
     module: 3,
     category: 'housing',
@@ -23,13 +23,13 @@ export const module3Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m3_bit',
     arabizi: 'L-bit',
-    arabic: 'البيت',
+    arabic: 'البِيتْ',
     translation: { fr: 'La chambre', en: 'The room', es: 'La habitación', ar: 'البيت' },
     module: 3,
     category: 'housing',
     example: {
       arabizi: 'Fin jate l-bit dyali?',
-      arabic: 'فين جات البيت ديالي؟',
+      arabic: 'فِينْ جَاتْ البِيتْ دْيَالِيْ؟',
       translation: {
         fr: 'Où est ma chambre ?',
         en: 'Where is my room?',
@@ -48,13 +48,13 @@ export const module3Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m3_lftour',
     arabizi: 'L-ftour',
-    arabic: 'الفطور',
+    arabic: 'لْفْطُورْ',
     translation: { fr: 'Le petit-déjeuner', en: 'Breakfast', es: 'El desayuno', ar: 'الفطور' },
     module: 3,
     category: 'food',
     example: {
       arabizi: 'F-ay weqt kaykoun l-ftour?',
-      arabic: 'فأشمن وقت كايكون الفطور؟',
+      arabic: 'فَأَشْمَنْ وَقْتْ كَايَكُونْ لْفْطُورْ؟',
       translation: {
         fr: 'À quelle heure est le petit-déjeuner ?',
         en: 'What time is breakfast?',
@@ -73,13 +73,13 @@ export const module3Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m3_makhddamch',
     arabizi: 'Makhddamch',
-    arabic: 'ماخدامش',
+    arabic: 'مَاخْدَامْشْ',
     translation: { fr: 'Ne fonctionne pas', en: 'Not working', es: 'No funciona', ar: 'ماخدامش' },
     module: 3,
     category: 'housing',
     example: {
       arabizi: 'L-ma skhoun makhddamch.',
-      arabic: 'الما سخون ماخدامش.',
+      arabic: 'الْمَا سْخُونْ مَاخْدَامْشْ.',
       translation: {
         fr: "L'eau chaude ne fonctionne pas.",
         en: 'The hot water is not working.',
@@ -98,13 +98,13 @@ export const module3Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m3_fota',
     arabizi: 'Fota',
-    arabic: 'فوطة',
+    arabic: 'فُوطَةْ',
     translation: { fr: 'La serviette', en: 'The towel', es: 'La toalla', ar: 'فوطة' },
     module: 3,
     category: 'housing',
     example: {
       arabizi: 'Khesni fota okhra 3afak.',
-      arabic: 'خصني فوطة اخرى عفاك.',
+      arabic: 'خَصْنِيْ فُوطَةْ أُخْرَى عَفَاكْ.',
       translation: {
         fr: "J'ai besoin d'une autre serviette s'il vous plaît.",
         en: 'I need another towel please.',
@@ -123,13 +123,13 @@ export const module3Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m3_rasi',
     arabizi: 'Rasi',
-    arabic: 'راسي',
+    arabic: 'رَاسِي',
     translation: { fr: 'Ma tête', en: 'My head', es: 'Mi cabeza', ar: 'راسي' },
     module: 3,
     category: 'health',
     example: {
       arabizi: 'Kayderrni rasi bezzaf.',
-      arabic: 'كيضرني راسي بزاف.',
+      arabic: 'كَيْضُرْنِيْ رَاسِي بْزَافْ.',
       translation: {
         fr: 'J\u2019ai très mal à la tête.',
         en: 'My head hurts a lot.',
@@ -148,13 +148,13 @@ export const module3Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m3_fermasian',
     arabizi: 'Fermasian',
-    arabic: 'فرمسيان',
+    arabic: 'فَرْمَسْيَانْ',
     translation: { fr: 'La pharmacie', en: 'The pharmacy', es: 'La farmacia', ar: 'فرمسيان' },
     module: 3,
     category: 'health',
     example: {
       arabizi: 'Fin kayna a9rab fermasian?',
-      arabic: 'فين كاينة اقرب فرمسيان؟',
+      arabic: 'فِينْ كَايْنَةْ أَقْرَبْ فَرْمَسْيَانْ؟',
       translation: {
         fr: 'Où est la pharmacie la plus proche ?',
         en: 'Where is the nearest pharmacy?',
@@ -173,13 +173,13 @@ export const module3Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m3_triq',
     arabizi: 'Triq',
-    arabic: 'طريق',
+    arabic: 'طْرِيقْ',
     translation: { fr: 'La rue / la route', en: 'The street / road', es: 'La calle / carretera', ar: 'طريق' },
     module: 3,
     category: 'orientation',
     example: {
       arabizi: 'Fin jat triq Bab Boujloud?',
-      arabic: 'فين جات طريق باب بوجلود؟',
+      arabic: 'فِينْ جَاتْ طْرِيقْ بَابْ بُوجْلُودْ؟',
       translation: {
         fr: 'Où est la rue Bab Boujloud ?',
         en: 'Where is Bab Boujloud street?',
@@ -198,13 +198,13 @@ export const module3Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m3_3awenni',
     arabizi: '3awenni',
-    arabic: 'عاوني',
+    arabic: 'عَاوْنِي',
     translation: { fr: 'Aidez-moi', en: 'Help me', es: 'Ayúdeme', ar: 'عاوني' },
     module: 3,
     category: 'emergency',
     example: {
       arabizi: '3awenni 3afak. Khellini f t-ti9ar.',
-      arabic: 'عاوني عفاك. خليني ف التيقار.',
+      arabic: 'عَاوْنِي عَفَاكْ. خَلِّيْنِي فْ التِّيقَارْ.',
       translation: {
         fr: 'Aidez-moi s\u2019il vous plaît. Laissez-moi tranquille.',
         en: 'Help me please. Leave me alone.',

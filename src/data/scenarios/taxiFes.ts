@@ -11,7 +11,7 @@ export const taxiFesScenario: DialogueScenario = {
       id: 'turn_1',
       speaker: 'bot',
       speakerRole: 'Chauffeur',
-      arabicText: 'السلام ! فين غادِي ؟',
+      arabicText: 'السَّلَامْ ! فِينْ غادِي ؟',
       arabiziText: 'Salam ! Fin ghadi ?',
       translationFr: 'Bonjour ! Où vas-tu ?',
       audioKey: 'salam_fin_ghadi' // Clé pour la synthèse vocale ou l'audio pré-enregistré

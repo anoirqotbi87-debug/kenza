@@ -9,7 +9,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m6_chof',
     arabizi: 'Chof-t / Chaf',
-    arabic: 'شفت / شاف',
+    arabic: 'شَفْتْ / شَافْ',
     translation: {
       fr: "J'ai vu / Il a vu",
       en: 'I saw / He saw',
@@ -29,7 +29,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m6_mchit',
     arabizi: 'Mchi-t',
-    arabic: 'مشيت',
+    arabic: 'مْشِيتْ',
     translation: {
       fr: "Je suis allé",
       en: 'I went',
@@ -40,7 +40,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
     category: 'verb',
     example: {
       arabizi: 'L-bare7, mchi-t l s-souk.',
-      arabic: 'البارح، مشيت لالسوق.',
+      arabic: 'الْبَارْحْ، مْشِيتْ لِسُّوقْ.',
       translation: {
         fr: 'Hier, je suis allé au souk.',
         en: 'Yesterday, I went to the souk.',
@@ -59,7 +59,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m6_galt',
     arabizi: 'Guel-t',
-    arabic: 'قلت',
+    arabic: 'قُلْتْ',
     translation: {
       fr: "J'ai dit",
       en: 'I said',
@@ -70,7 +70,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
     category: 'verb',
     example: {
       arabizi: 'Ana guel-t l-7aqiqa.',
-      arabic: 'أنا قلت الحقيقة.',
+      arabic: 'أَنَا قُلْتْ الْحَقِيقَةْ.',
       translation: {
         fr: "J'ai dit la vérité.",
         en: 'I told the truth.',
@@ -89,7 +89,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m6_chkoun',
     arabizi: 'Chkoun',
-    arabic: 'شكون',
+    arabic: 'شْكُونْ',
     translation: {
       fr: 'Qui ?',
       en: 'Who?',
@@ -100,7 +100,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
     category: 'abstract',
     example: {
       arabizi: 'Chkoun galha lik?',
-      arabic: 'شكون قالها ليك؟',
+      arabic: 'شْكُونْ قَالْهَا لِيكْ؟',
       translation: {
         fr: "Qui te l'a dit ?",
         en: 'Who told you that?',
@@ -113,7 +113,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m6_fin',
     arabizi: 'Fin',
-    arabic: 'فين',
+    arabic: 'فِينْ',
     translation: {
       fr: 'Où ?',
       en: 'Where?',
@@ -124,7 +124,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
     category: 'abstract',
     example: {
       arabizi: 'Fin ghadi?',
-      arabic: 'فين غادي؟',
+      arabic: 'فِينْ غَادِيْ؟',
       translation: {
         fr: 'Où vas-tu ?',
         en: 'Where are you going?',
@@ -137,7 +137,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m6_chofthu',
     arabizi: 'Chof-t-u',
-    arabic: 'شفتو',
+    arabic: 'شَفْتُو',
     translation: {
       fr: "Je l'ai vu",
       en: 'I saw him',
@@ -157,7 +157,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m6_gualtlih',
     arabizi: 'Guel-t-lih',
-    arabic: 'قلت ليه',
+    arabic: 'قُلْتْ لِيهْ',
     translation: {
       fr: "Je lui ai dit",
       en: 'I told him',
@@ -177,7 +177,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m6_liha',
     arabizi: 'Guel-t-liha',
-    arabic: 'قلت ليها',
+    arabic: 'قُلْتْ لِيْهَا',
     translation: {
       fr: "Je lui ai dit (à elle)",
       en: 'I told her',
@@ -188,7 +188,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
     category: 'pronouns',
     example: {
       arabizi: 'L-bare7, guel-t-liha l-7aqiqa.',
-      arabic: 'البارح، قلت ليها الحقيقة.',
+      arabic: 'الْبَارْحْ، قُلْتْ لِيْهَا الْحَقِيقَةْ.',
       translation: {
         fr: "Hier, je lui ai dit la vérité (à elle).",
         en: 'Yesterday, I told her the truth.',
@@ -201,7 +201,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m6_fhemtni',
     arabizi: 'Fhem-t-ni',
-    arabic: 'فهمتني',
+    arabic: 'فْهِمْتْنِيْ',
     translation: {
       fr: "Tu m'as compris",
       en: 'You understood me',
@@ -212,7 +212,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
     category: 'pronouns',
     example: {
       arabizi: 'Wash fhem-t-ni?',
-      arabic: 'واش فهمتني؟',
+      arabic: 'وَاَشْ فْهِمْتْنِيْ؟',
       translation: {
         fr: "Est-ce que tu m'as compris ?",
         en: 'Did you understand me?',
@@ -231,7 +231,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m6_koun',
     arabizi: 'Koun',
-    arabic: 'كون',
+    arabic: 'كُونْ',
     translation: {
       fr: 'Si (irréel du passé)',
       en: 'If (past unreal)',
@@ -242,7 +242,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
     category: 'grammar',
     example: {
       arabizi: 'Koun 3ref-t, koun ji-t.',
-      arabic: 'كون عرفت، كون جيت.',
+      arabic: 'كُونْ عْرَفْتْ، كُونْ جِيتْ.',
       translation: {
         fr: "Si j'avais su, je serais venu.",
         en: 'If I had known, I would have come.',
@@ -261,7 +261,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m6_dman',
     arabizi: 'Dman',
-    arabic: 'ضمان',
+    arabic: 'ضْمَانْ',
     translation: {
       fr: 'Caution, garantie',
       en: 'Deposit, guarantee',
@@ -272,7 +272,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
     category: 'housing',
     example: {
       arabizi: 'Khass-ni n-khelles ch-her dyal dman.',
-      arabic: 'خاصني نخلص شهر ديال ضمان.',
+      arabic: 'خَاصْنِيْ نْخَلّصْ شَهْرْ دْيَالْ ضْمَانْ.',
       translation: {
         fr: 'Je dois payer un mois de caution.',
         en: 'I have to pay one month of deposit.',
@@ -285,7 +285,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m6_kra',
     arabizi: 'L-kra',
-    arabic: 'الكرا',
+    arabic: 'الكْرَا',
     translation: {
       fr: 'Le loyer',
       en: 'The rent',
@@ -296,7 +296,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
     category: 'housing',
     example: {
       arabizi: 'Sh7al l-kra f ch-her?',
-      arabic: 'شحال الكرا فالشهر؟',
+      arabic: 'شْحَالْ الكْرَا فْشَّهْرْ؟',
       translation: {
         fr: 'Combien coûte le loyer par mois ?',
         en: 'How much is the rent per month?',
@@ -309,7 +309,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m6_chher',
     arabizi: 'Ch-her',
-    arabic: 'الشهر',
+    arabic: 'الشَّهْرْ',
     translation: {
       fr: 'Le mois',
       en: 'The month',
@@ -323,7 +323,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m6_dow',
     arabizi: 'D-dow',
-    arabic: 'الضو',
+    arabic: 'الضُّوْ',
     translation: {
       fr: "L'électricité",
       en: 'Electricity',
@@ -337,7 +337,7 @@ export const module6Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m6_wash',
     arabizi: 'Wash',
-    arabic: 'واش',
+    arabic: 'وَاَشْ',
     translation: {
       fr: 'Est-ce que ?',
       en: 'Is it that...? (question marker)',
