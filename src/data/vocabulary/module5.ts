@@ -9,7 +9,7 @@ export const module5Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m5_ra2yi',
     arabizi: 'F ra2yi',
-    arabic: 'في رأيي',
+    arabic: 'فِيْ رَأْيِيْ',
     translation: {
       fr: 'À mon avis',
       en: 'In my opinion',
@@ -20,7 +20,7 @@ export const module5Vocabulary: ModuleVocabularyItem[] = [
     category: 'debate',
     example: {
       arabizi: 'F ra2yi, had l-mouchkil s3ib.',
-      arabic: 'في رأيي، هاد المشكل صعيب.',
+      arabic: 'فِيْ رَأْيِيْ، هَادْ المُشْكِلْ صْعِيبْ.',
       translation: {
         fr: 'À mon avis, ce problème est difficile.',
         en: 'In my opinion, this problem is difficult.',
@@ -39,7 +39,7 @@ export const module5Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m5_banli',
     arabizi: 'Ban li bli...',
-    arabic: 'بان لي بلي...',
+    arabic: 'بَانْ لِيْ بْلِيْ...',
     translation: {
       fr: "Il me semble que...",
       en: 'It seems to me that...',
@@ -59,7 +59,7 @@ export const module5Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m5_heqq',
     arabizi: '3endek l-heqq',
-    arabic: 'عندك الحق',
+    arabic: 'عَنْدَكْ الْحَقْ',
     translation: {
       fr: 'Tu as raison',
       en: 'You are right',
@@ -73,7 +73,7 @@ export const module5Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m5_daroura',
     arabizi: 'Machi b daroura',
-    arabic: 'ماشي بالضرورة',
+    arabic: 'مَاشِيْ بْالضَّرُورَةْ',
     translation: {
       fr: 'Pas forcément',
       en: 'Not necessarily',
@@ -93,7 +93,7 @@ export const module5Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m5_ila',
     arabizi: 'Ila',
-    arabic: 'إلا',
+    arabic: 'إِلَا',
     translation: {
       fr: 'Si (condition réalisable)',
       en: 'If (a realizable condition)',
@@ -104,7 +104,7 @@ export const module5Vocabulary: ModuleVocabularyItem[] = [
     category: 'grammar',
     example: {
       arabizi: 'Ila 3ndek l-weqt, gha-nmchiw.',
-      arabic: 'إلا عندك الوقت، غانمشيو.',
+      arabic: 'إِلَا عَنْدَكْ لْوَقْتْ، غَنَمْشِيُوْ.',
       translation: {
         fr: 'Si tu as le temps, nous irons.',
         en: 'If you have time, we will go.',
@@ -123,7 +123,7 @@ export const module5Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m5_kon',
     arabizi: 'Kon',
-    arabic: 'كون',
+    arabic: 'كُونْ',
     translation: {
       fr: 'Si (irréel, regret)',
       en: 'If (unreal, regret)',
@@ -134,7 +134,7 @@ export const module5Vocabulary: ModuleVocabularyItem[] = [
     category: 'grammar',
     example: {
       arabizi: 'Kon 3reft, kon jite bekri.',
-      arabic: 'كون عرفت، كون جيت بكري.',
+      arabic: 'كُونْ عْرَفْتْ، كُونْ جِيتْ بْكْرِيْ.',
       translation: {
         fr: "Si j'avais su, je serais venu plus tôt.",
         en: 'If I had known, I would have come earlier.',
@@ -153,7 +153,7 @@ export const module5Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m5_ijtima3',
     arabizi: 'Ijtimā3',
-    arabic: 'اجتماع',
+    arabic: 'اِجْتِمَاعْ',
     translation: {
       fr: 'Réunion',
       en: 'Meeting',
@@ -167,7 +167,7 @@ export const module5Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m5_mochrou3',
     arabizi: 'Mochrou3',
-    arabic: 'مشروع',
+    arabic: 'مَشْرُوعْ',
     translation: {
       fr: 'Projet',
       en: 'Project',
@@ -181,7 +181,7 @@ export const module5Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m5_mow3id',
     arabizi: 'Mow3id',
-    arabic: 'موعد',
+    arabic: 'مَوْعِدْ',
     translation: {
       fr: 'Rendez-vous',
       en: 'Appointment',
@@ -201,7 +201,7 @@ export const module5Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m5_tfehemna',
     arabizi: 'Tfehemna',
-    arabic: 'تفاهمنا',
+    arabic: 'تَفَاهَمْنَا',
     translation: {
       fr: 'Nous nous sommes entendus',
       en: 'We came to an agreement',
@@ -212,7 +212,7 @@ export const module5Vocabulary: ModuleVocabularyItem[] = [
     category: 'work',
     example: {
       arabizi: 'Tfehemna 3la l-khedma, gha-nsift lik l-email.',
-      arabic: 'تفاهمنا على الخدمة، غانصيفط ليك الإيميل.',
+      arabic: 'تَفَاهَمْنَا عْلَى الْخَدْمَةْ، غَانْصَيْفَطْ لِيكْ الإِيمِيلْ.',
       translation: {
         fr: "Nous nous sommes entendus sur le travail, je t'enverrai l'email.",
         en: 'We agreed on the work, I will send you the email.',
@@ -225,7 +225,7 @@ export const module5Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m5_dqqa',
     arabizi: 'Dqqa b dqqa',
-    arabic: 'دقة بدقة',
+    arabic: 'دَقَّةْ بْدَقَّةْ',
     translation: {
       fr: 'Pas à pas',
       en: 'Little by little',
@@ -236,7 +236,7 @@ export const module5Vocabulary: ModuleVocabularyItem[] = [
     category: 'proverb',
     example: {
       arabizi: 'T3elem l-lugha dqqa b dqqa.',
-      arabic: 'تعلم اللغة دقة بدقة.',
+      arabic: 'تْعَلَّمْ اللُّغَةْ دَقَّةْ بْدَقَّةْ.',
       translation: {
         fr: 'Apprends la langue pas à pas.',
         en: 'Learn the language little by little.',
@@ -249,7 +249,7 @@ export const module5Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m5_lifatmat',
     arabizi: 'Lli fat mat',
-    arabic: 'اللي فات مات',
+    arabic: 'اللِّيْ فَاتْ مَاتْ',
     translation: {
       fr: "Ce qui est passé est passé",
       en: 'What is past is past',
@@ -269,7 +269,7 @@ export const module5Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m5_bir',
     arabizi: 'Khelli l-bir b ghettah',
-    arabic: 'خلي البير بغطاه',
+    arabic: 'خَلِّيْ الْبِيرْ بْغَطَاهْ',
     translation: {
       fr: "N'en parle pas (garde le secret)",
       en: 'Leave it unsaid (keep it quiet)',
@@ -289,7 +289,7 @@ export const module5Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m5_mregga',
     arabizi: 'Ki l-mregga bla melha',
-    arabic: 'كي المرقة بلا ملحة',
+    arabic: 'كِيْ الْمَرْقَةْ بْلَا مَلْحَةْ',
     translation: {
       fr: 'Fade, ennuyeux (comme un bouillon sans sel)',
       en: 'Bland, dull (like a broth without salt)',
@@ -300,7 +300,7 @@ export const module5Vocabulary: ModuleVocabularyItem[] = [
     category: 'proverb',
     example: {
       arabizi: 'Had l-film ki l-mregga bla melha.',
-      arabic: 'هاد الفيلم كي المرقة بلا ملحة.',
+      arabic: 'هَادْ الفِيلْمْ كِيْ الْمَرْقَةْ بْلَا مَلْحَةْ.',
       translation: {
         fr: 'Ce film est ennuyeux (comme un bouillon sans sel).',
         en: 'This film is dull (like a broth without salt).',

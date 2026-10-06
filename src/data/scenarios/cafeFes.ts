@@ -11,7 +11,7 @@ export const cafeFesScenario: DialogueScenario = {
       id: 'turn_1',
       speaker: 'bot',
       speakerRole: 'Serveur',
-      arabicText: 'السَّلَامُ عَلَيْكُم ! آشْ حَبّْ الخَاطْرْ أ سِيدِي ؟',
+      arabicText: 'السَّلَامُ عَلَيْكُم ! آشْ حَبّ الخَاطْرْ أَ سِيدِي ؟',
       arabiziText: 'Salamu 3alaykom ! Ach 7abb l-khatr a sidi ?',
       translationFr: 'Bonjour ! Que désirez-vous monsieur ?',
       audioKey: 'salam_ach_7abb_lkhatr'
@@ -34,7 +34,7 @@ export const cafeFesScenario: DialogueScenario = {
       id: 'turn_3',
       speaker: 'bot',
       speakerRole: 'Serveur',
-      arabicText: 'وْخَا أ سِيدِي، تْشْرَبْ مْعَاهْ كَاسْ دْ المَا ؟',
+      arabicText: 'وْخَا أَ سِيدِي، تْشْرَبْ مْعَاهْ كَاسْ دْ المَا ؟',
       arabiziText: 'Wakha a sidi, tchreb m3ah kas d-l-ma ?',
       translationFr: "D'accord monsieur, vous buvez un verre d'eau avec ?",
       audioKey: 'wakha_kas_dlma'

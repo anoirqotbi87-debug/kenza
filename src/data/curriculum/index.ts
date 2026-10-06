@@ -9,31 +9,31 @@ import { Lesson, MultiLangText } from '../../types/curriculum';
 
 export const fullCurriculum: Record<string, { title: MultiLangText, lessons: Lesson[] }> = {
   1: { 
-    title: { fr: "Les Fondations", en: "Foundations", es: "Los Cimientos", ar: "الأساسيات" }, 
+    title: { fr: "Les Fondations", en: "Foundations", es: "Los Cimientos", ar: "الْأَسَاسِيَّاتْ" }, 
     lessons: module1Lessons 
   },
   2: { 
-    title: { fr: "Survie Quotidienne", en: "Daily Survival", es: "Supervivencia Diaria", ar: "البقاء اليومي" }, 
+    title: { fr: "Survie Quotidienne", en: "Daily Survival", es: "Supervivencia Diaria", ar: "الْبَقَاءْ الْيَوْمِيْ" }, 
     lessons: module2Lessons 
   },
   3: { 
-    title: { fr: "Autonomie & Riad", en: "Autonomy & Riad", es: "Autonomía y Riad", ar: "الاستقلالية والرياض" }, 
+    title: { fr: "Autonomie & Riad", en: "Autonomy & Riad", es: "Autonomía y Riad", ar: "الِاسْتِقْلَالِيَّةْ وَالرِّيَاضْ" }, 
     lessons: module3Lessons 
   },
   4: { 
-    title: { fr: "Grammaire Active & Temps", en: "Active Grammar & Tenses", es: "Gramática Activa y Tiempos", ar: "قواعد نشطة والأزمنة" }, 
+    title: { fr: "Grammaire Active & Temps", en: "Active Grammar & Tenses", es: "Gramática Activa y Tiempos", ar: "قَوَاعِدْ نَشِطَةْ وَالْأَزْمِنَةْ" }, 
     lessons: module4Lessons 
   },
   5: { 
-    title: { fr: "Niveau B2 - Tanger (Le Grand Socco)", en: "Level B2 - Tangier (Le Grand Socco)", es: "Nivel B2 - Tánger (Le Grand Socco)", ar: "المستوى B2 - طنجة (السوق الكبير)" }, 
+    title: { fr: "Niveau B2 - Tanger (Le Grand Socco)", en: "Level B2 - Tangier (Le Grand Socco)", es: "Nivel B2 - Tánger (Le Grand Socco)", ar: "الْمُسْتَوَى B2 - طَنْجَةْ (السُّوقْ الْكَبِيرْ)" }, 
     lessons: module5Lessons 
   },
   6: {
-    title: { fr: "Niveau B1 - Autonomie", en: "Level B1 - Autonomy", es: "Nivel B1 - Autonomía", ar: "المستوى B1 - الاستقلالية" },
+    title: { fr: "Niveau B1 - Autonomie", en: "Level B1 - Autonomy", es: "Nivel B1 - Autonomía", ar: "الْمُسْتَوَى B1 - الِاسْتِقْلَالِيَّةْ" },
     lessons: module6Lessons
   },
   7: {
-    title: { fr: "Niveau B2 - Aisance", en: "Level B2 - Fluency", es: "Nivel B2 - Fluidez", ar: "المستوى B2 - الطلاقة" },
+    title: { fr: "Niveau B2 - Aisance", en: "Level B2 - Fluency", es: "Nivel B2 - Fluidez", ar: "الْمُسْتَوَى B2 - الطَّلَاقَةْ" },
     lessons: module7Lessons
   }
 };

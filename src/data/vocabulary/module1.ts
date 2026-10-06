@@ -8,13 +8,13 @@ export const module1Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m1_salam',
     arabizi: 'Salam',
-    arabic: 'سلام',
+    arabic: 'سَلَامْ',
     translation: { fr: 'Bonjour / Paix', en: 'Hello / Peace', es: 'Hola / Paz', ar: 'سلام' },
     module: 1,
     category: 'greetings',
     example: {
       arabizi: 'Salam, labas?',
-      arabic: 'سلام، لاباس؟',
+      arabic: 'سَلَامْ، لَابَاسْ؟',
       translation: {
         fr: 'Bonjour, ça va ?',
         en: 'Hello, how are you?',
@@ -33,7 +33,7 @@ export const module1Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m1_labas',
     arabizi: 'Labas?',
-    arabic: 'لاباس؟',
+    arabic: 'لَابَاسْ؟',
     translation: { fr: 'Ça va ?', en: 'How are you?', es: '¿Qué tal?', ar: 'لاباس؟' },
     module: 1,
     category: 'greetings',
@@ -48,7 +48,7 @@ export const module1Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m1_l7amdoulillah',
     arabizi: 'L7amdoulillah',
-    arabic: 'الحمد لله',
+    arabic: 'الْحَمْدُ لِلَّهْ',
     translation: { fr: 'Dieu merci / Je vais bien', en: 'Thank God / I am fine', es: 'Gracias a Dios / Estoy bien', ar: 'الحمد لله' },
     module: 1,
     category: 'greetings',
@@ -63,7 +63,7 @@ export const module1Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m1_3afak',
     arabizi: '3afak',
-    arabic: 'عفاك',
+    arabic: 'عَفَاكْ',
     translation: { fr: "S'il te/vous plaît", en: 'Please', es: 'Por favor', ar: 'عفاك' },
     module: 1,
     category: 'politeness',
@@ -78,7 +78,7 @@ export const module1Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m1_shokran',
     arabizi: 'Shokran',
-    arabic: 'شكرا',
+    arabic: 'شُكْرَانْ',
     translation: { fr: 'Merci', en: 'Thank you', es: 'Gracias', ar: 'شكرا' },
     module: 1,
     category: 'politeness',
@@ -87,7 +87,7 @@ export const module1Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m1_bla_jmil',
     arabizi: 'Bla jmil',
-    arabic: 'بلا جميل',
+    arabic: 'بْلَا جْمِيلْ',
     translation: { fr: 'De rien', en: "You're welcome", es: 'De nada', ar: 'بلا جميل' },
     module: 1,
     category: 'politeness',
@@ -102,7 +102,7 @@ export const module1Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m1_ana',
     arabizi: 'Ana',
-    arabic: 'أنا',
+    arabic: 'أَنَا',
     translation: { fr: 'Je / Moi', en: 'I / Me', es: 'Yo', ar: 'أنا' },
     module: 1,
     category: 'pronouns',
@@ -117,7 +117,7 @@ export const module1Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m1_nta',
     arabizi: 'Nta',
-    arabic: 'نتا',
+    arabic: 'نْتَا',
     translation: { fr: 'Tu (masculin)', en: 'You (male)', es: 'Tú (masculino)', ar: 'أنتَ' },
     module: 1,
     category: 'pronouns',
@@ -126,7 +126,7 @@ export const module1Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m1_nti',
     arabizi: 'Nti',
-    arabic: 'نتي',
+    arabic: 'نْتِيْ',
     translation: { fr: 'Tu (féminin)', en: 'You (female)', es: 'Tú (femenino)', ar: 'أنتِ' },
     module: 1,
     category: 'pronouns',
@@ -141,13 +141,13 @@ export const module1Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m1_sba7_lkhir',
     arabizi: 'sba7 l-khir',
-    arabic: 'صباح الخير',
+    arabic: 'صْبَاحْ الْخِيرْ',
     translation: { fr: 'Bonjour (le matin)', en: 'Good morning', es: 'Buenos días', ar: 'صباح الخير' },
     module: 1,
     category: 'greetings',
     example: {
       arabizi: 'sba7 l-khir, labas?',
-      arabic: 'صباح الخير، لاباس؟',
+      arabic: 'صْبَاحْ الْخِيرْ، لَابَاسْ؟',
       translation: { fr: 'Bonjour, ça va ?', en: 'Good morning, how are you?', es: 'Buenos días, ¿qué tal?', ar: 'صباح الخير، كيف حالك؟' },
     },
     culturalNote: {
@@ -161,13 +161,13 @@ export const module1Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m1_9hwa',
     arabizi: '9hwa',
-    arabic: 'قهوة',
+    arabic: 'قَهْوَةْ',
     translation: { fr: 'Café', en: 'Coffee', es: 'Café', ar: 'قهوة' },
     module: 1,
     category: 'food',
     example: {
       arabizi: '9hwa, 3afak',
-      arabic: 'قهوة، عفاك',
+      arabic: 'قَهْوَةْ، عَفَاكْ',
       translation: { fr: 'Un café, s\'il te plaît', en: 'A coffee, please', es: 'Un café, por favor', ar: 'قهوة، من فضلك' },
     },
     culturalNote: {
@@ -181,13 +181,13 @@ export const module1Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m1_khobz',
     arabizi: 'khobz',
-    arabic: 'خبز',
+    arabic: 'خُبْزْ',
     translation: { fr: 'Pain', en: 'Bread', es: 'Pan', ar: 'خبز' },
     module: 1,
     category: 'food',
     example: {
       arabizi: 'khobz bzzaf',
-      arabic: 'خبز بزاف',
+      arabic: 'خُبْزْ بْزَافْ',
       translation: { fr: 'Beaucoup de pain', en: 'A lot of bread', es: 'Mucho pan', ar: 'خبز كثير' },
     },
     culturalNote: {
@@ -201,13 +201,13 @@ export const module1Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m1_ghadi',
     arabizi: 'ghadi',
-    arabic: 'غادي',
+    arabic: 'غَادِيْ',
     translation: { fr: 'Je vais / (futur proche)', en: 'I am going / (near future)', es: 'Voy / (futuro próximo)', ar: 'سوف / (المستقبل القريب)' },
     module: 1,
     category: 'verb',
     example: {
       arabizi: 'ghadi nemshi',
-      arabic: 'غادي نمشي',
+      arabic: 'غَادِيْ نَمْشِيْ',
       translation: { fr: 'Je vais partir', en: 'I will go', es: 'Voy a ir', ar: 'سوف أذهب' },
     },
     culturalNote: {
@@ -221,13 +221,13 @@ export const module1Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m1_wa3alaykum_salam',
     arabizi: 'Wa 3alaykum salam',
-    arabic: 'وعليكم السلام',
+    arabic: 'وَعَلَيْكُمُ السَّلَامْ',
     translation: { fr: 'Et sur vous la paix', en: 'And upon you peace', es: 'Y sobre usted la paz', ar: 'وعليكم السلام' },
     module: 1,
     category: 'greetings',
     example: {
       arabizi: 'Salam u 3alaykum! Wa 3alaykum salam.',
-      arabic: 'السلام عليكم! وعليكم السلام.',
+      arabic: 'السَّلَامْ عَلَيْكُمْ! وَعَلَيْكُمُ السَّلَامْ.',
       translation: { fr: 'Bonjour ! Et sur vous la paix.', en: 'Hello! And upon you peace.', es: '¡Hola! Y sobre usted la paz.', ar: 'السلام عليكم! وعليكم السلام.' },
     },
     culturalNote: {
@@ -241,13 +241,13 @@ export const module1Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m1_kidayr',
     arabizi: 'Kidayr?',
-    arabic: 'كيدير؟',
+    arabic: 'كِيدَايْرْ؟',
     translation: { fr: 'Comment vas-tu ? (m)', en: 'How are you? (m)', es: '¿Cómo estás? (m)', ar: 'كيف حالك؟ (مذكر)' },
     module: 1,
     category: 'greetings',
     example: {
       arabizi: 'Salam, kidayr?',
-      arabic: 'سلام، كيدير؟',
+      arabic: 'سَلَامْ، كِيدَايْرْ؟',
       translation: { fr: 'Bonjour, comment vas-tu ?', en: 'Hello, how are you?', es: 'Hola, ¿cómo estás?', ar: 'سلام، كيف حالك؟' },
     },
     culturalNote: {
@@ -261,13 +261,13 @@ export const module1Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m1_bikhir',
     arabizi: 'Bikhir',
-    arabic: 'بخير',
+    arabic: 'بْخِيرْ',
     translation: { fr: 'Bien', en: 'Fine', es: 'Bien', ar: 'بخير' },
     module: 1,
     category: 'greetings',
     example: {
       arabizi: 'Bikhir, rbi ykhellik',
-      arabic: 'بخير، ربي يخليك',
+      arabic: 'بْخِيرْ، رَبِّي يْخَلِّيكْ',
       translation: { fr: 'Bien, que Dieu te garde', en: 'Fine, may God keep you', es: 'Bien, que Dios te guarde', ar: 'بخير، ربي يخليك' },
     },
     source: 'l4_greetings_3',
@@ -275,13 +275,13 @@ export const module1Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m1_smeh_li',
     arabizi: 'Smeh li',
-    arabic: 'سمح لي',
+    arabic: 'سْمَحْ لِيْ',
     translation: { fr: 'Excuse-moi', en: 'Excuse me', es: 'Perdóname', ar: 'سمح لي' },
     module: 1,
     category: 'politeness',
     example: {
       arabizi: 'Smeh li, 3afak',
-      arabic: 'سمح لي، عفاك',
+      arabic: 'سْمَحْ لِيْ، عَفَاكْ',
       translation: { fr: 'Excuse-moi, s\'il te plaît', en: 'Excuse me, please', es: 'Perdóname, por favor', ar: 'سمح لي، من فضلك' },
     },
     culturalNote: {
@@ -295,7 +295,7 @@ export const module1Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m1_huwa',
     arabizi: 'Huwa',
-    arabic: 'هو',
+    arabic: 'هُوْ',
     translation: { fr: 'Il', en: 'He', es: 'Él', ar: 'هو' },
     module: 1,
     category: 'pronouns',
@@ -304,7 +304,7 @@ export const module1Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m1_hiya',
     arabizi: 'Hiya',
-    arabic: 'هي',
+    arabic: 'هِيْ',
     translation: { fr: 'Elle', en: 'She', es: 'Ella', ar: 'هي' },
     module: 1,
     category: 'pronouns',
@@ -313,7 +313,7 @@ export const module1Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m1_hna',
     arabizi: 'Hna',
-    arabic: 'حنا',
+    arabic: 'حْنَا',
     translation: { fr: 'Nous', en: 'We', es: 'Nosotros', ar: 'نحن' },
     module: 1,
     category: 'pronouns',
@@ -322,7 +322,7 @@ export const module1Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m1_ntuma',
     arabizi: 'Ntuma',
-    arabic: 'نتوما',
+    arabic: 'نْتُومَا',
     translation: { fr: 'Vous (pluriel)', en: 'You (plural)', es: 'Ustedes', ar: 'أنتم' },
     module: 1,
     category: 'pronouns',

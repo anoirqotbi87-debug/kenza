@@ -11,7 +11,7 @@ export const soukFesScenario: DialogueScenario = {
       id: 'turn_1',
       speaker: 'bot',
       speakerRole: 'Marchand',
-      arabicText: 'مَرْحْبَا بِيك أ خُويَا ! دْخُلْ تْفَرَّجْ، كُلْشِي زْوِينْ',
+      arabicText: 'مَرْحْبَا بِيك أَ خُويَا ! دْخُلْ تْفَرَّجْ، كُلْشِي زْوِينْ',
       arabiziText: 'Mre7ba bik a khoya ! Dkhol tferrej, kolchi zwin.',
       translationFr: 'Bienvenue mon frère ! Entre regarder, tout est beau.',
       audioKey: 'mre7ba_dkhol_tferrej'
@@ -34,7 +34,7 @@ export const soukFesScenario: DialogueScenario = {
       id: 'turn_3',
       speaker: 'bot',
       speakerRole: 'Marchand',
-      arabicText: 'هَادَاك نْحَاسْ حُرّْ دْ فَاسْ، كَانْحْسْبُو بْ مْيَاتَيْنْ دَرْهَم',
+      arabicText: 'هَادَاك نْحَاسْ حُرّ دْ فَاسْ، كَانْحْسْبُو بْ مْيَاتَيْنْ دَرْهَم',
       arabiziText: 'Hadak n7as 7orr d-Fas, kan7esbo b-myatayn derhem.',
       translationFr: "C'est du vrai cuivre de Fès, je le fais à 200 dirhams.",
       audioKey: 'n7as_7orr_200_derhem'
@@ -43,7 +43,7 @@ export const soukFesScenario: DialogueScenario = {
       id: 'turn_4',
       speaker: 'user',
       speakerRole: 'Apprenant',
-      arabicText: 'غَالِي شْوِيَا أ خُويَا، نْقَّصْ لِيَا، نْعْطِيكْ مْيَة وْ خَمْسِينْ',
+      arabicText: 'غَالِي شْوِيَا أَ خُويَا، نْقَّصْ لِيَا، نْعْطِيكْ مْيَة وْ خَمْسِينْ',
       arabiziText: 'Ghali chwiya a khoya, nqess liya, n3tik mya w khemsin.',
       translationFr: "C'est un peu cher mon frère, baisse un peu, je vous donne 150.",
       expectedPhrases: {
@@ -66,7 +66,7 @@ export const soukFesScenario: DialogueScenario = {
       id: 'turn_6',
       speaker: 'user',
       speakerRole: 'Apprenant',
-      arabicText: 'شُكْرًا بْزَّافْ، الله يْخَلْفْ، بْسْلَامَة',
+      arabicText: 'شُكْرًا بْزَّافْ، اللّٰه يْخَلْفْ، بْسْلَامَة',
       arabiziText: 'Chokran bezzaf, llah ykhelef, bslama !',
       translationFr: 'Merci beaucoup, que Dieu te récompense, au revoir !',
       expectedPhrases: {

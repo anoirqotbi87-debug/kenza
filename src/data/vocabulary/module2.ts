@@ -8,7 +8,7 @@ export const module2Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m2_9hwa_atay',
     arabizi: '9hwa / Atay',
-    arabic: 'قهوة / أتاي',
+    arabic: 'قَهْوَةْ / أَتَايْ',
     translation: { fr: 'Café / Thé', en: 'Coffee / Tea', es: 'Café / Té', ar: 'قهوة / أتاي' },
     module: 2,
     category: 'cafe',
@@ -23,7 +23,7 @@ export const module2Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m2_bghit',
     arabizi: 'Bghit',
-    arabic: 'بغيت',
+    arabic: 'بْغِيتْ',
     translation: { fr: 'Je veux', en: 'I want', es: 'Quiero', ar: 'بغيت' },
     module: 2,
     category: 'verb',
@@ -38,7 +38,7 @@ export const module2Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m2_l7sab',
     arabizi: 'L-7sab',
-    arabic: 'الحساب',
+    arabic: 'لْحْسَابْ',
     translation: { fr: "L'addition", en: 'The bill', es: 'La cuenta', ar: 'الحساب' },
     module: 2,
     category: 'cafe',
@@ -53,7 +53,7 @@ export const module2Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m2_khdem_lkuntur',
     arabizi: 'Khdem l-kuntur',
-    arabic: 'خدم الكونتور',
+    arabic: 'خْدَمْ الْكُونْتُورْ',
     translation: { fr: 'Mettez le compteur', en: 'Turn on the meter', es: 'Ponga el contador', ar: 'خدم الكونتور' },
     module: 2,
     category: 'transport',
@@ -68,7 +68,7 @@ export const module2Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m2_b_sh7al',
     arabizi: 'B sh7al?',
-    arabic: 'ب شحال؟',
+    arabic: 'بْ شْحَالْ؟',
     translation: { fr: 'Combien ?', en: 'How much?', es: '¿Cuánto?', ar: 'ب شحال؟' },
     module: 2,
     category: 'transport',
@@ -83,7 +83,7 @@ export const module2Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m2_ma_bghitch',
     arabizi: 'Ma bghitch',
-    arabic: 'ما بغيتش',
+    arabic: 'مَا بْغِيتْشْ',
     translation: { fr: 'Je ne veux pas', en: "I don't want", es: 'No quiero', ar: 'ما بغيتش' },
     module: 2,
     category: 'verb',
@@ -98,7 +98,7 @@ export const module2Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m2_souk',
     arabizi: 'Souk',
-    arabic: 'السوق',
+    arabic: 'السُّوقْ',
     translation: { fr: 'Le marché', en: 'The market', es: 'El zoco', ar: 'السوق' },
     module: 2,
     category: 'abstract',
@@ -113,7 +113,7 @@ export const module2Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m2_sh7al_dyal',
     arabizi: 'Sh7al dyal...?',
-    arabic: 'شحال ديال...؟',
+    arabic: 'شْحَالْ دْيَالْ...؟',
     translation: { fr: 'Combien coûte... ?', en: 'How much for...?', es: '¿Cuánto cuesta...?', ar: 'شحال ديال...؟' },
     module: 2,
     category: 'abstract',
@@ -128,13 +128,13 @@ export const module2Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m2_bch7al_hada',
     arabizi: 'Bch7al hada ?',
-    arabic: 'بشحال هادا؟',
+    arabic: 'بْشْحَالْ هَادَا؟',
     translation: { fr: 'Combien coûte celui-ci ?', en: 'How much is this one?', es: '¿Cuánto cuesta este?', ar: 'بكم هذا؟' },
     module: 2,
     category: 'souk',
     example: {
       arabizi: 'Bch7al had l-berrad d-n-n7as 3afak ?',
-      arabic: 'بشحال هاد البراد د النحاس عفاك؟',
+      arabic: 'بْشْحَالْ هَادْ البَرَّادْ دْ النْحَاسْ عَفَاكْ؟',
       translation: {
         fr: "Combien coûte cette théière en cuivre s'il vous plaît ?",
         en: 'How much is this copper teapot please?',
@@ -153,13 +153,13 @@ export const module2Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m2_ghali_bezzaf',
     arabizi: 'Ghali bezzaf !',
-    arabic: 'غالي بزاف!',
+    arabic: 'غَالِي بْزَّافْ!',
     translation: { fr: "C'est trop cher !", en: 'That is too expensive!', es: '¡Es demasiado caro!', ar: 'غالي بزاف!' },
     module: 2,
     category: 'souk',
     example: {
       arabizi: 'Ghali chwiya a khoya, nqess liya.',
-      arabic: 'غالي شويا أ خويا، نقص ليا.',
+      arabic: 'غَالِي شْوِيَا أَ خُويَا، نْقَصْ لِيَّا.',
       translation: {
         fr: "C'est un peu cher mon frère, baisse pour moi.",
         en: 'A bit expensive my brother, lower it for me.',
@@ -178,13 +178,13 @@ export const module2Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m2_naqass',
     arabizi: 'Naqass chwiya',
-    arabic: 'نقص شويا',
+    arabic: 'نْقَصْ شْوِيَا',
     translation: { fr: 'Baisse un peu', en: 'Lower it a bit', es: 'Baja un poco', ar: 'نقص شويا' },
     module: 2,
     category: 'souk',
     example: {
       arabizi: 'Naqass chwiya 3afak.',
-      arabic: 'نقص شويا عفاك.',
+      arabic: 'نْقَصْ شْوِيَا عَفَاكْ.',
       translation: {
         fr: "Baisse un peu s'il te plaît.",
         en: 'Lower it a bit please.',
@@ -203,7 +203,7 @@ export const module2Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m2_akhir_taman',
     arabizi: 'Akhir taman dyalek ?',
-    arabic: 'آخر تمن ديالك؟',
+    arabic: 'آخِرْ تَمَنْ دْيَالِكْ؟',
     translation: { fr: "C'est ton dernier prix ?", en: 'Is that your final price?', es: '¿Es tu último precio?', ar: 'آخر تمن ديالك؟' },
     module: 2,
     category: 'souk',
@@ -218,7 +218,7 @@ export const module2Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m2_wakha',
     arabizi: 'Wakha',
-    arabic: 'واخا',
+    arabic: 'وَاْخَا',
     translation: { fr: "D'accord", en: 'Alright / OK', es: 'De acuerdo', ar: 'واخا' },
     module: 2,
     category: 'souk',
@@ -233,7 +233,7 @@ export const module2Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m2_nchouf_nrje3',
     arabizi: 'Nchouf ou n-rje3',
-    arabic: 'نشوف و نرجع',
+    arabic: 'نْشُوفْ وْ نْرْجَعْ',
     translation: { fr: 'Je regarde et je reviens', en: 'I will look around and come back', es: 'Miro y vuelvo', ar: 'نشوف و نرجع' },
     module: 2,
     category: 'souk',
@@ -248,7 +248,7 @@ export const module2Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m2_berrad',
     arabizi: 'L-berrad',
-    arabic: 'البراد',
+    arabic: 'البَرَّادْ',
     translation: { fr: 'La théière', en: 'The teapot', es: 'La tetera', ar: 'البراد' },
     module: 2,
     category: 'souk',
@@ -263,13 +263,13 @@ export const module2Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m2_derhem',
     arabizi: 'Derhem',
-    arabic: 'درهم',
+    arabic: 'دِرْهَمْ',
     translation: { fr: 'Le dirham', en: 'The dirham', es: 'El dirham', ar: 'درهم' },
     module: 2,
     category: 'souk',
     example: {
       arabizi: 'N3tik mya w khemsin derhem.',
-      arabic: 'نعطيك مية و خمسين درهم.',
+      arabic: 'نْعْطِيكْ مِيَّةْ وْ خَمْسِينْ دِرْهَمْ.',
       translation: {
         fr: 'Je te donne cent cinquante dirhams.',
         en: 'I give you one hundred and fifty dirhams.',
