@@ -24,21 +24,26 @@ const supabaseOrigin = (() => {
 const contentSecurityPolicy = [
   "default-src 'self'",
   // `'unsafe-inline'` reste requis : Next.js injecte des scripts inline pour
-  // l'hydratation. `'unsafe-eval'` a été retiré : aucun `eval`/`new Function`
-  // dans le code (vérifié), et le build de production n'en a pas besoin.
-  "script-src 'self' 'unsafe-inline' https://js.stripe.com",
+  // l'hydratation. `'unsafe-eval'` reste interdit : aucun `eval`/`new Function`
+  // dans le code (vérifié). `https://vercel.live` autorise la Vercel Toolbar
+  // (aperçus de dev/production) sans ouvrir un `https:` générique.
+  "script-src 'self' 'unsafe-inline' https://vercel.live",
   "style-src 'self' 'unsafe-inline'",
   // Les polices sont auto-hébergées par `next/font/google` (servies depuis
   // `/_next/static/media/`) : les domaines Google sont donc inutiles.
   "font-src 'self'",
   // `https:` retiré : il autorisait l'envoi de données vers n'importe quel
-  // domaine. Le logo Google est désormais hébergé localement.
-  "img-src 'self' data: blob:",
-  `connect-src 'self' ${supabaseOrigin}`,
+  // domaine. Les avatars Google OAuth sont chargés depuis un sous-domaine
+  // `lh3.googleusercontent.com` (identifié par l'audit `csp_violations`).
+  "img-src 'self' data: blob: https://lh3.googleusercontent.com",
+  `connect-src 'self' ${supabaseOrigin} https://lh3.googleusercontent.com https://vercel.live`,
   "object-src 'none'",
   "base-uri 'self'",
   "frame-ancestors 'none'",
-  'frame-src \'self\' https://js.stripe.com https://hooks.stripe.com',
+  'frame-src \'self\' https://js.stripe.com https://vercel.live',
+  // Les Web Workers locaux (service worker + workers chargés via `blob:`)
+  // doivent rester exécutables : Sans `blob:` ici, Chrome bloque leur instantiation.
+  "worker-src 'self' blob:",
   'report-uri /api/csp-report',
 ].join('; ') + ';';
 
