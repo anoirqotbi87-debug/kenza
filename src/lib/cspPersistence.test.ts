@@ -101,7 +101,7 @@ describe('persistCspViolations', () => {
     await expect(persistCspViolations([VIOLATION])).resolves.toBeUndefined();
 
     expect(createClientMock).not.toHaveBeenCalled();
-    expect(errorSpy.mock.calls.map((c) => String(c[0])).join(' ')).toContain('non persistées');
+    expect(errorSpy.mock.calls.map((c: unknown[]) => String(c[0])).join(' ')).toContain('non persistées');
   });
 
   it('fail-open : erreur d’insertion → signale, ne lève pas', async () => {
@@ -112,7 +112,7 @@ describe('persistCspViolations', () => {
 
     await expect(persistCspViolations([VIOLATION])).resolves.toBeUndefined();
 
-    expect(errorSpy.mock.calls.map((c) => String(c[0])).join(' ')).toContain('insertion refusée');
+    expect(errorSpy.mock.calls.map((c: unknown[]) => String(c[0])).join(' ')).toContain('insertion refusée');
   });
 
   it('fail-open : exception du client → signale, ne lève pas', async () => {
@@ -123,6 +123,6 @@ describe('persistCspViolations', () => {
 
     await expect(persistCspViolations([VIOLATION])).resolves.toBeUndefined();
 
-    expect(errorSpy.mock.calls.map((c) => String(c[0])).join(' ')).toContain('échec');
+    expect(errorSpy.mock.calls.map((c: unknown[]) => String(c[0])).join(' ')).toContain('échec');
   });
 });

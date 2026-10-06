@@ -75,9 +75,9 @@ describe('/api/csp-report collecte', () => {
 
   it('journalise la directive et l’URI bloquée', async () => {
     await report(LEGACY);
-    const logged = warnSpy.mock.calls.map((c) => String(c[0])).join(' ');
+    const logged = warnSpy.mock.calls.map((c: unknown[]) => String(c[0])).join(' ');
     expect(logged).toContain('[CSP Violation]');
-    expect(warnSpy.mock.calls.map((c) => JSON.stringify(c)).join(' ')).toContain('script-src-elem');
+    expect(warnSpy.mock.calls.map((c: unknown[]) => JSON.stringify(c)).join(' ')).toContain('script-src-elem');
   });
 
   it('neutralise les caractères de contrôle pour empêcher la forge de lignes de log', async () => {
@@ -85,8 +85,8 @@ describe('/api/csp-report collecte', () => {
       'csp-report': { 'effective-directive': 'script-src', 'blocked-uri': 'evil\nFAKE LOG LINE\r\nx' },
     });
     const payloads = warnSpy.mock.calls
-      .filter((c) => String(c[0]).includes('[CSP Violation]'))
-      .map((c) => String(c[1] ?? ''))
+      .filter((c: unknown[]) => String(c[0]).includes('[CSP Violation]'))
+      .map((c: unknown[]) => String(c[1] ?? ''))
       .join(' ');
     expect(payloads).not.toContain('\n');
     expect(payloads).not.toContain('\r');
@@ -124,7 +124,7 @@ describe('/api/csp-report robustesse', () => {
     checkRateLimitMock.mockResolvedValue({ allowed: false, error: 'DB_CONNECTION_TIMEOUT' });
     const res = await report(LEGACY);
     expect(res.status).toBe(204);
-    expect(warnSpy.mock.calls.map((c) => String(c[0])).join(' ')).toContain('indisponible');
+    expect(warnSpy.mock.calls.map((c: unknown[]) => String(c[0])).join(' ')).toContain('indisponible');
   });
 });
 
