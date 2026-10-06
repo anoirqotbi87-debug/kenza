@@ -173,14 +173,22 @@ describe('module 7 — densite et variete pedagogiques', () => {
     }
   });
 
-  it('les deux premieres lecons portent au moins deux exercices', () => {
-    // La troisieme lecon (variations regionales) n'en a qu'un : c'est une lecon
-    // d'ecoute culturelle, plus courte par nature. On fige le niveau des deux
-    // autres, qui sont des lecons de production.
-    for (const id of ['l_mod7_1', 'l_mod7_2']) {
+  it('chaque lecon porte au moins quatre exercices de production', () => {
+    // Enrichissement M7 : les trois lecons du module terminal doivent porter
+    // chacune un volume comparable aux modules 4-6 (>=4 exercices).
+    for (const id of LESSON_IDS) {
       const exercises = lessonById(id).steps.filter((s) => s.type === 'exercise').length;
-      expect(exercises, `${id} n a que ${exercises} exercice(s)`).toBeGreaterThanOrEqual(2);
+      expect(exercises, `${id} n a que ${exercises} exercice(s)`).toBeGreaterThanOrEqual(4);
     }
+  });
+
+  it('le module atteint la densite cible de 16 a 18 exercices', () => {
+    const total = lessons.reduce(
+      (sum, l) => sum + l.steps.filter((s) => s.type === 'exercise').length,
+      0
+    );
+    expect(total, `${total} exercices au total`).toBeGreaterThanOrEqual(16);
+    expect(total, `${total} exercices au total`).toBeLessThanOrEqual(18);
   });
 
   it('le module varie les formats au-dela du QCM', () => {
@@ -201,9 +209,9 @@ describe('module 7 — densite et variete pedagogiques', () => {
 
 describe('module 7 — couverture des notions d aisance', () => {
   const NOTIONS: Record<string, { lesson: string; formes: string[] }> = {
-    'les marqueurs de recit': { lesson: 'l_mod7_1', formes: ['f wa7ed n-nhar', 'f l-lowwel', 'men be3d', 'f l-lekher'] },
-    'les proverbes et leur sens': { lesson: 'l_mod7_2', formes: ['lli fat mat', 'zrbat matat', 'drba b drba'] },
-    'les variations regionales nord / centre': { lesson: 'l_mod7_3', formes: ['3ayel', 'daba', 'fayn machi'] },
+    'les marqueurs de recit': { lesson: 'l_mod7_1', formes: ['f wa7ed n-nhar', 'f l-lowwel', 'men be3d', 'f l-lekher', '9bel ma'] },
+    'les proverbes et leur sens': { lesson: 'l_mod7_2', formes: ['lli fat mat', 'zrbat matat', 'drba b drba', 'koul ta3tila fiha khira', 'yed we7da ma katsseqqefch'] },
+    'les variations regionales nord / centre / sud': { lesson: 'l_mod7_3', formes: ['3ayel', 'daba', 'fayn machi', 'la bas 3lik'] },
   };
 
   for (const [notion, { lesson, formes }] of Object.entries(NOTIONS)) {
@@ -226,10 +234,11 @@ describe('module 7 — couverture des notions d aisance', () => {
     }
   });
 
-  it('la lecon de variations regionales compare au moins deux parlers', () => {
+  it('la lecon de variations regionales compare au moins trois parlers', () => {
     const taught = darijaIn('l_mod7_3');
     expect(taught, 'parler du Nord absent').toMatch(/chamali|3ayel|fayn machi/);
     expect(taught, 'parler du Centre absent').toMatch(/casawi|daba|fin ghadi/);
+    expect(taught, 'parler du Sud (Marrakech) absent').toMatch(/marrakech|tashel7it|la bas 3lik/);
   });
 });
 
