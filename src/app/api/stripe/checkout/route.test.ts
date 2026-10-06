@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { NextRequest } from 'next/server';
+import { PRICING_CONFIG } from '@/lib/pricingConfig';
 
 const sessionsCreate = vi.fn();
 const getUser = vi.fn();
@@ -65,12 +66,12 @@ describe('checkout — essai gratuit 7 jours', () => {
   it('annuel (EUR) : passe subscription_data.trial_period_days = 7', async () => {
     const res = await post({ billingCycle: 'yearly', currency: 'EUR' });
     expect(res.status).toBe(200);
-    expect(lastCreateArg().subscription_data).toEqual({ trial_period_days: 7 });
+    expect(lastCreateArg().subscription_data).toEqual({ trial_period_days: PRICING_CONFIG.annual.trialDays });
   });
 
   it('annuel (MAD) : passe aussi trial_period_days = 7', async () => {
     await post({ billingCycle: 'yearly', currency: 'MAD' });
-    expect(lastCreateArg().subscription_data).toEqual({ trial_period_days: 7 });
+    expect(lastCreateArg().subscription_data).toEqual({ trial_period_days: PRICING_CONFIG.annual.trialDays });
   });
 
   it('mensuel : ne passe AUCUN trial_period_days (facturation immediate)', async () => {
@@ -81,7 +82,7 @@ describe('checkout — essai gratuit 7 jours', () => {
 
   it('annuel : le tarif reste celui de la config (59,00 EUR)', async () => {
     await post({ billingCycle: 'yearly', currency: 'EUR' });
-    expect(lastCreateArg().line_items[0].price_data.unit_amount).toBe(5900);
+    expect(lastCreateArg().line_items[0].price_data.unit_amount).toBe(PRICING_CONFIG.annual.priceEUR * 100);
   });
 
   it('annuel : reste un abonnement recurrent annuel', async () => {

@@ -14,8 +14,8 @@ type Lang = (typeof LANGS)[number];
 function textOf(value: MultiLangText | string, lang: Lang): string {
   return typeof value === 'string' ? value : value[lang];
 }
-const LESSON_TYPES = ['learning', 'exercise', 'grammar'];
-const EXERCISE_TYPES = ['mcq', 'reorder', 'match', 'matching', 'fill-blank', 'dialogue'];
+const LESSON_TYPES = ['learning', 'exercise', 'grammar', 'culture_tip'];
+const EXERCISE_TYPES = ['mcq', 'reorder', 'scramble', 'match', 'matching', 'fill-blank', 'dialogue', 'roleplay_challenge'];
 
 /** La leçon de négociation du souk, objet de ce lot. */
 const soukLesson = module2Lessons.find((l) => l.id === 'l_module2_souk_1')!;
@@ -104,7 +104,7 @@ describe('module 2 — integrite des etapes', () => {
     for (const lesson of module2Lessons) {
       for (const step of lesson.steps) {
         const ex = step.exercise;
-        if (!ex || ex.type !== 'reorder') continue;
+        if (!ex || (ex.type !== 'reorder' && ex.type !== 'scramble')) continue;
         const where = `${lesson.id}.${step.id}`;
         const tileIds = ex.options!.map((o) => o.id).sort();
         const answerIds = (ex.answer as string[]).slice().sort();
@@ -128,7 +128,7 @@ describe('module 2 — integrite des etapes', () => {
     for (const lesson of module2Lessons) {
       for (const step of lesson.steps) {
         const ex = step.exercise;
-        if (!ex || ex.type !== 'dialogue') continue;
+        if (!ex || (ex.type !== 'dialogue' && ex.type !== 'roleplay_challenge')) continue;
         const where = `${lesson.id}.${step.id}`;
         expect(ex.npcStartLine, `${where} sans replique du marchand`).toBeDefined();
         expect(ex.dialogueChoices!.length, `${where} choix`).toBeGreaterThanOrEqual(2);

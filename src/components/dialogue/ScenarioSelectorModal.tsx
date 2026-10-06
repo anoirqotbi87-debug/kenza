@@ -6,6 +6,7 @@ import type { DialogueScenario } from '../../types/dialogue';
 import DialogueView from './DialogueView';
 import Link from 'next/link';
 import { useAppStore, useTranslation } from '../../store/useAppStore';
+import { useDialog } from '../../hooks/useDialog';
 import { useNetwork } from '../../hooks/useNetwork';
 
 interface ScenarioSelectorModalProps {
@@ -16,6 +17,7 @@ interface ScenarioSelectorModalProps {
 }
 
 export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePremium, onStartSrs }: ScenarioSelectorModalProps) {
+  const { dialogRef } = useDialog(true, onClose);
   const { isPremium } = useAppStore();
   const { t } = useTranslation();
   const sc = t.modules.scenario;
@@ -32,6 +34,7 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
       case 'taxi': return '🚕';
       case 'cafe': return '☕';
       case 'souk': return '🛒';
+      case 'medecin': return '🩺';
       default: return '👋';
     }
   };
@@ -72,7 +75,15 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#1B2A4A]/60 backdrop-blur-sm flex items-center justify-center p-4" dir={isAr ? 'rtl' : 'ltr'}>
+    <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="scenario-selector-title"
+      tabIndex={-1}
+      className="fixed inset-0 z-50 bg-[#1B2A4A]/60 backdrop-blur-sm flex items-center justify-center p-4"
+      dir={isAr ? 'rtl' : 'ltr'}
+    >
       <div className="bg-[#FDFCF8] rounded-[28px] w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border border-[#E8E2D5] animate-in zoom-in-95 duration-200">
         
         {/* Header */}
@@ -83,7 +94,7 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
               <span>—</span>
               <span>Immersion Active</span>
             </div>
-            <h2 className="font-display text-2xl font-bold flex items-center gap-2">
+            <h2 id="scenario-selector-title" className="font-display text-2xl font-bold flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-[#C9A05C]" />
               {modalTitle}
             </h2>
@@ -92,6 +103,7 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
             </p>
           </div>
           <button 
+          aria-label={t.common.close}
             onClick={onClose}
             className="p-2 hover:bg-white/10 rounded-full text-[#E8E2D5] hover:text-[#FDFCF8] transition-colors"
           >
@@ -199,7 +211,7 @@ export default function ScenarioSelectorModal({ onClose, onSelectAi, onRequirePr
      <div className="pt-4 mt-3 border-t border-[#E8E2D5]/60 flex justify-between items-center text-xs">
                     <div className="flex items-center gap-1.5 text-[#7A7670]">
                       <MapPin className="w-3.5 h-3.5 text-[#C9A05C]" />
-                      <span className="font-medium">{persona.id === 'taxi' ? 'Fès Médina' : persona.id === 'souk' ? 'Grand Souk' : 'Café Populaire'}</span>
+                      <span className="font-medium">{persona.id === 'taxi' ? 'Fès Médina' : persona.id === 'souk' ? 'Grand Souk' : persona.id === 'medecin' ? 'Cabinet Médical' : 'Café Populaire'}</span>
                     </div>
 
                     <div className="w-8 h-8 rounded-full bg-[#1B2A4A] text-[#FDFCF8] flex items-center justify-center group-hover:bg-[#C9A05C] group-hover:text-[#1B2A4A] transition-colors shadow-xs">

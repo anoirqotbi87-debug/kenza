@@ -9,6 +9,8 @@
  * (paywall), il ne doit donc contenir aucune donnée secrète ni import du SDK.
  */
 
+import { PRICING_CONFIG as BASE_PRICING, type PricingPlan, type PricingConfig } from '@/lib/pricingConfig';
+
 export type Currency = 'EUR' | 'MAD';
 export type BillingCycle = 'yearly' | 'monthly';
 
@@ -16,7 +18,7 @@ export const CURRENCIES: readonly Currency[] = ['EUR', 'MAD'] as const;
 export const BILLING_CYCLES: readonly BillingCycle[] = ['yearly', 'monthly'] as const;
 
 /** Durée de l'essai gratuit, offert sur l'abonnement annuel uniquement. */
-export const TRIAL_PERIOD_DAYS = 7;
+export const TRIAL_PERIOD_DAYS = BASE_PRICING.annual.trialDays ?? 7;
 
 interface PlanSpec {
   /** Montant en centimes, tel qu'attendu par Stripe. */
@@ -30,7 +32,7 @@ interface PlanSpec {
 export const PRICING_CONFIG: Record<Currency, Record<BillingCycle, PlanSpec>> = {
   EUR: {
     yearly: {
-      unitAmount: 5900, // 59,00 €
+      unitAmount: BASE_PRICING.annual.priceEUR * 100, // 59,00 €
       currency: 'eur',
       interval: 'year',
       name: 'Kenza Pro - Abonnement Annuel',
@@ -38,7 +40,7 @@ export const PRICING_CONFIG: Record<Currency, Record<BillingCycle, PlanSpec>> = 
         'Accès illimité aux Modules B1/B2, Roleplay IA et Passeport Culturel (Facturé annuellement)',
     },
     monthly: {
-      unitAmount: 900, // 9,00 €
+      unitAmount: BASE_PRICING.monthly.priceEUR * 100, // 9,00 €
       currency: 'eur',
       interval: 'month',
       name: 'Kenza Pro - Abonnement Mensuel',
@@ -48,14 +50,14 @@ export const PRICING_CONFIG: Record<Currency, Record<BillingCycle, PlanSpec>> = 
   },
   MAD: {
     yearly: {
-      unitAmount: 59000, // 590,00 DH (MAD en centimes)
+      unitAmount: BASE_PRICING.annual.priceMAD * 100, // 590,00 DH (MAD en centimes)
       currency: 'mad',
       interval: 'year',
       name: 'Kenza Pro - Abonnement Annuel (Maroc)',
       description: 'Accès complet au dialecte marocain, IA et certification (Facturé annuellement)',
     },
     monthly: {
-      unitAmount: 9000, // 90,00 DH
+      unitAmount: BASE_PRICING.monthly.priceMAD * 100, // 90,00 DH
       currency: 'mad',
       interval: 'month',
       name: 'Kenza Pro - Abonnement Mensuel (Maroc)',
@@ -63,6 +65,8 @@ export const PRICING_CONFIG: Record<Currency, Record<BillingCycle, PlanSpec>> = 
     },
   },
 };
+
+export { BASE_PRICING, type PricingPlan, type PricingConfig };
 
 /**
  * Remise annoncée par le badge « meilleure offre », en pourcentage.
@@ -94,19 +98,19 @@ interface CurrencyDisplay {
 const DISPLAY_PRICING: Record<Currency, CurrencyDisplay> = {
   EUR: {
     symbol: '€',
-    yearlyAmount: '59 €',
-    monthlyAmount: '9 €',
+    yearlyAmount: `${BASE_PRICING.annual.priceEUR} €`,
+    monthlyAmount: `${BASE_PRICING.monthly.priceEUR} €`,
     yearlyPerMonth: '4,90 €',
-    yearlyTotal: '59 € / an',
-    monthlyPrice: '9,00 €',
+    yearlyTotal: `${BASE_PRICING.annual.priceEUR} € / an`,
+    monthlyPrice: `${BASE_PRICING.monthly.priceEUR},00 €`,
   },
   MAD: {
     symbol: 'DH',
-    yearlyAmount: '590 DH',
-    monthlyAmount: '90 DH',
+    yearlyAmount: `${BASE_PRICING.annual.priceMAD} DH`,
+    monthlyAmount: `${BASE_PRICING.monthly.priceMAD} DH`,
     yearlyPerMonth: '49 DH',
-    yearlyTotal: '590 DH / an',
-    monthlyPrice: '90 DH',
+    yearlyTotal: `${BASE_PRICING.annual.priceMAD} DH / an`,
+    monthlyPrice: `${BASE_PRICING.monthly.priceMAD} DH`,
   },
 };
 

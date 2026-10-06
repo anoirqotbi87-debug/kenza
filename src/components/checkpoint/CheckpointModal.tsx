@@ -8,6 +8,7 @@ import type { MultiLangText } from '../../types/curriculum';
 import { checkpointB1 } from '../../data/checkpoints/checkpointB1';
 import { checkpointB2 } from '../../data/checkpoints/checkpointB2';
 import { useTranslation, useAppStore } from '../../store/useAppStore';
+import { useDialog } from '../../hooks/useDialog';
 import { playAudio } from '../../lib/audio';
 import CheckpointResult from './CheckpointResult';
 import { shuffle } from '../../lib/shuffle';
@@ -19,6 +20,7 @@ interface CheckpointModalProps {
 }
 
 export default function CheckpointModal({ levelId, levelName, onClose }: CheckpointModalProps) {
+  const { dialogRef } = useDialog(true, onClose);
   const { t, lang } = useTranslation();
   const { soundEnabled, preferredNotation } = useAppStore();
   
@@ -138,10 +140,18 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#F7F3EA] flex flex-col">
+    <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="checkpoint-modal-title"
+      tabIndex={-1}
+      className="fixed inset-0 z-50 bg-[#F7F3EA] flex flex-col"
+    >
       {/* Header Progress */}
       <div className="bg-[#FDFCF8] px-4 py-4 flex items-center gap-4 shadow-xs border-b border-[#E8E2D5] relative z-10">
         <button 
+        aria-label={t.common.close}
           onClick={onClose} 
           className="p-2 text-[#7A7670] hover:text-[#1B2A4A] hover:bg-[#E8E2D5]/50 rounded-full transition-colors"
         >
@@ -167,7 +177,7 @@ export default function CheckpointModal({ levelId, levelName, onClose }: Checkpo
             <span>—</span>
             <span>Examen {levelId.toUpperCase()}</span>
           </div>
-          <h2 className="font-display text-xl sm:text-2xl text-[#7A7670] font-normal">
+          <h2 id="checkpoint-modal-title" className="font-display text-xl sm:text-2xl text-[#7A7670] font-normal">
             Comment dit-on en Darija :
           </h2>
           <div className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-[#1B2A4A] mt-2">

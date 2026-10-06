@@ -17,20 +17,20 @@ import {
   Headphones,
   Heart,
   Home as HomeIcon,
-  Leaf,
   LockKeyhole,
   Menu,
   MessageCircle,
+  Play,
   Search,
   Sparkles,
   Star,
   Target,
   Volume2,
   X,
-  Crown,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
 import { useAppStore, useTranslation } from "@/store/useAppStore";
 import type { User } from "@supabase/supabase-js";
 
@@ -54,6 +54,7 @@ import {
   getPlayableLessons,
   type LessonRef,
 } from "@/data/homeCurriculum";
+import { getHomeModules, getHomeModuleLessons } from "@/data/homeModules";
 import { getLocalizedText } from "@/lib/i18n/utils";
 import type { UILanguage } from "@/lib/i18n/translations";
 import { syncService } from "@/lib/syncService";
@@ -65,6 +66,7 @@ import PaywallModal from "@/components/monetization/PaywallModal";
 import SubscriptionBadge from "@/components/monetization/SubscriptionBadge";
 import OnboardingModal from "@/components/onboarding/OnboardingModal";
 import OfflineDownloadCard from "@/components/monetization/OfflineDownloadCard";
+import DownloadApkCard from "@/components/DownloadApkCard";
 import InstallPwaBanner from "@/components/pwa/InstallPwaBanner";
 import DarijaPassportCard from "@/components/certificate/DarijaPassportCard";
 import { PersonaId } from "@/lib/ai/prompts";
@@ -153,6 +155,13 @@ export default function Home() {
     }
   }, [showToast]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
+    setMobileMenuOpen(false);
+  }
+
   const [prevView, setPrevView] = useState<View>(view);
   if (prevView !== view) {
     setPrevView(view);
@@ -532,10 +541,25 @@ export default function Home() {
     ? getSavePromptVariant(completedCount, streakDays)
     : null;
 
+  // Arrière-plan inerte pendant qu'un dialogue est ouvert : les éléments de fond sont
+  // retirés de l'ordre de tabulation ET de l'arbre d'accessibilité (React 19 rend `inert`
+  // en attribut natif). On ne peut pas poser `aria-hidden` sur `.app-shell` : les modales
+  // sont ses enfants, elles seraient masquées avec lui.
+  const backgroundInert =
+    showScenarioSelector ||
+    activePersonaId !== null ||
+    checkpointOpen !== null ||
+    onboardingOpen ||
+    activePricingSource !== null ||
+    authMode !== null;
+
   return (
     <div className="app-shell">
       {/* Sidebar Desktop & Mobile Slideout */}
-      <aside className={`sidebar ${mobileMenuOpen ? "sidebar-open" : ""}`}>
+      <aside
+        className={`sidebar ${mobileMenuOpen ? "sidebar-open" : ""}`}
+        inert={backgroundInert}
+      >
         <div className="brand-lockup">
           <div className="brand-mark" aria-hidden="true">
             <span>ك</span>
@@ -574,23 +598,26 @@ export default function Home() {
 
         <div className="sidebar-label">{trL(lang, "EXPLORER", "EXPLORE", "EXPLORAR", "استكشف")}</div>
         <nav className="side-nav" aria-label={trL(lang, "Ressources d'étude", "Study resources", "Recursos de estudio", "موارد الدراسة")}>
-          <a href="/etudier" className="nav-item">
+          <a href="/etudier" onClick={() => setMobileMenuOpen(false)} className="nav-item">
             <span>{trL(lang, "Étudier — Modules complets", "Study — Full modules", "Estudiar — Módulos completos", "الدراسة — الوحدات الكاملة")}</span>
           </a>
-          <a href="/grammaire" className="nav-item">
+          <a href="/grammaire" onClick={() => setMobileMenuOpen(false)} className="nav-item">
             <span>{trL(lang, "Grammaire active", "Active grammar", "Gramática activa", "القواعد النشطة")}</span>
           </a>
-          <a href="/parler" className="nav-item">
+          <a href="/parler" onClick={() => setMobileMenuOpen(false)} className="nav-item">
             <span>{trL(lang, "Pratique orale", "Speaking practice", "Práctica oral", "تدريب النطق")}</span>
           </a>
-          <a href="/revisions" className="nav-item">
+          <a href="/revisions" onClick={() => setMobileMenuOpen(false)} className="nav-item">
             <span>{trL(lang, "Révisions SRS", "SRS review", "Repaso SRS", "مراجعة SRS")}</span>
           </a>
         </nav>
 
         <div className="sidebar-label sidebar-label-spaced">{t.side.oral || tr("PRATIQUE ORALE & IA", "SPEAKING & AI", "PRÁCTICA ORAL E IA", "المحادثة والذكاء الاصطناعي")}</div>
         <button
-          onClick={() => setShowScenarioSelector(true)}
+          onClick={() => {
+            setMobileMenuOpen(false);
+            setShowScenarioSelector(true);
+          }}
           className="nav-item"
         >
           <MessageCircle size={19} strokeWidth={1.8} />
@@ -655,7 +682,7 @@ export default function Home() {
       )}
 
       {/* Main Area */}
-      <main className="main-area">
+      <main className="main-area" inert={backgroundInert}>
         <header className="topbar">
           <button
             className="icon-button mobile-menu-trigger"
@@ -815,6 +842,8 @@ export default function Home() {
               onOpenLesson={openLessonInEtudier}
               onOpenCheckpoint={(id, name) => setCheckpointOpen({ id, name })}
               onOpenPaywall={() => setPricingSource("module_locked")}
+              onOpenRoleplay={() => setShowScenarioSelector(true)}
+              onNavigate={switchView}
               isPremium={isPremium}
             />
           )}
@@ -876,7 +905,11 @@ export default function Home() {
       </main>
 
       {/* Mobile Bottom Navigation (Visible sous 900px) */}
-      <nav className="mobile-bottom-nav" aria-label={tr("Navigation mobile", "Mobile navigation", "Navegación móvil", "التنقل على الهاتف")}>
+      <nav
+        className="mobile-bottom-nav"
+        aria-label={tr("Navigation mobile", "Mobile navigation", "Navegación móvil", "التنقل على الهاتف")}
+        inert={backgroundInert}
+      >
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -1348,178 +1381,282 @@ function PathView({
   onOpenLesson,
   onOpenCheckpoint,
   onOpenPaywall,
+  onOpenRoleplay,
+  onNavigate,
   isPremium,
 }: {
   completedLessons: string[];
   onOpenLesson: (lessonId?: string) => void;
   onOpenCheckpoint: (id: string, name: string) => void;
   onOpenPaywall: () => void;
+  onOpenRoleplay: () => void;
+  onNavigate: (view: View) => void;
   isPremium: boolean;
 }) {
-  const { t } = useTranslation();
   const { lang } = useLocalizedContent();
   const { hasPassedLevel } = useCheckpointProgress();
-  const lessons = useMemo(() => getPlayableLessons(lang), [lang]);
-  const totalLessons = lessons.length;
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState<"parcours" | "grammaire" | "parler" | "revision">("parcours");
+  const [selectedModule, setSelectedModule] = useState<string>("1");
+
+  const modules = useMemo(() => getHomeModules(lang, completedLessons, isPremium), [lang, completedLessons, isPremium]);
+  const doneSet = useMemo(() => new Set(completedLessons), [completedLessons]);
+  const totalLessons = useMemo(() => modules.reduce((sum, m) => sum + m.lessons, 0), [modules]);
+  const totalCompleted = useMemo(() => modules.reduce((sum, m) => sum + m.completed, 0), [modules]);
+
+  // Module selectionne : l'utilisateur choisit via la grille; on retombe sur le
+  // premier module debloque non termine, sinon le module 1 (toujours gratuit).
+  const selectedCard = useMemo(() => {
+    const explicit = modules.find((m) => m.key === selectedModule && !m.locked);
+    if (explicit) return explicit;
+    return modules.find((m) => !m.locked && m.completed < m.lessons) ?? modules.find((m) => !m.locked) ?? modules[0];
+  }, [modules, selectedModule]);
+
+  const selectedLessons = useMemo(
+    () => selectedCard ? getHomeModuleLessons(lang, selectedCard.key, completedLessons) : [],
+    [lang, selectedCard, completedLessons]
+  );
+
+  const progressPct = totalLessons ? Math.round((totalCompleted / totalLessons) * 100) : 0;
+
+  const handleTab = (tab: "parcours" | "grammaire" | "parler" | "revision") => {
+    if (tab === "parcours") { setActiveTab("parcours"); return; }
+    if (tab === "grammaire") { router.push("/grammaire"); return; }
+    if (tab === "parler") { onOpenRoleplay(); return; }
+    if (tab === "revision") { onNavigate("review"); return; }
+  };
+
+  const pills: Array<{ id: "parcours" | "grammaire" | "parler" | "revision"; emoji: string; label: string }> = [
+    { id: "parcours", emoji: "📖", label: trL(lang, "Parcours", "Path", "Recorrido", "المسار") },
+    { id: "grammaire", emoji: "🎓", label: trL(lang, "Grammaire", "Grammar", "Gramática", "القواعد") },
+    { id: "parler", emoji: "💬", label: trL(lang, "Parler", "Speak", "Hablar", "تحدث") },
+    { id: "revision", emoji: "🔄", label: trL(lang, "Révision", "Review", "Repaso", "مراجعة") },
+  ];
 
   return (
-    <div className="path-layout">
-      <section className="path-main-card">
-        <div className="path-banner">
-          <div>
-            <span className="hero-kicker">
-              <Compass size={14} /> {trL(lang, "PARCOURS DÉCOUVERTE", "DISCOVERY JOURNEY", "RUTA DE DESCUBRIMIENTO", "مسار الاستكشاف")}
-            </span>
-            <h2>
-              {trL(lang, "Les premiers pas", "The first steps", "Los primeros pasos", "الخطوات الأولى")}
-              <br />
-              {trL(lang, "en darija.", "in darija.", "en darija.", "في الدارجة.")}
-            </h2>
-            <p>{trL(lang, "Trois escales pour oser dire les premiers mots.", "Three stops to dare your first words.", "Tres paradas para atreverte a hablar.", "ثلاث محطات لتبدأ كلماتك الأولى.")}</p>
-          </div>
-          <div className="path-stamp">
-            <span>المغرب</span>
-            <small>Maroc</small>
-          </div>
-          <div className="path-doodle" />
-        </div>
+    <div className="space-y-6">
+      {/* A. Barre de sous-onglets en pilules */}
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-2 px-4 -mx-4">
+        {pills.map((pill) => (
+          <button
+            key={pill.id}
+            type="button"
+            onClick={() => handleTab(pill.id)}
+            className={
+              activeTab === pill.id
+                ? "rounded-full px-4 py-2 text-sm font-semibold flex items-center gap-2 shadow-sm bg-[#0B2545] text-white"
+                : "rounded-full px-3 py-2 text-sm font-medium flex items-center gap-2 text-gray-600 hover:text-gray-900"
+            }
+          >
+            <span aria-hidden="true">{pill.emoji}</span>
+            <span>{pill.label}</span>
+          </button>
+        ))}
+      </div>
 
-        <div className="path-progress-row">
-          <div>
-            <span className="mini-kicker">{trL(lang, "TON AVANCÉE", "YOUR PROGRESS", "TU AVANCE", "تقدّمك")}</span>
-            <strong>
-              {completedLessons.length}{" "}
-              <small>
-                {tr("leçon", "lesson", "lección", "درس")}{completedLessons.length > 1 ? tr("s", "s", "s", "") : ""}{tr(" sur ", " of ", " de ", " من ")}{totalLessons}
-              </small>
-            </strong>
-          </div>
-          <div className="path-overall-track">
-            <span
-              style={{
-                width: `${totalLessons ? Math.round((completedLessons.length / totalLessons) * 100) : 0}%`,
-              }}
-            />
-          </div>
-          <span className="path-percent">
-            {totalLessons ? Math.round((completedLessons.length / totalLessons) * 100) : 0}%
-          </span>
-        </div>
+      {/* B. Hero & carte de progression globale */}
+      <section className="pt-2">
+        <p className="text-[11px] font-semibold tracking-[0.18em] uppercase text-[#8C6D23] mb-2">
+          {trL(lang, "— Parcours complet", "— Full curriculum", "— Recorrido completo", "— المسار الكامل")}
+        </p>
+        <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#0B2545] leading-tight mb-5">
+          {trL(lang, "Ton parcours complet — 7 modules", "Your full curriculum — 7 modules", "Tu recorrido completo — 7 módulos", "مسارك الكامل — 7 وحدات")}
+        </h2>
 
-        <div className="lesson-roadmap">
-          {lessons.map((lesson, index) => {
-            const done = completedLessons.includes(lesson.id);
-            // Le verrou premium vient de @/lib/premiumModules, via lesson.free.
-            const isGated = !lesson.free && !isPremium;
+        <div className="rounded-2xl bg-white/90 border border-[#E8E2D2] p-4 sm:p-6 shadow-sm mb-6">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-[#0B2545] flex items-center justify-center text-[#C59B27] shrink-0">
+              <Sparkles size={22} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <span className="text-[10px] font-bold tracking-[0.15em] uppercase text-[#8C6D23]">
+                {trL(lang, "Progression", "Progress", "Progreso", "التقدم")}
+              </span>
+              <div className="flex items-baseline gap-2 flex-wrap">
+                <strong className="text-lg font-bold text-[#0B2545]">
+                  {totalCompleted} / {totalLessons}{" "}
+                  <span className="text-xs font-semibold text-[#7A7670]">
+                    {trL(lang, "leçons terminées", "lessons completed", "lecciones completadas", "دروس مُنجزة")}
+                  </span>
+                </strong>
+                <span className="ml-auto text-sm font-bold text-[#0B2545]">{progressPct}%</span>
+              </div>
+              <p className="text-xs text-[#7A7670] mt-1">
+                {trL(lang, "Choisissez un module et reprenez là où vous en êtes.", "Pick a module and resume where you left off.", "Elige un módulo y retoma donde lo dejaste.", "اختر وحدة وتابع من حيث توقفت.")}
+              </p>
+              <div className="h-2 bg-[#E8E2D2] rounded-full overflow-hidden mt-3">
+                <div
+                  className="h-full bg-gradient-to-r from-[#0B2545] to-[#C59B27] rounded-full transition-all"
+                  style={{ width: `${progressPct}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* C. Grille de sélection des modules (2 colonnes) */}
+      <section>
+        <p className="text-[11px] font-semibold tracking-[0.18em] uppercase text-[#8C6D23] mb-1">
+          {trL(lang, "Parcours complet", "Full curriculum", "Recorrido completo", "المسار الكامل")}
+        </p>
+        <h3 className="text-xl font-serif font-bold text-[#0B2545] mb-3">
+          {trL(lang, "Choisissez votre module", "Choose your module", "Elige tu módulo", "اختر وحدتك")}
+        </h3>
+
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-8">
+          {modules.map((mod) => {
+            const modDone = mod.done;
+            const modProgress = mod.lessons ? Math.round((mod.completed / mod.lessons) * 100) : 0;
+            const active = selectedCard?.key === mod.key && !mod.locked;
 
             return (
-              <div
-                className={`roadmap-row ${done ? "roadmap-done" : ""} ${isGated ? "roadmap-locked" : ""}`}
-                key={lesson.id}
+              <button
+                key={mod.key}
+                type="button"
+                disabled={mod.locked}
+                onClick={() => setSelectedModule(mod.key)}
+                className={
+                  active
+                    ? "relative text-left rounded-2xl bg-[#0B2545] text-white p-4 shadow-sm border border-[#0B2545] transition-colors"
+                    : mod.locked
+                    ? "relative text-left rounded-2xl bg-white border border-[#E8E2D2] p-4 opacity-80 cursor-not-allowed transition-colors"
+                    : "relative text-left rounded-2xl bg-white border border-[#E8E2D2] p-4 hover:border-[#C9A05C] transition-colors"
+                }
+                aria-current={active ? "page" : undefined}
               >
-                <div className="roadmap-track">
-                  <div className="roadmap-line" />
-                  <button
-                    className={`roadmap-node ${done ? "node-done" : ""} ${
-                      !isGated && !done ? "node-current" : ""
-                    }`}
-                    disabled={isGated}
-                    onClick={() => (isGated ? onOpenPaywall() : onOpenLesson(lesson.id))}
-                    aria-label={
-                      done
-                        ? t.modules.home.reviewLesson.replace("{title}", lesson.title)
-                        : isGated
-                        ? t.modules.home.lessonLocked.replace("{title}", lesson.title)
-                        : t.modules.home.startLesson.replace("{title}", lesson.title)
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <span
+                    className={
+                      active
+                        ? "text-[9px] font-bold tracking-[0.14em] uppercase text-[#C59B27]"
+                        : mod.locked
+                        ? "text-[9px] font-bold tracking-[0.14em] uppercase text-[#B0ACA2]"
+                        : "text-[9px] font-bold tracking-[0.14em] uppercase text-[#C59B27]"
                     }
                   >
-                    {done ? (
-                      <Check size={16} />
-                    ) : isGated ? (
-                      <Crown size={14} className="text-[#C9A05C]" />
-                    ) : (
-                      <span>0{index + 1}</span>
-                    )}
-                  </button>
-                </div>
-                <div className="roadmap-content">
-                  <div className="roadmap-meta">
-                    <span>
-                      {tr("MODULE", "MODULE", "MÓDULO", "الوحدة")} {lesson.moduleKey} ·{" "}
-                      {tr("NIVEAU", "LEVEL", "NIVEL", "المستوى")} {lesson.level} · {lesson.steps}{" "}
-                      {tr("étapes", "steps", "pasos", "خطوات")}
+                    {tr("Module", "Module", "Módulo", "الوحدة")} {mod.key}
+                  </span>
+                  {mod.locked ? (
+                    <span className="text-[#C59B27] shrink-0" aria-hidden="true">
+                      <LockKeyhole size={14} />
                     </span>
-                    {done && (
-                      <span className="done-tag">
-                        <CheckCircle2 size={13} /> {tr("TERMINÉE", "COMPLETED", "COMPLETADA", "مكتملة")}
-                      </span>
-                    )}
-                    {!done && !isGated && (
-                      <span className="current-tag">{trL(lang, "À SUIVRE", "TO CONTINUE", "A CONTINUAR", "للمتابعة")}</span>
-                    )}
-                    {isGated && (
-                      <span className="current-tag" style={{ background: "#fef3c7", color: "#b45309" }}>
-                        PRO
-                      </span>
-                    )}
-                  </div>
-                  <h3>{lesson.title}</h3>
-                  <p>{lesson.description}</p>
-                  <div className="roadmap-footer">
-                    <span>
-                      <BookOpen size={14} /> {lesson.steps} {tr("étapes", "steps", "pasos", "خطوات")}
+                  ) : (
+                    <span className={active ? "text-white" : "text-[#0B2545]"} aria-hidden="true">
+                      <ChevronRight size={16} />
                     </span>
-                    {isGated ? (
-                      <button onClick={onOpenPaywall} style={{ color: "#d69b47" }}>
-                        {trL(lang, "Débloquer avec Pro", "Unlock with Pro", "Desbloquear con Pro", "افتح مع برو")} <ArrowRight size={14} />
-                      </button>
-                    ) : (
-                      <button onClick={() => onOpenLesson(lesson.id)}>
-                        {done ? trL(lang, "Revoir", "Review", "Repasar", "مراجعة") : trL(lang, "Commencer", "Start", "Empezar", "ابدأ")}
-                        <ArrowRight size={14} />
-                      </button>
-                    )}
-                  </div>
+                  )}
                 </div>
-              </div>
+                <h4 className={`text-sm font-bold leading-snug mb-3 ${active ? "text-white" : "text-[#0B2545]"}`}>
+                  {mod.title}
+                </h4>
+                <div className={`text-[10px] font-medium ${active ? "text-[#DDE3EC]" : "text-[#7A7670]"}`}>
+                  {mod.completed} / {mod.lessons}{" "}
+                  {trL(lang, "leçons terminées", "lessons completed", "lecciones completadas", "دروس مُنجزة")}
+                </div>
+                {!mod.locked && (
+                  <div className="h-1.5 bg-[#E8E2D2] rounded-full overflow-hidden mt-2">
+                    <div
+                      className={`h-full rounded-full ${active ? "bg-[#C59B27]" : "bg-[#0B2545]"}`}
+                      style={{ width: `${modProgress}%` }}
+                    />
+                  </div>
+                )}
+                {modDone && !mod.locked && (
+                  <span className="absolute top-2 right-2 flex items-center gap-1 text-[9px] font-bold uppercase text-[#7A9174]">
+                    <CheckCircle2 size={12} /> {trL(lang, "Terminé", "Completed", "Completado", "مكتمل")}
+                  </span>
+                )}
+              </button>
             );
           })}
         </div>
       </section>
 
-      <aside className="path-aside">
-        <div className="path-aside-card">
-          <span className="aside-icon">
-            <Leaf size={18} />
+      {/* D. Vue détaillée du module sélectionné */}
+      {selectedCard && (
+        <section className="bg-white/90 border border-[#E8E2D2] rounded-2xl p-5 sm:p-6 shadow-sm">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#0B2545] text-white text-[10px] font-bold tracking-[0.14em] uppercase px-3 py-1.5 mb-3">
+            {tr("Module", "Module", "Módulo", "الوحدة")} {selectedCard.key}
           </span>
-          <span className="mini-kicker">{trL(lang, "PETIT CONSEIL", "QUICK TIP", "PEQUEÑO CONSEJO", "نصيحة صغيرة")}</span>
-          <h3>{trL(lang, "La régularité avant la perfection.", "Consistency beats perfection.", "La constancia antes que la perfección.", "الاستمرارية قبل الإتقان.")}</h3>
-          <p>
-            {tr("5 minutes par jour font plus qu’une heure de temps en temps. Reviens quand tu veux.", "5 minutes a day beats an hour once in a while. Come back whenever you want.", "5 minutos al día hacen más que una hora de vez en cuando. Vuelve cuando quieras.", "5 دقائق يومياً تنفع أكثر من ساعة بين الحين والآخر. عُد متى شئت.")}
-          </p>
-          <div className="aside-divider" />
-          <div className="aside-stat">
-            <span>{trL(lang, "Palier A1 (Fondations)", "Level A1 (Foundations)", "Nivel A1 (Fundamentos)", "المستوى A1 (الأساسيات)")}</span>
-            <strong>{hasPassedLevel("1") ? tr("Validé ✓", "Passed ✓", "Aprobado ✓", "ناجح ✓") : tr("En cours", "In progress", "En curso", "قيد التقدم")}</strong>
+          <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#0B2545] mb-4">
+            {selectedCard.title}
+          </h3>
+          <div className="flex items-center gap-3 bg-[#F7F3EA] border border-[#E8E2D2] rounded-xl px-4 py-3 mb-5">
+            <span className="text-lg" aria-hidden="true">📖</span>
+            <span className="text-sm font-semibold text-[#0B2545]">
+              {selectedCard.completed} / {selectedCard.lessons}{" "}
+              {trL(lang, "leçons terminées", "lessons completed", "lecciones completadas", "دروس مُنجزة")}
+            </span>
+            <span className="ml-auto text-sm font-bold text-[#C59B27]">
+              {selectedCard.lessons ? Math.round((selectedCard.completed / selectedCard.lessons) * 100) : 0}%
+            </span>
           </div>
-          <button
-            onClick={() => onOpenCheckpoint("1", trL(lang, tr("Palier A1 — Fondations", "Level A1 — Foundations", "Nivel A1 — Fundamentos", "المستوى A1 — الأساسيات"), "Level A1 — Foundations", "Nivel A1 — Fundamentos", "المستوى A1 — الأساسيات"))}
-          >
-            {trL(lang, "Passer le Checkpoint A1", "Take Checkpoint A1", "Pasar el Checkpoint A1", "اجتز نقطة A1")} <ArrowRight size={14} />
-          </button>
-        </div>
 
-        <div className="path-aside-note">
-          <span className="note-symbol">✳</span>
-          <p>
-            {tr("Le mot ", "The word ", "La palabra ", "كلمة ")}<strong>darija</strong>{tr(" vient de l’arabe ", " comes from Arabic ", " viene del árabe ", " أصله من العربية ")}<span dir="rtl">الدارجة</span>{tr(" — la langue courante, celle de tous les jours.", " — the everyday language.", " — la lengua corriente, la de todos los días.", " — اللغة الدارجة، لغة كل يوم.")}
-          </p>
-        </div>
-      </aside>
+          <ul className="space-y-2.5">
+            {selectedLessons.map((lesson) => (
+              <li key={lesson.id}>
+                <button
+                  type="button"
+                  onClick={() => (lesson.free || isPremium ? onOpenLesson(lesson.id) : onOpenPaywall())}
+                  className="w-full flex items-center gap-3 text-left bg-[#FDFCF8] border border-[#E8E2D5] rounded-xl p-3 hover:border-[#C9A05C] transition-colors"
+                >
+                  <span
+                    className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                      doneSet.has(lesson.id)
+                        ? "bg-[#7A9174] text-white"
+                        : "bg-[#0B2545] text-[#FDFCF8]"
+                    }`}
+                  >
+                    {doneSet.has(lesson.id) ? <Check size={14} /> : <BookOpen size={14} />}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold text-[#0B2545] leading-snug">
+                      {lesson.title}
+                    </span>
+                    <span className="block text-[11px] text-[#7A7670] mt-0.5">
+                      {lesson.steps} {trL(lang, "étapes", "steps", "pasos", "خطوات")}
+                      {!lesson.free && <span className="ml-2 text-[#C59B27] font-bold">Pro</span>}
+                    </span>
+                  </span>
+                  {lesson.done ? (
+                    <CheckCircle2 className="w-4 h-4 text-[#7A9174] shrink-0" />
+                  ) : lesson.free || isPremium ? (
+                    <span className="w-7 h-7 rounded-full bg-[#0B2545] text-[#FDFCF8] flex items-center justify-center shrink-0">
+                      <Play size={12} />
+                    </span>
+                  ) : (
+                    <LockKeyhole className="w-4 h-4 text-[#C59B27] shrink-0" />
+                  )}
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          {/* Acces Checkpoint A1 (premiere palier gratuite) */}
+          <div className="flex items-center justify-between gap-3 bg-[#F7F3EA] border border-[#E8E2D2] rounded-xl px-4 py-3 mt-5">
+            <div>
+              <span className="text-[10px] font-bold tracking-[0.14em] uppercase text-[#8C6D23]">
+                {trL(lang, "Palier A1", "Level A1", "Nivel A1", "المستوى A1")}
+              </span>
+              <p className="text-xs text-[#7A7670]">
+                {trL(lang, "Les Fondations — validez vos premiers acquis.", "Foundations — validate your first wins.", "Fundamentos — valida tus primeros logros.", "الأساسيات — أكّد مكتسباتك الأولى.")}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => onOpenCheckpoint("1", trL(lang, "Palier A1 — Fondations", "Level A1 — Foundations", "Nivel A1 — Fundamentos", "المستوى A1 — الأساسيات"))}
+              className="shrink-0 inline-flex items-center gap-1.5 text-xs font-bold text-[#0B2545] bg-white border border-[#0B2545]/20 rounded-full px-3 py-2 hover:bg-[#0B2545] hover:text-white transition-colors"
+            >
+              {hasPassedLevel("1") ? trL(lang, "Validé ✓", "Passed ✓", "Aprobado ✓", "ناجح ✓") : trL(lang, "Passer le Checkpoint", "Take the checkpoint", "Pasar el checkpoint", "اجتز نقطة المراجعة")}
+              <ArrowRight size={13} />
+            </button>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
-
 // -------------------------------------------------------------
 // Composant 3 : PhrasesView
 // -------------------------------------------------------------
@@ -1951,6 +2088,8 @@ function SpaceView({
           isPremium={isPremium}
           onLocked={() => onOpenPaywall("offline_locked")}
         />
+
+        <DownloadApkCard />
 
         <article className="data-card data-card-cert">
           <div className="data-card-heading">

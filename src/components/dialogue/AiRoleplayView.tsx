@@ -10,49 +10,16 @@ import { playAudio } from '@/lib/audio';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/lib/supabase';
 import PaywallModal from '@/components/monetization/PaywallModal';
+import { useDialog } from '@/hooks/useDialog';
+import { parseAiMessage } from '@/lib/ai/parseAiMessage';
 
 interface AiRoleplayViewProps {
   personaId: PersonaId;
   onClose: () => void;
 }
 
-const parseAiMessage = (content: string) => {
-  let ar = '';
-  let arz = '';
-  let fr = '';
-  
-  const arIndex = content.indexOf('[AR]');
-  const arzIndex = content.indexOf('[ARZ]');
-  const frIndex = content.indexOf('[FR]');
-  
-  if (arIndex !== -1) {
-    const endAr = arzIndex !== -1 ? arzIndex : (frIndex !== -1 ? frIndex : content.length);
-    ar = content.substring(arIndex + 4, endAr).trim();
-  }
-  
-  if (arzIndex !== -1) {
-    const endArz = frIndex !== -1 ? frIndex : content.length;
-    arz = content.substring(arzIndex + 5, endArz).trim();
-  }
-  
-  if (frIndex !== -1) {
-    fr = content.substring(frIndex + 4).trim();
-  }
-
-  // Repli robuste : si aucune balise reconnue ou si parsing incomplet
-  if (!ar && !arz && !fr) {
-    const hasArabicChars = /[\u0600-\u06FF]/.test(content);
-    if (hasArabicChars) {
-      ar = content.trim();
-    } else {
-      fr = content.trim();
-    }
-  }
-  
-  return { ar, arz, fr };
-};
-
 export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewProps) {
+  const { dialogRef } = useDialog(true, onClose);
 
   const [token, setToken] = useState<string>('');
   const [showPaywall, setShowPaywall] = useState(false);
@@ -74,7 +41,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
   const handlePlayVoice = (text: string, arabic?: string, speed: 'normal' | 'slow' = 'normal') => {
     playAudio(text, arabic, soundEnabled, speed === 'slow' ? 0.75 : 1.0, {
       speed,
-      voice: personaId === 'cafe' || personaId === 'taxi' || personaId === 'souk' ? 'male' : 'female',
+      voice: personaId === 'cafe' || personaId === 'taxi' || personaId === 'souk' || personaId === 'medecin' ? 'male' : 'female',
     });
   };
 
@@ -127,7 +94,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
       arabizi: arz || '',
       translation: { fr: fr || '', en: fr || '', es: fr || '', ar: ar || '' },
       category: `roleplay_${personaId}`,
-      illustration: { iconName: personaId === 'taxi' ? 'Car' : personaId === 'cafe' ? 'Coffee' : 'ShoppingBag' }
+      illustration: { iconName: personaId === 'taxi' ? 'Car' : personaId === 'cafe' ? 'Coffee' : personaId === 'medecin' ? 'Stethoscope' : 'ShoppingBag' }
     });
     
     setToastMessage(rp.addedToSrs);
@@ -140,10 +107,21 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#F7F3EA] relative animate-in fade-in zoom-in-95 duration-200">
+    <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="ai-roleplay-title"
+      tabIndex={-1}
+      className="flex flex-col h-full bg-[#F7F3EA] relative animate-in fade-in zoom-in-95 duration-200"
+    >
       
       {toastMessage && (
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-50 bg-[#1B2A4A] text-[#FDFCF8] border border-[#C9A05C]/40 px-4 py-2 rounded-full shadow-lg text-sm flex items-center gap-2 animate-in slide-in-from-top-4">
+        <div
+          role="status"
+          aria-live="polite"
+          className="absolute top-20 left-1/2 -translate-x-1/2 z-50 bg-[#1B2A4A] text-[#FDFCF8] border border-[#C9A05C]/40 px-4 py-2 rounded-full shadow-lg text-sm flex items-center gap-2 animate-in slide-in-from-top-4"
+        >
           <Save className="w-4 h-4 text-[#C9A05C]" />
           {toastMessage}
         </div>
@@ -152,12 +130,12 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
       {/* HEADER */}
       <div className="bg-[#FDFCF8] px-4 py-3.5 flex items-center justify-between shadow-xs border-b border-[#E8E2D5] z-10 sticky top-0">
         <div className="flex items-center gap-3">
-          <button onClick={onClose} className="p-2 -ml-2 rounded-full hover:bg-[#E8E2D5]/50 text-[#7A7670] hover:text-[#1B2A4A] transition-colors">
+          <button aria-label={t.common.back} onClick={onClose} className="p-2 -ml-2 rounded-full hover:bg-[#E8E2D5]/50 text-[#7A7670] hover:text-[#1B2A4A] transition-colors">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
           </button>
           <div>
-            <h2 className="font-display font-bold text-[#1B2A4A] flex items-center gap-2 text-base sm:text-lg">
-              {personaId === 'taxi' ? '🚕' : personaId === 'cafe' ? '☕' : '🏺'} {persona.name}
+            <h2 id="ai-roleplay-title" className="font-display font-bold text-[#1B2A4A] flex items-center gap-2 text-base sm:text-lg">
+              {personaId === 'taxi' ? '🚕' : personaId === 'cafe' ? '☕' : personaId === 'medecin' ? '🩺' : '🏺'} {persona.name}
             </h2>
             <p className="text-xs text-[#7A7670] line-clamp-1">{persona.context}</p>
           </div>
@@ -175,7 +153,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center p-6 opacity-75">
             <div className="w-16 h-16 rounded-full bg-[#C9A05C]/15 border border-[#C9A05C]/30 flex items-center justify-center mb-4 text-3xl">
-              {personaId === 'taxi' ? '🚕' : personaId === 'cafe' ? '☕' : '🏺'}
+              {personaId === 'taxi' ? '🚕' : personaId === 'cafe' ? '☕' : personaId === 'medecin' ? '🩺' : '🏺'}
             </div>
             <p className="text-[#1B2A4A] font-medium text-sm">L'agent est prêt. Envoyez "Salam" pour commencer !</p>
           </div>

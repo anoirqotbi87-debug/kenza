@@ -35,7 +35,7 @@ export const module2Lessons: Lesson[] = [
             ar: 'السؤال الذي يفتح كل تفاوض.',
           },
           arabizi: 'Bch7al hada ? Bch7al hadi ?',
-          arabic: 'بشحال هادا؟ بشحال هادي؟',
+          arabic: 'بْشْحَالْ هَادَا؟ بْشْحَالْ هَادْيِ؟',
           translation: {
             fr: 'Combien coûte celui-ci ? Combien coûte celle-ci ?',
             en: 'How much is this one (m) ? How much is this one (f) ?',
@@ -48,6 +48,22 @@ export const module2Lessons: Lesson[] = [
             es: '«Hada» para un objeto masculino, «hadi» para uno femenino. Se señala el objeto: es normal en el zoco.',
             ar: '«هادا» للمذكر و«هادي» للمؤنث. الإشارة إلى السلعة عادية في السوق.',
           },
+        },
+      },
+  {
+        id: 'm2_souk_tip_negociation',
+        type: 'culture_tip',
+        cultureTip: {
+          title: 'Marchander, un jeu respectueux',
+          badge: '🇳🇦 L’art du souk',
+          content: 'Au souk, le prix affiché n’est qu’un point de départ. On marchande avec le sourire, jamais avec agressivité. La danse est codée : on demande le prix sans brusquer (« Chhal akher taman ? »(, on s’exclame (« L-la !»(,, on menace poliment de partir(« Bslama »(, et on bénit le vendeur quand l’accord est trouvé (« Lah y3awen »(. Refuser de marchander est perçu comme une impolitesse.',
+          expressions: [
+            { darija: 'Chhal akher taman ?', arabicWithTashkeel: 'شْحَالْ آخِرْ ثَمَنْ؟', french: 'Quel est le dernier prix ?' },
+            { darija: 'Bch7al hada ?', arabicWithTashkeel: 'بْشْحَالْ هَادَا؟', french: 'Combien ça coûte ?' },
+            { darija: 'L-la, ghali bzzaf.', arabicWithTashkeel: 'لَّا، غَالِي بْزَّافْ', french: 'Non, c’est trop cher.' },
+            { darija: 'Lah y3awen', arabicWithTashkeel: 'اللّٰه يْعَاوِنْ', french: 'Que Dieu t’assiste(merci au vendeur(' },
+            { darija: 'Bslama !', arabicWithTashkeel: 'بْسْلَامَةْ', french: 'Au revoir(menace polie de partir(' },
+          ],
         },
       },
       {
@@ -88,7 +104,7 @@ export const module2Lessons: Lesson[] = [
             ar: 'الرد المعتاد على الثمن الأول.',
           },
           arabizi: 'Ghali bezzaf !',
-          arabic: 'غالي بزاف!',
+          arabic: 'غَالِيْ بْزَّافْ!',
           translation: {
             fr: 'C\'est trop cher !',
             en: 'That is too expensive !',
@@ -142,7 +158,7 @@ export const module2Lessons: Lesson[] = [
             ar: 'اطلب تخفيضاً ثم اسأل عن الثمن الأخير.',
           },
           arabizi: 'Naqass chwiya 3afak. Akhir taman dyalek ?',
-          arabic: 'نقص شويا عفاك. آخر تمن ديالك؟',
+          arabic: 'نْقَصْ شْوِيَا عَفَاكْ. آخِرْ تَمَنْ دْيَالِكْ؟',
           translation: {
             fr: 'Baisse un peu s\'il te plaît. C\'est ton dernier prix ?',
             en: 'Lower it a bit please. Is that your final price ?',
@@ -162,7 +178,7 @@ export const module2Lessons: Lesson[] = [
         type: 'exercise',
         exercise: {
           id: 'ex_m2_l3_3',
-          type: 'reorder',
+          type: 'scramble',
           prompt: {
             fr: 'Reconstituez : « Baisse un peu s\'il te plaît »',
             en: 'Reorder: "Lower it a bit please"',
@@ -222,7 +238,7 @@ export const module2Lessons: Lesson[] = [
             ar: 'نتيجتان: الاتفاق أو المغادرة والعودة.',
           },
           arabizi: 'Wakha. Nchouf ou n-rje3.',
-          arabic: 'واخا. نشوف و نرجع.',
+          arabic: 'وَاْخَا. نْشُوفْ وْ نْرْجَعْ.',
           translation: {
             fr: 'D\'accord. Je regarde et je reviens.',
             en: 'Alright. I will look around and come back.',
@@ -257,7 +273,7 @@ export const module2Lessons: Lesson[] = [
           },
           npcStartLine: {
             arabizi: 'Mre7ba bik a khoya ! Dkhol tferrej, kolchi zwin.',
-            arabic: 'مرحبا بيك أ خويا! دخل تفرج، كلشي زوين.',
+            arabic: 'مَرْحْبَا بِيك أَ خُويَا! دْخُلْ تْفَرَّجْ، كُلْشِي زْوِينْ.',
             translation: {
               fr: 'Bienvenue mon frère ! Entre regarder, tout est beau.',
               en: 'Welcome my brother! Come in and look, everything is beautiful.',
@@ -272,7 +288,7 @@ export const module2Lessons: Lesson[] = [
               id: 'c1',
               text: {
                 arabizi: 'Bch7al had l-berrad d-n-n7as 3afak ?',
-                arabic: 'بشحال هاد البراد د النحاس عفاك؟',
+                arabic: 'بْشْحَالْ هَادْ البَرَّادْ دْ النْحَاسْ عَفَاكْ؟',
                 translation: {
                   fr: 'Combien coûte cette théière en cuivre s\'il vous plaît ?',
                   en: 'How much is this copper teapot please?',
@@ -293,7 +309,7 @@ export const module2Lessons: Lesson[] = [
               id: 'c2',
               text: {
                 arabizi: 'Ghali bezzaf !',
-                arabic: 'غالي بزاف!',
+                arabic: 'غَالِيْ بْزَّافْ!',
                 translation: {
                   fr: 'C\'est trop cher !',
                   en: 'That is too expensive!',
@@ -314,7 +330,7 @@ export const module2Lessons: Lesson[] = [
               id: 'c3',
               text: {
                 arabizi: 'Ma bghitch.',
-                arabic: 'ما بغيتش.',
+                arabic: 'مَا بْغِيتْشْ.',
                 translation: {
                   fr: 'Je ne veux pas.',
                   en: 'I do not want it.',
@@ -335,7 +351,7 @@ export const module2Lessons: Lesson[] = [
               id: 'c4',
               text: {
                 arabizi: 'Naqass chwiya 3afak, akhir taman dyalek ?',
-                arabic: 'نقص شويا عفاك، آخر تمن ديالك؟',
+                arabic: 'نْقَصْ شْوِيَا عَفَاكْ، آخِرْ تَمَنْ دْيَالِكْ؟',
                 translation: {
                   fr: 'Baisse un peu s\'il te plaît, c\'est ton dernier prix ?',
                   en: 'Lower it a bit please, is that your final price?',
@@ -381,6 +397,144 @@ export const module2Lessons: Lesson[] = [
           },
         },
       },
+      {
+        id: 'm2_boss_challenge',
+        type: 'exercise',
+        exercise: {
+          id: 'ex_m2_boss_hassan',
+          type: 'roleplay_challenge',
+          prompt: {
+            fr: 'Épreuve finale : négociez une paire de babouches avec Hassan au Souk de Fès.',
+            en: 'Final challenge: negotiate a pair of babouches with Hassan at the souk of Fès.',
+            es: 'Desafío final: negocia un par de babuchas con Hassan en el zoco de Fez.',
+            ar: 'التحدي الختامي: تفاوض على زوج من البلغة مع حسن في سوق فاس.',
+          },
+          dialogueContext: {
+            fr: 'Vous êtes devant l\'étal de Hassan, au Souk de Fès.',
+            en: 'You stand in front of Hassan\'s stall, at the souk of Fès.',
+            es: 'Estás delante del puesto de Hassan, en el zoco de Fez.',
+            ar: 'أنت أمام دكان حسن، في سوق فاس.',
+          },
+          npcStartLine: {
+            arabizi: 'Mre7ba bik a khoya ! 3ndna babouj d-l-jeld d-Fas, kolchi mzyan.',
+            arabic: 'مَرْحْبَا بِيك أَ خُويَا ! عَنْدْنَا بَابُوجْ دْ الجِلْدْ دْ فَاسْ، كُلْشِي مْزْيَانْ.',
+            translation: {
+              fr: 'Bienvenue mon frère ! Nous avons des babouches en cuir de Fès, tout est beau.',
+              en: 'Welcome my brother! We have Fès leather babouches, everything is beautiful.',
+              es: '¡Bienvenido hermano! Tenemos babuchas de cuero de Fez, todo es bonito.',
+              ar: 'مرحبا بك يا أخي! عندنا بلغة من جلد فاس، كل شيء جميل.',
+            },
+          },
+          answer: '',
+          explanation: {
+            fr: 'Vous demandez le prix avant de vous engager, puis vous faites baisser sans braquer le vendeur. Ces mêmes réflexes se jouent ensuite en dialogue ouvert avec Hassan.',
+            en: 'You ask the price before committing, then lower it without alienating the seller. The same reflexes then play out in open dialogue with Hassan.',
+            es: 'Pides el precio antes de comprometerte y luego lo bajas sin ofender al vendedor.',
+            ar: 'تسأل عن الثمن قبل الالتزام ثم تخفضه دون إحراج البائع.',
+          },
+          dialogueChoices: [
+            {
+              id: 'boss_c1',
+              text: {
+                arabizi: 'Bch7al had l-babouj 3afak ?',
+                arabic: 'بْشْحَالْ هَادْ البَابُوجْ عَفَاكْ ؟',
+                translation: {
+                  fr: 'Combien coûtent ces babouches s\'il vous plaît ?',
+                  en: 'How much are these babouches please?',
+                  es: '¿Cuánto cuestan estas babuchas por favor?',
+                  ar: 'بكم هذه البلغة من فضلك؟',
+                },
+              },
+              isOptimal: true,
+              nextNpcLine: 'Hadou jeld 7orr, kan7esbo b-tlata mya derhem.',
+              feedback: {
+                fr: 'Bien joué : vous demandez le prix sans vous engager. La négociation peut commencer.',
+                en: 'Well done: you ask the price without committing. The negotiation can start.',
+                es: 'Bien hecho: preguntas el precio sin comprometerte.',
+                ar: 'أحسنت: سألت عن الثمن دون التزام.',
+              },
+            },
+            {
+              id: 'boss_c2',
+              text: {
+                arabizi: 'Ghali bezzaf !',
+                arabic: 'غَالِيْ بْزَّافْ !',
+                translation: {
+                  fr: 'C\'est trop cher !',
+                  en: 'That is too expensive!',
+                  es: '¡Es demasiado caro!',
+                  ar: 'غالي جداً!',
+                },
+              },
+              isOptimal: false,
+              nextNpcLine: 'Chno ghali ? Ma sme3tich taman baqi !',
+              feedback: {
+                fr: 'Trop tôt : vous n\'avez pas encore entendu le prix. On objecte après l\'annonce, pas avant.',
+                en: 'Too early: you have not heard the price yet. You object after the quote, not before.',
+                es: 'Demasiado pronto: aún no has oído el precio.',
+                ar: 'مبكر جداً: لم تسمع الثمن بعد.',
+              },
+            },
+            {
+              id: 'boss_c3',
+              text: {
+                arabizi: 'Naqass chwiya 3afak, akhir taman dyalek ?',
+                arabic: 'نْقَصْ شْوِيَا عَفَاكْ، آخِرْ تَمَنْ دْيَالِكْ ؟',
+                translation: {
+                  fr: 'Baisse un peu s\'il te plaît, c\'est ton dernier prix ?',
+                  en: 'Lower it a bit please, is that your final price?',
+                  es: 'Baja un poco por favor, ¿es tu último precio?',
+                  ar: 'نقص قليلاً من فضلك، هل هذا آخر ثمن لديك؟',
+                },
+              },
+              isOptimal: true,
+              nextNpcLine: 'Safi, nkhellih lik b-myatayn w khemsin, 3la rass w l-3ayn !',
+              feedback: {
+                fr: 'Exactement : demande de baisse adoucie, puis question sur le dernier prix. Hassan cède.',
+                en: 'Exactly: a softened request for a reduction, then the final-price question. Hassan gives in.',
+                es: 'Exacto: petición suavizada y luego el precio final.',
+                ar: 'بالضبط: طلب تخفيض ملطّف ثم سؤال عن الثمن الأخير.',
+              },
+            },
+            {
+              id: 'boss_c4',
+              text: {
+                arabizi: 'Ma bghitch, bslama.',
+                arabic: 'مَا بْغِيتْشْ، بْسْلَامَةْ.',
+                translation: {
+                  fr: 'Je ne veux pas, au revoir.',
+                  en: 'I do not want it, goodbye.',
+                  es: 'No quiero, adiós.',
+                  ar: 'لا أريد، وداعاً.',
+                },
+              },
+              isOptimal: false,
+              nextNpcLine: 'Wakha a khoya, bslama.',
+              feedback: {
+                fr: 'Refuser sans négocier ferme la porte. Ici, on veut faire baisser le prix, pas renoncer.',
+                en: 'Refusing without negotiating closes the door. Here you want a lower price, not to give up.',
+                es: 'Rechazar sin negociar cierra la puerta.',
+                ar: 'الرفض دون تفاوض يغلق الباب.',
+              },
+            },
+          ],
+        },
+      },
+  {
+        id: 'm2_souk_tip_hospitalite',
+        type: 'culture_tip',
+        cultureTip: {
+          title: 'L’hospitalité et le refus doux',
+          badge: '🇳🇦 Code social — gestes',
+          content: 'Quand un Marocain t’offre quelque chose — thé, repas, service — refuser brutalement est perçu comme une offense. On décline avec la main posée sur le cœur, en disant « Allah ybarek fik »(que Dieu te bénisse( ou « La, shokran, bzzaf de l’honneur ». Ce geste de la main sur le cœur accompagne aussi le « merci » sincère.',
+          expressions: [
+            { darija: 'Allah ybarek fik', arabicWithTashkeel: 'اللّٰه يْبَارِكْ فِيكْ', french: 'Que Dieu te bénisse' },
+            { darija: 'Bzzaf de l’honneur', arabicWithTashkeel: 'بْزَّافْ دْ لُونُورْ', french: 'C’est trop d’honneur(refus poli(' },
+            { darija: 'La, shokran', arabicWithTashkeel: 'لَا، شُكْرًا', french: 'Non merci(poli(' },
+          ],
+        },
+      },
+
     ],
   },
 ];

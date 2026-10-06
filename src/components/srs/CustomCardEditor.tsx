@@ -128,6 +128,7 @@ export default function CustomCardEditor({ isOpen, onClose, cardToEdit }: Custom
               : (isAr ? 'إضافة كلمة جديدة' : 'Ajouter un nouveau mot')}
           </h2>
           <button 
+          aria-label={t.common.close}
             onClick={onClose}
             className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-200 rounded-full transition-colors"
           >

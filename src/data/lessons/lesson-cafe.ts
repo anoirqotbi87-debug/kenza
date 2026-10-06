@@ -23,10 +23,24 @@ export const lessonCafe: Lesson = {
         title: { fr: 'Vocabulaire du Café', en: 'Cafe Vocabulary', es: 'Vocabulario del Café', ar: 'مفردات المقهى' },
         description: { fr: 'La culture du café est centrale au Maroc.', en: 'Cafe culture is central in Morocco.', es: 'La cultura del café es central en Marruecos.', ar: 'ثقافة المقاهي أساسية في المغرب.' },
         arabizi: '9hwa / Atay',
-        arabic: 'قهوة / أتاي',
+        arabic: 'قَهْوَةْ / أَتَايْ',
         translation: { fr: 'Café / Thé', en: 'Coffee / Tea', es: 'Café / Té', ar: 'قهوة / شاي' },
         culturalNote: { fr: 'Le thé à la menthe (Atay b ne3na3) est la boisson nationale.', en: 'Mint tea is the national drink.', es: 'El té a la menta es la bebida nacional.', ar: 'الشاي بالنعناع هو المشروب الوطني.' }
       }
+    },
+    {
+      id: 'm2_cafe_tip_commander',
+      type: 'culture_tip',
+      cultureTip: {
+        title: 'Noss-noss, k7la ou thé b rezza',
+        badge: '🇳🇦 Rituel du café',
+        content: 'Commander est un mini-rituel. « 9hwa » est le café ; « 9hwa k7la »(café noir( se boit court et très sucré par défaut ; « Noss-noss » = moitié café, moitié lait ; « Atay b rezza » = thé avec des feuilles fraîches de menthe. Le serveur s’attend à ce que tu prennes ton temps.',
+        expressions: [
+          { darija: '9hwa k7la', arabicWithTashkeel: 'قَهْوَةْ كَحْلَةْ', french: 'Café noir' },
+          { darija: 'Noss-noss', arabicWithTashkeel: 'نَصْ نَصْ', french: 'Moitié café, moitié lait' },
+          { darija: 'Atay b rezza', arabicWithTashkeel: 'أَتَايْ بْ رَزَّةْ', french: 'Thé à la menthe' },
+        ],
+      },
     },
     {
       id: 's3_matching',

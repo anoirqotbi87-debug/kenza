@@ -23,7 +23,12 @@ export default function Leaderboard() {
           .limit(10);
         
         if (data) {
-          setLeaders(data);
+          setLeaders(
+            data.map((p) => ({
+              username: p.username || 'Anonyme',
+              xp: p.xp ?? 0,
+            }))
+          );
         }
       } catch (err) {
         console.error("Failed to fetch leaders", err);

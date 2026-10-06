@@ -9,7 +9,7 @@ export const module7Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m7_wa7ednnhar',
     arabizi: 'F wa7ed n-nhar',
-    arabic: 'فواحد النهار',
+    arabic: 'فْوَاحْدْ النْهَارْ',
     translation: {
       fr: 'Un jour (ouverture de récit)',
       en: 'One day (story opener)',
@@ -20,7 +20,7 @@ export const module7Vocabulary: ModuleVocabularyItem[] = [
     category: 'narration',
     example: {
       arabizi: 'F wa7ed n-nhar, koun-t f l-medina dyal Fes.',
-      arabic: 'فواحد النهار، كنت فالمدينة ديال فاس.',
+      arabic: 'فْوَاحْدْ النْهَارْ، كُنْتْ فَالْمْدِينَةْ دْيَالْ فَاسْ.',
       translation: {
         fr: "Un jour, j'étais dans la médina de Fès.",
         en: 'One day, I was in the medina of Fes.',
@@ -39,7 +39,7 @@ export const module7Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m7_flowwel',
     arabizi: 'F l-lowwel',
-    arabic: 'فاللول',
+    arabic: 'فَاللُوّلْ',
     translation: {
       fr: 'Au début',
       en: 'At first',
@@ -50,7 +50,7 @@ export const module7Vocabulary: ModuleVocabularyItem[] = [
     category: 'narration',
     example: {
       arabizi: 'F l-lowwel, chof-t l-makan, w men be3d mchi-t l d-dar.',
-      arabic: 'فاللول، شفت المكان، ومن بعد مشيت لالدار.',
+      arabic: 'فَاللُوّلْ، شَفْتْ الْمَكَانْ، وْمِنْ بْعَدْ مْشِيتْ لِدَّارْ.',
       translation: {
         fr: "Au début j'ai vu l'endroit, et ensuite je suis allé à la maison.",
         en: 'At first I saw the place, and then I went to the house.',
@@ -63,7 +63,7 @@ export const module7Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m7_menbe3d',
     arabizi: 'Men be3d',
-    arabic: 'من بعد',
+    arabic: 'مِنْ بْعَدْ',
     translation: {
       fr: 'Ensuite, après',
       en: 'Then, after',
@@ -77,7 +77,7 @@ export const module7Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m7_melli',
     arabizi: 'Melli / Fash',
-    arabic: 'مللي / فاش',
+    arabic: 'مَلِّيْ / فَاشْ',
     translation: {
       fr: 'Lorsque, quand',
       en: 'When',
@@ -88,7 +88,7 @@ export const module7Vocabulary: ModuleVocabularyItem[] = [
     category: 'narration',
     example: {
       arabizi: 'Melli swwel-t wa7ed s-siyed, na3t liya t-triq.',
-      arabic: 'مللي سولت واحد السيد، نعت ليا الطريق.',
+      arabic: 'مَلِّيْ سُولْتْ وَاحْدْ السِّيدْ، نْعَتْ لِيَّا الطَّرِيقْ.',
       translation: {
         fr: "Lorsque j'ai demandé à un monsieur, il m'a indiqué le chemin.",
         en: 'When I asked a gentleman, he showed me the way.',
@@ -101,7 +101,7 @@ export const module7Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m7_llekher',
     arabizi: 'F l-lekher',
-    arabic: 'في اللخر',
+    arabic: 'فِيْ اللَّخَّارْ',
     translation: {
       fr: 'À la fin, finalement',
       en: 'In the end, finally',
@@ -112,7 +112,7 @@ export const module7Vocabulary: ModuleVocabularyItem[] = [
     category: 'narration',
     example: {
       arabizi: 'F l-lekher, wsel-t b-khir!',
-      arabic: 'في اللخر، وصلت بخير!',
+      arabic: 'فِيْ اللَّخَّارْ، وْصَلْتْ بْخِيرْ!',
       translation: {
         fr: 'Finalement, je suis arrivé sain et sauf !',
         en: 'In the end, I arrived safe and sound!',
@@ -125,7 +125,7 @@ export const module7Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m7_bkhir',
     arabizi: 'B-khir',
-    arabic: 'بخير',
+    arabic: 'بْخِيرْ',
     translation: {
       fr: 'Bien, sain et sauf',
       en: 'Well, safe and sound',
@@ -145,7 +145,7 @@ export const module7Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m7_tlef',
     arabizi: 'Tlef-t',
-    arabic: 'تلفت',
+    arabic: 'تَلْفَتْ',
     translation: {
       fr: "Je me suis perdu",
       en: 'I got lost',
@@ -156,7 +156,7 @@ export const module7Vocabulary: ModuleVocabularyItem[] = [
     category: 'narration',
     example: {
       arabizi: 'F l-lowwel, tleff-t f d-drouba.',
-      arabic: 'فاللول، تلفت فالدروبة.',
+      arabic: 'فَاللُوّلْ، تَلْفَتْ فَدْدْرُوبَةْ.',
       translation: {
         fr: "Au début, je me suis perdu dans les ruelles.",
         en: 'At first, I got lost in the alleys.',
@@ -169,7 +169,7 @@ export const module7Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m7_llifatmat',
     arabizi: 'Lli fat mat',
-    arabic: 'اللي فات مات',
+    arabic: 'اللِّيْ فَاتْ مَاتْ',
     translation: {
       fr: "Ce qui est passé est mort (tourner la page)",
       en: 'What is past is dead (turn the page)',
@@ -183,7 +183,7 @@ export const module7Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m7_drbabdrba',
     arabizi: 'Drba b drba kat-bna d-dar',
-    arabic: 'ضربة بضربة كتبنى الدار',
+    arabic: 'ضَرْبَةْ بْضَرْبَةْ كْتَبْنِيْ الدَّارْ',
     translation: {
       fr: 'Coup après coup se bâtit la maison (la patience paie)',
       en: 'Blow by blow the house is built (patience pays)',
@@ -203,7 +203,7 @@ export const module7Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m7_zrbat',
     arabizi: 'Zrbat matat',
-    arabic: 'الزربات ماتات',
+    arabic: 'الزَّرْبَاتْ مَاتَاتْ',
     translation: {
       fr: 'La précipitation est morte (rien ne sert de courir)',
       en: 'Haste is dead (there is no point in rushing)',
@@ -217,7 +217,7 @@ export const module7Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m7_3ayla',
     arabizi: '3ayla',
-    arabic: 'عايلة',
+    arabic: 'عَايْلَةْ',
     translation: {
       fr: 'Fille, jeune fille (Nord)',
       en: 'Girl, young woman (North)',
@@ -237,7 +237,7 @@ export const module7Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m7_daba',
     arabizi: 'Daba',
-    arabic: 'دابا',
+    arabic: 'دَابَا',
     translation: {
       fr: 'Maintenant (Centre)',
       en: 'Now (Centre)',
@@ -257,7 +257,7 @@ export const module7Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m7_fayn',
     arabizi: 'Fayn machi? / Fin ghadi?',
-    arabic: 'فاين ماشي؟ / فين غادي؟',
+    arabic: 'فَايْن مَاشِيْ؟ / فِينْ غَادِيْ؟',
     translation: {
       fr: 'Où vas-tu ? (deux variantes régionales)',
       en: 'Where are you going? (two regional variants)',

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { BookOpen, CheckCircle2, Lock, Play } from 'lucide-react';
+import { BookOpen, CheckCircle2, Lock, Play, Sparkles } from 'lucide-react';
 import { fullCurriculum } from '@/data/curriculum';
 import type { Lesson, MultiLangText } from '@/types/curriculum';
 import { useAppStore, useTranslation } from '@/store/useAppStore';
@@ -9,6 +9,7 @@ import type { UILanguage } from '@/lib/i18n/translations';
 import { getLocalizedText } from '@/lib/i18n/utils';
 import { isModuleLocked } from '@/lib/premiumModules';
 import ExerciseRunner from '@/components/ExerciseRunner';
+import ArabiziGuideModal from '@/components/curriculum/ArabiziGuideModal';
 import PaywallModal from '@/components/monetization/PaywallModal';
 import PageHeader from '@/components/ui/PageHeader';
 import { usePremiumStatus } from '@/hooks/usePremiumStatus';
@@ -20,6 +21,7 @@ export default function EtudierPage() {
   const { t } = useTranslation();
   const [runnerLesson, setRunnerLesson] = useState<Lesson | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showArabiziGuide, setShowArabiziGuide] = useState(false);
 
   const lang = uiLanguage || 'fr';
   const isAr = lang === 'ar';
@@ -84,6 +86,25 @@ export default function EtudierPage() {
       />
 
       <main className="max-w-4xl mx-auto p-6 space-y-8">
+        <button
+          onClick={() => setShowArabiziGuide(true)}
+          className="w-full text-left bg-white/70 border border-dashed border-[#C9A05C]/50 hover:border-[#C9A05C] hover:bg-[#C9A05C]/5 rounded-2xl px-5 py-4 flex items-center gap-3 transition-colors group"
+        >
+          <div className="w-10 h-10 rounded-xl bg-[#C9A05C]/15 text-[#B8860B] flex items-center justify-center shrink-0 transition-transform group-hover:scale-105">
+            <Sparkles className="w-5 h-5" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-bold text-[#1B2A4A]">💡 La Clé des Chiffres Arabizi</p>
+            <p className="text-xs text-[#7A7670] mt-0.5">
+              2 · 3 · 5 · 7 · 9 — le décodeur des sons gutturaux, avant ou pendant ton parcours.
+
+            </p>
+          </div>
+          <span className="text-xs font-bold text-[#B8860B] bg-[#C9A05C]/10 border border-[#C9A05C]/20 px-3 py-1 rounded-full shrink-0">
+            Mini-guide
+          </span>
+        </button>
+
         {Object.entries(fullCurriculum).map(([key, mod]) => {
           const isPremiumModule = isModuleLocked(key, false) && (!isPremiumReady || !isPremium);
           return (
@@ -156,6 +177,9 @@ export default function EtudierPage() {
           }}
           source="module_locked"
         />
+      )}
+      {showArabiziGuide && (
+        <ArabiziGuideModal onClose={() => setShowArabiziGuide(false)} />
       )}
     </div>
   );

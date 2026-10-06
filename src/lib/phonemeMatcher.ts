@@ -75,6 +75,8 @@ export function normalizeDarijaText(text: string): string {
     .replace(/[\u064B-\u065F\u0670]/g, '')
     // Normalize forms of alif
     .replace(/[أإآ]/g, 'ا')
+    // Normalize 5 to kh in Arabizi
+    .replace(/5/g, 'kh')
     // Remove common punctuation and symbols
     .replace(/[.,!?؟;:'"()\-–—_]/g, ' ')
     // Normalize spaces
@@ -209,7 +211,7 @@ export function evaluatePronunciation(
     tier = 'good';
     const firstMissing = missingPhonemes[0];
     const missingHint = firstMissing
-      ? ` Insistez sur le son guttural '${firstMissing}' (${ARABIZI_TO_ARABIC[firstMissing] || ''}).`
+      ? ` Insiste sur le son '${firstMissing}' (${ARABIZI_TO_ARABIC[firstMissing] || ''}).`
       : '';
     badge = {
       icon: '🟡',
@@ -220,7 +222,7 @@ export function evaluatePronunciation(
     tier = 'needs_work';
     badge = {
       icon: '🔴',
-      text: 'À réécouter. Utilisez le mode ralenti 🐢 pour bien décomposer.',
+      text: 'À réécouter. Utilise le mode ralenti 🐢 pour bien décomposer.',
       color: '#ef4444',
     };
   }

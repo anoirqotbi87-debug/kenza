@@ -1,5 +1,5 @@
 import { streamText, type CoreMessage } from 'ai';
-import { google } from '@ai-sdk/google';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { getSystemPrompt, PersonaId } from '@/lib/ai/prompts';
 import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
@@ -18,7 +18,9 @@ export async function POST(req: NextRequest) {
     if (!origin && !referer && !fetchSite) {
       return new Response('Forbidden: Missing origin headers', { status: 403 });
     }
-    if (fetchSite && fetchSite !== 'same-origin' && fetchSite !== 'same-site') {
+    // Bloquer uniquement les requêtes explicitement cross-site.
+    // Autoriser same-origin, same-site et 'none' (PWA standalone, WebView mobile, requêtes directes).
+    if (fetchSite === 'cross-site') {
       return new Response('Forbidden: Cross-site request blocked', { status: 403 });
     }
     if (origin && !isAllowedOrigin(origin)) {
@@ -59,18 +61,18 @@ export async function POST(req: NextRequest) {
         const { data: quotaOk, error: quotaError } = await supabase.rpc('consume_ai_quota');
         if (quotaError) {
           console.error('[Supabase Quota Error]:', quotaError);
+          return new Response('Service Unavailable (DB)', { status: 503 });
         }
         if (!quotaOk) {
           return new Response(JSON.stringify({
             error: 'QUOTA_EXCEEDED',
             message: 'Quota quotidien de 8 messages atteint. Passez à Kenza Pro pour des conversations illimitées !'
-          }), 
-{ status: 403, headers: { 'Content-Type': 'application/json' } });
+          }), { status: 403, headers: { 'Content-Type': 'application/json' } });
         }
       }
     } else {
       const userAgent = req.headers.get('user-agent') || '';
-      const fingerprint = crypto.createHash('sha256').update(`${userAgent}${ip}`).digest('hex').substring(0, 16);
+      const fingerprint = crypto.createHash('sha256').update(`${userAgent}${ip}`).digest('hex');
       const guestQuota = await checkRateLimit(`roleplay:guest:${ip}:${fingerprint}`, 3, 24 * 60 * 60 * 1000);
       if (guestQuota.error) {
         return new Response('Service Unavailable (DB)', { status: 503 });
@@ -113,7 +115,19 @@ export async function POST(req: NextRequest) {
       return new Response('Invalid persona or personaId', { status: 400 });
     }
 
-    // Appel direct : pas de repli, on échoue vite et on laisse le catch classer l'erreur.
+    const apiKey =
+      process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
+      process.env.GEMINI_API_KEY ||
+      (process.env.NODE_ENV === 'test' ? 'test-api-key' : '');
+    if (!apiKey) {
+      console.error('[Roleplay Chat] Missing Google Gemini API key');
+      return new Response(JSON.stringify({
+        error: 'AI_SERVICE_UNAVAILABLE',
+        message: 'Service IA momentanément indisponible (clé API non configurée).'
+      }), { status: 503, headers: { 'Content-Type': 'application/json' } });
+    }
+
+    const google = createGoogleGenerativeAI({ apiKey });
     const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
     const result = await streamText({
       model: google(primaryModel),
@@ -121,31 +135,33 @@ export async function POST(req: NextRequest) {
       messages,
       temperature: 0.7,
       maxTokens: 300, // Short responses
-      maxRetries: 0, // Pas de retry : 6 s de backoff par modele, pour rien
+      maxRetries: 0, // Pas de retry : 6 s de backoff par modèle, pour rien
     });
 
     // Return the streaming response
     return result.toDataStreamResponse();
   } catch (error: unknown) {
     const errMsg = error instanceof Error ? error.message : String(error);
-    // Le message d'un 403 Google est « Your project has been denied access... » : il ne
-    // contient ni « 403 » ni « PERMISSION_DENIED ». Seul `statusCode` est fiable.
     const status = (error as { statusCode?: number } | undefined)?.statusCode;
     console.error('API Roleplay Chat Error:', errMsg, '| upstream status:', status);
 
-    if (status === 401 || status === 403) {
+    // Sur erreur 401/403 (clé invalide / permission), 404 (modèle non supporté), 429 (quota) ou 5xx : renvoyer immédiatement HTTP 503
+    if (
+      status === 401 ||
+      status === 403 ||
+      status === 404 ||
+      status === 429 ||
+      (status !== undefined && status >= 500) ||
+      errMsg.includes('not found') ||
+      errMsg.includes('quota') ||
+      errMsg.includes('API key')
+    ) {
       return new Response(JSON.stringify({
-        error: 'AI_AUTH_FAILED',
-        message: 'Google AI Studio authentication error. Check GOOGLE_GENERATIVE_AI_API_KEY.'
-      }), { status: 500, headers: { 'Content-Type': 'application/json' } });
-    }
-
-    // 429 (quota/rate limit) et 5xx sont transitoires : 503 le dit, 500 non.
-    if (status === 429 || (status !== undefined && status >= 500)) {
-      return new Response(JSON.stringify({ error: 'AI_UNAVAILABLE' }), {
-        status: 503,
-        headers: { 'Content-Type': 'application/json' }
-      });
+        error: 'AI_SERVICE_UNAVAILABLE',
+        message: status === 401 || status === 403
+          ? 'Service IA momentanément indisponible (authentification ou clé Google API).'
+          : 'Service IA temporairement indisponible. Veuillez réessayer dans un instant.'
+      }), { status: 503, headers: { 'Content-Type': 'application/json' } });
     }
 
     return new Response(JSON.stringify({ error: 'INTERNAL_ERROR', message: errMsg }), {

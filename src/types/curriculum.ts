@@ -13,7 +13,22 @@ export interface UserProfile {
   preferredNotation: Notation;
 }
 
-export type ExerciseType = 'mcq' | 'reorder' | 'match' | 'matching' | 'fill-blank' | 'dialogue';
+/**
+ * Types d'exercices du moteur.
+ *
+ * - `mcq` : question a choix unique.
+ * - `reorder` : remettre des tuiles dans l'ordre (reconstitution de phrase).
+ * - `scramble` : alias pedagogique de `reorder` : blocs melanges a reconstituer
+ *   en phrase syntaxiquement exacte (rendu et validation identiques).
+ * - `match` / `matching` : associer des paires (darija <=> traduction).
+ * - `fill-blank` : completer un trou dans une phrase.
+ * - `dialogue` : scenario dialogue multi-choix (ronde avec l'IA).
+ * - `roleplay_challenge` : epreuve de cloture de module, mise en situation
+ *   avec un persona Roleplay (Driss au cafe, Hassan au souk...). Meme structure
+ *   que `dialogue`, mais signale la passerelle vers l'onglet Parler.
+ */
+
+export type ExerciseType = 'mcq' | 'reorder' | 'scramble' | 'match' | 'matching' | 'fill-blank' | 'dialogue' | 'roleplay_challenge' | 'culture_tip';
 
 export interface MultiLangText {
   fr: string;
@@ -37,7 +52,7 @@ export interface Lesson {
 
 export interface LessonStep {
   id: string;
-  type: 'learning' | 'exercise' | 'grammar';
+  type: 'learning' | 'exercise' | 'grammar' | 'culture_tip';
   content?: {
     title: MultiLangText | string;
     description: MultiLangText | string;
@@ -47,6 +62,7 @@ export interface LessonStep {
     audioUrl?: string;
     culturalNote?: MultiLangText | string;
   };
+  cultureTip?: CultureTipStep;
   exercise?: Exercise;
 }
 
@@ -93,6 +109,19 @@ export interface Exercise {
   acceptedAnswers?: string[];
   explanation?: MultiLangText | string;
   culturalNote?: MultiLangText | string;
+}
+
+/** Encart d'immersion culturelle : codes sociaux marocains, formules rituelles,
+ *  politesse du quotidien. Rendu carte dédié dans `ExerciseRunner`. */
+export interface CultureTipStep {
+  title: string;
+  badge?: string; // ex. "🇲🇦 Code Social Marocain"
+  content: string;
+  expressions: Array<{
+    darija: string;
+    arabicWithTashkeel: string;
+    french: string;
+  }>;
 }
 
 export interface VocabularyItem {

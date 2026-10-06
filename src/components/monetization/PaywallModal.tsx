@@ -8,6 +8,7 @@ import { trackEvent } from '../../utils/analytics';
 import { supabase } from '../../lib/supabase';
 import { openBillingPortal } from '../../lib/billingPortal';
 import { getDisplayPricing } from '../../config/pricing';
+import { useDialog } from '../../hooks/useDialog';
 
 interface PaywallModalProps {
   onClose: () => void;
@@ -35,6 +36,8 @@ export default function PaywallModal({
   onRequireSignIn,
 }: PaywallModalProps) {
   const { t } = useTranslation();
+  // `onDismiss` prime : c'est la sortie voulue par l'appelant (paywall d'onboarding).
+  const { dialogRef } = useDialog(true, onDismiss ?? onClose);
   const isPremium = useAppStore((s) => s.isPremium);
   const user = useAppStore((s) => s.user);
   // Un invité ne peut pas s'abonner : la route checkout refuse de créer une session sans
@@ -188,9 +191,12 @@ export default function PaywallModal({
   return (
     <div className="fixed inset-0 z-[100] bg-[#1B2A4A]/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
       <div 
+        ref={dialogRef}
         className="bg-[#FDFCF8] rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl border border-[#E8E2D5] flex flex-col md:flex-row relative my-auto animate-in fade-in zoom-in-95 duration-200"
         role="dialog"
         aria-modal="true"
+        aria-labelledby="paywall-modal-title"
+        tabIndex={-1}
       >
         {/* Bouton Fermer - sticky sur mobile (<380px) pour rester toujours accessible */}
         <button 
@@ -221,7 +227,7 @@ export default function PaywallModal({
             </div>
 
             {/* Titre Serif */}
-            <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-normal text-[#FDFCF8] leading-tight">
+            <h2 id="paywall-modal-title" className="font-display text-2xl sm:text-3xl lg:text-4xl font-normal text-[#FDFCF8] leading-tight">
               {headerInfo.title}
             </h2>
 

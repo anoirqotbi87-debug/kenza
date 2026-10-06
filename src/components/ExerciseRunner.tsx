@@ -15,6 +15,7 @@ import ConjugationTable from './grammar/ConjugationTable';
 import { getLocalizedText } from '../lib/i18n/utils';
 import { isAcceptedAnswer, isAcceptedOrder } from '../lib/exerciseAnswers';
 import { renderArabiziWithBadges } from './ui/PhoneticBadge';
+import { useDialog } from '../hooks/useDialog';
 import confetti from 'canvas-confetti';
 
 interface ExerciseRunnerProps {
@@ -45,14 +46,25 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
 
   const { preferredNotation, addXp, soundEnabled, audioSpeed, setAudioSpeed } = useAppStore();
 
+  // Le runner occupe tout l'ecran : c'est un dialogue modal au sens ARIA.
+  // Appel inconditionnel, avant les retours anticipes (regles des Hooks).
+  const { dialogRef } = useDialog(true, onClose);
+
   // --- Crash guard placé APRÈS tous les hooks (règles des Hooks React) ---
   if (!lesson || !Array.isArray(lesson.steps) || lesson.steps.length === 0) {
     console.error("[ExerciseRunner Crash Guard] Leçon manquante ou sans steps :", lesson);
     return (
-      <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="exercise-runner-title"
+        tabIndex={-1}
+        className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4"
+      >
         <div className="bg-white rounded-2xl p-6 max-w-md w-full text-center shadow-xl">
           <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">⚠️</div>
-          <h3 className="text-lg font-bold text-slate-800 mb-2">{t.lessons.unavailable}</h3>
+          <h3 id="exercise-runner-title" className="text-lg font-bold text-slate-800 mb-2">{t.lessons.unavailable}</h3>
           <p className="text-sm text-slate-500 mb-4">{t.lessons.unavailableDesc}</p>
           <button onClick={onClose} className="w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl hover:bg-blue-700">
             {t.lessons.backToDashboard}
@@ -73,7 +85,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
 
     if (type === 'mcq') {
       correct = isAcceptedAnswer(step.exercise, selectedMcqId);
-    } else if (type === 'reorder') {
+    } else if (type === 'reorder' || type === 'scramble') {
       correct = isAcceptedOrder(step.exercise, orderedWords);
     } else if (type === 'fill-blank') {
       correct = isAcceptedAnswer(step.exercise, selectedBlankId);
@@ -143,9 +155,16 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
 
   if (lives === 0 && !isLessonFinished) {
     return (
-      <div className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-4 text-center">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="exercise-runner-title"
+        tabIndex={-1}
+        className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-4 text-center"
+      >
         <HeartCrack className="w-24 h-24 text-red-500 mb-6" />
-        <h2 className="text-3xl font-bold text-slate-800 mb-4">{t.lessons.gameOver}</h2>
+        <h2 id="exercise-runner-title" className="text-3xl font-bold text-slate-800 mb-4">{t.lessons.gameOver}</h2>
         <button onClick={onClose} className="px-8 py-4 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-2xl font-bold text-lg">
           {t.lessons.retry}
         </button>
@@ -155,11 +174,18 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
 
   if (isLessonFinished) {
     return (
-      <div className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-4 text-center animate-in fade-in zoom-in duration-300">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="exercise-runner-title"
+        tabIndex={-1}
+        className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-4 text-center animate-in fade-in zoom-in duration-300"
+      >
         <div className="w-32 h-32 bg-amber-100 rounded-full flex items-center justify-center mb-8 shadow-inner border-4 border-amber-50">
           <Trophy className="w-16 h-16 text-amber-500" />
         </div>
-        <h2 className="text-4xl font-black text-amber-500 mb-2">{t.lessons.congrats}</h2>
+        <h2 id="exercise-runner-title" className="text-4xl font-black text-amber-500 mb-2">{t.lessons.congrats}</h2>
 
         <div className={`flex gap-8 ${finishExtra ? 'mb-6' : 'mb-12'}`}>
           <div className="bg-blue-50 border border-blue-100 p-6 rounded-3xl min-w-[140px]">
@@ -241,6 +267,69 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
       );
     }
 
+    // 1.5. Culture tips — encarts d'immersion culturelle (codes sociaux marocains)
+    if ((step.type as string) === 'culture_tip') {
+      const tip = step.cultureTip;
+      if (!tip) {
+        return null;
+      }
+      return (
+        <div className="w-full max-w-lg mx-auto">
+          <div className="bg-[#FDFCF8] rounded-3xl border-2 border-[#C9A05C]/50 shadow-md overflow-hidden animate-in fade-in zoom-in duration-300">
+            <div className="bg-gradient-to-r from-[#C9A05C]/15 to-[#F7F3EA] px-6 py-4 border-b border-[#C9A05C]/20 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#C9A05C]/20 text-[#C9A05C] flex items-center justify-center text-xl shrink-0">
+                💡
+              </div>
+              <div>
+                {tip.badge && (
+                  <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-[#B8860B] bg-[#C9A05C]/15 px-2.5 py-0.5 rounded-full mb-1">
+                    {tip.badge}
+                  </span>
+                )}
+                <h2 className="font-display text-xl font-bold text-[#1B2A4A] leading-tight">{tip.title}</h2>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-5">
+              <p className="text-[#4A463F] leading-relaxed text-sm">{tip.content}</p>
+
+              <div className="space-y-3">
+                <p className="text-xs font-bold uppercase tracking-wider text-[#B8860B]">
+                  Expressions à retenir
+                </p>
+                {tip.expressions.map((ex) => {
+                  const arabicText = ex.arabicWithTashkeel;
+                  const isRtl = /[\u0600-\u06FF]/.test(arabicText);
+                  return (
+                    <div key={`${ex.darija}_${ex.french}`} className="bg-[#F7F3EA] border border-[#E8E2D5] rounded-2xl p-4 flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p dir={isRtl ? 'rtl' : 'ltr'} className="font-arabic text-lg font-bold text-[#1B2A4A] leading-relaxed">
+                          {ex.arabicWithTashkeel}
+                        </p>
+                        <p className="font-display font-bold text-[#1B2A4A] text-sm">
+                          {ex.darija}
+                        </p>
+                        <p className="text-xs text-[#7A7670] italic">{ex.french}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handlePlayAudio(arabicText, arabicText)}
+                        className="p-3 rounded-full bg-[#1B2A4A] text-[#FDFCF8] hover:bg-[#1B2A4A]/90 transition-colors shrink-0 shadow-sm"
+                        title="Écouter l'expression"
+                        aria-label="Écouter l'expression"
+                      >
+                        <Volume2 className="w-5 h-5 text-[#C9A05C]" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     // 2. Exercises
     if (step.type === 'exercise' && step.exercise) {
       return (
@@ -264,7 +353,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
             />
           )}
 
-          {step.exercise.type === 'reorder' && (
+          {(step.exercise.type === 'reorder' || step.exercise.type === 'scramble') && (
             <ReorderExercise 
               key={step.exercise.id}
               exercise={step.exercise} 
@@ -293,7 +382,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
             />
           )}
 
-          {step.exercise.type === 'dialogue' && (
+          {(step.exercise.type === 'dialogue' || step.exercise.type === 'roleplay_challenge') && (
             <ScenarioDialogue
               exercise={step.exercise}
               preferredNotation={preferredNotation}
@@ -319,14 +408,27 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
   const isCheckDisabled = () => {
     if (!step.exercise) return false;
     if (step.exercise.type === 'mcq') return !selectedMcqId;
-    if (step.exercise.type === 'reorder') return orderedWords.length === 0;
+    if (step.exercise.type === 'reorder' || step.exercise.type === 'scramble') return orderedWords.length === 0;
+    if (step.exercise.type === 'dialogue' || step.exercise.type === 'roleplay_challenge') return true;
     if (step.exercise.type === 'fill-blank') return !selectedBlankId;
     if (step.exercise.type === 'matching' || step.exercise.type === 'match') return Object.keys(matches).length !== (step.exercise.pairs?.length || 0);
     return false;
   };
 
   return (
-    <div className="fixed inset-0 bg-[#F7F3EA] text-[#1B2A4A] z-50 flex flex-col">
+    <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="exercise-runner-title"
+      tabIndex={-1}
+      className="fixed inset-0 bg-[#F7F3EA] text-[#1B2A4A] z-50 flex flex-col"
+    >
+      {/* Titre du dialogue : nomme la modale pour les lecteurs d'ecran.
+          `sr-only` le masque visuellement : aucun changement de rendu. */}
+      <h2 id="exercise-runner-title" className="sr-only">
+        {typeof lesson.title === 'string' ? lesson.title : getLocalizedText(lesson.title, lang)}
+      </h2>
       {/* Header */}
       <header className="p-4 bg-[#FDFCF8] border-b border-[#E8E2D5] flex items-center gap-6 max-w-5xl mx-auto w-full shadow-xs">
         <button

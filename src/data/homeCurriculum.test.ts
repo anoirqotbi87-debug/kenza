@@ -10,6 +10,7 @@ import {
 } from './homeCurriculum';
 import { fullCurriculum } from './curriculum';
 import { PREMIUM_MODULES, isModuleLocked } from '@/lib/premiumModules';
+import { getHomeModules } from './homeModules';
 
 describe('accueil — gating aligne sur la source unique', () => {
   it('chaque lecon de l accueil pointe un module reel du curriculum', () => {
@@ -140,5 +141,39 @@ describe('migration des identifiants de l ancien accueil (store v4 -> v5)', () =
 
   it('ne perd pas un identifiant inconnu', () => {
     expect(migrateLegacyLessonIds(['lecon_future'])).toEqual(['lecon_future']);
+  });
+});
+
+describe('accueil — grille des modules (refonte UI)', () => {
+  it('expose les 7 modules du curriculum, sans chiffres en dur', () => {
+    const modules = getHomeModules('fr', [], false);
+    const keys = modules.map((entry) => entry.key);
+    const expected = Object.keys(fullCurriculum);
+    expect(keys).toEqual(expected);
+  });
+
+  it('le total de lecons jouables reste egal a celui de la vitrine', () => {
+    const modules = getHomeModules('fr', [], false);
+    const total = modules.reduce((sum, entry) => sum + entry.lessons, 0);
+    const expected = getPlayableLessons('fr').length;
+    expect(total).toBe(expected);
+  });
+
+  it('les modules gratuits 1 et  ̄2 ne sont jamais verrouilles pour un invite', () => {
+    const modules = getHomeModules('fr', [], false);
+    for (const entry of modules) {
+      const expected = PREMIUM_MODULES.includes(entry.key);
+      expect(entry.locked).toBe(expected);
+    }
+  });
+
+  it('compte les lecons realisees par module depuis completedLessons', () => {
+    const lessons = getPlayableLessons('fr');
+    const firstFree = lessons.find((entry) => entry.moduleKey === '1');
+    const firstId = firstFree!.id;
+    const modules = getHomeModules('fr', [firstId], false);
+    const first = modules.find((entry) => entry.key === '1');
+    expect(first!.completed).toBe(1);
+    expect(first!.done).toBe(false);
   });
 });

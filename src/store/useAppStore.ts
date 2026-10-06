@@ -2,12 +2,13 @@ import { create } from 'zustand';
 import type { User } from '@supabase/supabase-js';
 import { persist } from 'zustand/middleware';
 import { Notation } from '../types/curriculum';
+export type { Notation };
 import { SRSCard, ReviewGrade, CustomVocabularyItem } from '../types/srs';
 
 import { UILanguage, translations } from '../lib/i18n/translations';
 import { getLocalTodayDateString, getDaysDifference } from '../utils/dateUtils';
 
-import { srsService } from '../services/srsService';
+import { srsService, normalizeDateToUtcMidnight } from '../services/srsService';
 import { migrateLegacyLessonIds } from '../data/homeCurriculum';
 interface AppState {
   // User Progress
@@ -51,6 +52,7 @@ interface AppState {
   deleteCustomWord: (wordId: string) => void;
   reviewCard: (wordId: string, grade: ReviewGrade) => void;
   getDueCards: () => SRSCard[];
+  activateNewCards: (count?: number) => void;
   
   resetData: () => void;
   
@@ -207,7 +209,9 @@ export const useAppStore = create<AppState>()(
       
       addCardsToSRS: (wordIds: string[]) => set((state: AppState) => {
         const newDeck = { ...state.srsDeck };
-        const now = new Date().toISOString();
+        const todayUtc = normalizeDateToUtcMidnight();
+        const iso = todayUtc.toISOString();
+        const nowIso = new Date().toISOString();
         
         wordIds.forEach(id => {
           if (!newDeck[id]) {
@@ -217,8 +221,9 @@ export const useAppStore = create<AppState>()(
               interval: 0,
               repetition: 0,
               easeFactor: 2.5,
-              dueDate: now,
-              state: 'new' as const
+              dueDate: iso,
+              state: 'new' as const,
+              updatedAt: nowIso,
             };
           }
         });
@@ -229,7 +234,9 @@ export const useAppStore = create<AppState>()(
       addCustomWordToSRS: (word: CustomVocabularyItem) => set((state: AppState) => {
         const newVocab = { ...state.customVocabulary, [word.id]: word };
         const newDeck = { ...state.srsDeck };
-        const now = new Date().toISOString();
+        const todayUtc = normalizeDateToUtcMidnight();
+        const iso = todayUtc.toISOString();
+        const nowIso = new Date().toISOString();
         if (!newDeck[word.id]) {
           newDeck[word.id] = {
             id: `card_${word.id}`,
@@ -237,11 +244,33 @@ export const useAppStore = create<AppState>()(
             interval: 0,
             repetition: 0,
             easeFactor: 2.5,
-            dueDate: now,
-            state: 'new' as const
+            dueDate: iso,
+            state: 'learning' as const, // Prêt à réviser
+            updatedAt: nowIso,
           };
         }
         return { customVocabulary: newVocab, srsDeck: newDeck };
+      }),
+
+      activateNewCards: (count: number = 5) => set((state: AppState) => {
+        const todayUtc = normalizeDateToUtcMidnight();
+        const iso = todayUtc.toISOString();
+        const nowIso = new Date().toISOString();
+        const newDeck = { ...state.srsDeck };
+        let activated = 0;
+        for (const [id, card] of Object.entries(newDeck)) {
+          if (card.state === 'new') {
+            newDeck[id] = {
+              ...card,
+              state: 'learning',
+              dueDate: iso,
+              updatedAt: nowIso,
+            };
+            activated++;
+            if (activated >= count) break;
+          }
+        }
+        return { srsDeck: newDeck };
       }),
 
       updateCustomWord: (wordId: string, updates: Partial<CustomVocabularyItem>) => set((state: AppState) => {
@@ -261,11 +290,12 @@ export const useAppStore = create<AppState>()(
         return { customVocabulary: newVocab, srsDeck: newDeck };
       }),
       
-      reviewCard: (wordId: string, grade: ReviewGrade) => set((state: AppState) => {
+      reviewCard: (wordId: string, grade: ReviewGrade) => {
+        const state = get();
         const card = state.srsDeck[wordId];
-        if (!card) return state;
+        if (!card) return;
 
-        // Use srsService to calculate next review based on the 5-box system
+        // Calcul SM-2 avec réinitialisation stricte en cas d'échec
         const updatedCard = srsService.calculateNextReview(card, grade);
 
         const newDeck = {
@@ -273,9 +303,14 @@ export const useAppStore = create<AppState>()(
           [wordId]: updatedCard
         };
 
-        // Add 5 XP for reviewing a card
-        return { srsDeck: newDeck, xp: state.xp + 5 };
-      }),
+        const newXp = state.xp + 5;
+        set({ srsDeck: newDeck, xp: newXp });
+
+        // Synchronisation asynchrone sécurisée vers Supabase sans bloquer l'UI
+        if (state.user) {
+          srsService.syncCardToCloud(state.user.id, updatedCard).catch(() => {});
+        }
+      },
       
       getDueCards: () => {
         const deck = get().srsDeck;

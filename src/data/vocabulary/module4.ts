@@ -8,7 +8,7 @@ export const module4Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m4_kteb',
     arabizi: 'Ktebt / Ketbat / Ktebna / Ktebou',
-    arabic: 'كتبت، كتبات، كتبنا، كتبوا',
+    arabic: 'كْتَبْتْ، كْتَبَاتْ، كْتَبْنَا، كْتَبُواْ',
     translation: {
       fr: "J'ai écrit / elle a écrit / nous avons écrit / ils ont écrit",
       en: 'I wrote / she wrote / we wrote / they wrote',
@@ -28,13 +28,13 @@ export const module4Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m4_lbareh',
     arabizi: 'L-bareh',
-    arabic: 'البارح',
+    arabic: 'الْبَارْحْ',
     translation: { fr: 'Hier', en: 'Yesterday', es: 'Ayer', ar: 'البارح' },
     module: 4,
     category: 'time',
     example: {
       arabizi: 'L-bareh, mchit l-sbitar, men be3d rje3t l-dar.',
-      arabic: 'البارح، مشيت لسبيطار، من بعد رجعت لدار.',
+      arabic: 'الْبَارْحْ، مْشِيتْ لِسْبِيطَارْ، مِنْ بْعَدْ رْجَعْتْ لْدَارْ.',
       translation: {
         fr: "Hier, je suis allé à l'hôpital, puis je suis rentré à la maison.",
         en: 'Yesterday I went to the hospital, then I went home.',
@@ -53,13 +53,13 @@ export const module4Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m4_ka_nkteb',
     arabizi: 'Ka-nkteb / Ka-ykteb',
-    arabic: 'كنكتب / كيكتب',
+    arabic: 'كَنْكْتَبْ / كَيْكْتَبْ',
     translation: { fr: "J'écris / il écrit", en: 'I write / he writes', es: 'Escribo / él escribe', ar: 'كنكتب / كيكتب' },
     module: 4,
     category: 'verb',
     example: {
       arabizi: 'Ana ka-nkteb, houwa ka-ykteb.',
-      arabic: 'أنا كنكتب، هو كيكتب.',
+      arabic: 'أَنَا كَنْكْتَبْ، هُوْ كَيْكْتَبْ.',
       translation: {
         fr: "Moi j'écris, lui il écrit.",
         en: 'I write, he writes.',
@@ -78,7 +78,7 @@ export const module4Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m4_ta_nmchi',
     arabizi: 'Ta-nmchi',
-    arabic: 'تنمشي',
+    arabic: 'تْنَمْشِي',
     translation: { fr: 'Je vais aller', en: 'I will go', es: 'Iré', ar: 'تنمشي' },
     module: 4,
     category: 'verb',
@@ -93,13 +93,13 @@ export const module4Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m4_ghadi',
     arabizi: 'Ghadi',
-    arabic: 'غادي',
+    arabic: 'غَادِيْ',
     translation: { fr: 'Aller (futur)', en: 'Going to (future)', es: 'Ir a (futuro)', ar: 'غادي' },
     module: 4,
     category: 'verb',
     example: {
       arabizi: 'Gha-nmchi. Ghadi nchoufou.',
-      arabic: 'غانمشي. غادي نشوفو.',
+      arabic: 'غَنَمْشِيْ. غَادِيْ نْشُوفُوْ.',
       translation: {
         fr: "Je vais partir. Nous allons voir.",
         en: 'I am going to leave. We are going to see.',
@@ -118,13 +118,13 @@ export const module4Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m4_ma_kla_ch',
     arabizi: 'Ma-kla-ch',
-    arabic: 'ماكلاش',
+    arabic: 'مَا كْلَاشْ',
     translation: { fr: "Il n'a pas mangé", en: 'He did not eat', es: 'No comió', ar: 'ماكلاش' },
     module: 4,
     category: 'verb',
     example: {
       arabizi: 'Ma-kla-ch l-ftour.',
-      arabic: 'ماكلاش الفطور.',
+      arabic: 'مَا كْلَاشْ الفْطُورْ.',
       translation: {
         fr: "Il n'a pas pris le petit-déjeuner.",
         en: 'He did not have breakfast.',
@@ -143,13 +143,13 @@ export const module4Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m4_khassna',
     arabizi: 'Khassna',
-    arabic: 'خاصنا',
+    arabic: 'خَاصْنَا',
     translation: { fr: 'Nous devons / il nous faut', en: 'We must / we need', es: 'Debemos / necesitamos', ar: 'خاصنا' },
     module: 4,
     category: 'abstract',
     example: {
       arabizi: 'Khassna nchoufou l-tbib.',
-      arabic: 'خاصنا نشوفو الطبيب.',
+      arabic: 'خَاصْنَا نْشُوفُوْ الطَّبِيبْ.',
       translation: {
         fr: 'Nous devons voir le médecin.',
         en: 'We must see the doctor.',
@@ -168,13 +168,13 @@ export const module4Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m4_bghit_nchreb',
     arabizi: 'Bghit nchreb',
-    arabic: 'بغيت نشرب',
+    arabic: 'بْغِيتْ نْشْرَبْ',
     translation: { fr: 'Je veux boire', en: 'I want to drink', es: 'Quiero beber', ar: 'بغيت نشرب' },
     module: 4,
     category: 'verb',
     example: {
       arabizi: 'Bghit nchreb qahwa.',
-      arabic: 'بغيت نشرب قهوة.',
+      arabic: 'بْغِيتْ نْشْرَبْ قَهْوَةْ.',
       translation: {
         fr: 'Je veux boire un café.',
         en: 'I want to drink a coffee.',
@@ -193,13 +193,13 @@ export const module4Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m4_moumkin',
     arabizi: 'Moumkin',
-    arabic: 'ممكن',
+    arabic: 'مُمْكِنْ',
     translation: { fr: 'Possible / puis-je', en: 'Possible / may I', es: 'Posible / ¿puedo?', ar: 'ممكن' },
     module: 4,
     category: 'abstract',
     example: {
       arabizi: 'Moumkin nchouf l-menu?',
-      arabic: 'ممكن نشوف المينو؟',
+      arabic: 'مُمْكِنْ نْشُوفْ لْمِينُو؟',
       translation: {
         fr: 'Puis-je voir le menu ?',
         en: 'May I see the menu?',
@@ -218,13 +218,13 @@ export const module4Vocabulary: ModuleVocabularyItem[] = [
   {
     id: 'vocab_m4_machi_mochkil',
     arabizi: 'Machi mochkil',
-    arabic: 'ماشي مشكل',
+    arabic: 'مَاشِيْ مُشْكِلْ',
     translation: { fr: "Ce n'est pas un problème", en: 'No problem', es: 'No hay problema', ar: 'ماشي مشكل' },
     module: 4,
     category: 'abstract',
     example: {
       arabizi: 'Machi mochkil, ma-ghadi-ch nqle9.',
-      arabic: 'ماشي مشكل، ماغاديش نقلق.',
+      arabic: 'مَاشِيْ مُشْكِلْ، مَاغَادِيشْ نْقَلَّقْ.',
       translation: {
         fr: "Ce n'est pas un problème, je ne vais pas m'inquiéter.",
         en: 'No problem, I am not going to worry.',

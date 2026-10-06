@@ -11,8 +11,8 @@ function textOf(value: MultiLangText | string, lang: Lang): string {
   return typeof value === 'string' ? value : value[lang];
 }
 
-const LESSON_TYPES = ['learning', 'exercise', 'grammar'];
-const EXERCISE_TYPES = ['mcq', 'reorder', 'match', 'matching', 'fill-blank', 'dialogue'];
+const LESSON_TYPES = ['learning', 'exercise', 'grammar', 'culture_tip'];
+const EXERCISE_TYPES = ['mcq', 'reorder', 'scramble', 'match', 'matching', 'fill-blank', 'dialogue', 'roleplay_challenge'];
 const ARABIC = /[\u0600-\u06FF]/;
 
 /** Les six lecons historiques : leurs ids ne doivent jamais bouger. */
@@ -134,7 +134,7 @@ describe('module 1 — integrite des etapes', () => {
     for (const lesson of lessons) {
       for (const step of lesson.steps) {
         const ex = step.exercise;
-        if (!ex || ex.type !== 'reorder') continue;
+        if (!ex || (ex.type !== 'reorder' && ex.type !== 'scramble')) continue;
         const where = `${lesson.id}.${step.id}`;
         const tileIds = ex.options!.map((o) => o.id).sort();
         const answerIds = (ex.answer as string[]).slice().sort();

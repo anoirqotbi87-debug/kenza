@@ -22,7 +22,7 @@ export const medecinFes: DialogueScenario = {
       id: 't1',
       speaker: 'bot',
       speakerRole: 'T-Tbib',
-      arabicText: 'تفضل أ سيدي، باش كتحس اليوم؟',
+      arabicText: 'تْفَضَّلْ أَ سِيدِيْ، بَاشْ كَتْحَسْ لْيُومْ؟',
       arabiziText: 'Tfeddel a sidi, bach kat7ess l-youm?',
       translationFr: 'Entrez monsieur, qu\'est-ce que vous ressentez aujourd\'hui ?',
       audioKey: '/audio/roleplay/medecin/t1.mp3'
@@ -31,7 +31,7 @@ export const medecinFes: DialogueScenario = {
       id: 't2',
       speaker: 'user',
       speakerRole: 'Apprenant',
-      arabicText: 'كيضرني راسي بزاف و فيا السخانة.',
+      arabicText: 'كَيْضُرْنِيْ رَاسِي بْزَافْ وْ فِيَّا السَّخَانَةْ.',
       arabiziText: 'Kayderrni rasi bezzaf w fiya s-skhana.',
       translationFr: 'J\'ai très mal à la tête et j\'ai de la fièvre.',
       expectedPhrases: {
@@ -53,7 +53,7 @@ export const medecinFes: DialogueScenario = {
       id: 't3',
       speaker: 'bot',
       speakerRole: 'T-Tbib',
-      arabicText: 'واخا، غادي نقلبك دابا. تنفس مزيان.',
+      arabicText: 'وَاْخَا، غَادِيْ نْقَلْبَكْ دَابَا. تْنَفَّسْ مْزْيَانْ.',
       arabiziText: 'Wakha, ghadi n9ellbek daba. Tneffes mezyan.',
       translationFr: 'D\'accord, je vais vous examiner maintenant. Respirez bien.',
       audioKey: '/audio/roleplay/medecin/t3.mp3'
@@ -62,7 +62,7 @@ export const medecinFes: DialogueScenario = {
       id: 't4',
       speaker: 'user',
       speakerRole: 'Apprenant',
-      arabicText: 'واخا أ الطبيب، شنو عندي؟',
+      arabicText: 'وَاْخَا أَ الطَّبِيبْ، شْنُوْ عَنْدِي؟',
       arabiziText: 'Wakha a t-tbib, chno 3endi?',
       translationFr: 'D\'accord docteur, qu\'est-ce que j\'ai ?',
       expectedPhrases: {
@@ -84,7 +84,7 @@ export const medecinFes: DialogueScenario = {
       id: 't5',
       speaker: 'bot',
       speakerRole: 'T-Tbib',
-      arabicText: 'عندك غير رواح خفيف. هادي لوردونونص، خود هاد الدوا مورا الماكلة.',
+      arabicText: 'عَنْدَكْ غِيرْ رْوَاحْ خْفِيفْ. هَادِيْ لُورْدُونُونْصْ، خُودْ هَادْ الدَّوَا مُورَا الْمَاكْلَةْ.',
       arabiziText: '3endek ghir rwa7 khfif. Hadi l-ordonnance, khoud had d-dwa mowra l-makla.',
       translationFr: 'Vous avez juste un léger rhume. Voici l\'ordonnance, prenez ce médicament après les repas.',
       audioKey: '/audio/roleplay/medecin/t5.mp3'
@@ -93,7 +93,7 @@ export const medecinFes: DialogueScenario = {
       id: 't6',
       speaker: 'user',
       speakerRole: 'Apprenant',
-      arabicText: 'شكرا بزاف أ الطبيب، شحال تيسوا هاد الدوا؟',
+      arabicText: 'شُكْرَانْ بْزَافْ أَ الطَّبِيبْ، شْحَالْ تِيسْوَا هَادْ الدَّوَا؟',
       arabiziText: 'Choukrane bezzaf a t-tbib, ch7al tayswa had d-dwa?',
       translationFr: 'Merci beaucoup docteur, combien coûte ce médicament ?',
       expectedPhrases: {

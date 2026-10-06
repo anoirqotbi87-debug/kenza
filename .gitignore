@@ -52,3 +52,13 @@ next-env.d.ts
 
 # OpenHands agent memory (local, not for VCS)
 /.openhands/
+
+# Android / TWA — artefacts de build et CLE DE SIGNATURE.
+# Le keystore n'est pas recuperable : le commiter permettrait a n'importe qui de
+# signer des APK au nom de l'app, et Play refuse la rotation d'une cle d'upload.
+*.keystore
+*.jks
+*.aab
+*.apk
+!public/downloads/*.apk
+twa/

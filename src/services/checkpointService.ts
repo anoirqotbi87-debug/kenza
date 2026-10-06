@@ -54,8 +54,8 @@ export const checkpointService = {
           levelName: `Palier ${row.checkpoint_id}`, // In real app, we'd map this properly
           score: row.score,
           passed: true,
-          date: new Date(row.passed_at).toLocaleDateString(getDateLocale(useAppStore.getState().uiLanguage)),
-          passportId: row.certificate_code
+          date: new Date(row.passed_at || Date.now()).toLocaleDateString(getDateLocale(useAppStore.getState().uiLanguage)),
+          passportId: row.certificate_code || `KZ-${row.checkpoint_id}`
         };
       });
 

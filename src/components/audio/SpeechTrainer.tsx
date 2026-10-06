@@ -15,10 +15,10 @@ import { trackEvent } from '../../utils/analytics';
 // DONNÉES : MODE ÉLOCUTION
 // ---------------------------
 const speechExercises = [
-  { id: '1', arabizi: 'Sba7 l-khir', arabic: 'صباح الخير', translation: { fr: 'Bonjour', en: 'Good morning', es: 'Buenos días', ar: 'صباح الخير' } },
-  { id: '2', arabizi: 'Fin ghadi a khoya', arabic: 'فين غادي ا خويا', translation: { fr: 'Où vas-tu mon frère ?', en: 'Where are you going brother?', es: '¿A dónde vas hermano?', ar: 'إلى أين أنت ذاهب يا أخي؟' } },
-  { id: '3', arabizi: 'Bch7al hada 3afak', arabic: 'بشحال هادا عفاك', translation: { fr: 'Combien ça coûte s\'il vous plaît ?', en: 'How much is this please?', es: '¿Cuánto cuesta esto por favor?', ar: 'بكم هذا من فضلك؟' } },
-  { id: '4', arabizi: 'Bghit atay b n3na3', arabic: 'بغيت اتاي ب النعناع', translation: { fr: 'Je voudrais un thé à la menthe', en: 'I would like mint tea', es: 'Quisiera un té con menta', ar: 'أريد شاي بالنعناع' } },
+  { id: '1', arabizi: 'Sba7 l-khir', arabic: 'صْبَاحْ الخِيرْ', translation: { fr: 'Bonjour', en: 'Good morning', es: 'Buenos días', ar: 'صباح الخير' } },
+  { id: '2', arabizi: 'Fin ghadi a khoya', arabic: 'فِينْ غَادِي ا خُويَا', translation: { fr: 'Où vas-tu mon frère ?', en: 'Where are you going brother?', es: '¿A dónde vas hermano?', ar: 'إلى أين أنت ذاهب يا أخي؟' } },
+  { id: '3', arabizi: 'Bch7al hada 3afak', arabic: 'بْشْحَالْ هَادَا عَفَاكْ', translation: { fr: 'Combien ça coûte s\'il vous plaît ?', en: 'How much is this please?', es: '¿Cuánto cuesta esto por favor?', ar: 'بكم هذا من فضلك؟' } },
+  { id: '4', arabizi: 'Bghit atay b n3na3', arabic: 'بْغِيتْ أَتَايْ بْ نْنَعْنَاعْ', translation: { fr: 'Je voudrais un thé à la menthe', en: 'I would like mint tea', es: 'Quisiera un té con menta', ar: 'أريد شاي بالنعناع' } },
 ];
 
 // ---------------------------
@@ -39,10 +39,10 @@ const rpScenarios: RPScenario[] = [
     name: 'Karim (Petit Taxi)',
     icon: CarFront,
     context: 'Vous montez dans un taxi à Casablanca.',
-    npcFirstLine: { arabizi: 'Salam a khoya, fin ghadi ?', arabic: 'سلام ا خويا، فين غادي؟', translation: 'Bonjour mon frère, où vas-tu ?' },
+    npcFirstLine: { arabizi: 'Salam a khoya, fin ghadi ?', arabic: 'سَلَامْ ا خُويَا، فِينْ غَادِي؟', translation: 'Bonjour mon frère, où vas-tu ?' },
     userChoices: [
-      { id: 'c1', arabizi: 'Bghit nemchi l medina', arabic: 'بغيت نمشي ل لمدينة', translation: 'Je veux aller à la médina', nextNpcLine: { arabizi: 'Wakha, yallah', arabic: 'واخا، يالاه', translation: 'D\'accord, allons-y' } },
-      { id: 'c2', arabizi: 'Dor 3la limen 3afak', arabic: 'دور على ليمن عفاك', translation: 'Tournez à droite s\'il vous plaît', nextNpcLine: { arabizi: 'Mzyan, hna ?', arabic: 'مزيان، هنا؟', translation: 'Bien, ici ?' } }
+      { id: 'c1', arabizi: 'Bghit nemchi l medina', arabic: 'بْغِيتْ نِمْشِي ل لْمْدِينَة', translation: 'Je veux aller à la médina', nextNpcLine: { arabizi: 'Wakha, yallah', arabic: 'وَاخَا، يَالَاهْ', translation: 'D\'accord, allons-y' } },
+      { id: 'c2', arabizi: 'Dor 3la limen 3afak', arabic: 'دُورْ عْلَى لِيمَنْ عَفَاكْ', translation: 'Tournez à droite s\'il vous plaît', nextNpcLine: { arabizi: 'Mzyan, hna ?', arabic: 'مْزِيَانْ، هْنَا؟', translation: 'Bien, ici ?' } }
     ]
   },
   {
@@ -50,10 +50,10 @@ const rpScenarios: RPScenario[] = [
     name: 'Driss (Serveur de Café)',
     icon: Coffee,
     context: 'Vous vous asseyez en terrasse.',
-    npcFirstLine: { arabizi: 'Merhba bik ! Shnu n-jib lik tchrob ?', arabic: 'مرحبا بيك! شنو نجيب ليك تشرب؟', translation: 'Bienvenue ! Qu\'est-ce que je vous sers à boire ?' },
+    npcFirstLine: { arabizi: 'Merhba bik ! Shnu n-jib lik tchrob ?', arabic: 'مْرْحَبَا بِيكْ! شْنُو نْجِيبْ لِيكْ تِشْرَبْ؟', translation: 'Bienvenue ! Qu\'est-ce que je vous sers à boire ?' },
     userChoices: [
-      { id: 'c1', arabizi: 'Qhwa kahla bla sukkar', arabic: 'قهوة كحلة بلا سكر', translation: 'Un café noir sans sucre', nextNpcLine: { arabizi: 'Mojouda a sidi', arabic: 'موجودة ا سيدي', translation: 'Tout de suite monsieur' } },
-      { id: 'c2', arabizi: 'Atay b n3na3 3afak', arabic: 'اتاي ب النعناع عفاك', translation: 'Un thé à la menthe s\'il vous plaît', nextNpcLine: { arabizi: 'Atay mcha77ar, wesh bghiti m3ah chi 7alwa ?', arabic: 'اتاي مشحر، واش بغيتي معاه شي حلوة؟', translation: 'Un thé bien infusé, vous voulez une pâtisserie avec ?' } }
+      { id: 'c1', arabizi: 'Qhwa kahla bla sukkar', arabic: 'قْهوَة كَحْلَة بْلَا سُكَّرْ', translation: 'Un café noir sans sucre', nextNpcLine: { arabizi: 'Mojouda a sidi', arabic: 'مَوْجُودَة ا سِيدِي', translation: 'Tout de suite monsieur' } },
+      { id: 'c2', arabizi: 'Atay b n3na3 3afak', arabic: 'أَتَايْ بْ نْنَعْنَاعْ عَفَاكْ', translation: 'Un thé à la menthe s\'il vous plaît', nextNpcLine: { arabizi: 'Atay mcha77ar, wesh bghiti m3ah chi 7alwa ?', arabic: 'أَتَايْ مْشَحْحَرْ، وَاشْ بْغِيتِي مْعَاهْ شِي حْلُوَة؟', translation: 'Un thé bien infusé, vous voulez une pâtisserie avec ?' } }
     ]
   },
   {
@@ -61,10 +61,10 @@ const rpScenarios: RPScenario[] = [
     name: 'Hassan (Marchand du Souk)',
     icon: ShoppingBag,
     context: 'Vous négociez au souk.',
-    npcFirstLine: { arabizi: 'Salam ! Kif dayr ? Chof had zrabi zwinin !', arabic: 'سلام! كيف داير؟ شوف هاد الزرابي زوينين!', translation: 'Bonjour ! Comment ça va ? Regarde ces beaux tapis !' },
+    npcFirstLine: { arabizi: 'Salam ! Kif dayr ? Chof had zrabi zwinin !', arabic: 'سَلَامْ! كِيفْ دَايْرْ؟ شُوفْ هَادْ زْرَابِي زْوِينِينْ!', translation: 'Bonjour ! Comment ça va ? Regarde ces beaux tapis !' },
     userChoices: [
-      { id: 'c1', arabizi: 'Bch7al hadi a sidi ?', arabic: 'بشحال هادي ا سيدي؟', translation: 'Combien pour celui-ci monsieur ?', nextNpcLine: { arabizi: 'Hadi b myatayn derham', arabic: 'هادي ب مياتين درهم', translation: 'Celui-ci est à deux cents dirhams' } },
-      { id: 'c2', arabizi: 'Ghalia chwiya, nqess lia', arabic: 'غالية شوية، نقص ليا', translation: 'C\'est un peu cher, baissez le prix', nextNpcLine: { arabizi: 'Wakha, 3tini mya w khamsin', arabic: 'واخا، عطيني مية و خمسين', translation: 'D\'accord, donnez-moi cent cinquante' } }
+      { id: 'c1', arabizi: 'Bch7al hadi a sidi ?', arabic: 'بْشْحَالْ هَادِي ا سِيدِي؟', translation: 'Combien pour celui-ci monsieur ?', nextNpcLine: { arabizi: 'Hadi b myatayn derham', arabic: 'هَادِي بْ مْيَاتَيْنْ دِرْهَمْ', translation: 'Celui-ci est à deux cents dirhams' } },
+      { id: 'c2', arabizi: 'Ghalia chwiya, nqess lia', arabic: 'غَالْيَة شْوِيَّة، نْقَسْ لِيَا', translation: 'C\'est un peu cher, baissez le prix', nextNpcLine: { arabizi: 'Wakha, 3tini mya w khamsin', arabic: 'وَاخَا، عْطِينِي مْيَة وْ خَمْسِينْ', translation: 'D\'accord, donnez-moi cent cinquante' } }
     ]
   }
 ];
@@ -253,6 +253,7 @@ export default function SpeechTrainer() {
             {/* Zone d'enregistrement */}
             <div className="flex flex-col items-center gap-3">
               <button
+              aria-label={isListening ? t.modules.speech.listening : t.modules.speech.pressMic}
                 onClick={toggleListening}
                 className={`
                   w-20 h-20 rounded-full flex items-center justify-center shadow-lg transition-all duration-300
