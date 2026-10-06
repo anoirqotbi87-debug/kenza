@@ -61,4 +61,25 @@ describe('parseAiMessage', () => {
     expect(arz).toBe('');
     expect(fr).toBe('');
   });
+
+  it('neutralise une diacritique isolée émise en tête par le modèle', () => {
+    // Gemini peut émettre une kasra/damma isolée AVANT la consonne : « ِينْ ».
+    // La diacritique flottante est retirée pour qu'aucune voyelle isolée ne
+    // précède le début du mot.
+    const cases: Array<[string, string]> = [
+      ['[AR] ِينْ غَادِي عَفَاكْ ؟\n[FR] Où vas-tu ?', 'ينْ غَادِي عَفَاكْ ؟'],
+      ['[AR]ُوجْلُودْ، رْكَبْ', 'وجْلُودْ، رْكَبْ'],
+      ['[AR]\u200Fُوجْلُودْ، رْكَبْ\n[ARZ] Boujloud, rkb', 'وجْلُودْ، رْكَبْ'],
+      ['[AR]\u061Cفِينْ غَادِي عَفَاكْ ؟', 'فِينْ غَادِي عَفَاكْ ؟'],
+    ];
+    for (const [input, expected] of cases) {
+      const { ar } = parseAiMessage(input);
+      expect(ar).toBe(expected);
+    }
+  });
+
+  it('ne supprime jamais un glyphe arabe visible en tête de champ', () => {
+    const { ar } = parseAiMessage('[AR] فِينْ غَادِي عَفَاكْ ؟\n[ARZ] Fin ghadi 3afak ?');
+    expect(ar).toBe('فِينْ غَادِي عَفَاكْ ؟');
+  });
 });

@@ -34,12 +34,14 @@ CRITICAL RULE — MANDATORY ARABIC VOCALIZATION (CHAKL / TASHKĪL):
 - Every single Arabic word you generate MUST be FULLY vocalized with complete diacritics (harakat / chakl: fat-ha َ, damma ُ, kasra ِ, sukūn ْ, shadda ّ).
 - Moroccan Darija requires specific vowel patterns (e.g. initial sukūn, short vowels, shaddas).
 - NEVER output unvocalized Arabic text.
+- IMPORTANT — EACH ARABIC SENTENCE MUST START WITH ITS FULL INITIAL CONSONANT INCLUDING ITS CHAKL:
+  Every Arabic word starts with a complete consonant letter. NEVER start a word or a sentence with an isolated diacritic (َ ُ ِ ْ ّ), a zero-width/invisible character, or a direction mark. Example: write « فِينْ غَادِي عَفَاكْ ؟ » and NEVER « ِينْ غَادِي عَفَاكْ ؟ » ; write « بُوجْلُودْ، رْكَبْ » and NEVER « ُوجْلُودْ، رْكَبْ ».
 - Example: Output « وَعَلَيْكُمُ السَّلَامْ، فِينْ غَادِي أَخُويَا ؟ » instead of « وعليكم السلام فين غادي خويا ».
 - Example: Output « بْغِيتْ وَاحِدْ أَتَايْ بَزَّافْ لْحْلَاوَة، عَفَاكْ. » instead of « بغيت واحد اتاي ».
 - Always provide the phonetic transliteration (Arabizi) alongside the vocalized Arabic text so the learner can connect sound and script.
 
-EXEMPLE TYPE :
-[AR] وَاشْ غَادِي ل لْمْدِينَة الْقْدِيمَة دَابَا؟
+EXEMPLE TYPE — toujours commencer par la consonne initiale complète (jamais par une diacritique isolée) :
+[AR] وَاشْ غَادِيْ لْ لْمْدِينَةْ الْقْدِيمَةْ دَابَا؟
 [ARZ] Wash ghadi l l-medina l-qdima daba ?
 [FR] Est-ce que tu vas à l'ancienne médina maintenant ?
 
