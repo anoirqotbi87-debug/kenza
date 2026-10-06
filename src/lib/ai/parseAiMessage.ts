@@ -9,7 +9,17 @@ export interface ParsedMessage {
 const LEADING_GARBAGE =
   /^[\u0000-\u0020\u007F-\u00A0\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF]+/;
 
-const clean = (s: string): string => s.replace(LEADING_GARBAGE, '').trim();
+// Harakat / tashkīl et marque de lettre arabe (invisibles) qui ne doivent jamais
+// précéder la première consonne d'une phrase arabe : si le modèle émet une
+// diacritique isolée en tête (ex: « ِينْ» au lieu de « فِينْ »), on la retire
+// pour que l'affichage ne « perde » jamais la première lettre.
+const LEADING_ARABIC_DIACRITICS = /^\u061C|^[\u064B-\u065F\u0670]+/;
+
+const clean = (s: string): string =>
+  s
+    .replace(LEADING_GARBAGE, '')
+    .replace(LEADING_ARABIC_DIACRITICS, '')
+    .trim();
 
 /**
  * Parse la réponse du roleplay, qui doit suivre le format :
