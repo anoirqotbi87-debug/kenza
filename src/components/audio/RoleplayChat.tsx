@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useChat } from 'ai/react';
 import { PersonaId, personas } from '@/lib/ai/prompts';
+import { parseAiMessage } from '@/lib/ai/parseAiMessage';
 import { useVoiceRecognition } from '@/hooks/useVoiceRecognition';
 import { playAudio } from '@/lib/audio';
 import {
@@ -25,46 +26,7 @@ export interface RoleplayChatProps {
   authToken?: string;
 }
 
-interface ParsedMessage {
-  ar: string;
-  arz: string;
-  fr: string;
-}
-
-export function parseAiMessage(content: string): ParsedMessage {
-  let ar = '';
-  let arz = '';
-  let fr = '';
-
-  const arIndex = content.indexOf('[AR]');
-  const arzIndex = content.indexOf('[ARZ]');
-  const frIndex = content.indexOf('[FR]');
-
-  if (arIndex !== -1) {
-    const endAr = arzIndex !== -1 ? arzIndex : frIndex !== -1 ? frIndex : content.length;
-    ar = content.substring(arIndex + 4, endAr).trim();
-  }
-
-  if (arzIndex !== -1) {
-    const endArz = frIndex !== -1 ? frIndex : content.length;
-    arz = content.substring(arzIndex + 5, endArz).trim();
-  }
-
-  if (frIndex !== -1) {
-    fr = content.substring(frIndex + 4).trim();
-  }
-
-  if (!ar && !arz && !fr) {
-    const hasArabicChars = /[\u0600-\u06FF]/.test(content);
-    if (hasArabicChars) {
-      ar = content.trim();
-    } else {
-      fr = content.trim();
-    }
-  }
-
-  return { ar, arz, fr };
-}
+export { parseAiMessage };
 
 export default function RoleplayChat({
   personaId,

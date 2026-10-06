@@ -11,47 +11,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/lib/supabase';
 import PaywallModal from '@/components/monetization/PaywallModal';
 import { useDialog } from '@/hooks/useDialog';
+import { parseAiMessage } from '@/lib/ai/parseAiMessage';
 
 interface AiRoleplayViewProps {
   personaId: PersonaId;
   onClose: () => void;
 }
-
-const parseAiMessage = (content: string) => {
-  let ar = '';
-  let arz = '';
-  let fr = '';
-  
-  const arIndex = content.indexOf('[AR]');
-  const arzIndex = content.indexOf('[ARZ]');
-  const frIndex = content.indexOf('[FR]');
-  
-  if (arIndex !== -1) {
-    const endAr = arzIndex !== -1 ? arzIndex : (frIndex !== -1 ? frIndex : content.length);
-    ar = content.substring(arIndex + 4, endAr).trim();
-  }
-  
-  if (arzIndex !== -1) {
-    const endArz = frIndex !== -1 ? frIndex : content.length;
-    arz = content.substring(arzIndex + 5, endArz).trim();
-  }
-  
-  if (frIndex !== -1) {
-    fr = content.substring(frIndex + 4).trim();
-  }
-
-  // Repli robuste : si aucune balise reconnue ou si parsing incomplet
-  if (!ar && !arz && !fr) {
-    const hasArabicChars = /[\u0600-\u06FF]/.test(content);
-    if (hasArabicChars) {
-      ar = content.trim();
-    } else {
-      fr = content.trim();
-    }
-  }
-  
-  return { ar, arz, fr };
-};
 
 export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewProps) {
   const { dialogRef } = useDialog(true, onClose);

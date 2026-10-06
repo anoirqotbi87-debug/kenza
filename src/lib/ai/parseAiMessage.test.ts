@@ -1,0 +1,64 @@
+import { describe, expect, it } from 'vitest';
+import { parseAiMessage } from './parseAiMessage';
+
+describe('parseAiMessage', () => {
+  it('conserve le premier caractère arabe dans chaque réplique roleplay', () => {
+    const samples = [
+      '[AR] فِينْ غَادِي عَفَاكْ ؟\n[ARZ] Fin ghadi 3afak ?\n[FR] Où vas-tu ?',
+      '[AR]بُوجْلُودْ، رْكَبْ\n[ARZ] Boujloud, rkb\n[FR] Boujloud, monte',
+      '[AR] سَلَامْ ! فِينْ غَادِيْ أَ خُويَا ؟',
+      '[FR] Bonjour.\n[AR] وَعَلَيْكُمُ السَّلَامْ',
+    ];
+
+    for (const sample of samples) {
+      const { ar } = parseAiMessage(sample);
+      expect(ar.length, `longueur pour "${sample.slice(0, 20)}"`).toBeGreaterThan(0);
+      // Le premier caractère attendu est un glyphe arabe, jamais un caractère
+      // tronqué (ce qui donnerait un code point hors plage arabe ou un contrôle).
+      const first = ar.codePointAt(0)!;
+      expect(first, `premier code point pour "${ar}"`).toBeGreaterThanOrEqual(0x0600);
+      expect(first, `premier code point pour "${ar}"`).toBeLessThanOrEqual(0x06ff);
+    }
+  });
+
+  it('neutralise les caractères invisibles qui précèdent le texte', () => {
+    const { ar } = parseAiMessage('');
+    expect(ar).toBe('');
+  });
+
+  it('ignore les caractères invisibles de tête (BOM, ZWSP, marques RTL)', () => {
+    const cases: Array<[string, string]> = [
+      ['\uFEFF[AR] فِينْ غَادِي عَفَاكْ ؟\n[FR] Où vas-tu ?', 'فِينْ غَادِي عَفَاكْ ؟'],
+      ['\u200B[AR] بُوجْلُودْ، رْكَبْ', 'بُوجْلُودْ، رْكَبْ'],
+      ['\u200F\u200F[AR] سَلَامْ ا خُويَا\n[ARZ] Salam a khoya\n[FR] Bonjour', 'سَلَامْ ا خُويَا'],
+      ['[AR]\nفِينْ غَادِي عَفَاكْ ؟', 'فِينْ غَادِي عَفَاكْ ؟'],
+      ['[AR]\r\nبُوجْلُودْ، رْكَبْ', 'بُوجْلُودْ، رْكَبْ'],
+    ];
+
+    for (const [input, expected] of cases) {
+      const { ar } = parseAiMessage(input);
+      expect(ar).toBe(expected);
+    }
+  });
+
+  it('parse les trois champs indépendamment', () => {
+    const { ar, arz, fr } = parseAiMessage('[AR] سَلَامْ [ARZ] Salam [FR] Bonjour');
+    expect(ar).toBe('سَلَامْ');
+    expect(arz).toBe('Salam');
+    expect(fr).toBe('Bonjour');
+  });
+
+  it('ne s’écrase pas si un marqueur arrive dans le désordre', () => {
+    const { ar, arz, fr } = parseAiMessage('[FR] Bonjour [ARZ] Salam [AR] سَلَامْ');
+    expect(ar).toBe('سَلَامْ');
+    expect(arz).toBe('Salam');
+    expect(fr).toBe('Bonjour');
+  });
+
+  it('repli sur le texte arabe même sans balises', () => {
+    const { ar, arz, fr } = parseAiMessage('وَعَلَيْكُمُ السَّلَامْ');
+    expect(ar).toBe('وَعَلَيْكُمُ السَّلَامْ');
+    expect(arz).toBe('');
+    expect(fr).toBe('');
+  });
+});
