@@ -10,7 +10,7 @@ import {
 } from './homeCurriculum';
 import { fullCurriculum } from './curriculum';
 import { PREMIUM_MODULES, isModuleLocked } from '@/lib/premiumModules';
-import { getHomeModules } from './homeModules';
+import { getHomeModules, getNextPlayableLesson } from './homeModules';
 
 describe('accueil — gating aligne sur la source unique', () => {
   it('chaque lecon de l accueil pointe un module reel du curriculum', () => {
@@ -175,5 +175,36 @@ describe('accueil — grille des modules (refonte UI)', () => {
     const first = modules.find((entry) => entry.key === '1');
     expect(first!.completed).toBe(1);
     expect(first!.done).toBe(false);
+  });
+});
+
+describe('getNextPlayableLesson — progression dynamique de la carte prochaine étape', () => {
+  it('si completedLessons = [] -> la prochaine lecon est la lecon 1 (l1_phonetics_1)', () => {
+    const next = getNextPlayableLesson([]);
+    expect(next).not.toBeNull();
+    expect(next?.id).toBe('l1_phonetics_1');
+    expect(next?.moduleNumber).toBe(1);
+    expect(next?.stepsCount).toBeGreaterThan(0);
+  });
+
+  it("si completedLessons = ['l1_phonetics_1'] -> la prochaine lecon est la lecon 2 (l2_greetings_1)", () => {
+    const next = getNextPlayableLesson(['l1_phonetics_1']);
+    expect(next).not.toBeNull();
+    expect(next?.id).toBe('l2_greetings_1');
+    expect(next?.moduleNumber).toBe(1);
+  });
+
+  it("si toutes les lecons du module 1 sont finies -> bascule automatiquement sur la premiere lecon du module 2", () => {
+    const mod1LessonIds = fullCurriculum['1'].lessons.map((l) => l.id);
+    const next = getNextPlayableLesson(mod1LessonIds);
+    expect(next).not.toBeNull();
+    expect(next?.moduleNumber).toBe(2);
+    expect(next?.id).toBe(fullCurriculum['2'].lessons[0].id);
+  });
+
+  it("si toutes les lecons du curriculum sont finies -> renvoie null", () => {
+    const allLessonIds = Object.values(fullCurriculum).flatMap((m) => m.lessons.map((l) => l.id));
+    const next = getNextPlayableLesson(allLessonIds);
+    expect(next).toBeNull();
   });
 });
