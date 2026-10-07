@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useChat, Message } from 'ai/react';
 import { PersonaId, personas } from '@/lib/ai/prompts';
 import { useVoiceRecognition } from '@/hooks/useVoiceRecognition';
-import { Send, Mic, MicOff, Save, Loader2, RefreshCw, Volume2, Turtle } from 'lucide-react';
+import { Send, Mic, MicOff, Save, Loader2, RefreshCw, Volume2, Turtle, AlertCircle } from 'lucide-react';
 import { useAppStore, useTranslation } from '@/store/useAppStore';
 import { playAudio } from '@/lib/audio';
 import { v4 as uuidv4 } from 'uuid';
@@ -48,6 +48,22 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
 
   const STREAM_TIMEOUT_MS = 30000;
 
+  const getErrorMessage = (err: Error | null | undefined): string => {
+    if (!err) return '';
+    try {
+      const parsed = JSON.parse(err.message);
+      if (parsed && typeof parsed.message === 'string') {
+        return parsed.message;
+      }
+    } catch {
+      // Not JSON
+    }
+    if (err.message && err.message !== 'An error occurred.') {
+      return err.message;
+    }
+    return 'Service IA temporairement indisponible. Veuillez réessayer dans un instant.';
+  };
+
   const { messages, input, handleInputChange, handleSubmit, isLoading, setInput, reload, error, stop } = useChat({
     api: '/api/roleplay/chat',
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
@@ -55,11 +71,18 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
     initialMessages: [],
     onError: (err) => {
       console.error('[AI Chat Error]:', err);
+      let errMsg = err.message || '';
+      try {
+        const parsed = JSON.parse(err.message);
+        if (parsed?.error) errMsg = `${parsed.error} ${parsed.message || ''}`;
+      } catch {
+        // Not JSON
+      }
       if (
-        err.message?.includes('QUOTA') || 
-        err.message?.includes('403') || 
-        err.message?.includes('quota') ||
-        err.message?.includes('UNAUTHORIZED')
+        errMsg.includes('QUOTA') || 
+        errMsg.includes('403') || 
+        errMsg.includes('quota') ||
+        errMsg.includes('UNAUTHORIZED')
       ) {
         setShowPaywall(true);
       }
@@ -189,9 +212,35 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
         )}
 
         {error && !streamTimeoutHit && (
-          <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-2xl text-sm flex items-center justify-between shadow-xs">
-            <span>Erreur de communication avec l'agent.</span>
-            <button onClick={() => { setStreamTimeoutHit(false); reload(); }} className="flex items-center gap-1 font-bold hover:underline"><RefreshCw className="w-4 h-4"/> Réessayer</button>
+          <div className="bg-red-50 border border-red-200 text-red-700 p-3.5 rounded-2xl text-sm shadow-xs space-y-2.5">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-2.5">
+                <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-red-600" />
+                <div>
+                  <p className="font-semibold text-red-900">Erreur de communication avec l'agent</p>
+                  <p className="text-xs text-red-700 mt-0.5 leading-relaxed">
+                    {getErrorMessage(error)}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => { setStreamTimeoutHit(false); reload(); }}
+                className="flex items-center gap-1 text-xs font-bold bg-white text-red-700 border border-red-200 px-2.5 py-1.5 rounded-lg hover:bg-red-100 transition-colors shrink-0 shadow-2xs"
+              >
+                <RefreshCw className="w-3.5 h-3.5" /> Réessayer
+              </button>
+            </div>
+            <div className="pt-2 border-t border-red-200/60 flex items-center justify-between text-xs">
+              <span className="text-red-700/80">Besoin de vous entraîner sans IA ?</span>
+              <button
+                type="button"
+                onClick={onClose}
+                className="font-bold underline hover:text-red-900 ml-2"
+              >
+                Dialogues guidés
+              </button>
+            </div>
           </div>
         )}
 

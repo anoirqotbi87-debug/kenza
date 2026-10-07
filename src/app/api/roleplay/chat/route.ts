@@ -128,39 +128,81 @@ export async function POST(req: NextRequest) {
     }
 
     const google = createGoogleGenerativeAI({ apiKey });
-    const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
-    const result = await streamText({
-      model: google(primaryModel),
-      system: systemPrompt,
-      messages,
-      temperature: 0.7,
-      maxTokens: 300, // Short responses
-      maxRetries: 0, // Pas de retry : 6 s de backoff par modèle, pour rien
-    });
+    const primaryModel = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+    let result;
+    try {
+      result = await streamText({
+        model: google(primaryModel),
+        system: systemPrompt,
+        messages,
+        temperature: 0.7,
+        maxTokens: 300, // Short responses
+        maxRetries: 0, // Pas de retry long
+      });
+    } catch (primaryErr: unknown) {
+      const primaryMsg = primaryErr instanceof Error ? primaryErr.message : String(primaryErr);
+      const isNotFound = primaryMsg.includes('not found') || primaryMsg.includes('404');
+      if (isNotFound && primaryModel !== 'gemini-2.0-flash') {
+        console.warn(`[Roleplay Chat] Primary model ${primaryModel} failed with 404, falling back to gemini-2.0-flash`);
+        result = await streamText({
+          model: google('gemini-2.0-flash'),
+          system: systemPrompt,
+          messages,
+          temperature: 0.7,
+          maxTokens: 300,
+          maxRetries: 0,
+        });
+      } else {
+        throw primaryErr;
+      }
+    }
 
     // Return the streaming response
     return result.toDataStreamResponse();
   } catch (error: unknown) {
     const errMsg = error instanceof Error ? error.message : String(error);
-    const status = (error as { statusCode?: number } | undefined)?.statusCode;
+    const status =
+      (error as { status?: number; statusCode?: number } | undefined)?.status ??
+      (error as { status?: number; statusCode?: number } | undefined)?.statusCode;
     console.error('API Roleplay Chat Error:', errMsg, '| upstream status:', status);
+
+    const isAuth =
+      status === 401 ||
+      status === 403 ||
+      errMsg.includes('API key') ||
+      errMsg.includes('authentication') ||
+      errMsg.includes('credentials') ||
+      errMsg.includes('Permission denied');
+
+    const isNotFound =
+      status === 404 ||
+      errMsg.includes('not found') ||
+      errMsg.includes('is not supported');
+
+    const isQuota =
+      status === 429 ||
+      errMsg.includes('quota') ||
+      errMsg.includes('Resource exhausted');
 
     // Sur erreur 401/403 (clé invalide / permission), 404 (modèle non supporté), 429 (quota) ou 5xx : renvoyer immédiatement HTTP 503
     if (
-      status === 401 ||
-      status === 403 ||
-      status === 404 ||
-      status === 429 ||
-      (status !== undefined && status >= 500) ||
-      errMsg.includes('not found') ||
-      errMsg.includes('quota') ||
-      errMsg.includes('API key')
+      isAuth ||
+      isNotFound ||
+      isQuota ||
+      (status !== undefined && status >= 500)
     ) {
+      let clientMsg = 'Service IA temporairement indisponible. Veuillez réessayer dans un instant.';
+      if (isAuth) {
+        clientMsg = 'Service IA momentanément indisponible : clé Google Gemini invalide ou expirée (doit commencer par AIzaSy...).';
+      } else if (isQuota) {
+        clientMsg = 'Quota Google Gemini temporairement atteint. Veuillez réessayer dans quelques instants.';
+      } else if (isNotFound) {
+        clientMsg = 'Modèle Google Gemini introuvable ou non supporté.';
+      }
+
       return new Response(JSON.stringify({
         error: 'AI_SERVICE_UNAVAILABLE',
-        message: status === 401 || status === 403
-          ? 'Service IA momentanément indisponible (authentification ou clé Google API).'
-          : 'Service IA temporairement indisponible. Veuillez réessayer dans un instant.'
+        message: clientMsg
       }), { status: 503, headers: { 'Content-Type': 'application/json' } });
     }
 
