@@ -7,6 +7,7 @@ import { VocabularySRSData, ReviewGrade, SRSCard } from '../../types/srs';
 import { playAudio } from '../../lib/audio';
 import { useAppStore, useTranslation } from '../../store/useAppStore';
 import { getLocalizedText } from '../../lib/i18n/utils';
+import { getWordFromDictionary } from '../../data/srs-deck';
 import CardIllustration from './CardIllustration';
 
 interface FlashcardDeckProps {
@@ -18,11 +19,16 @@ interface FlashcardDeckProps {
 export default function FlashcardDeck({ cards, vocabulary, onComplete }: FlashcardDeckProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-  const { preferredNotation, soundEnabled, reviewCard } = useAppStore();
+  const { preferredNotation, soundEnabled, reviewCard, customVocabulary } = useAppStore();
   const { lang, t } = useTranslation();
 
   const currentSRSCard = cards[currentIndex];
-  const wordData = currentSRSCard ? vocabulary.find(v => v.id === currentSRSCard.wordId) : null;
+  const wordData = currentSRSCard
+    ? (vocabulary.find(v => v.id === currentSRSCard.wordId)
+       || getWordFromDictionary(currentSRSCard.wordId)
+       || customVocabulary?.[currentSRSCard.wordId]
+       || null)
+    : null;
 
   const handleGrade = useCallback((grade: ReviewGrade) => {
     if (!currentSRSCard) return;
@@ -62,8 +68,28 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
 
   if (!wordData) {
     return (
-      <div className="text-center p-12 text-[#7A7670] font-display">
-        {t.dashboard?.loading || "Chargement..."}
+      <div className="bg-[#FDFCF8] p-8 rounded-2xl border border-[#E8E2D5] max-w-md mx-auto my-12 text-center space-y-4 shadow-sm">
+        <p className="text-sm font-semibold text-[#1B2A4A]">
+          Expression introuvable dans le dictionnaire
+        </p>
+        <p className="text-xs text-[#7A7670]">
+          ID de la carte : <code className="bg-[#E8E2D5]/50 px-2 py-0.5 rounded font-mono">{currentSRSCard?.wordId || 'inconnu'}</code>
+        </p>
+        <div className="pt-2">
+          <button
+            type="button"
+            onClick={() => {
+              if (currentIndex < cards.length - 1) {
+                setCurrentIndex(prev => prev + 1);
+              } else {
+                onComplete();
+              }
+            }}
+            className="px-5 py-2.5 bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] text-xs font-bold rounded-full transition-colors shadow-xs"
+          >
+            Passer cette carte
+          </button>
+        </div>
       </div>
     );
   }

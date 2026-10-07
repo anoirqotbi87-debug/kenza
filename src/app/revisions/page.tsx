@@ -10,6 +10,7 @@ import Leaderboard from '@/components/gamification/Leaderboard';
 import StreakHeatmap from '@/components/gamification/StreakHeatmap';
 import BadgesList from '@/components/gamification/BadgesList';
 import PageHeader from '@/components/ui/PageHeader';
+import BottomNav from '@/components/navigation/BottomNav';
 
 type Tab = 'srs' | 'decks' | 'gamification';
 
@@ -41,15 +42,16 @@ export default function RevisionsPage() {
             key={id}
             onClick={() => setTab(id)}
             className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-colors ${
-              tab === id ? 'bg-[#1B2A4A] text-[#FDFCF8]' : 'bg-[#FDFCF8] text-[#1B2A4A] border border-[#E8E2D5] hover:border-[#C9A05C]'
+              tab === id ? 'bg-[#1B2A4A] !text-white shadow-xs' : 'bg-[#FDFCF8] text-[#1B2A4A] border border-[#E8E2D5] hover:border-[#C9A05C]'
             }`}
           >
-            <Icon className="w-4 h-4" /> {label}
+            <Icon className={`w-4 h-4 ${tab === id ? 'text-[#C9A05C]' : ''}`} />
+            <span className={tab === id ? '!text-white' : ''}>{label}</span>
           </button>
         ))}
       </div>
 
-      <main className="max-w-4xl mx-auto p-6 space-y-6">
+      <main className="max-w-4xl mx-auto p-6 pb-24 space-y-6">
         {tab === 'srs' && <SRSDashboard />}
         {tab === 'decks' && <DeckManagerView />}
         {tab === 'gamification' && (
@@ -75,6 +77,8 @@ export default function RevisionsPage() {
           </div>
         )}
       </main>
+
+      <BottomNav />
     </div>
   );
 }

@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useAppStore, useTranslation } from '../../store/useAppStore';
 import { srsVocabulary } from '../../data/srs-deck';
 import FlashcardDeck from './FlashcardDeck';
-import { Sparkles, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Sparkles, ArrowRight, ArrowLeft, CheckCircle2, BookOpen, RotateCw, Plus } from 'lucide-react';
 import { SRSCard } from '../../types/srs';
 
 export default function SRSDashboard() {
@@ -34,6 +35,26 @@ export default function SRSDashboard() {
       setSessionCards(due);
       setIsReviewing(true);
     }
+  };
+
+  const handleReviewAhead = () => {
+    const activeCards = Object.values(srsDeck).filter((c) => c.state !== 'new');
+    if (activeCards.length > 0) {
+      const sorted = [...activeCards].sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+      setSessionCards(sorted.slice(0, 10));
+      setIsReviewing(true);
+    }
+  };
+
+  const handleLearnNew = () => {
+    activateNewCards(5);
+    setTimeout(() => {
+      const due = getDueCards();
+      if (due.length > 0) {
+        setSessionCards(due);
+        setIsReviewing(true);
+      }
+    }, 50);
   };
 
   if (isReviewing && sessionCards.length > 0) {
@@ -70,49 +91,84 @@ export default function SRSDashboard() {
         <span>{t.modules.srs.spacedRepetition}</span>
       </div>
 
-      {/* Title */}
-      <h2 className="font-display text-3xl sm:text-4xl font-normal text-[#1B2A4A] mb-3">
-        {t.srs?.smartReviewsTitle || "Révision Intelligente"}
-      </h2>
+      {currentDueCards.length > 0 ? (
+        <>
+          {/* Title */}
+          <h2 className="font-display text-3xl sm:text-4xl font-normal text-[#1B2A4A] mb-3">
+            {t.srs?.smartReviewsTitle || "Révision Intelligente"}
+          </h2>
 
-      <p className="text-sm text-[#7A7670] mb-8 max-w-md leading-relaxed">
-        {t.srs?.smartReviewsDesc || "Ancrez durablement le vocabulaire dans votre mémoire grâce au système d'espacement algorithmique."}
-      </p>
+          <p className="text-sm text-[#7A7670] mb-8 max-w-md leading-relaxed">
+            {t.srs?.smartReviewsDesc || "Ancrez durablement le vocabulaire dans votre mémoire grâce au système d'espacement algorithmique."}
+          </p>
 
-      {/* Counter card */}
-      <div className="bg-[#F7F3EA] border border-[#E8E2D5] rounded-2xl p-6 w-full max-w-sm mb-8 flex justify-between items-center">
-        <div className="text-left">
-          <div className="font-display text-4xl font-bold text-[#1B2A4A]">{currentDueCards.length}</div>
-          <div className="text-xs text-[#7A7670] font-medium mt-1">
-            {t.srs?.cardsToReview || "expressions prêtes pour aujourd'hui"}
+          {/* Counter card */}
+          <div className="bg-[#F7F3EA] border border-[#E8E2D5] rounded-2xl p-6 w-full max-w-sm mb-8 flex justify-between items-center">
+            <div className="text-left">
+              <div className="font-display text-4xl font-bold text-[#1B2A4A]">{currentDueCards.length}</div>
+              <div className="text-xs text-[#7A7670] font-medium mt-1">
+                {t.srs?.cardsToReview || "expressions prêtes pour aujourd'hui"}
+              </div>
+            </div>
+
+            <div className="w-4 h-4 rounded-full bg-[#C9A05C] shadow-[0_0_8px_rgba(201,160,92,0.6)] animate-pulse" />
           </div>
-        </div>
 
-        {currentDueCards.length > 0 ? (
-          <div className="w-4 h-4 rounded-full bg-[#C9A05C] shadow-[0_0_8px_rgba(201,160,92,0.6)] animate-pulse" />
-        ) : (
-          <div className="w-4 h-4 rounded-full bg-[#7A9174]" />
-        )}
-      </div>
+          {/* Action button */}
+          <button
+            onClick={handleStartReview}
+            className="w-full max-w-sm py-4 px-6 bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] rounded-full font-bold text-sm shadow-md hover:shadow-lg transition-all flex justify-center items-center gap-3 active:scale-95"
+          >
+            <span>{t.srs?.startSession || "Lancer la session de révision"}</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </>
+      ) : (
+        <>
+          {/* Finished state */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#7A9174]/15 text-[#7A9174] text-xs font-bold mb-3">
+            <CheckCircle2 className="w-4 h-4" />
+            <span>À jour pour aujourd'hui</span>
+          </div>
 
-      {/* Action button */}
-      <button
-        onClick={handleStartReview}
-        disabled={currentDueCards.length === 0}
-        className="w-full max-w-sm py-4 px-6 bg-[#C9A05C] hover:bg-[#b88f4b] disabled:bg-[#E8E2D5] disabled:text-[#7A7670] text-[#1B2A4A] rounded-full font-bold text-sm shadow-md hover:shadow-lg transition-all flex justify-center items-center gap-3 active:scale-95"
-      >
-        <span>{currentDueCards.length > 0 ? (t.srs?.startSession || "Lancer la session de révision") : (t.srs?.allCaughtUp || "Tout est à jour !")}</span>
-        <ArrowRight className="w-4 h-4" />
-      </button>
+          <h2 className="font-display text-2xl sm:text-3xl font-normal text-[#1B2A4A] mb-3">
+            Félicitations ! Toutes vos révisions du jour sont terminées.
+          </h2>
 
-      {currentDueCards.length === 0 && Object.values(srsDeck).some((c) => c.state === 'new') && (
-        <button
-          type="button"
-          onClick={() => activateNewCards(5)}
-          className="mt-4 text-xs font-bold text-[#1B2A4A] hover:text-[#C9A05C] transition-colors underline underline-offset-4"
-        >
-          + Apprendre 5 nouvelles expressions
-        </button>
+          <p className="text-sm text-[#7A7670] mb-8 max-w-md leading-relaxed">
+            Votre mémoire est bien ancrée ! Revenez demain pour la prochaine répétition espacée, ou continuez votre apprentissage dès maintenant.
+          </p>
+
+          <div className="w-full max-w-sm space-y-3">
+            {Object.values(srsDeck).some((c) => c.state === 'new') ? (
+              <button
+                type="button"
+                onClick={handleLearnNew}
+                className="w-full py-3.5 px-6 bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] rounded-full font-bold text-sm shadow-sm transition-all flex justify-center items-center gap-2 active:scale-95"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Apprendre 5 nouvelles expressions</span>
+              </button>
+            ) : Object.values(srsDeck).some((c) => c.state !== 'new') ? (
+              <button
+                type="button"
+                onClick={handleReviewAhead}
+                className="w-full py-3.5 px-6 bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] rounded-full font-bold text-sm shadow-sm transition-all flex justify-center items-center gap-2 active:scale-95"
+              >
+                <RotateCw className="w-4 h-4" />
+                <span>Réviser à l'avance (cartes actives)</span>
+              </button>
+            ) : null}
+
+            <Link
+              href="/etudier"
+              className="w-full py-3.5 px-6 bg-[#1B2A4A] hover:bg-[#253961] !text-white rounded-full font-bold text-sm shadow-sm transition-all flex justify-center items-center gap-2 active:scale-95"
+            >
+              <BookOpen className="w-4 h-4 text-[#C9A05C]" />
+              <span className="!text-white">Retour au parcours</span>
+            </Link>
+          </div>
+        </>
       )}
     </div>
   );

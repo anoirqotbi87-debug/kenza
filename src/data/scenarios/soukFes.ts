@@ -20,12 +20,12 @@ export const soukFesScenario: DialogueScenario = {
       id: 'turn_2',
       speaker: 'user',
       speakerRole: 'Apprenant',
-      arabicText: 'بْشْحَالْ هَادْ البَرَّادْ دْ النْحَاسْ عَفَاك ؟',
+      arabicText: 'بْشْحَالْ هَادْ الْبَرَّادْ دْ النْحَاسْ عَافَاكْ ؟',
       arabiziText: 'Bch7al had l-berrad d-n-n7as 3afak ?',
       translationFr: "Combien coûte cette théière en cuivre s'il vous plaît ?",
       expectedPhrases: {
         primaryArabizi: 'Bch7al had l-berrad d-n-n7as 3afak',
-        primaryArabic: 'بشحال هاد البراد د النحاس عفاك',
+        primaryArabic: 'بْشْحَالْ هَادْ الْبَرَّادْ دْ النْحَاسْ عَافَاكْ',
         acceptedVariants: ['bch7al had lberrad 3afak', 'bch7al lberrad dn7as', 'bch7al hadchi 3afak'],
         hints: ['bch7al', 'lberrad', 'dn7as']
       }
@@ -48,7 +48,7 @@ export const soukFesScenario: DialogueScenario = {
       translationFr: "C'est un peu cher mon frère, baisse un peu, je vous donne 150.",
       expectedPhrases: {
         primaryArabizi: 'Ghali chwiya a khoya, nqess liya, n3tik mya w khemsin',
-        primaryArabic: 'غالي شويا أ خويا، نقص ليا، نعطيك مية و خمسين',
+        primaryArabic: 'غَالِي شْوِيَا أ خُويَا، نْقَّصْ لِيَا، نْعْطِيكْ مْيَة وْ خَمْسِينْ',
         acceptedVariants: ['ghali chwiya n3tik mya w khemsin', 'nqess liya chwiya', 'n3tik 150 derhem'],
         hints: ['ghali', 'nqess', 'n3tik mya w khemsin']
       }
@@ -66,12 +66,12 @@ export const soukFesScenario: DialogueScenario = {
       id: 'turn_6',
       speaker: 'user',
       speakerRole: 'Apprenant',
-      arabicText: 'شُكْرًا بْزَّافْ، الله يْخَلْفْ، بْسْلَامَة',
+      arabicText: 'شُكْرَانْ بْزَّافْ، اللَّهْ يْخَلّْفْ، بْسْلَامَةْ',
       arabiziText: 'Chokran bezzaf, llah ykhelef, bslama !',
       translationFr: 'Merci beaucoup, que Dieu te récompense, au revoir !',
       expectedPhrases: {
         primaryArabizi: 'Chokran bezzaf, llah ykhelef, bslama',
-        primaryArabic: 'شكرا بزاف، الله يخلف، بسلامة',
+        primaryArabic: 'شُكْرَانْ بْزَّافْ، اللَّهْ يْخَلّْفْ، بْسْلَامَةْ',
         acceptedVariants: ['chokran bezzaf bslama', 'llah ykhelef bslama', 'chokran bslama'],
         hints: ['chokran', 'llah ykhelef', 'bslama']
       }

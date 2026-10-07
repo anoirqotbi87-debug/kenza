@@ -11,6 +11,7 @@ import { isModuleLocked } from '@/lib/premiumModules';
 import ExerciseRunner from '@/components/ExerciseRunner';
 import PaywallModal from '@/components/monetization/PaywallModal';
 import PageHeader from '@/components/ui/PageHeader';
+import BottomNav from '@/components/navigation/BottomNav';
 import { usePremiumStatus } from '@/hooks/usePremiumStatus';
 import { syncService } from '@/lib/syncService';
 
@@ -83,7 +84,7 @@ export default function EtudierPage() {
         title={tp.title || 'Ton parcours complet — 7 modules'}
       />
 
-      <main className="max-w-4xl mx-auto p-6 space-y-8">
+      <main className="max-w-4xl mx-auto p-6 pb-24 space-y-8">
         {Object.entries(fullCurriculum).map(([key, mod]) => {
           const isPremiumModule = isModuleLocked(key, false) && (!isPremiumReady || !isPremium);
           return (
@@ -157,6 +158,7 @@ export default function EtudierPage() {
           source="module_locked"
         />
       )}
+      <BottomNav />
     </div>
   );
 }

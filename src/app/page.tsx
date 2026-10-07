@@ -76,6 +76,7 @@ import { useAuthUser } from "@/lib/useAuthUser";
 import { dismissSavePrompt, getSavePromptVariant } from "@/lib/savePrompt";
 import AuthModal from "@/components/auth/AuthModal";
 import SaveProgressCard from "@/components/auth/SaveProgressCard";
+import BottomNav from "@/components/navigation/BottomNav";
 
 export type View = "today" | "path" | "phrases" | "review" | "space";
 
@@ -89,14 +90,14 @@ export type Phrase = {
 };
 
 const buildPhrases = (lang: string): Phrase[] => [
-  { id: "salam", category: trL(lang, tr("Saluer", "Greeting", "Saludar", "التحية"), "Greeting", "Saludar", "التحية"), darija: "Salam, labas?", arabic: "سلام، لاباس؟", meaning: trL(lang, tr("Salut, ça va ?", "Hi, how are you?", "Hola, ¿qué tal?", "مرحبا، كيف حالك؟"), "Hi, how are you?", "Hola, ¿qué tal?", "مرحبا، كيف حالك؟"), note: trL(lang, tr("La formule la plus simple pour ouvrir une conversation.", "The simplest way to open a conversation.", "La fórmula más simple para abrir una conversación.", "أبسط صيغة لبدء أي حديث."), "The simplest way to open a conversation.", "La fórmula más simple para abrir una conversación.", "أبسط صيغة لبدء أي حديث.") },
-  { id: "bikhir", category: trL(lang, tr("Saluer", "Greeting", "Saludar", "التحية"), "Greeting", "Saludar", "التحية"), darija: "Labas, hamdullah.", arabic: "لاباس، الحمد لله.", meaning: trL(lang, tr("Ça va, merci / Dieu merci.", "Fine, thanks / Thank God.", "Bien, gracias / Gracias a Dios.", "بخير، الحمد لله."), "Fine, thanks / Thank God.", "Bien, gracias / Gracias a Dios.", "بخير، الحمد لله."), note: trL(lang, tr("La réponse classique à « labas? ».", "The classic reply to « labas? ».", "La respuesta clásica a « labas? ».", "الرد المألوف على «لاباس؟»."), "The classic reply to « labas? ».", "La respuesta clásica a « labas? ».", "الرد المألوف على «لاباس؟».") },
-  { id: "afak", category: trL(lang, tr("Au café", "At the café", "En el café", "في المقهى"), "At the café", "En el café", "في المقهى"), darija: "Wahed atay, afak.", arabic: "واحد أتاي، عفاك.", meaning: trL(lang, tr("Un thé, s’il vous plaît.", "A tea, please.", "Un té, por favor.", "شاي من فضلك."), "A tea, please.", "Un té, por favor.", "شاي من فضلك."), note: tr("« Wahed » = un, « atay » = thé, « afak » = s’il te plaît.", "« Wahed » = one, « atay » = tea, « afak » = please.", "« Wahed » = uno, « atay » = té, « afak » = por favor.", "«واحد» = واحد، «أتاي» = شاي، «عفاك» = من فضلك.") },
-  { id: "bghit", category: trL(lang, tr("Au café", "At the café", "En el café", "في المقهى"), "At the café", "En el café", "في المقهى"), darija: "Bghit lma, afak.", arabic: "بغيت الما، عفاك.", meaning: trL(lang, tr("Je voudrais de l’eau, s’il vous plaît.", "I’d like some water, please.", "Quisiera agua, por favor.", "أريد ماءً، من فضلك."), "I’d like some water, please.", "Quisiera agua, por favor.", "أريد ماءً، من فضلك."), note: trL(lang, tr("Remplace « lma » par ce que tu aimerais commander.", "Replace « lma » with whatever you’d like to order.", "Sustituye « lma » por lo que quieras pedir.", "استبدل «لما» بما تود طلبه."), "Replace « lma » with whatever you’d like to order.", "Sustituye « lma » por lo que quieras pedir.", "استبدل «لما» بما تود طلبه.") },
-  { id: "fin", category: trL(lang, tr("Se déplacer", "Getting around", "Desplazarse", "التنقل"), "Getting around", "Desplazarse", "التنقل"), darija: "Fin kayn souk?", arabic: "فين كاين السوق؟", meaning: trL(lang, tr("Où est le souk ?", "Where is the souk?", "¿dónde está el souk?", "أين السوق؟"), "Where is the souk?", "¿dónde está el souk?", "أين السوق؟"), note: trL(lang, tr("Utilise cette structure pour demander un lieu.", "Use this structure to ask for a place.", "Usa esta estructura para preguntar por un lugar.", "استخدم هذه الصيغة لسؤال عن مكان."), "Use this structure to ask for a place.", "Usa esta estructura para preguntar por un lugar.", "استخدم هذه الصيغة لسؤال عن مكان.") },
-  { id: "shukran", category: trL(lang, tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات"), "Essentials", "Lo esencial", "الأساسيات"), darija: "Shukran bzaf!", arabic: "شكرا بزاف!", meaning: trL(lang, tr("Merci beaucoup !", "Thank you very much!", "¡Muchas gracias!", "شكراً جزيلاً!"), "Thank you very much!", "¡Muchas gracias!", "شكراً جزيلاً!"), note: trL(lang, tr("« Bzaf » signifie beaucoup — un mot qui sert partout.", "« Bzaf » means a lot — a word useful everywhere.", "« Bzaf » significa mucho — una palabra útil en todo.", "«بزاف» تعني كثيراً — كلمة تفيد في كل مكان."), "« Bzaf » means a lot — a word useful everywhere.", "« Bzaf » significa mucho — una palabra útil en todo.", "«بزاف» تعني كثيراً — كلمة تفيد في كل مكان.") },
-  { id: "smah", category: trL(lang, tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات"), "Essentials", "Lo esencial", "الأساسيات"), darija: "Smah liya.", arabic: "سمح ليا.", meaning: trL(lang, tr("Excuse-moi / pardon.", "Excuse me / sorry.", "Disculpa / perdón.", "المامعة / عفواً."), "Excuse me / sorry.", "Disculpa / perdón.", "المامعة / عفواً."), note: trL(lang, tr("Pour attirer l’attention ou demander pardon, avec douceur.", "To catch attention or apologize, gently.", "Para llamar la atención o pedir perdón, con dulzura.", "للتنبيه أو طلب العفو، بلطف."), "To catch attention or apologize, gently.", "Para llamar la atención o pedir perdón, con dulzura.", "للتنبيه أو طلب العفو، بلطف.") },
-  { id: "bslama", category: trL(lang, tr("Saluer", "Greeting", "Saludar", "التحية"), "Greeting", "Saludar", "التحية"), darija: "Bslama, nshawfek.", arabic: "بسلامة، نشوفك.", meaning: tr("Au revoir, à bientôt.", "Goodbye, see you soon.", "Adiós, hasta pronto.", "إلى اللقاء، أراك قريباً."), note: trL(lang, tr("Une façon amicale de prendre congé.", "A friendly way to say goodbye.", "Una manera amable de despedirse.", "طريقة ودية للوداع."), "A friendly way to say goodbye.", "Una manera amable de despedirse.", "طريقة ودية للوداع.") },
+  { id: "salam", category: trL(lang, tr("Saluer", "Greeting", "Saludar", "التحية"), "Greeting", "Saludar", "التحية"), darija: "Salam, labas?", arabic: "سَلَامْ، لَابَاسْ ؟", meaning: trL(lang, tr("Salut, ça va ?", "Hi, how are you?", "Hola, ¿qué tal?", "مرحبا، كيف حالك؟"), "Hi, how are you?", "Hola, ¿qué tal?", "مرحبا، كيف حالك؟"), note: trL(lang, tr("La formule la plus simple pour ouvrir une conversation.", "The simplest way to open a conversation.", "La fórmula más simple para abrir una conversación.", "أبسط صيغة لبدء أي حديث."), "The simplest way to open a conversation.", "La fórmula más simple para abrir una conversación.", "أبسط صيغة لبدء أي حديث.") },
+  { id: "bikhir", category: trL(lang, tr("Saluer", "Greeting", "Saludar", "التحية"), "Greeting", "Saludar", "التحية"), darija: "Labas, hamdullah.", arabic: "لَابَاسْ، الْحَمْدُ لِلَّهْ.", meaning: trL(lang, tr("Ça va, merci / Dieu merci.", "Fine, thanks / Thank God.", "Bien, gracias / Gracias a Dios.", "بخير، الحمد لله."), "Fine, thanks / Thank God.", "Bien, gracias / Gracias a Dios.", "بخير، الحمد لله."), note: trL(lang, tr("La réponse classique à « labas? ».", "The classic reply to « labas? ».", "La respuesta clásica a « labas? ».", "الرد المألوف على «لاباس؟»."), "The classic reply to « labas? ».", "La respuesta clásica a « labas? ».", "الرد المألوف على «لاباس؟».") },
+  { id: "afak", category: trL(lang, tr("Au café", "At the café", "En el café", "في المقهى"), "At the café", "En el café", "في المقهى"), darija: "Wahed atay, afak.", arabic: "وَاحِدْ أَتَايْ، عَافَاكْ.", meaning: trL(lang, tr("Un thé, s’il vous plaît.", "A tea, please.", "Un té, por favor.", "شاي من فضلك."), "A tea, please.", "Un té, por favor.", "شاي من فضلك."), note: tr("« Wahed » = un, « atay » = thé, « afak » = s’il te plaît.", "« Wahed » = one, « atay » = tea, « afak » = please.", "« Wahed » = uno, « atay » = té, « afak » = por favor.", "«واحد» = واحد، «أتاي» = شاي، «عفاك» = من فضلك.") },
+  { id: "bghit", category: trL(lang, tr("Au café", "At the café", "En el café", "في المقهى"), "At the café", "En el café", "في المقهى"), darija: "Bghit lma, afak.", arabic: "بْغِيتْ الْمَا، عَافَاكْ.", meaning: trL(lang, tr("Je voudrais de l’eau, s’il vous plaît.", "I’d like some water, please.", "Quisiera agua, por favor.", "أريد ماءً، من فضلك."), "I’d like some water, please.", "Quisiera agua, por favor.", "أريد ماءً، من فضلك."), note: trL(lang, tr("Remplace « lma » par ce que tu aimerais commander.", "Replace « lma » with whatever you’d like to order.", "Sustituye « lma » por lo que quieras pedir.", "استبدل «لما» بما تود طلبه."), "Replace « lma » with whatever you’d like to order.", "Sustituye « lma » por lo que quieras pedir.", "استبدل «لما» بما تود طلبه.") },
+  { id: "fin", category: trL(lang, tr("Se déplacer", "Getting around", "Desplazarse", "التنقل"), "Getting around", "Desplazarse", "التنقل"), darija: "Fin kayn souk?", arabic: "فِينْ كَايْنْ السُّوقْ ؟", meaning: trL(lang, tr("Où est le souk ?", "Where is the souk?", "¿dónde está el souk?", "أين السوق؟"), "Where is the souk?", "¿dónde está el souk?", "أين السوق؟"), note: trL(lang, tr("Utilise cette structure pour demander un lieu.", "Use this structure to ask for a place.", "Usa esta estructura para preguntar por un lugar.", "استخدم هذه الصيغة لسؤال عن مكان."), "Use this structure to ask for a place.", "Usa esta estructura para preguntar por un lugar.", "استخدم هذه الصيغة لسؤال عن مكان.") },
+  { id: "shukran", category: trL(lang, tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات"), "Essentials", "Lo esencial", "الأساسيات"), darija: "Shukran bzaf!", arabic: "شُكْرَانْ بْزَّافْ !", meaning: trL(lang, tr("Merci beaucoup !", "Thank you very much!", "¡Muchas gracias!", "شكراً جزيلاً!"), "Thank you very much!", "¡Muchas gracias!", "شكراً جزيلاً!"), note: trL(lang, tr("« Bzaf » signifie beaucoup — un mot qui sert partout.", "« Bzaf » means a lot — a word useful everywhere.", "« Bzaf » significa mucho — una palabra útil en todo.", "«بزاف» تعني كثيراً — كلمة تفيد في كل مكان."), "« Bzaf » means a lot — a word useful everywhere.", "« Bzaf » significa mucho — una palabra útil en todo.", "«بزاف» تعني كثيراً — كلمة تفيد في كل مكان.") },
+  { id: "smah", category: trL(lang, tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات"), "Essentials", "Lo esencial", "الأساسيات"), darija: "Smah liya.", arabic: "سْمَحْ لِيَّا.", meaning: trL(lang, tr("Excuse-moi / pardon.", "Excuse me / sorry.", "Disculpa / perdón.", "المامعة / عفواً."), "Excuse me / sorry.", "Disculpa / perdón.", "المامعة / عفواً."), note: trL(lang, tr("Pour attirer l’attention ou demander pardon, avec douceur.", "To catch attention or apologize, gently.", "Para llamar la atención o pedir perdón, con dulzura.", "للتنبيه أو طلب العفو، بلطف."), "To catch attention or apologize, gently.", "Para llamar la atención o pedir perdón, con dulzura.", "للتنبيه أو طلب العفو، بلطف.") },
+  { id: "bslama", category: trL(lang, tr("Saluer", "Greeting", "Saludar", "التحية"), "Greeting", "Saludar", "التحية"), darija: "Bslama, nshawfek.", arabic: "بْسْلَامَةْ، نْشُوفْكْ.", meaning: tr("Au revoir, à bientôt.", "Goodbye, see you soon.", "Adiós, hasta pronto.", "إلى اللقاء، أراك قريباً."), note: trL(lang, tr("Une façon amicale de prendre congé.", "A friendly way to say goodbye.", "Una manera amable de despedirse.", "طريقة ودية للوداع."), "A friendly way to say goodbye.", "Una manera amable de despedirse.", "طريقة ودية للوداع.") },
 ];
 
 const buildNavItems = (lang: string): { id: View; label: string; icon: LucideIcon }[] => [
@@ -116,9 +117,18 @@ function useLocalizedContent() {
   const navItems = useMemo(() => buildNavItems(lang), [lang]);
   return { lang, phrases, navItems };
 }
-
 export default function Home() {
-  const [view, setView] = useState<View>("today");
+  const [view, setView] = useState<View>(() => {
+    if (typeof window === "undefined") return "today";
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const v = params.get("view");
+      if (v === "phrases" || v === "path" || v === "review" || v === "space" || v === "today") {
+        return v as View;
+      }
+    } catch {}
+    return "today";
+  });
   const [search, setSearch] = useState("");
   const [authMode, setAuthMode] = useState<"login" | "signup" | null>(null);
   const [savePromptHidden, setSavePromptHidden] = useState(false);
@@ -341,6 +351,18 @@ export default function Home() {
     };
     window.addEventListener("keydown", handleShortcut);
     return () => window.removeEventListener("keydown", handleShortcut);
+  }, []);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const v = params.get("view");
+      if (v === "phrases" || v === "path" || v === "review" || v === "space" || v === "today") {
+        setView(v as View);
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
   useEffect(() => {
@@ -902,36 +924,10 @@ export default function Home() {
         </div>
       </main>
 
-      {/* Mobile Bottom Navigation (Visible sous 900px) */}
-      <nav
-        className="mobile-bottom-nav"
-        aria-label={tr("Navigation mobile", "Mobile navigation", "Navegación móvil", "التنقل على الهاتف")}
-        inert={backgroundInert}
-      >
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <button
-              key={item.id}
-              onClick={() => switchView(item.id)}
-              className={view === item.id ? "mobile-nav-active" : ""}
-              aria-label={navLabel(item.id) || item.label}
-              aria-current={view === item.id ? "page" : undefined}
-            >
-              <Icon size={19} />
-              <span>
-                {item.id === "today"
-                  ? trL(lang, "Accueil", "Home", "Inicio", "الرئيسية")
-                  : item.id === "path"
-                  ? trL(lang, "Parcours", "Journey", "Recorrido", "المسار")
-                  : item.id === "phrases"
-                  ? trL(lang, "Phrases", "Phrases", "Frases", "العبارات")
-                  : trL(lang, "Réviser", "Review", "Repasar", "مراجعة")}
-              </span>
-            </button>
-          );
-        })}
-      </nav>
+      {/* Mobile Bottom Navigation unifiée */}
+      <div inert={backgroundInert}>
+        <BottomNav currentView={view} onSelectView={switchView} />
+      </div>
 
 
       {/* Roleplay Scenario Selector */}
@@ -1731,31 +1727,31 @@ function ReviewView({
     {
       front: trL(lang, "Merci beaucoup", "Thank you so much", "Muchas gracias", "شكراً جزيلاً"),
       back: "Shukran bzaf",
-      arabic: "شكرا بزاف!",
+      arabic: "شُكْرَانْ بْزَّافْ !",
       hint: trL(lang, "Un petit mot chaleureux qui ouvre toutes les portes.", "A warm little word that opens every door.", "Una palabra cálida que abre todas las puertas.", "كلمة دافئة تفتح كل الأبواب."),
     },
     {
       front: trL(lang, tr("Où est le souk ?", "Where is the souk?", "¿dónde está el souk?", "أين السوق؟"), "Where is the souk?", "¿dónde está el souk?", "أين السوق؟"),
       back: "Fin kayn souk?",
-      arabic: "فين كاين السوق؟",
+      arabic: "فِينْ كَايْنْ السُّوقْ ؟",
       hint: trL(lang, "Pour trouver ton chemin dans la médina.", "To find your way in the medina.", "Para encontrar tu camino en la medina.", "لتجد طريقك في المدينة القديمة."),
     },
     {
       front: trL(lang, "S’il vous plaît", "Please", "Por favor", "من فضلك"),
       back: "Afak",
-      arabic: "عفاك",
+      arabic: "عَافَاكْ",
       hint: trL(lang, "Un mot simple pour rendre tes demandes plus douces.", "A simple word that softens your requests.", "Una palabra simple para suavizar tus peticiones.", "كلمة بسيطة تجعل طلباتك ألطف."),
     },
     {
       front: trL(lang, "Au revoir, à bientôt", "Goodbye, see you soon", "Adiós, hasta pronto", "إلى اللقاء، أراك قريباً"),
       back: "Bslama, nshawfek",
-      arabic: "بسلامة، نشوفك",
+      arabic: "بْسْلَامَةْ، نْشُوفْكْ",
       hint: trL(lang, "Une manière chaleureuse de se dire à bientôt.", "A warm way to say see you soon.", "Una manera cálida de decir hasta pronto.", "طريقة دافئة للقول أراك قريباً."),
     },
     {
       front: trL(lang, "Je voudrais un thé", "I’d like a tea", "Quisiera un té", "أريد شاياً"),
       back: "Bghit wahed atay, afak",
-      arabic: "بغيت واحد أتاي، عفاك",
+      arabic: "بْغِيتْ وَاحِدْ أَتَايْ، عَافَاكْ",
       hint: trL(lang, "Pour savourer un moment au café.", "To savor a moment at the café.", "Para saborear un momento en el café.", "للاستمتاع بلحظة في المقهى."),
     },
   ];

@@ -31,35 +31,35 @@ const DEFAULT_EXERCISES: PronunciationExercise[] = [
   {
     id: 'p1',
     arabizi: '3afak, bch7al hada ?',
-    arabic: 'عافاك، بشحال هادا؟',
+    arabic: 'عَافَاكْ، بْشْحَالْ هَادَا ؟',
     translation: "S'il vous plaît, combien ça coûte ?",
     focusPhoneme: '3',
   },
   {
     id: 'p2',
     arabizi: 'Sba7 l-khir a khoya',
-    arabic: 'صباح الخير ا خويا',
+    arabic: 'صْبَاحْ الْخِيرْ أ خُويَا',
     translation: 'Bonjour mon frère',
     focusPhoneme: '7',
   },
   {
     id: 'p3',
     arabizi: 'Bghit 9hwa nss-nss',
-    arabic: 'بغيت قهوة نص نص',
+    arabic: 'بْغِيتْ قَهْوَة نْصّْ نْصّْ',
     translation: 'Je voudrais un café moitié lait',
     focusPhoneme: '9',
   },
   {
     id: 'p4',
     arabizi: 'L-khobz skhoun bzzaf',
-    arabic: 'الخبز سخون بزاف',
+    arabic: 'الْخُبْزْ سْخُونْ بْزَّافْ',
     translation: 'Le pain est très chaud',
     focusPhoneme: 'kh',
   },
   {
     id: 'p5',
     arabizi: 'Ghadi nemchi daba',
-    arabic: 'غادي نمشي دابا',
+    arabic: 'غَادِي نْمْشِي دَابَا',
     translation: 'Je vais partir maintenant',
     focusPhoneme: 'gh',
   },
@@ -190,13 +190,13 @@ export default function PronunciationTrainer({
             onClick={() => handleListen('normal')}
             className={`px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 transition-all ${
               activeSpeed === 'normal'
-                ? 'bg-[#1B2A4A] text-[#FDFCF8] shadow-xs'
+                ? 'bg-[#1B2A4A] !text-white shadow-xs'
                 : 'bg-[#FDFCF8] text-[#1B2A4A] border border-[#E8E2D5] hover:bg-[#E8E2D5]/50'
             }`}
             title="Écouter à vitesse normale"
           >
             <Volume2 className="w-4 h-4 text-[#C9A05C]" />
-            <span>Normal (1.0x)</span>
+            <span className={activeSpeed === 'normal' ? '!text-white' : ''}>Normal (1.0x)</span>
           </button>
 
           <button
@@ -204,13 +204,13 @@ export default function PronunciationTrainer({
             onClick={() => handleListen('slow')}
             className={`px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 transition-all ${
               activeSpeed === 'slow'
-                ? 'bg-[#1B2A4A] text-[#FDFCF8] shadow-xs'
+                ? 'bg-[#1B2A4A] !text-white shadow-xs'
                 : 'bg-[#FDFCF8] text-[#1B2A4A] border border-[#E8E2D5] hover:bg-[#E8E2D5]/50'
             }`}
             title="Mode Tortue ralenti (0.75x) pour décomposer les phonèmes"
           >
             <Turtle className="w-4 h-4 text-[#C9A05C]" />
-            <span>Tortue 🐢 (0.75x)</span>
+            <span className={activeSpeed === 'slow' ? '!text-white' : ''}>Tortue 🐢 (0.75x)</span>
           </button>
         </div>
       </div>
@@ -223,13 +223,13 @@ export default function PronunciationTrainer({
             onClick={handleMicToggle}
             className={`w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 shadow-md ${
               isListening
-                ? 'bg-red-500 text-white animate-pulse scale-110 ring-4 ring-red-200'
-                : 'bg-[#1B2A4A] text-[#FDFCF8] hover:bg-[#1B2A4A]/90 hover:scale-105 active:scale-95'
+                ? 'bg-red-500 !text-white animate-pulse scale-110 ring-4 ring-red-200'
+                : 'bg-[#1B2A4A] !text-white hover:bg-[#1B2A4A]/90 hover:scale-105 active:scale-95'
             }`}
             aria-label={isListening ? 'Arrêter l’enregistrement' : 'Commencer à parler'}
           >
             {isListening ? (
-              <MicOff className="w-8 h-8 text-white" />
+              <MicOff className="w-8 h-8 !text-white" />
             ) : (
               <Mic className="w-8 h-8 text-[#C9A05C]" />
             )}
