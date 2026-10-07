@@ -30,6 +30,14 @@ export interface HomeModuleLesson {
   done: boolean;
 }
 
+export interface NextLessonInfo {
+  id: string;
+  title: string;
+  moduleTitle: string;
+  moduleNumber: number;
+  stepsCount: number;
+}
+
 const text = (value: string | { fr: string; en: string; es: string; ar: string } | undefined, lang: string) =>
   getLocalizedText(value, lang as UILanguage);
 
@@ -75,4 +83,35 @@ export function getHomeModuleLessons(
     free: !isModuleLocked(moduleKey, false),
     done: done.has(lesson.id),
   }));
+}
+
+/**
+ * Dérive la prochaine leçon jouable non terminée à partir de la progression utilisateur.
+ * Parcourt les modules dans l'ordre chronologique (1 à 7).
+ */
+export function getNextPlayableLesson(
+  completedLessonIds: readonly string[] = [],
+  lang: string = 'fr'
+): NextLessonInfo | null {
+  const done = new Set(completedLessonIds || []);
+
+  for (const [key, mod] of Object.entries(fullCurriculum)) {
+    const playableLessons = mod.lessons.filter(hasSteps);
+    const modNumber = parseInt(key, 10) || 1;
+    const modTitle = text(mod.title, lang);
+
+    for (const lesson of playableLessons) {
+      if (!done.has(lesson.id)) {
+        return {
+          id: lesson.id,
+          title: text(lesson.title, lang),
+          moduleTitle: `${modTitle} · Niveau ${lesson.level ?? modNumber}`,
+          moduleNumber: modNumber,
+          stepsCount: lesson.steps?.length || 8,
+        };
+      }
+    }
+  }
+
+  return null; // Toutes les leçons sont terminées
 }

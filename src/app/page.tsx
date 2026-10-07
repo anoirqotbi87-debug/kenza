@@ -50,11 +50,14 @@ import { openBillingPortal } from "@/lib/billingPortal";
 import { shouldShowOnboardingPaywall } from "@/lib/monetizationGates";
 import {
   getModuleSummaries,
-  getNextLesson,
   getPlayableLessons,
-  type LessonRef,
 } from "@/data/homeCurriculum";
-import { getHomeModules, getHomeModuleLessons } from "@/data/homeModules";
+import {
+  getHomeModules,
+  getHomeModuleLessons,
+  getNextPlayableLesson,
+  type NextLessonInfo,
+} from "@/data/homeModules";
 import { getLocalizedText } from "@/lib/i18n/utils";
 import type { UILanguage } from "@/lib/i18n/translations";
 import { syncService } from "@/lib/syncService";
@@ -447,8 +450,8 @@ export default function Home() {
 
   const completedCount = completedLessons.length;
   const nextLesson = useMemo(
-    () => getNextLesson(lang, completedLessons),
-    [lang, completedLessons]
+    () => getNextPlayableLesson(completedLessons, lang),
+    [completedLessons, lang]
   );
 
   /**
@@ -1053,7 +1056,7 @@ function TodayView({
   completedCount: number;
   xp: number;
   streak: number;
-  nextLesson: LessonRef | null;
+  nextLesson: NextLessonInfo | null;
   onOpenCurriculum: () => void;
   onOpenLesson: (lessonId?: string) => void;
   onOpenPaywall: () => void;
@@ -1140,22 +1143,35 @@ function TodayView({
           </div>
           <div className="next-card-copy">
             <span className="lesson-pill">
-              {trL(lang, "LEÇON SUIVANTE", "NEXT LESSON", "PRÓXIMA LECCIÓN", "الدرس التالي")}
-              {nextLesson ? ` · ${nextLesson.steps} ${tr("étapes", "steps", "pasos", "خطوات")}` : ""}
+              {nextLesson
+                ? `${trL(lang, "LEÇON SUIVANTE", "NEXT LESSON", "PRÓXIMA LECCIÓN", "الدرس التالي")} · ${nextLesson.stepsCount} ${tr("étapes", "steps", "pasos", "خطوات")}`
+                : trL(lang, "PARCOURS TERMINÉ", "JOURNEY COMPLETE", "RECORRIDO COMPLETADO", "أتممت المسار")}
             </span>
             <h3>
               {nextLesson
                 ? nextLesson.title
-                : trL(lang, "Parcours terminé", "Journey complete", "Recorrido completado", "أتممت المسار")}
+                : trL(lang, "Parcours terminé !", "Journey complete!", "¡Recorrido completado!", "أتممت المسار!")}
             </h3>
             <p>
               {nextLesson
-                ? `${nextLesson.moduleTitle} · ${tr("Niveau", "Level", "Nivel", "المستوى")} ${nextLesson.level}`
-                : trL(lang, "Revois n’importe quelle leçon depuis le parcours complet.", "Revisit any lesson from the full journey.", "Repasa cualquier lección desde el recorrido completo.", "راجع أي درس من المسار الكامل.")}
+                ? nextLesson.moduleTitle
+                : trL(lang, "Tous les modules validés. Revois n’importe quelle leçon depuis le parcours complet.", "All modules completed. Revisit any lesson from the full journey.", "Todos los módulos validados. Repasa cualquier lección desde el recorrido completo.", "جميع الوحدات مكتملة. راجع أي درس من المسار الكامل.")}
             </p>
           </div>
-          <button className="text-link" onClick={() => onOpenLesson(nextLesson?.id)}>
-            {trL(lang, "C’est parti", "Let’s go", "¡Vamos!", "هيا بنا")} <ArrowRight size={15} />
+          <button
+            className="text-link"
+            onClick={() => (nextLesson ? onOpenLesson(nextLesson.id) : onNavigate("review"))}
+          >
+            {nextLesson ? (
+              <>
+                {trL(lang, "C’est parti", "Let’s go", "¡Vamos!", "هيا بنا")} <ArrowRight size={15} />
+              </>
+            ) : (
+              <>
+                {trL(lang, "Passer aux révisions", "Go to reviews", "Ir a repasos", "الانتقال إلى المراجعة")}{" "}
+                <ArrowRight size={15} />
+              </>
+            )}
           </button>
         </article>
       </div>

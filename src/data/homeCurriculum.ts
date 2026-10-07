@@ -124,3 +124,6 @@ export function getNextLesson(lang: string, completedLessons: string[]): LessonR
     null
   );
 }
+
+export { getNextPlayableLesson } from './homeModules';
+export type { NextLessonInfo } from './homeModules';
