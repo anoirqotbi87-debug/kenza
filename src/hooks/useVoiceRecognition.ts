@@ -78,7 +78,11 @@ export function useVoiceRecognition(lang = 'ar-MA', timeoutMs = 5000) {
     setTranscript('');
     setIsListening(true);
 
-    recognitionRef.current.lang = lang;
+    try {
+      recognitionRef.current.lang = lang || 'ar-MA';
+    } catch {
+      recognitionRef.current.lang = 'ar-MA';
+    }
 
     recognitionRef.current.onstart = () => {
       setIsListening(true);
@@ -108,6 +112,14 @@ export function useVoiceRecognition(lang = 'ar-MA', timeoutMs = 5000) {
         setError("Permission micro refusée. Veuillez autoriser l'accès au microphone.");
       } else if (event.error === 'no-speech') {
         setError("Aucun son détecté.");
+      } else if (event.error === 'language-not-supported') {
+        // Fallback transparent si ar-MA n'est pas supporté par le moteur natif
+        try {
+          if (recognitionRef.current) {
+            recognitionRef.current.lang = 'fr-FR';
+          }
+        } catch {}
+        setError("Langue vocale ar-MA indisponible sur cet appareil. Mode texte recommandé.");
       } else {
         setError(`Erreur vocale : ${event.error}`);
       }

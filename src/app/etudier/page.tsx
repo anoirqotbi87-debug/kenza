@@ -12,6 +12,7 @@ import ExerciseRunner from '@/components/ExerciseRunner';
 import ArabiziGuideModal from '@/components/curriculum/ArabiziGuideModal';
 import PaywallModal from '@/components/monetization/PaywallModal';
 import PageHeader from '@/components/ui/PageHeader';
+import BottomNav from '@/components/navigation/BottomNav';
 import { usePremiumStatus } from '@/hooks/usePremiumStatus';
 import { syncService } from '@/lib/syncService';
 
@@ -85,7 +86,7 @@ export default function EtudierPage() {
         title={tp.title || 'Ton parcours complet — 7 modules'}
       />
 
-      <main className="max-w-4xl mx-auto p-6 space-y-8">
+      <main className="max-w-4xl mx-auto p-6 pb-24 space-y-8">
         <button
           onClick={() => setShowArabiziGuide(true)}
           className="w-full text-left bg-white/70 border border-dashed border-[#C9A05C]/50 hover:border-[#C9A05C] hover:bg-[#C9A05C]/5 rounded-2xl px-5 py-4 flex items-center gap-3 transition-colors group"
@@ -97,14 +98,12 @@ export default function EtudierPage() {
             <p className="text-sm font-bold text-[#1B2A4A]">💡 La Clé des Chiffres Arabizi</p>
             <p className="text-xs text-[#7A7670] mt-0.5">
               2 · 3 · 5 · 7 · 9 — le décodeur des sons gutturaux, avant ou pendant ton parcours.
-
             </p>
           </div>
           <span className="text-xs font-bold text-[#B8860B] bg-[#C9A05C]/10 border border-[#C9A05C]/20 px-3 py-1 rounded-full shrink-0">
             Mini-guide
           </span>
         </button>
-
         {Object.entries(fullCurriculum).map(([key, mod]) => {
           const isPremiumModule = isModuleLocked(key, false) && (!isPremiumReady || !isPremium);
           return (
@@ -181,6 +180,7 @@ export default function EtudierPage() {
       {showArabiziGuide && (
         <ArabiziGuideModal onClose={() => setShowArabiziGuide(false)} />
       )}
+      <BottomNav />
     </div>
   );
 }

@@ -11,6 +11,7 @@ import ExerciseRunner from '@/components/ExerciseRunner';
 import ConjugationTable from '@/components/grammar/ConjugationTable';
 import PageHeader from '@/components/ui/PageHeader';
 import PaywallModal from '@/components/monetization/PaywallModal';
+import BottomNav from '@/components/navigation/BottomNav';
 import { usePremiumStatus } from '@/hooks/usePremiumStatus';
 import { isModuleLocked } from '@/lib/premiumModules';
 import { syncService } from '@/lib/syncService';
@@ -44,7 +45,7 @@ export default function GrammairePage() {
         title={tp.title || 'Grammaire & Conjugaison'}
       />
 
-      <main className="max-w-4xl mx-auto p-6 space-y-8">
+      <main className="max-w-4xl mx-auto p-6 pb-24 space-y-8">
         <section className="bg-[#FDFCF8] rounded-2xl border border-[#E8E2D5] p-6 shadow-xs">
           <h2 className="font-display text-xl font-bold text-[#1B2A4A] mb-4">
             {tp.conjugationTable || 'Tableau de conjugaison'}
@@ -115,6 +116,7 @@ export default function GrammairePage() {
       {showPaywall && (
         <PaywallModal onClose={() => setShowPaywall(false)} source="module_locked" />
       )}
+      <BottomNav />
     </div>
   );
 }

@@ -61,6 +61,19 @@ button { color: inherit; }
 button:focus-visible, input:focus-visible { outline: 3px solid rgba(214, 155, 71, .65); outline-offset: 3px; }
 ::selection { color: var(--ink); background: #ead7ad; }
 
+/* Règle stricte d'accessibilité & contraste : fond bleu nuit sombre = texte blanc garanti */
+button[class*="bg-[#1B2A4A]"],
+button[class*="bg-[#0B2545]"],
+button[class*="bg-[#142943]"],
+div[class*="bg-[#1B2A4A]"],
+div[class*="bg-[#0B2545]"] {
+  color: #FFFFFF !important;
+}
+button[class*="bg-[#1B2A4A]"] span,
+button[class*="bg-[#0B2545]"] span {
+  color: inherit;
+}
+
 /* Polices exactes de Manus */
 .font-display {
   font-family: "DM Serif Display", Georgia, serif !important;
@@ -606,7 +619,8 @@ button:focus-visible, input:focus-visible { outline: 3px solid rgba(214, 155, 71
     background: rgba(255,254,250,.96);
     backdrop-filter: blur(15px);
   }
-  .mobile-bottom-nav button {
+  .mobile-bottom-nav button,
+  .mobile-bottom-nav a {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -616,13 +630,21 @@ button:focus-visible, input:focus-visible { outline: 3px solid rgba(214, 155, 71
     border-radius: 9px;
     color: #969991;
     background: transparent;
-    font-size: 7px;
+    font-size: 10px;
+    font-weight: 600;
+    text-decoration: none;
     cursor: pointer;
+    transition: color 0.15s, background-color 0.15s;
   }
-  .mobile-bottom-nav button.mobile-nav-active {
-    color: #315a7d;
-    background: #f1f4f1;
+  .mobile-bottom-nav button.mobile-nav-active,
+  .mobile-bottom-nav a.mobile-nav-active {
+    color: #1B2A4A;
+    background: #e9eff2;
     font-weight: 700;
+  }
+  .mobile-bottom-nav button.mobile-nav-active svg,
+  .mobile-bottom-nav a.mobile-nav-active svg {
+    color: #C9A05C;
   }
 }
 
