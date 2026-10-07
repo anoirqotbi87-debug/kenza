@@ -61,9 +61,32 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
   }, [isFlipped, wordData, handleGrade]);
 
   if (!wordData) {
+    // Pas de carte valide (vocabulaire introuvable) : on propose de passer la
+    // carte au lieu de rester sur un « Chargement... » qui ne se finit jamais.
+    const canSkip = currentIndex < cards.length - 1;
     return (
-      <div className="text-center p-12 text-[#7A7670] font-display">
-        {t.dashboard?.loading || "Chargement..."}
+      <div className="text-center p-12 text-[#7A7670] font-display flex flex-col items-center gap-4">
+        <span>Cette carte n'est plus disponible.</span>
+        {canSkip ? (
+          <button
+            type="button"
+            onClick={() => {
+              setCurrentIndex((prev) => prev + 1);
+              setIsFlipped(false);
+            }}
+            className="px-5 py-2 rounded-full text-xs font-bold bg-[#FDFCF8] border border-[#E8E2D5] text-[#1B2A4A] hover:border-[#C9A05C] transition-colors"
+          >
+            Passer la carte
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={onComplete}
+            className="px-5 py-2 rounded-full text-xs font-bold bg-[#FDFCF8] border border-[#E8E2D5] text-[#1B2A4A] hover:border-[#C9A05C] transition-colors"
+          >
+            Terminer la session
+          </button>
+        )}
       </div>
     );
   }

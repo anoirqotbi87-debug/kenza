@@ -36,6 +36,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
   const { t } = useTranslation();
   const rp = t.modules.roleplay;
   const [showImmersion, setShowImmersion] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const handlePlayVoice = (text: string, arabic?: string, speed: 'normal' | 'slow' = 'normal') => {
@@ -45,7 +46,9 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
     });
   };
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading, setInput, reload, error } = useChat({
+  const STREAM_TIMEOUT_MS = 30000;
+
+  const { messages, input, handleInputChange, handleSubmit, isLoading, setInput, reload, error, stop } = useChat({
     api: '/api/roleplay/chat',
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     body: { personaId },
@@ -63,9 +66,34 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
     }
   });
 
-  const { isSupported, isListening, transcript, startListening, stopListening } = useVoiceRecognition('ar-MA', 10000);
+  // Sécurise le stream : si la réponse tarde plus que STREAM_TIMEOUT_MS,
+  // on arrête le spinner, on réactive l'envoi et on prévient l'utilisateur.
+  const streamTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [streamTimeoutHit, setStreamTimeoutHit] = useState(false);
 
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  useEffect(() => {
+    if (isLoading) {
+      streamTimeoutRef.current = setTimeout(() => {
+        setStreamTimeoutHit(true);
+        stop();
+        setToastMessage('La réponse prend du temps. Réessayez.');
+        setTimeout(() => setToastMessage(null), 4000);
+      }, STREAM_TIMEOUT_MS);
+    } else {
+      if (streamTimeoutRef.current) {
+        clearTimeout(streamTimeoutRef.current);
+        streamTimeoutRef.current = null;
+      }
+    }
+    return () => {
+      if (streamTimeoutRef.current) {
+        clearTimeout(streamTimeoutRef.current);
+        streamTimeoutRef.current = null;
+      }
+    };
+  }, [isLoading, stop]);
+
+  const { isSupported, isListening, transcript, startListening, stopListening } = useVoiceRecognition('ar-MA', 10000);
 
   // Sync voice transcript to chat input
   useEffect(() => {
@@ -103,6 +131,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
 
   const onSubmitForm = (e: React.FormEvent<HTMLFormElement>) => {
     if (isListening) stopListening();
+    setStreamTimeoutHit(false);
     handleSubmit(e);
   };
 
@@ -159,10 +188,17 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
           </div>
         )}
 
-        {error && (
+        {error && !streamTimeoutHit && (
           <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-2xl text-sm flex items-center justify-between shadow-xs">
             <span>Erreur de communication avec l'agent.</span>
-            <button onClick={() => reload()} className="flex items-center gap-1 font-bold hover:underline"><RefreshCw className="w-4 h-4"/> Réessayer</button>
+            <button onClick={() => { setStreamTimeoutHit(false); reload(); }} className="flex items-center gap-1 font-bold hover:underline"><RefreshCw className="w-4 h-4"/> Réessayer</button>
+          </div>
+        )}
+
+      {streamTimeoutHit && (
+          <div className="bg-amber-50 border border-amber-200 text-amber-900 p-3 rounded-2xl text-sm flex items-center justify-between shadow-xs">
+            <span>La réponse prend du temps. Réessayer.</span>
+            <button onClick={() => { setStreamTimeoutHit(false); reload(); }} className="flex items-center gap-1 font-bold hover:underline"><RefreshCw className="w-4 h-4"/> Réessayer</button>
           </div>
         )}
 
