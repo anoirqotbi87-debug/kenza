@@ -35,21 +35,32 @@ export default function RevisionsPage() {
         title={tp.title || 'Révisions & Paquets de cartes'}
       />
 
-      <div className="max-w-4xl mx-auto px-6 pt-6 flex gap-2 flex-wrap">
-        {tabs.map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            onClick={() => setTab(id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-colors ${
-              tab === id ? 'bg-[#1B2A4A] text-[#FDFCF8]' : 'bg-[#FDFCF8] text-[#1B2A4A] border border-[#E8E2D5] hover:border-[#C9A05C]'
-            }`}
-          >
-            <Icon className="w-4 h-4" /> {label}
-          </button>
-        ))}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-5">
+        <div
+          role="tablist"
+          aria-label={tp.badge || 'Sections de révision'}
+          className="grid grid-cols-3 gap-1.5 p-1 bg-[#FDFCF8] border border-[#E8E2D5] rounded-2xl shadow-xs"
+        >
+          {tabs.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              role="tab"
+              aria-selected={tab === id}
+              onClick={() => setTab(id)}
+              className={`flex items-center justify-center gap-1.5 px-1 py-2.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all min-w-0 ${
+                tab === id
+                  ? 'bg-[#1B2A4A] text-[#FDFCF8] shadow-sm'
+                  : 'text-[#7A7670] hover:text-[#1B2A4A] hover:bg-[#F7F3EA]'
+              }`}
+            >
+              <Icon className={`w-3.5 h-3.5 shrink-0 ${tab === id ? 'text-[#C9A05C]' : ''}`} />
+              <span className="truncate">{label}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
-      <main className="max-w-4xl mx-auto p-6 space-y-6">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-6">
         {tab === 'srs' && <SRSDashboard />}
         {tab === 'decks' && <DeckManagerView />}
         {tab === 'gamification' && (

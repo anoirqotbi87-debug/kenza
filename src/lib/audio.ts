@@ -83,7 +83,9 @@ export interface AudioOptions {
 }
 
 /**
- * Play audio with speed control via Web Audio API, or fallback to SpeechSynthesis.
+ * Play audio with speed control via Web Audio API. La lecture passe
+ * exclusivement par Edge TTS (/api/tts, voix marocaines ar-MA-Jamal/MounaNeural) :
+ * aucun recours à window.speechSynthesis (synthèse Android non marocaine).
  *
  * Point de passage unique de la lecture : c'est ici qu'est appliqué le quota
  * journalier des utilisateurs gratuits (les sons d'interface ne le consomment pas).
@@ -160,7 +162,14 @@ export const playAudio = async (
     try {
       let audioBuffer = audioCache.get(audioUrl!);
       if (!audioBuffer) {
-        const response = await fetch(audioUrl!);
+        const controller = new AbortController();
+        const networkTimeout = setTimeout(() => controller.abort(), 15000);
+        let response: Response;
+        try {
+          response = await fetch(audioUrl!, { signal: controller.signal });
+        } finally {
+          clearTimeout(networkTimeout);
+        }
         const arrayBuffer = await response.arrayBuffer();
         audioBuffer = await ctx.decodeAudioData(arrayBuffer);
         audioCache.set(audioUrl!, audioBuffer);
@@ -210,7 +219,14 @@ export const playAudio = async (
           params.append('voice', voiceParam);
           params.append('speed', speedParam);
           
-          const response = await fetch(`/api/tts?${params.toString()}`);
+          const controller = new AbortController();
+          const networkTimeout = setTimeout(() => controller.abort(), 15000);
+          let response: Response;
+          try {
+            response = await fetch(`/api/tts?${params.toString()}`, { signal: controller.signal });
+          } finally {
+            clearTimeout(networkTimeout);
+          }
           if (!response.ok) throw new Error('TTS API failed');
           arrayBuffer = await response.arrayBuffer();
         }
@@ -228,31 +244,10 @@ export const playAudio = async (
         source.start();
       });
     } catch (e) {
-      console.warn("[Audio TTS] Erreur Edge TTS ou indisponibilité hors-ligne, bascule vers Web Speech API :", e);
+      // Pas de fallback Web Speech : le synthétiseur Android ne parle que le
+      // MSA/égyptien et détruit l'accent marocain. On signale l'échec pour que
+      // l'UI puisse proposer une retry, sans produire de voix non marocaine.
+      console.warn("[Audio TTS] Erreur Edge TTS ou audio indisponible :", e);
     }
-  }
-
-  // Fallback ultime : Web Speech API du navigateur
-  if ('speechSynthesis' in window && text && text !== 'correct' && text !== 'error') {
-    return new Promise<void>((resolve) => {
-      try {
-        const voices = window.speechSynthesis.getVoices();
-        const voice = voices.find(v => v.lang.includes('ar-MA')) || voices.find(v => v.lang.includes('ar-'));
-        
-        const utterance = new SpeechSynthesisUtterance(arabicText?.trim() || text.trim());
-        utterance.lang = 'ar-MA';
-        utterance.rate = numericSpeed;
-        if (voice) {
-          utterance.voice = voice;
-        }
-        
-        utterance.onend = () => resolve();
-        utterance.onerror = () => resolve();
-        
-        window.speechSynthesis.speak(utterance);
-      } catch {
-        resolve();
-      }
-    });
   }
 };
