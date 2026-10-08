@@ -141,37 +141,44 @@ export async function POST(req: NextRequest) {
     }
 
     const googleProvider = createGoogleGenerativeAI({ apiKey });
-    const targetModel = process.env.GEMINI_MODEL?.trim() || 'gemini-2.5-flash';
+    const candidates = [
+      process.env.GEMINI_MODEL?.trim(),
+      'gemini-3.8-flash',
+      'gemini-3.5-flash',
+      'gemini-3.5-flash-lite',
+      'gemini-2.5-flash',
+    ].filter((m): m is string => Boolean(m && m.length > 0));
 
     let result;
-    try {
-      result = await streamText({
-        model: googleProvider(targetModel),
-        system: systemPrompt,
-        messages: normalizedHistory as CoreMessage[],
-        temperature: 0.7,
-        maxTokens: 300,
-        maxRetries: 0,
-      });
-    } catch (primaryErr: unknown) {
-      const primaryMsg = primaryErr instanceof Error ? primaryErr.message : String(primaryErr);
-      const isNotFound =
-        primaryMsg.includes('not found') ||
-        primaryMsg.includes('404') ||
-        primaryMsg.includes('not supported');
-      if (isNotFound) {
-        console.warn(`[Roleplay Chat] Primary model ${targetModel} not found, falling back to gemini-2.5-flash-lite`);
+    let lastErr: unknown;
+
+    for (const modelName of candidates) {
+      try {
         result = await streamText({
-          model: googleProvider('gemini-2.5-flash-lite'),
+          model: googleProvider(modelName),
           system: systemPrompt,
           messages: normalizedHistory as CoreMessage[],
           temperature: 0.7,
           maxTokens: 300,
           maxRetries: 0,
         });
-      } else {
-        throw primaryErr;
+        break;
+      } catch (tryErr: unknown) {
+        lastErr = tryErr;
+        const msg = tryErr instanceof Error ? tryErr.message : String(tryErr);
+        const isNotFound =
+          msg.includes('not found') ||
+          msg.includes('404') ||
+          msg.includes('not supported');
+        if (!isNotFound) {
+          throw tryErr;
+        }
+        console.warn(`[Roleplay Chat] Model ${modelName} returned 404, falling back...`);
       }
+    }
+
+    if (!result) {
+      throw lastErr;
     }
 
     // Return the streaming response immediately
