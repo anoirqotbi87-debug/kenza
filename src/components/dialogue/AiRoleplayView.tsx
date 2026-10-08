@@ -12,6 +12,7 @@ import { supabase } from '@/lib/supabase';
 import PaywallModal from '@/components/monetization/PaywallModal';
 import { useDialog } from '@/hooks/useDialog';
 import { parseAiMessage } from '@/lib/ai/parseAiMessage';
+import AuthModal from '@/components/auth/AuthModal';
 
 interface AiRoleplayViewProps {
   personaId: PersonaId;
@@ -23,6 +24,8 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
 
   const [token, setToken] = useState<string>('');
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [rateLimitCooldown, setRateLimitCooldown] = useState<number | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -31,6 +34,19 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
       }
     });
   }, []);
+
+  // Compte à rebours de cooldown 10s sur 429
+  useEffect(() => {
+    if (rateLimitCooldown === null || rateLimitCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setRateLimitCooldown((prev) => {
+        if (prev === null || prev <= 1) return null;
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [rateLimitCooldown]);
+
   const persona = personas[personaId];
   const { addCustomWordToSRS, soundEnabled } = useAppStore();
   const { t } = useTranslation();
@@ -48,24 +64,58 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
 
   const STREAM_TIMEOUT_MS = 30000;
 
-  const getErrorMessage = (err: Error | null | undefined): string => {
-    if (!err) return '';
+  const getErrorInfo = (err: Error | null | undefined) => {
+    if (!err) return null;
+    let parsed: { error?: string; message?: string; guest?: boolean } | null = null;
     try {
-      const parsed = JSON.parse(err.message);
-      if (parsed && typeof parsed.message === 'string') {
-        return parsed.message;
-      }
+      parsed = JSON.parse(err.message);
     } catch {
       // Not JSON
     }
     const raw = err.message || '';
+    const isRateLimit = raw.includes('429') || raw.includes('RATE_LIMIT') || parsed?.error === 'RATE_LIMIT_EXCEEDED';
+    const isGuestQuota = parsed?.guest === true || raw.includes('session d\'essai') || raw.includes('3 messages');
+    const isQuota = raw.includes('403') || raw.includes('QUOTA') || parsed?.error === 'QUOTA_EXCEEDED' || isGuestQuota;
+
+    if (isRateLimit) {
+      return {
+        type: 'ratelimit' as const,
+        title: "L'agent reprend son souffle",
+        message: rateLimitCooldown !== null && rateLimitCooldown > 0
+          ? `L'agent reprend son souffle ! Veuillez patienter ${rateLimitCooldown} secondes...`
+          : "L'agent reprend son souffle ! Vous pouvez maintenant renvoyer votre message.",
+      };
+    }
+
+    if (isGuestQuota) {
+      return {
+        type: 'guest_quota' as const,
+        title: 'Session de découverte terminée',
+        message: 'Votre session de découverte de 3 messages est terminée. Connectez-vous pour continuer gratuitement !',
+      };
+    }
+
+    if (isQuota) {
+      return {
+        type: 'quota' as const,
+        title: "Limite d'utilisation atteinte",
+        message: parsed?.message || 'Quota quotidien de 8 messages atteint. Passez à Kenza Pro pour des conversations illimitées !',
+      };
+    }
+
     if (raw.includes('503') || raw.includes('AI_SERVICE_UNAVAILABLE') || raw.includes('Configuration API')) {
-      return 'Configuration API en cours sur le serveur.';
+      return {
+        type: 'server' as const,
+        title: 'Configuration API requise',
+        message: parsed?.message || 'Configuration API en cours sur le serveur.',
+      };
     }
-    if (raw && raw !== 'An error occurred.') {
-      return raw;
-    }
-    return 'Service IA temporairement indisponible. Veuillez réessayer dans un instant.';
+
+    return {
+      type: 'general' as const,
+      title: 'Information sur le service IA',
+      message: parsed?.message || (raw && raw !== 'An error occurred.' ? raw : 'Service IA temporairement indisponible. Veuillez réessayer dans un instant.'),
+    };
   };
 
   const { messages, input, handleInputChange, handleSubmit, isLoading, setInput, reload, error, stop } = useChat({
@@ -76,13 +126,19 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
     onError: (err) => {
       console.error('[AI Chat Error]:', err);
       let errMsg = err.message || '';
+      let isGuest = false;
       try {
         const parsed = JSON.parse(err.message);
         if (parsed?.error) errMsg = `${parsed.error} ${parsed.message || ''}`;
+        if (parsed?.guest === true) isGuest = true;
       } catch {
         // Not JSON
       }
-      if (
+      if (errMsg.includes('RATE_LIMIT_EXCEEDED') || errMsg.includes('429')) {
+        setRateLimitCooldown(10);
+      } else if (isGuest || errMsg.includes('session d\'essai') || errMsg.includes('3 messages')) {
+        // Afficher l'invitation à se connecter
+      } else if (
         errMsg.includes('QUOTA') || 
         errMsg.includes('403') || 
         errMsg.includes('quota') ||
@@ -215,58 +271,86 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
           </div>
         )}
 
-        {error && !streamTimeoutHit && (
-          <div className="bg-red-50 border border-red-200 text-red-700 p-3.5 rounded-2xl text-sm shadow-xs space-y-2.5">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-start gap-2.5">
-                <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-red-600" />
-                <div>
-                  <p className="font-semibold text-red-900">
-                    {getErrorMessage(error).includes('Configuration API')
-                      ? 'Configuration API requise'
-                      : getErrorMessage(error).includes('session d\'essai') || getErrorMessage(error).includes('Quota')
-                        ? 'Limite d\'utilisation atteinte'
-                        : 'Information sur le service IA'}
-                  </p>
-                  <p className="text-xs text-red-700 mt-0.5 leading-relaxed">
-                    {getErrorMessage(error)}
-                  </p>
+        {error && !streamTimeoutHit && (() => {
+          const info = getErrorInfo(error);
+          if (!info) return null;
+          const isRateLimit = info.type === 'ratelimit';
+          const isGuestQuota = info.type === 'guest_quota';
+          const isCooldownActive = isRateLimit && rateLimitCooldown !== null && rateLimitCooldown > 0;
+
+          return (
+            <div className={`p-3.5 rounded-2xl text-sm shadow-xs space-y-2.5 ${
+              isRateLimit
+                ? 'bg-amber-50 border border-amber-200 text-amber-900'
+                : 'bg-red-50 border border-red-200 text-red-700'
+            }`}>
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-2.5">
+                  <AlertCircle className={`w-4 h-4 mt-0.5 shrink-0 ${isRateLimit ? 'text-amber-600' : 'text-red-600'}`} />
+                  <div>
+                    <p className={`font-semibold ${isRateLimit ? 'text-amber-950' : 'text-red-900'}`}>
+                      {info.title}
+                    </p>
+                    <p className={`text-xs mt-0.5 leading-relaxed ${isRateLimit ? 'text-amber-800' : 'text-red-700'}`}>
+                      {info.message}
+                    </p>
+                  </div>
                 </div>
+                <button
+                  type="button"
+                  disabled={isCooldownActive}
+                  onClick={() => { setStreamTimeoutHit(false); reload(); }}
+                  className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1.5 rounded-lg transition-colors shrink-0 shadow-2xs ${
+                    isRateLimit
+                      ? isCooldownActive
+                        ? 'bg-amber-100 text-amber-500 border border-amber-300 cursor-not-allowed opacity-60'
+                        : 'bg-white text-amber-900 border border-amber-300 hover:bg-amber-100'
+                      : 'bg-white text-red-700 border border-red-200 hover:bg-red-100'
+                  }`}
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isCooldownActive ? 'animate-spin' : ''}`} />
+                  {isCooldownActive ? `${rateLimitCooldown}s` : 'Réessayer'}
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => { setStreamTimeoutHit(false); reload(); }}
-                className="flex items-center gap-1 text-xs font-bold bg-white text-red-700 border border-red-200 px-2.5 py-1.5 rounded-lg hover:bg-red-100 transition-colors shrink-0 shadow-2xs"
-              >
-                <RefreshCw className="w-3.5 h-3.5" /> Réessayer
-              </button>
+              <div className={`pt-2 border-t flex items-center justify-between text-xs ${
+                isRateLimit ? 'border-amber-200/60' : 'border-red-200/60'
+              }`}>
+                <span className={isRateLimit ? 'text-amber-800/80' : 'text-red-700/80'}>
+                  {isGuestQuota
+                    ? 'Débloquez plus de messages gratuits :'
+                    : info.type === 'quota'
+                      ? 'Débloquez des conversations illimitées :'
+                      : 'Besoin de vous entraîner sans IA ?'}
+                </span>
+                {isGuestQuota ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowAuthModal(true)}
+                    className="font-bold underline text-[#1B2A4A] hover:text-[#C9A05C] ml-2"
+                  >
+                    Se connecter
+                  </button>
+                ) : info.type === 'quota' ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowPaywall(true)}
+                    className="font-bold underline hover:text-red-900 ml-2"
+                  >
+                    Passer Pro
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="font-bold underline hover:opacity-80 ml-2"
+                  >
+                    Dialogues guidés
+                  </button>
+                )}
+              </div>
             </div>
-            <div className="pt-2 border-t border-red-200/60 flex items-center justify-between text-xs">
-              <span className="text-red-700/80">
-                {getErrorMessage(error).includes('session d\'essai') || getErrorMessage(error).includes('Quota')
-                  ? 'Débloquez des conversations illimitées :'
-                  : 'Besoin de vous entraîner sans IA ?'}
-              </span>
-              {getErrorMessage(error).includes('session d\'essai') || getErrorMessage(error).includes('Quota') ? (
-                <button
-                  type="button"
-                  onClick={() => setShowPaywall(true)}
-                  className="font-bold underline hover:text-red-900 ml-2"
-                >
-                  Passer Pro
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="font-bold underline hover:text-red-900 ml-2"
-                >
-                  Dialogues guidés
-                </button>
-              )}
-            </div>
-          </div>
-        )}
+          );
+        })()}
 
       {streamTimeoutHit && (
           <div className="bg-amber-50 border border-amber-200 text-amber-900 p-3 rounded-2xl text-sm flex items-center justify-between shadow-xs">
@@ -405,6 +489,16 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
       
 
       {showPaywall && <PaywallModal source="ai_quota_exceeded" onClose={() => setShowPaywall(false)} />}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={() => {
+          setShowAuthModal(false);
+          supabase.auth.getSession().then(({ data }) => {
+            if (data.session) setToken(data.session.access_token);
+          });
+        }}
+      />
     </div>
   );
 }

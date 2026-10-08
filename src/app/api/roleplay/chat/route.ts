@@ -9,6 +9,8 @@ import crypto from 'crypto';
 
 export const maxDuration = 30;
 
+import { sanitizeHistory } from '@/lib/ai/sanitizeHistory';
+
 export async function POST(req: NextRequest) {
   try {
     const origin = req.headers.get('origin');
@@ -90,7 +92,7 @@ export async function POST(req: NextRequest) {
     const messages = body?.messages;
     const personaParam = (body?.personaId || body?.persona) as PersonaId;
 
-    // 4. Payload Validation
+    // 4. Payload Validation & History Sanitization
     if (!messages || !Array.isArray(messages)) {
       return new Response('Messages array is required', { status: 400 });
     }
@@ -99,13 +101,24 @@ export async function POST(req: NextRequest) {
       return new Response('Maximum context length exceeded', { status: 400 });
     }
 
-    const lastMessage = messages[messages.length - 1];
+    const normalizedHistory = sanitizeHistory(messages);
+    if (!normalizedHistory) {
+      return new Response(JSON.stringify({
+        error: 'INVALID_HISTORY',
+        message: "Le dernier message doit provenir de l'utilisateur."
+      }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const lastMessage = normalizedHistory[normalizedHistory.length - 1];
     if (lastMessage?.content && lastMessage.content.length > 500) {
       return new Response('Message exceeds maximum length of 500 characters', { status: 400 });
     }
 
-    const totalChars = messages.reduce(
-      (sum: number, m: CoreMessage) => sum + (typeof m.content === 'string' ? m.content.length : 0),
+    const totalChars = normalizedHistory.reduce(
+      (sum: number, m) => sum + m.content.length,
       0
     );
     if (totalChars > 4000) return new Response('Payload too large', { status: 400 });
@@ -177,7 +190,7 @@ export async function POST(req: NextRequest) {
         result = await streamText({
           model: googleProvider(modelToTry),
           system: systemPrompt,
-          messages,
+          messages: normalizedHistory as CoreMessage[],
           temperature: 0.7,
           maxTokens: 300,
           maxRetries: 0,
@@ -208,7 +221,25 @@ export async function POST(req: NextRequest) {
     const status =
       (error as { status?: number; statusCode?: number } | undefined)?.status ??
       (error as { status?: number; statusCode?: number } | undefined)?.statusCode;
-    console.error('API Roleplay Chat Error:', errMsg, '| upstream status:', status);
+
+    console.error('[Roleplay Chat Error Details]:', {
+      status,
+      message: errMsg,
+      cause: (error as Error)?.cause,
+    });
+
+    // Gestion du Rate-Limit Google (429 / RESOURCE_EXHAUSTED)
+    if (
+      status === 429 ||
+      errMsg.includes('429') ||
+      errMsg.includes('RESOURCE_EXHAUSTED') ||
+      errMsg.includes('Resource exhausted')
+    ) {
+      return new Response(JSON.stringify({
+        error: 'RATE_LIMIT_EXCEEDED',
+        message: "L'agent reprend son souffle ! Veuillez patienter quelques secondes avant d'envoyer votre prochain message.",
+      }), { status: 429, headers: { 'Content-Type': 'application/json' } });
+    }
 
     const isAuth =
       status === 401 ||
@@ -223,23 +254,15 @@ export async function POST(req: NextRequest) {
       errMsg.includes('not found') ||
       errMsg.includes('is not supported');
 
-    const isQuota =
-      status === 429 ||
-      errMsg.includes('quota') ||
-      errMsg.includes('Resource exhausted');
-
-    // Sur erreur 401/403 (clé invalide / permission), 404 (modèle non supporté), 429 (quota) ou 5xx : renvoyer immédiatement HTTP 503
+    // Sur erreur 401/403 (clé invalide / permission), 404 (modèle non supporté) ou 5xx : renvoyer immédiatement HTTP 503
     if (
       isAuth ||
       isNotFound ||
-      isQuota ||
       (status !== undefined && status >= 500)
     ) {
       let clientMsg = 'Service IA temporairement indisponible. Veuillez réessayer dans un instant.';
       if (isAuth) {
         clientMsg = 'Configuration API en cours sur le serveur.';
-      } else if (isQuota) {
-        clientMsg = 'Quota Google Gemini temporairement atteint. Veuillez réessayer dans quelques instants.';
       } else if (isNotFound) {
         clientMsg = 'Modèle Google Gemini introuvable ou non supporté.';
       }

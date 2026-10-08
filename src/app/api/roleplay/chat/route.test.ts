@@ -25,6 +25,7 @@ vi.mock('@supabase/supabase-js', () => ({
 }));
 
 const { POST } = await import('./route');
+const { sanitizeHistory } = await import('@/lib/ai/sanitizeHistory');
 
 beforeEach(() => {
   checkRateLimitMock.mockReset();
@@ -188,7 +189,7 @@ describe('/api/roleplay/chat security & rate limit', () => {
     expect(data.error).toBe('AI_SERVICE_UNAVAILABLE');
   });
 
-  it('renvoie immédiatement HTTP 503 en cas d’erreur 429 upstream (quota LLM épuisé)', async () => {
+  it('renvoie HTTP 429 avec RATE_LIMIT_EXCEEDED en cas d’erreur 429 upstream (quota/rate-limit Google)', async () => {
     checkRateLimitMock.mockResolvedValue({ allowed: true });
     const quotaErr = new Error('Resource exhausted');
     (quotaErr as unknown as { statusCode: number }).statusCode = 429;
@@ -203,8 +204,38 @@ describe('/api/roleplay/chat security & rate limit', () => {
       body: JSON.stringify({ messages: [{ role: 'user', content: 'Salam' }], personaId: 'cafe' }),
     });
     const res = await POST(req as unknown as NextRequest);
-    expect(res.status).toBe(503);
+    expect(res.status).toBe(429);
     const data = await res.json();
-    expect(data.error).toBe('AI_SERVICE_UNAVAILABLE');
+    expect(data.error).toBe('RATE_LIMIT_EXCEEDED');
+    expect(data.message).toContain("L'agent reprend son souffle");
+  });
+
+  it('sanitizeHistory : fusionne deux messages consécutifs et retire un message initial assistant', () => {
+    const input = [
+      { role: 'assistant', content: 'Salam! Marhaban bik.' },
+      { role: 'user', content: 'Labas?' },
+      { role: 'user', content: 'Kidayr?' },
+      { role: 'assistant', content: 'Labas hamdullah.' },
+      { role: 'user', content: 'Fin ghadi?' },
+    ];
+
+    const result = sanitizeHistory(input);
+    expect(result).toEqual([
+      { role: 'user', content: 'Labas?\nKidayr?' },
+      { role: 'assistant', content: 'Labas hamdullah.' },
+      { role: 'user', content: 'Fin ghadi?' },
+    ]);
+  });
+
+  it('sanitizeHistory : filtre les messages vides et rejette si le dernier message n’est pas user', () => {
+    expect(sanitizeHistory([])).toBeNull();
+    expect(sanitizeHistory([{ role: 'assistant', content: 'Salam' }])).toBeNull();
+    expect(sanitizeHistory([
+      { role: 'user', content: 'Salam' },
+      { role: 'assistant', content: 'Labas' },
+    ])).toBeNull();
+    expect(sanitizeHistory([
+      { role: 'user', content: '   ' },
+    ])).toBeNull();
   });
 });
