@@ -141,80 +141,40 @@ export async function POST(req: NextRequest) {
     }
 
     const googleProvider = createGoogleGenerativeAI({ apiKey });
-
-    // Résolution du modèle actif (GEMINI_MODEL > auto-découverte ListModels > gemini-3.8-flash)
-    let activeModel = process.env.GEMINI_MODEL?.trim() || '';
-    if (!activeModel) {
-      try {
-        const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`, {
-          headers: { 'x-goog-api-key': apiKey },
-          signal: AbortSignal.timeout(3000),
-        });
-        if (listRes.ok) {
-          const listData = await listRes.json();
-          const availableModels: string[] = (listData.models || [])
-            .filter((m: { supportedGenerationMethods?: string[] }) =>
-              m.supportedGenerationMethods?.includes('generateContent')
-            )
-            .map((m: { name: string }) => m.name.replace(/^models\//, ''));
-
-          const matched =
-            availableModels.find((m) => m.includes('3.8-flash')) ||
-            availableModels.find((m) => m.includes('3.5-flash') && !m.includes('lite')) ||
-            availableModels.find((m) => m.includes('3.5-flash-lite')) ||
-            availableModels.find((m) => m.includes('flash') && !m.includes('image') && !m.includes('live')) ||
-            availableModels.find((m) => m.includes('flash')) ||
-            availableModels[0];
-
-          if (matched) activeModel = matched;
-        }
-      } catch {
-        // En cas de timeout ou blocage réseau ListModels, repli sur le modèle standard actif
-      }
-    }
-    if (!activeModel) activeModel = 'gemini-3.8-flash';
-
-    const fallbackCandidates = [
-      activeModel,
-      'gemini-3.5-flash',
-      'gemini-3.5-flash-lite',
-      'gemini-2.5-flash',
-      'gemini-1.5-flash-latest',
-    ].filter((v, idx, arr) => arr.indexOf(v) === idx);
+    const targetModel = process.env.GEMINI_MODEL?.trim() || 'gemini-2.5-flash';
 
     let result;
-    let lastErr: unknown;
-
-    for (const modelToTry of fallbackCandidates) {
-      try {
+    try {
+      result = await streamText({
+        model: googleProvider(targetModel),
+        system: systemPrompt,
+        messages: normalizedHistory as CoreMessage[],
+        temperature: 0.7,
+        maxTokens: 300,
+        maxRetries: 0,
+      });
+    } catch (primaryErr: unknown) {
+      const primaryMsg = primaryErr instanceof Error ? primaryErr.message : String(primaryErr);
+      const isNotFound =
+        primaryMsg.includes('not found') ||
+        primaryMsg.includes('404') ||
+        primaryMsg.includes('not supported');
+      if (isNotFound) {
+        console.warn(`[Roleplay Chat] Primary model ${targetModel} not found, falling back to gemini-2.5-flash-lite`);
         result = await streamText({
-          model: googleProvider(modelToTry),
+          model: googleProvider('gemini-2.5-flash-lite'),
           system: systemPrompt,
           messages: normalizedHistory as CoreMessage[],
           temperature: 0.7,
           maxTokens: 300,
           maxRetries: 0,
         });
-        break;
-      } catch (tryErr: unknown) {
-        lastErr = tryErr;
-        const msg = tryErr instanceof Error ? tryErr.message : String(tryErr);
-        const isNotFound =
-          msg.includes('not found') ||
-          msg.includes('404') ||
-          msg.includes('not supported');
-        if (!isNotFound) {
-          throw tryErr;
-        }
-        console.warn(`[Roleplay Chat] Model ${modelToTry} not found/supported, trying next fallback...`);
+      } else {
+        throw primaryErr;
       }
     }
 
-    if (!result) {
-      throw lastErr;
-    }
-
-    // Return the streaming response
+    // Return the streaming response immediately
     return result.toDataStreamResponse();
   } catch (error: unknown) {
     const errMsg = error instanceof Error ? error.message : String(error);

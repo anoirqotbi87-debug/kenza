@@ -149,13 +149,14 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
     }
   });
 
-  // Sécurise le stream : si la réponse tarde plus que STREAM_TIMEOUT_MS,
-  // on arrête le spinner, on réactive l'envoi et on prévient l'utilisateur.
+  // Sécurise le stream : délai de 30 secondes pour les démarrages à froid.
+  // Dès que le premier chunk de texte arrive via le stream, on annule immédiatement le timeout.
   const streamTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [streamTimeoutHit, setStreamTimeoutHit] = useState(false);
 
   useEffect(() => {
     if (isLoading) {
+      if (streamTimeoutRef.current) clearTimeout(streamTimeoutRef.current);
       streamTimeoutRef.current = setTimeout(() => {
         setStreamTimeoutHit(true);
         stop();
@@ -175,6 +176,18 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
       }
     };
   }, [isLoading, stop]);
+
+  // Annulation immédiate du timeout dès l'arrivée du premier chunk de texte
+  useEffect(() => {
+    if (!isLoading) return;
+    const lastMsg = messages[messages.length - 1];
+    if (lastMsg && lastMsg.role === 'assistant' && lastMsg.content && lastMsg.content.trim().length > 0) {
+      if (streamTimeoutRef.current) {
+        clearTimeout(streamTimeoutRef.current);
+        streamTimeoutRef.current = null;
+      }
+    }
+  }, [messages, isLoading]);
 
   const { isSupported, isListening, transcript, startListening, stopListening } = useVoiceRecognition('ar-MA', 10000);
 
