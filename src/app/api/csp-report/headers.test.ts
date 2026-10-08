@@ -58,11 +58,10 @@ describe('assainissement de la CSP', () => {
     expect(await csp()).toContain("script-src 'self' 'unsafe-inline'");
   });
 
-  it('ne référence plus les domaines Google Fonts (polices auto-hébergées)', async () => {
+  it('autorise Vercel Live et fonts.gstatic.com dans font-src pour la Vercel Toolbar', async () => {
     const value = await csp();
     expect(value).not.toContain('fonts.googleapis.com');
-    expect(value).not.toContain('fonts.gstatic.com');
-    expect(value).toContain("font-src 'self'");
+    expect(value).toContain("font-src 'self' data: https://fonts.gstatic.com https://vercel.live");
   });
 
   it("n'autorise plus `https:` en bloc pour les images, mais blanchit les avatars Google OAuth", async () => {

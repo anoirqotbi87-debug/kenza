@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
     let result;
     try {
       result = await streamText({
-        model: googleProvider('gemini-1.5-flash-latest'),
+        model: googleProvider('gemini-2.5-flash'),
         system: systemPrompt,
         messages,
         temperature: 0.7,
@@ -145,27 +145,15 @@ export async function POST(req: NextRequest) {
         primaryMsg.includes('404') ||
         primaryMsg.includes('not supported');
       if (isNotFound) {
-        console.warn('[Roleplay Chat] Primary model gemini-1.5-flash-latest failed with 404, falling back to gemini-1.5-flash-001');
-        try {
-          result = await streamText({
-            model: googleProvider('gemini-1.5-flash-001'),
-            system: systemPrompt,
-            messages,
-            temperature: 0.7,
-            maxTokens: 300,
-            maxRetries: 0,
-          });
-        } catch {
-          console.warn('[Roleplay Chat] Fallback to gemini-1.5-pro-latest');
-          result = await streamText({
-            model: googleProvider('gemini-1.5-pro-latest'),
-            system: systemPrompt,
-            messages,
-            temperature: 0.7,
-            maxTokens: 300,
-            maxRetries: 0,
-          });
-        }
+        console.warn('[Roleplay Chat] Primary model gemini-2.5-flash failed with 404, falling back to gemini-2.5-flash-lite');
+        result = await streamText({
+          model: googleProvider('gemini-2.5-flash-lite'),
+          system: systemPrompt,
+          messages,
+          temperature: 0.7,
+          maxTokens: 300,
+          maxRetries: 0,
+        });
       } else {
         throw primaryErr;
       }

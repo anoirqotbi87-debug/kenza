@@ -29,9 +29,7 @@ const contentSecurityPolicy = [
   // (aperçus de dev/production) sans ouvrir un `https:` générique.
   "script-src 'self' 'unsafe-inline' https://vercel.live",
   "style-src 'self' 'unsafe-inline'",
-  // Les polices sont auto-hébergées par `next/font/google` (servies depuis
-  // `/_next/static/media/`) : les domaines Google sont donc inutiles.
-  "font-src 'self'",
+  "font-src 'self' data: https://fonts.gstatic.com https://vercel.live",
   // `https:` retiré : il autorisait l'envoi de données vers n'importe quel
   // domaine. Les avatars Google OAuth sont chargés depuis un sous-domaine
   // `lh3.googleusercontent.com` (identifié par l'audit `csp_violations`).
