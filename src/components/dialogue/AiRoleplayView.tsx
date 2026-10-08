@@ -58,8 +58,12 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
     } catch {
       // Not JSON
     }
-    if (err.message && err.message !== 'An error occurred.') {
-      return err.message;
+    const raw = err.message || '';
+    if (raw.includes('503') || raw.includes('AI_SERVICE_UNAVAILABLE') || raw.includes('Configuration API')) {
+      return 'Configuration API en cours sur le serveur.';
+    }
+    if (raw && raw !== 'An error occurred.') {
+      return raw;
     }
     return 'Service IA temporairement indisponible. Veuillez réessayer dans un instant.';
   };
@@ -217,7 +221,13 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
               <div className="flex items-start gap-2.5">
                 <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-red-600" />
                 <div>
-                  <p className="font-semibold text-red-900">Erreur de communication avec l'agent</p>
+                  <p className="font-semibold text-red-900">
+                    {getErrorMessage(error).includes('Configuration API')
+                      ? 'Configuration API requise'
+                      : getErrorMessage(error).includes('session d\'essai') || getErrorMessage(error).includes('Quota')
+                        ? 'Limite d\'utilisation atteinte'
+                        : 'Information sur le service IA'}
+                  </p>
                   <p className="text-xs text-red-700 mt-0.5 leading-relaxed">
                     {getErrorMessage(error)}
                   </p>
@@ -232,14 +242,28 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
               </button>
             </div>
             <div className="pt-2 border-t border-red-200/60 flex items-center justify-between text-xs">
-              <span className="text-red-700/80">Besoin de vous entraîner sans IA ?</span>
-              <button
-                type="button"
-                onClick={onClose}
-                className="font-bold underline hover:text-red-900 ml-2"
-              >
-                Dialogues guidés
-              </button>
+              <span className="text-red-700/80">
+                {getErrorMessage(error).includes('session d\'essai') || getErrorMessage(error).includes('Quota')
+                  ? 'Débloquez des conversations illimitées :'
+                  : 'Besoin de vous entraîner sans IA ?'}
+              </span>
+              {getErrorMessage(error).includes('session d\'essai') || getErrorMessage(error).includes('Quota') ? (
+                <button
+                  type="button"
+                  onClick={() => setShowPaywall(true)}
+                  className="font-bold underline hover:text-red-900 ml-2"
+                >
+                  Passer Pro
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="font-bold underline hover:text-red-900 ml-2"
+                >
+                  Dialogues guidés
+                </button>
+              )}
             </div>
           </div>
         )}

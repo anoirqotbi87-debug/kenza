@@ -123,16 +123,16 @@ export async function POST(req: NextRequest) {
       console.error('[Roleplay Chat] Missing Google Gemini API key');
       return new Response(JSON.stringify({
         error: 'AI_SERVICE_UNAVAILABLE',
-        message: 'Service IA momentanément indisponible (clé API non configurée).'
+        message: 'Configuration API en cours sur le serveur.'
       }), { status: 503, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const google = createGoogleGenerativeAI({ apiKey });
+    const googleProvider = createGoogleGenerativeAI({ apiKey });
     const primaryModel = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
     let result;
     try {
       result = await streamText({
-        model: google(primaryModel),
+        model: googleProvider(primaryModel),
         system: systemPrompt,
         messages,
         temperature: 0.7,
@@ -145,7 +145,7 @@ export async function POST(req: NextRequest) {
       if (isNotFound && primaryModel !== 'gemini-2.0-flash') {
         console.warn(`[Roleplay Chat] Primary model ${primaryModel} failed with 404, falling back to gemini-2.0-flash`);
         result = await streamText({
-          model: google('gemini-2.0-flash'),
+          model: googleProvider('gemini-2.0-flash'),
           system: systemPrompt,
           messages,
           temperature: 0.7,
@@ -193,7 +193,7 @@ export async function POST(req: NextRequest) {
     ) {
       let clientMsg = 'Service IA temporairement indisponible. Veuillez réessayer dans un instant.';
       if (isAuth) {
-        clientMsg = 'Service IA momentanément indisponible : clé Google Gemini invalide ou expirée.';
+        clientMsg = 'Configuration API en cours sur le serveur.';
       } else if (isQuota) {
         clientMsg = 'Quota Google Gemini temporairement atteint. Veuillez réessayer dans quelques instants.';
       } else if (isNotFound) {
