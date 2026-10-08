@@ -128,34 +128,15 @@ export async function POST(req: NextRequest) {
     }
 
     const googleProvider = createGoogleGenerativeAI({ apiKey });
-    const primaryModel = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
-    let result;
-    try {
-      result = await streamText({
-        model: googleProvider(primaryModel),
-        system: systemPrompt,
-        messages,
-        temperature: 0.7,
-        maxTokens: 300, // Short responses
-        maxRetries: 0, // Pas de retry long
-      });
-    } catch (primaryErr: unknown) {
-      const primaryMsg = primaryErr instanceof Error ? primaryErr.message : String(primaryErr);
-      const isNotFound = primaryMsg.includes('not found') || primaryMsg.includes('404');
-      if (isNotFound && primaryModel !== 'gemini-2.0-flash') {
-        console.warn(`[Roleplay Chat] Primary model ${primaryModel} failed with 404, falling back to gemini-2.0-flash`);
-        result = await streamText({
-          model: googleProvider('gemini-2.0-flash'),
-          system: systemPrompt,
-          messages,
-          temperature: 0.7,
-          maxTokens: 300,
-          maxRetries: 0,
-        });
-      } else {
-        throw primaryErr;
-      }
-    }
+    // Modèle officiel stable Google AI Studio garanti (sans models/ ni variable d'environnement obsolète)
+    const result = await streamText({
+      model: googleProvider('gemini-1.5-flash'),
+      system: systemPrompt,
+      messages,
+      temperature: 0.7,
+      maxTokens: 300, // Short responses
+      maxRetries: 0, // Pas de retry long
+    });
 
     // Return the streaming response
     return result.toDataStreamResponse();

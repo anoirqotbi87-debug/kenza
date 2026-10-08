@@ -5,7 +5,7 @@ import { useAppStore, useTranslation } from '../../store/useAppStore';
 import { Volume2 } from 'lucide-react';
 import { playAudio } from '../../lib/audio';
 
-type GrammarRule = 'present' | 'negation' | 'future' | 'possession';
+type GrammarRule = 'present' | 'past' | 'future' | 'negation' | 'possession';
 
 interface RuleExample {
   person: string;
@@ -30,8 +30,8 @@ export default function ConjugationTable() {
   const { preferredNotation, soundEnabled } = useAppStore();
   const { t } = useTranslation();
 
-  const handlePlay = (text: string) => {
-    playAudio(text, undefined, soundEnabled);
+  const handlePlay = (arabicText: string, arabiziText?: string) => {
+    playAudio(arabiziText || arabicText, arabicText, soundEnabled);
   };
 
   const { lang } = useTranslation();
@@ -57,17 +57,56 @@ export default function ConjugationTable() {
     present: {
       title: { fr: "Le présent", en: "Present", es: "Presente", ar: "المضارع" },
       description: {
-        fr: "On ajoute le préfixe 'ka-' suivi du marqueur de personne.",
-        en: "Add the prefix 'ka-' followed by the person marker.",
-        es: "Añadimos el prefijo 'ka-' seguido del marcador de persona.",
-        ar: "نضيف البادئة 'ka-' متبوعة بعلامة الشخص."
+        fr: "On ajoute le préfixe 'ka-' suivi du marqueur de personne (n-, t-, y-).",
+        en: "Add the prefix 'ka-' followed by the person marker (n-, t-, y-).",
+        es: "Añadimos el prefijo 'ka-' seguido del marcador de persona (n-, t-, y-).",
+        ar: "نضيف البادئة 'ka-' متبوعة بعلامة الشخص (n-, t-, y-)."
       },
       examples: [
-        { person: "Ana", prefix: "ka-n", verb: "kteb", suffix: "", arabic: "كانكتب" },
-        { person: "Nta", prefix: "ka-t", verb: "kteb", suffix: "", arabic: "كاتكتب" },
-        { person: "Nti", prefix: "ka-t", verb: "ketb", suffix: "i", arabic: "كاتكتبي" },
-        { person: "Houwa", prefix: "ka-y", verb: "kteb", suffix: "", arabic: "كايكتب" },
-        { person: "Hiya", prefix: "ka-t", verb: "kteb", suffix: "", arabic: "كاتكتب" },
+        { person: "Ana", prefix: "ka-n", verb: "kteb", suffix: "", arabic: "كَانْكْتَبْ", translation: "J'écris" },
+        { person: "Nta", prefix: "ka-t", verb: "kteb", suffix: "", arabic: "كَاتْكْتَبْ", translation: "Tu écris (m)" },
+        { person: "Nti", prefix: "ka-t", verb: "ketb", suffix: "i", arabic: "كَاتْكْتْبِي", translation: "Tu écris (f)" },
+        { person: "Houwa", prefix: "ka-y", verb: "kteb", suffix: "", arabic: "كَايْكْتَبْ", translation: "Il écrit" },
+        { person: "Hiya", prefix: "ka-t", verb: "kteb", suffix: "", arabic: "كَاتْكْتَبْ", translation: "Elle écrit" },
+        { person: "Hna", prefix: "ka-n", verb: "ketb", suffix: "ou", arabic: "كَانْكْتْبُو", translation: "Nous écrivons" },
+        { person: "Ntoma", prefix: "ka-t", verb: "ketb", suffix: "ou", arabic: "كَاتْكْتْبُو", translation: "Vous écrivez" },
+        { person: "Houma", prefix: "ka-y", verb: "ketb", suffix: "ou", arabic: "كَايْكْتْبُو", translation: "Ils écrivent" },
+      ]
+    },
+    past: {
+      title: { fr: "Le passé", en: "Past", es: "Pasado", ar: "الماضي" },
+      description: {
+        fr: "Le verbe au passé se conjugue en ajoutant des suffixes de personne (-t, -ti, -at, -na, -tou, -ou).",
+        en: "The past tense is conjugated by adding person suffixes (-t, -ti, -at, -na, -tou, -ou).",
+        es: "El pasado se conjuga añadiendo sufijos de persona (-t, -ti, -at, -na, -tou, -ou).",
+        ar: "يُصرف الفعل في الماضي بإضافة لواحق الشخص (-t, -ti, -at, -na, -tou, -ou)."
+      },
+      examples: [
+        { person: "Ana", prefix: "", verb: "kteb", suffix: "t", arabic: "كْتَبْتْ", translation: "J'ai écrit" },
+        { person: "Nta", prefix: "", verb: "kteb", suffix: "ti", arabic: "كْتَبْتِي", translation: "Tu as écrit (m)" },
+        { person: "Nti", prefix: "", verb: "kteb", suffix: "ti", arabic: "كْتَبْتِي", translation: "Tu as écrit (f)" },
+        { person: "Houwa", prefix: "", verb: "kteb", suffix: "", arabic: "كْتَبْ", translation: "Il a écrit" },
+        { person: "Hiya", prefix: "", verb: "ketb", suffix: "at", arabic: "كْتْبَاتْ", translation: "Elle a écrit" },
+        { person: "Hna", prefix: "", verb: "kteb", suffix: "na", arabic: "كْتَبْنَا", translation: "Nous avons écrit" },
+        { person: "Ntoma", prefix: "", verb: "kteb", suffix: "tou", arabic: "كْتَبْتُو", translation: "Vous avez écrit" },
+        { person: "Houma", prefix: "", verb: "ketb", suffix: "ou", arabic: "كْتْبُو", translation: "Ils ont écrit" },
+      ]
+    },
+    future: {
+      title: { fr: "Le futur", en: "Future", es: "Futuro", ar: "المستقبل" },
+      description: {
+        fr: "On utilise la particule 'ghadi' + le verbe sans 'ka-'.",
+        en: "Use the particle 'ghadi' + the verb without 'ka-'.",
+        es: "Usamos la partícula 'ghadi' + el verbo sin 'ka-'.",
+        ar: "نستخدم الأداة 'ghadi' + الفعل بدون 'ka-'."
+      },
+      examples: [
+        { person: "Ana", prefix: "ghadi ", verb: "nkteb", suffix: "", arabic: "غَادِي نْكْتَبْ", translation: "Je vais écrire" },
+        { person: "Nta", prefix: "ghadi ", verb: "tkteb", suffix: "", arabic: "غَادِي تْكْتَبْ", translation: "Tu vas écrire (m)" },
+        { person: "Nti", prefix: "ghadya ", verb: "tketbi", suffix: "", arabic: "غَادْيَة تْكْتْبِي", translation: "Tu vas écrire (f)" },
+        { person: "Houwa", prefix: "ghadi ", verb: "ykteb", suffix: "", arabic: "غَادِي يْكْتَبْ", translation: "Il va écrire" },
+        { person: "Ana", prefix: "ghadi ", verb: "nmchi", suffix: "", arabic: "غَادِي نْمْشِي", translation: "Je vais partir" },
+        { person: "Nta", prefix: "ghadi ", verb: "tmchi", suffix: "", arabic: "غَادِي تْمْشِي", translation: "Tu vas partir" },
       ]
     },
     negation: {
@@ -79,23 +118,13 @@ export default function ConjugationTable() {
         ar: "نضع الفعل بين 'ma-' قبله و '-ch' بعده."
       },
       examples: [
-        { person: "Positif", prefix: "fhem", verb: "t", suffix: "", arabic: "فهمت", translation: "J'ai compris" },
-        { person: "Négatif", prefix: "ma-fhem-t", verb: "-ch", suffix: "", arabic: "مافهمتش", translation: "Je n'ai pas compris" },
-        { person: "Positif", prefix: "ka-n", verb: "akol", suffix: "", arabic: "كاناكل", translation: "Je mange" },
-        { person: "Négatif", prefix: "ma-ka-n", verb: "akol", suffix: "-ch", arabic: "ماكاناكلش", translation: "Je ne mange pas" },
-      ]
-    },
-    future: {
-      title: { fr: "Le futur", en: "Future", es: "Futuro", ar: "المستقبل" },
-      description: {
-        fr: "On utilise la particule invariable 'ghadi' + le verbe sans 'ka-'.",
-        en: "Use the invariable particle 'ghadi' + the verb without 'ka-'.",
-        es: "Usamos la partícula invariable 'ghadi' + el verbo sin 'ka-'.",
-        ar: "نستخدم الأداة الثابتة 'ghadi' + الفعل بدون 'ka-'."
-      },
-      examples: [
-        { person: "Ana", prefix: "ghadi ", verb: "nmchi", suffix: "", arabic: "غادي نمشي", translation: "Je vais partir" },
-        { person: "Nta", prefix: "ghadi ", verb: "tmchi", suffix: "", arabic: "غادي تمشي", translation: "Tu vas partir" },
+        { person: "Positif", prefix: "", verb: "fhem", suffix: "t", arabic: "فْهَمْتْ", translation: "J'ai compris" },
+        { person: "Négatif", prefix: "ma-", verb: "fhem-t", suffix: "-ch", arabic: "مَا فْهَمْتْشْ", translation: "Je n'ai pas compris" },
+        { person: "Positif", prefix: "ka-n", verb: "kteb", suffix: "", arabic: "كَانْكْتَبْ", translation: "J'écris" },
+        { person: "Négatif", prefix: "ma-ka-n", verb: "kteb", suffix: "-ch", arabic: "مَا كَانْكْتَبْشْ", translation: "Je n'écris pas" },
+        { person: "Négatif", prefix: "ma-", verb: "kteb-t", suffix: "-ch", arabic: "مَا كْتَبْتْشْ", translation: "Je n'ai pas écrit" },
+        { person: "Positif", prefix: "ka-n", verb: "akol", suffix: "", arabic: "كَا نَاكُلْ", translation: "Je mange" },
+        { person: "Négatif", prefix: "ma-ka-n", verb: "akol", suffix: "-ch", arabic: "مَا كَا نَاكُلْشْ", translation: "Je ne mange pas" },
       ]
     },
     possession: {
@@ -107,9 +136,11 @@ export default function ConjugationTable() {
         ar: "تُستخدم كلمة 'dyal' (لـ) غالباً للتعبير عن الانتماء."
       },
       examples: [
-        { person: "À moi", prefix: "dyal", verb: "i", suffix: "", arabic: "ديالي", translation: "L-ktab dyali" },
-        { person: "À toi", prefix: "dyal", verb: "ek", suffix: "", arabic: "ديالك", translation: "T-tonobil dyalek" },
-        { person: "À lui", prefix: "dyal", verb: "o", suffix: "", arabic: "ديالو", translation: "D-dar dyalo" },
+        { person: "À moi", prefix: "dyal", verb: "i", suffix: "", arabic: "دْيَالِي", translation: "L-ktab dyali" },
+        { person: "À toi", prefix: "dyal", verb: "ek", suffix: "", arabic: "دْيَالَكْ", translation: "T-tonobil dyalek" },
+        { person: "À lui", prefix: "dyal", verb: "o", suffix: "", arabic: "دْيَالُو", translation: "D-dar dyalo" },
+        { person: "À elle", prefix: "dyal", verb: "ha", suffix: "", arabic: "دْيَالْهَا", translation: "D-dar dyalha" },
+        { person: "À nous", prefix: "dyal", verb: "na", suffix: "", arabic: "دْيَالْنَا", translation: "D-dar dyalna" },
       ]
     }
   };
@@ -166,8 +197,9 @@ export default function ConjugationTable() {
                 </div>
               </div>
               <button 
-                onClick={() => handlePlay(ex.arabic)}
+                onClick={() => handlePlay(ex.arabic, `${ex.prefix}${ex.verb}${ex.suffix}`.trim())}
                 className="p-3 bg-white border border-slate-200 rounded-full text-slate-400 hover:text-blue-500 hover:border-blue-200 shadow-sm transition-all"
+                title="Écouter la prononciation"
               >
                 <Volume2 className="w-5 h-5" />
               </button>
