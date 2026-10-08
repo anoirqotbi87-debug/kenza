@@ -193,7 +193,7 @@ export async function POST(req: NextRequest) {
     ) {
       let clientMsg = 'Service IA temporairement indisponible. Veuillez réessayer dans un instant.';
       if (isAuth) {
-        clientMsg = 'Service IA momentanément indisponible : clé Google Gemini invalide ou expirée (doit commencer par AIzaSy...).';
+        clientMsg = 'Service IA momentanément indisponible : clé Google Gemini invalide ou expirée.';
       } else if (isQuota) {
         clientMsg = 'Quota Google Gemini temporairement atteint. Veuillez réessayer dans quelques instants.';
       } else if (isNotFound) {
