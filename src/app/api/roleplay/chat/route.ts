@@ -128,15 +128,48 @@ export async function POST(req: NextRequest) {
     }
 
     const googleProvider = createGoogleGenerativeAI({ apiKey });
-    // Modèle officiel stable Google AI Studio garanti (sans models/ ni variable d'environnement obsolète)
-    const result = await streamText({
-      model: googleProvider('gemini-1.5-flash'),
-      system: systemPrompt,
-      messages,
-      temperature: 0.7,
-      maxTokens: 300, // Short responses
-      maxRetries: 0, // Pas de retry long
-    });
+    let result;
+    try {
+      result = await streamText({
+        model: googleProvider('gemini-1.5-flash-latest'),
+        system: systemPrompt,
+        messages,
+        temperature: 0.7,
+        maxTokens: 300, // Short responses
+        maxRetries: 0, // Pas de retry long
+      });
+    } catch (primaryErr: unknown) {
+      const primaryMsg = primaryErr instanceof Error ? primaryErr.message : String(primaryErr);
+      const isNotFound =
+        primaryMsg.includes('not found') ||
+        primaryMsg.includes('404') ||
+        primaryMsg.includes('not supported');
+      if (isNotFound) {
+        console.warn('[Roleplay Chat] Primary model gemini-1.5-flash-latest failed with 404, falling back to gemini-1.5-flash-001');
+        try {
+          result = await streamText({
+            model: googleProvider('gemini-1.5-flash-001'),
+            system: systemPrompt,
+            messages,
+            temperature: 0.7,
+            maxTokens: 300,
+            maxRetries: 0,
+          });
+        } catch {
+          console.warn('[Roleplay Chat] Fallback to gemini-1.5-pro-latest');
+          result = await streamText({
+            model: googleProvider('gemini-1.5-pro-latest'),
+            system: systemPrompt,
+            messages,
+            temperature: 0.7,
+            maxTokens: 300,
+            maxRetries: 0,
+          });
+        }
+      } else {
+        throw primaryErr;
+      }
+    }
 
     // Return the streaming response
     return result.toDataStreamResponse();
