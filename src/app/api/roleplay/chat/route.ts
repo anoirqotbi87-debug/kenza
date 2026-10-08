@@ -128,35 +128,77 @@ export async function POST(req: NextRequest) {
     }
 
     const googleProvider = createGoogleGenerativeAI({ apiKey });
+
+    // Résolution du modèle actif (GEMINI_MODEL > auto-découverte ListModels > gemini-3.8-flash)
+    let activeModel = process.env.GEMINI_MODEL?.trim() || '';
+    if (!activeModel) {
+      try {
+        const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`, {
+          headers: { 'x-goog-api-key': apiKey },
+          signal: AbortSignal.timeout(3000),
+        });
+        if (listRes.ok) {
+          const listData = await listRes.json();
+          const availableModels: string[] = (listData.models || [])
+            .filter((m: { supportedGenerationMethods?: string[] }) =>
+              m.supportedGenerationMethods?.includes('generateContent')
+            )
+            .map((m: { name: string }) => m.name.replace(/^models\//, ''));
+
+          const matched =
+            availableModels.find((m) => m.includes('3.8-flash')) ||
+            availableModels.find((m) => m.includes('3.5-flash') && !m.includes('lite')) ||
+            availableModels.find((m) => m.includes('3.5-flash-lite')) ||
+            availableModels.find((m) => m.includes('flash') && !m.includes('image') && !m.includes('live')) ||
+            availableModels.find((m) => m.includes('flash')) ||
+            availableModels[0];
+
+          if (matched) activeModel = matched;
+        }
+      } catch {
+        // En cas de timeout ou blocage réseau ListModels, repli sur le modèle standard actif
+      }
+    }
+    if (!activeModel) activeModel = 'gemini-3.8-flash';
+
+    const fallbackCandidates = [
+      activeModel,
+      'gemini-3.5-flash',
+      'gemini-3.5-flash-lite',
+      'gemini-2.5-flash',
+      'gemini-1.5-flash-latest',
+    ].filter((v, idx, arr) => arr.indexOf(v) === idx);
+
     let result;
-    try {
-      result = await streamText({
-        model: googleProvider('gemini-2.5-flash'),
-        system: systemPrompt,
-        messages,
-        temperature: 0.7,
-        maxTokens: 300, // Short responses
-        maxRetries: 0, // Pas de retry long
-      });
-    } catch (primaryErr: unknown) {
-      const primaryMsg = primaryErr instanceof Error ? primaryErr.message : String(primaryErr);
-      const isNotFound =
-        primaryMsg.includes('not found') ||
-        primaryMsg.includes('404') ||
-        primaryMsg.includes('not supported');
-      if (isNotFound) {
-        console.warn('[Roleplay Chat] Primary model gemini-2.5-flash failed with 404, falling back to gemini-2.5-flash-lite');
+    let lastErr: unknown;
+
+    for (const modelToTry of fallbackCandidates) {
+      try {
         result = await streamText({
-          model: googleProvider('gemini-2.5-flash-lite'),
+          model: googleProvider(modelToTry),
           system: systemPrompt,
           messages,
           temperature: 0.7,
           maxTokens: 300,
           maxRetries: 0,
         });
-      } else {
-        throw primaryErr;
+        break;
+      } catch (tryErr: unknown) {
+        lastErr = tryErr;
+        const msg = tryErr instanceof Error ? tryErr.message : String(tryErr);
+        const isNotFound =
+          msg.includes('not found') ||
+          msg.includes('404') ||
+          msg.includes('not supported');
+        if (!isNotFound) {
+          throw tryErr;
+        }
+        console.warn(`[Roleplay Chat] Model ${modelToTry} not found/supported, trying next fallback...`);
       }
+    }
+
+    if (!result) {
+      throw lastErr;
     }
 
     // Return the streaming response
