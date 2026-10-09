@@ -143,21 +143,57 @@ export async function POST(req: NextRequest) {
     );
     if (totalChars > 4000) return new Response('Payload too large', { status: 400 });
 
-    // 6. Streaming avec Llama 3.3 70B via Groq (~200ms de latence)
+    // 6. Streaming ultra-rapide avec Groq (Modèle validé + repli automatique)
     const groq = createOpenAI({
       baseURL: 'https://api.groq.com/openai/v1',
       apiKey,
     });
-    const result = await streamText({
-      model: groq('llama-3.3-70b-versatile'),
-      system: `${systemPrompt}\n\nIMPORTANT: Réponds TOUJOURS en Darija marocaine authentique avec le chakl (vocalisation) complet. Ne commence jamais par une voyelle ou un caractère invisible.`,
-      messages: normalizedHistory as CoreMessage[],
-      temperature: 0.6,
-      maxTokens: 300,
-      maxRetries: 0,
-    });
 
-    return result.toDataStreamResponse();
+    const CANDIDATE_MODELS = [
+      'qwen/qwen3.8-27b',
+      'allam-2-7b',
+      'openai/gpt-oss-120b',
+    ];
+
+    const systemInstruction = `${systemPrompt}\n\nIMPORTANT: Réponds TOUJOURS en Darija marocaine authentique avec le chakl (vocalisation) complet en alphabet arabe. Ne commence jamais par une voyelle ou un caractère invisible.`;
+
+    let lastError: unknown = null;
+    for (const modelId of CANDIDATE_MODELS) {
+      try {
+        const result = await streamText({
+          model: groq(modelId),
+          system: systemInstruction,
+          messages: normalizedHistory as CoreMessage[],
+          temperature: 0.6,
+          maxTokens: 300,
+          maxRetries: 0,
+        });
+
+        return result.toDataStreamResponse();
+      } catch (err: unknown) {
+        lastError = err;
+        const errStatus =
+          (err as { status?: number; statusCode?: number } | undefined)?.status ??
+          (err as { status?: number; statusCode?: number } | undefined)?.statusCode;
+        const errStr = err instanceof Error ? err.message : String(err);
+
+        // Si l'erreur est liée aux droits ou aux quotas (401, 403, 429), inutile de boucler sur les autres modèles
+        if (
+          errStatus === 401 ||
+          errStatus === 403 ||
+          errStatus === 429 ||
+          errStr.includes('429') ||
+          errStr.includes('Resource exhausted') ||
+          errStr.includes('rate_limit')
+        ) {
+          throw err;
+        }
+
+        console.warn(`[Groq Model Warning] Échec avec ${modelId}, tentative sur modèle de repli...`, err);
+      }
+    }
+
+    throw lastError;
   } catch (error: unknown) {
     const errMsg = error instanceof Error ? error.message : String(error);
     const status =
