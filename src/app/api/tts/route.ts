@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'TEXT_TOO_LONG' }, { status: 400 });
     }
 
-    const ttsVoice: TtsVoice = voice === 'male' ? 'male' : 'female';
+    const ttsVoice: TtsVoice = voice === 'male' || voice === 'ar-MA-JamalNeural' ? 'male' : 'female';
     const ttsSpeed: TtsSpeed = speed === 'slow' ? 'slow' : 'normal';
 
     return await synthesize(text, normalizedArabic, ttsVoice, ttsSpeed);
@@ -153,7 +153,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'TEXT_TOO_LONG' }, { status: 400 });
     }
 
-    const ttsVoice: TtsVoice = voiceParam === 'male' ? 'male' : 'female';
+    const ttsVoice: TtsVoice = voiceParam === 'male' || voiceParam === 'ar-MA-JamalNeural' ? 'male' : 'female';
     const ttsSpeed: TtsSpeed = speedParam === 'slow' ? 'slow' : 'normal';
 
     return await synthesize(text, normalizedArabic, ttsVoice, ttsSpeed);

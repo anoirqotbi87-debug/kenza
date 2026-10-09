@@ -81,20 +81,20 @@ export function parseAiMessage(content: string): ParsedMessage {
 }
 
 /**
- * Extrait chirurgicalement l'arabe Darija pur vocalisé pour msedge-tts :
- * - Isole le contenu situé entre [AR] et [/AR] s'il existe
- * - Supprime toutes les balises [AR], [/AR], [ARZ], [FR], [TR]
- * - Supprime les caractères latins, chiffres, symboles (#, _, -) et parenthèses
- * - Supprime les tanwins classiques de fin de mot (ً ٌ ٍ) pour respecter le rythme marocain
- * - Nettoie les espaces superflus
+ * Nettoyage strict du texte envoyé au TTS :
+ * Extrait uniquement l'arabe pur vocalisé, sans balises, sans caractères latins/chiffres,
+ * sans parenthèses et sans tanwīn classique (ً ٌ ٍ).
  */
-export function extractCleanArabicForTts(rawText: string): string {
-  if (!rawText) return '';
-  const match = rawText.match(/\[AR\]([\s\S]*?)\[\/AR\]/i);
-  const cleanStr = match ? match[1] : rawText;
-  return cleanStr
+export function sanitizeTtsArabic(raw: string): string {
+  if (!raw) return '';
+  const match = raw.match(/\[AR\]([\s\S]*?)\[\/AR\]/i);
+  const text = match ? match[1] : raw;
+  return text
     .replace(/\[\/?(AR|ARZ|FR|TR)\]/gi, '') // Supprime les balises
-    .replace(/[a-zA-Z0-9_\-#]/g, '')       // Supprime tout caractère latin ou chiffre
-    .replace(/[()]/g, '')                   // Supprime les parenthèses
+    .replace(/[a-zA-Z0-9_\-#]/g, '')       // Supprime le latin et chiffres
+    .replace(/[()]/g, '')                   // Supprime parenthèses
+    .replace(/[\u064B\u064C\u064D]/g, '')   // Supprime tanwin Fusha classique
     .trim();
 }
+
+export const extractCleanArabicForTts = sanitizeTtsArabic;

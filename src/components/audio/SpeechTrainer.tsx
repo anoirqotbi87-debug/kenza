@@ -168,7 +168,7 @@ export default function SpeechTrainer() {
     setTimeout(() => {
       if (choice.nextNpcLine) {
         setChatHistory(prev => [...prev, { sender: 'npc', textArabizi: choice.nextNpcLine!.arabizi, textArabic: choice.nextNpcLine!.arabic, translation: choice.nextNpcLine!.translation }]);
-        playAudio(choice.nextNpcLine.arabizi, choice.nextNpcLine.arabic, soundEnabled);
+        playAudio(choice.nextNpcLine.arabizi, choice.nextNpcLine.arabic, soundEnabled, 1.0, { voice: 'male' });
         setRoleplayComplete(true);
       } else {
         setRoleplayComplete(true);
@@ -329,7 +329,7 @@ export default function SpeechTrainer() {
                 <div className={`p-4 rounded-2xl max-w-[85%] ${msg.sender === 'user' ? 'bg-[#1B2A4A] text-[#FDFCF8] rounded-br-none' : 'bg-[#FDFCF8] border border-[#E8E2D5] shadow-xs text-[#1B2A4A] rounded-bl-none'}`}>
                   <div className="flex items-start gap-3">
                     {msg.sender === 'npc' && (
-                      <button onClick={() => playAudio(msg.textArabizi, msg.textArabic, soundEnabled)} className="text-[#C9A05C] hover:text-[#b88f4b] shrink-0 mt-1">
+                      <button onClick={() => playAudio(msg.textArabizi, msg.textArabic, soundEnabled, 1.0, { voice: 'male' })} className="text-[#C9A05C] hover:text-[#b88f4b] shrink-0 mt-1">
                         <Volume2 className="w-4 h-4" />
                       </button>
                     )}

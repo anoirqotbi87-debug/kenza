@@ -79,8 +79,10 @@ function audioQuotaStorage(): Storage | null {
 
 export interface AudioOptions {
   speed?: number | 'normal' | 'slow';
-  voice?: 'female' | 'male';
+  voice?: 'female' | 'male' | 'ar-MA-JamalNeural' | 'ar-MA-MounaNeural';
 }
+
+export { sanitizeTtsArabic } from './ai/parseAiMessage';
 
 /**
  * Play audio with speed control via Web Audio API. La lecture passe
@@ -106,7 +108,8 @@ export const playAudio = async (
       ? 'slow'
       : 'normal';
   const numericSpeed = typeof speed === 'number' ? speed : (speedParam === 'slow' ? 0.75 : 1.0);
-  const voiceParam: 'female' | 'male' = options?.voice || 'female';
+  const voiceParam: 'female' | 'male' =
+    options?.voice === 'male' || options?.voice === 'ar-MA-JamalNeural' ? 'male' : 'female';
 
   // Quota des écoutes gratuites : on refuse AVANT toute requête réseau
   if (shouldConsumeAudioQuota(text, audioUrl)) {

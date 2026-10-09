@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseAiMessage, extractCleanArabicForTts } from './parseAiMessage';
+import { parseAiMessage, extractCleanArabicForTts, sanitizeTtsArabic } from './parseAiMessage';
 
 describe('parseAiMessage', () => {
   it('conserve le premier caractère arabe dans chaque réplique roleplay', () => {
@@ -90,13 +90,14 @@ describe('parseAiMessage', () => {
   });
 });
 
-describe('extractCleanArabicForTts', () => {
+describe('extractCleanArabicForTts / sanitizeTtsArabic', () => {
   it('extrait chirurgicalement le texte arabe pur depuis une réponse tripartite', () => {
     const raw = `[AR] وَعَلَيْكُمُ السَّلَامْ ! فِينْ غَادِي أَخُويَا ؟ [/AR]
 [ARZ] Wa 3alaykoum salam ! Fin ghadi a khoya ? [/ARZ]
 [FR] Bonjour ! Où vas-tu mon frère ? [/FR]`;
     const clean = extractCleanArabicForTts(raw);
     expect(clean).toBe('وَعَلَيْكُمُ السَّلَامْ ! فِينْ غَادِي أَخُويَا ؟');
+    expect(sanitizeTtsArabic(raw)).toBe('وَعَلَيْكُمُ السَّلَامْ ! فِينْ غَادِي أَخُويَا ؟');
   });
 
   it('élimine les balises orphelines, caractères latins, chiffres et parenthèses', () => {
@@ -105,13 +106,20 @@ describe('extractCleanArabicForTts', () => {
     expect(clean).toBe('مَرْحْبَا');
   });
 
-  it('gère une chaîne déjà propre ou du texte arabe pur', () => {
-    const raw = 'أَهْلًا بيكْ ! شْنُو نْجِيبْ لِكْ تْشْرَبْ ؟';
+  it('élimine les tanwins classiques de fin de mot (ً ٌ ٍ)', () => {
+    const raw = '[AR] أَهْلًا بيكْ ! شْنُو نْجِيبْ لِكْ تْشْرَبْ ؟ [/AR]';
+    const clean = sanitizeTtsArabic(raw);
+    expect(clean).toBe('أَهْلا بيكْ ! شْنُو نْجِيبْ لِكْ تْشْرَبْ ؟');
+  });
+
+  it('gère une chaîne déjà propre en Darija', () => {
+    const raw = 'أَهْلا بيكْ ! شْنُو نْجِيبْ لِكْ تْشْرَبْ ؟';
     const clean = extractCleanArabicForTts(raw);
-    expect(clean).toBe('أَهْلًا بيكْ ! شْنُو نْجِيبْ لِكْ تْشْرَبْ ؟');
+    expect(clean).toBe('أَهْلا بيكْ ! شْنُو نْجِيبْ لِكْ تْشْرَبْ ؟');
   });
 
   it('gère les chaînes vides', () => {
     expect(extractCleanArabicForTts('')).toBe('');
+    expect(sanitizeTtsArabic('')).toBe('');
   });
 });

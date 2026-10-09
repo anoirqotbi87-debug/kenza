@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useChat } from 'ai/react';
 import { PersonaId, personas } from '@/lib/ai/prompts';
-import { parseAiMessage, extractCleanArabicForTts } from '@/lib/ai/parseAiMessage';
+import { parseAiMessage, extractCleanArabicForTts, sanitizeTtsArabic } from '@/lib/ai/parseAiMessage';
 import { useVoiceRecognition } from '@/hooks/useVoiceRecognition';
 import { playAudio } from '@/lib/audio';
 import {
@@ -26,7 +26,7 @@ export interface RoleplayChatProps {
   authToken?: string;
 }
 
-export { parseAiMessage, extractCleanArabicForTts };
+export { parseAiMessage, extractCleanArabicForTts, sanitizeTtsArabic };
 
 export default function RoleplayChat({
   personaId,
@@ -86,6 +86,30 @@ export default function RoleplayChat({
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Timeout de 10s : si le serveur tarde à streamer, désactiver le spinner et proposer de réessayer
+  const [streamTimeoutHit, setStreamTimeoutHit] = useState(false);
+  const streamTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (isLoading) {
+      if (streamTimeoutRef.current) clearTimeout(streamTimeoutRef.current);
+      streamTimeoutRef.current = setTimeout(() => {
+        setStreamTimeoutHit(true);
+      }, 10000);
+    } else {
+      if (streamTimeoutRef.current) {
+        clearTimeout(streamTimeoutRef.current);
+        streamTimeoutRef.current = null;
+      }
+    }
+    return () => {
+      if (streamTimeoutRef.current) {
+        clearTimeout(streamTimeoutRef.current);
+        streamTimeoutRef.current = null;
+      }
+    };
+  }, [isLoading]);
 
   const handleMicToggle = () => {
     if (isListening) {
@@ -228,11 +252,30 @@ export default function RoleplayChat({
           );
         })}
 
-        {isLoading && (
+        {isLoading && !streamTimeoutHit && (
           <div className="flex justify-start">
             <div className="bg-[#F7F3EA] border border-[#E8E2D5] rounded-2xl rounded-bl-none p-3 shadow-xs flex items-center gap-2">
               <Loader2 className="w-4 h-4 text-[#C9A05C] animate-spin" />
               <span className="text-xs text-[#7A7670]">En train de répondre...</span>
+            </div>
+          </div>
+        )}
+
+        {streamTimeoutHit && (
+          <div className="flex justify-start">
+            <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-2xl rounded-bl-none p-3 shadow-xs flex items-center gap-3">
+              <span className="text-xs">La réponse prend du temps.</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setStreamTimeoutHit(false);
+                  reload();
+                }}
+                className="flex items-center gap-1 text-xs font-bold px-2 py-1 bg-white border border-amber-300 rounded-lg hover:bg-amber-100 transition-colors shadow-2xs"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>🔄 Réessayer</span>
+              </button>
             </div>
           </div>
         )}
@@ -244,6 +287,7 @@ export default function RoleplayChat({
       <div className="p-3 bg-[#F7F3EA] border-t border-[#E8E2D5]">
         <form
           onSubmit={(e) => {
+            setStreamTimeoutHit(false);
             if (isListening) stopListening();
             handleSubmit(e);
           }}

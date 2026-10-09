@@ -21,14 +21,14 @@ export default function SRSDashboard() {
     const initializeCards = async () => {
       try {
         setLoading(true);
-        // Timeout de sécurité : si après 2.5 secondes rien n'est chargé, on force l'état local
+        // Timeout de sécurité : si après 4 secondes rien n'est chargé, on force l'état local
         timeoutId = setTimeout(() => {
           if (Object.keys(useAppStore.getState().srsDeck).length === 0) {
             addCardsToSRS(srsVocabulary.map((v) => v.id));
             activateNewCards(5);
           }
           setLoading(false);
-        }, 2500);
+        }, 4000);
 
         if (Object.keys(srsDeck).length === 0) {
           addCardsToSRS(srsVocabulary.map((v) => v.id));

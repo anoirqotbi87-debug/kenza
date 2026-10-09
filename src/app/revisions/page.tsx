@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Layers, Flame, Award, Trophy } from 'lucide-react';
+import { Flame, Award, Trophy } from 'lucide-react';
 import { useAppStore, useTranslation } from '@/store/useAppStore';
-import type { LucideIcon } from 'lucide-react';
 import SRSDashboard from '@/components/srs/SRSDashboard';
 import DeckManagerView from '@/components/srs/DeckManagerView';
 import Leaderboard from '@/components/gamification/Leaderboard';
@@ -12,22 +11,16 @@ import BadgesList from '@/components/gamification/BadgesList';
 import PageHeader from '@/components/ui/PageHeader';
 import BottomNav from '@/components/navigation/BottomNav';
 
-type Tab = 'srs' | 'decks' | 'gamification';
+type Tab = 'smart' | 'decks' | 'badges';
 
 export default function RevisionsPage() {
   const { uiLanguage } = useAppStore();
   const { t } = useTranslation();
   const lang = uiLanguage || 'fr';
   const isAr = lang === 'ar';
-  const [tab, setTab] = useState<Tab>('srs');
+  const [tab, setTab] = useState<Tab>('smart');
 
   const tp = t.pages.revisions;
-
-  const tabs: { id: Tab; label: string; icon: LucideIcon }[] = [
-    { id: 'srs', label: tp.tabSrs || 'Révision intelligente', icon: Layers },
-    { id: 'decks', label: tp.tabDecks || 'Mes paquets de cartes', icon: Flame },
-    { id: 'gamification', label: tp.tabGamification || 'Progression & Badges', icon: Trophy },
-  ];
 
   return (
     <div dir={isAr ? 'rtl' : 'ltr'} className="min-h-screen bg-[#F7F3EA]">
@@ -37,34 +30,35 @@ export default function RevisionsPage() {
       />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-5">
-        <div
-          role="tablist"
-          aria-label={tp.badge || 'Sections de révision'}
-          className="grid grid-cols-3 gap-1.5 p-1 bg-[#FDFCF8] border border-[#E8E2D5] rounded-2xl shadow-xs"
-        >
-          {tabs.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              role="tab"
-              aria-selected={tab === id}
-              onClick={() => setTab(id)}
-              className={`flex items-center justify-center gap-1.5 px-1 py-2.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all min-w-0 ${
-                tab === id
-                  ? 'bg-[#1B2A4A] !text-white shadow-sm'
-                  : 'text-[#7A7670] hover:text-[#1B2A4A] hover:bg-[#F7F3EA]'
-              }`}
-            >
-              <Icon className={`w-3.5 h-3.5 shrink-0 ${tab === id ? 'text-[#C9A05C]' : ''}`} />
-              <span className={`truncate ${tab === id ? '!text-white' : ''}`}>{label}</span>
-            </button>
-          ))}
+        <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100/90 rounded-xl mb-4 text-xs font-medium">
+          <button
+            type="button"
+            onClick={() => setTab('smart')}
+            className={`py-2 px-1 text-center rounded-lg transition-all truncate ${tab === 'smart' ? 'bg-[#142943] text-white shadow-sm font-semibold' : 'text-slate-600 hover:text-slate-900'}`}
+          >
+            Révision
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab('decks')}
+            className={`py-2 px-1 text-center rounded-lg transition-all truncate ${tab === 'decks' ? 'bg-[#142943] text-white shadow-sm font-semibold' : 'text-slate-600 hover:text-slate-900'}`}
+          >
+            Mes paquets
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab('badges')}
+            className={`py-2 px-1 text-center rounded-lg transition-all truncate ${tab === 'badges' ? 'bg-[#142943] text-white shadow-sm font-semibold' : 'text-slate-600 hover:text-slate-900'}`}
+          >
+            Badges
+          </button>
         </div>
       </div>
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 pb-24 space-y-6">
-        {tab === 'srs' && <SRSDashboard />}
+        {tab === 'smart' && <SRSDashboard />}
         {tab === 'decks' && <DeckManagerView />}
-        {tab === 'gamification' && (
+        {tab === 'badges' && (
           <div className="space-y-6">
             <section className="bg-[#FDFCF8] rounded-2xl border border-[#E8E2D5] p-6 shadow-xs">
               <h2 className="font-display text-lg font-bold text-[#1B2A4A] mb-4 flex items-center gap-2">

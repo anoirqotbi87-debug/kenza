@@ -23,7 +23,9 @@ export function escapeXml(unsafe: string): string {
  * Resolves the Edge TTS voice identifier.
  */
 export function getVoiceName(voice?: TtsVoice | string): string {
-  return voice === 'male' ? VOICE_MALE : VOICE_FEMALE;
+  return voice === 'male' || voice === 'ar-MA-JamalNeural' || voice === VOICE_MALE
+    ? VOICE_MALE
+    : VOICE_FEMALE;
 }
 
 /**
