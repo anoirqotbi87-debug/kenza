@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useChat } from 'ai/react';
 import { PersonaId, personas } from '@/lib/ai/prompts';
-import { parseAiMessage } from '@/lib/ai/parseAiMessage';
+import { parseAiMessage, extractCleanArabicForTts } from '@/lib/ai/parseAiMessage';
 import { useVoiceRecognition } from '@/hooks/useVoiceRecognition';
 import { playAudio } from '@/lib/audio';
 import {
@@ -26,7 +26,7 @@ export interface RoleplayChatProps {
   authToken?: string;
 }
 
-export { parseAiMessage };
+export { parseAiMessage, extractCleanArabicForTts };
 
 export default function RoleplayChat({
   personaId,
@@ -96,7 +96,8 @@ export default function RoleplayChat({
   };
 
   const handlePlayVoice = (text: string, arabic?: string, speed: 'normal' | 'slow' = 'normal') => {
-    playAudio(text, arabic, soundEnabled, speed === 'slow' ? 0.75 : 1.0, {
+    const cleanAr = extractCleanArabicForTts(arabic || text);
+    playAudio(cleanAr || text, cleanAr, soundEnabled, speed === 'slow' ? 0.75 : 1.0, {
       speed,
       voice: personaId === 'cafe' || personaId === 'taxi' || personaId === 'souk' || personaId === 'medecin' ? 'male' : 'female',
     });

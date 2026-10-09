@@ -189,8 +189,8 @@ Format attendu :
           model: groq(modelId),
           system: systemInstruction,
           messages: normalizedHistory as CoreMessage[],
-          temperature: 0.6,
-          maxTokens: 300,
+          temperature: 0.35,
+          maxTokens: 120,
           maxRetries: 0,
         });
 

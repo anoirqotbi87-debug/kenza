@@ -11,7 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/lib/supabase';
 import PaywallModal from '@/components/monetization/PaywallModal';
 import { useDialog } from '@/hooks/useDialog';
-import { parseAiMessage } from '@/lib/ai/parseAiMessage';
+import { parseAiMessage, extractCleanArabicForTts } from '@/lib/ai/parseAiMessage';
 import AuthModal from '@/components/auth/AuthModal';
 
 interface AiRoleplayViewProps {
@@ -56,7 +56,8 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const handlePlayVoice = (text: string, arabic?: string, speed: 'normal' | 'slow' = 'normal') => {
-    playAudio(text, arabic, soundEnabled, speed === 'slow' ? 0.75 : 1.0, {
+    const cleanAr = extractCleanArabicForTts(arabic || text);
+    playAudio(cleanAr || text, cleanAr, soundEnabled, speed === 'slow' ? 0.75 : 1.0, {
       speed,
       voice: personaId === 'cafe' || personaId === 'taxi' || personaId === 'souk' || personaId === 'medecin' ? 'male' : 'female',
     });

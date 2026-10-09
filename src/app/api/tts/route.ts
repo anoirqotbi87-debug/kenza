@@ -4,6 +4,7 @@ import { normalizeDarija } from '@/lib/tts/darijaPhonetics';
 import { buildSsml, TtsVoice, TtsSpeed } from '@/lib/tts/ssml';
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 import { isAllowedOrigin } from '@/lib/allowedOrigins';
+import { extractCleanArabicForTts } from '@/lib/ai/parseAiMessage';
 
 export type TTSRequest = {
   text: string;
@@ -18,7 +19,9 @@ async function synthesize(
   voice: TtsVoice = 'female',
   speed: TtsSpeed = 'normal'
 ) {
-  const textToSpeak = normalizeDarija(text, arabicText);
+  const sanitizedArabic = arabicText ? extractCleanArabicForTts(arabicText) : undefined;
+  const sanitizedText = extractCleanArabicForTts(text) || text;
+  const textToSpeak = normalizeDarija(sanitizedText, sanitizedArabic);
   const { ssml, voiceName } = buildSsml(textToSpeak, voice, speed);
 
   const tts = new MsEdgeTTS();

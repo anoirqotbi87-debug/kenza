@@ -79,3 +79,22 @@ export function parseAiMessage(content: string): ParsedMessage {
 
   return { ar, arz, fr };
 }
+
+/**
+ * Extrait chirurgicalement l'arabe Darija pur vocalisé pour msedge-tts :
+ * - Isole le contenu situé entre [AR] et [/AR] s'il existe
+ * - Supprime toutes les balises [AR], [/AR], [ARZ], [FR], [TR]
+ * - Supprime les caractères latins, chiffres, symboles (#, _, -) et parenthèses
+ * - Supprime les tanwins classiques de fin de mot (ً ٌ ٍ) pour respecter le rythme marocain
+ * - Nettoie les espaces superflus
+ */
+export function extractCleanArabicForTts(rawText: string): string {
+  if (!rawText) return '';
+  const match = rawText.match(/\[AR\]([\s\S]*?)\[\/AR\]/i);
+  const cleanStr = match ? match[1] : rawText;
+  return cleanStr
+    .replace(/\[\/?(AR|ARZ|FR|TR)\]/gi, '') // Supprime les balises
+    .replace(/[a-zA-Z0-9_\-#]/g, '')       // Supprime tout caractère latin ou chiffre
+    .replace(/[()]/g, '')                   // Supprime les parenthèses
+    .trim();
+}

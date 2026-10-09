@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseAiMessage } from './parseAiMessage';
+import { parseAiMessage, extractCleanArabicForTts } from './parseAiMessage';
 
 describe('parseAiMessage', () => {
   it('conserve le premier caractère arabe dans chaque réplique roleplay', () => {
@@ -87,5 +87,31 @@ describe('parseAiMessage', () => {
     const { ar, fr } = parseAiMessage('[AR] فِينْ غَادِي أَ خُويَا ؟ [/AR]\n[TR] Où vas-tu mon frère ? [/TR]');
     expect(ar).toBe('فِينْ غَادِي أَ خُويَا ؟');
     expect(fr).toBe('Où vas-tu mon frère ?');
+  });
+});
+
+describe('extractCleanArabicForTts', () => {
+  it('extrait chirurgicalement le texte arabe pur depuis une réponse tripartite', () => {
+    const raw = `[AR] وَعَلَيْكُمُ السَّلَامْ ! فِينْ غَادِي أَخُويَا ؟ [/AR]
+[ARZ] Wa 3alaykoum salam ! Fin ghadi a khoya ? [/ARZ]
+[FR] Bonjour ! Où vas-tu mon frère ? [/FR]`;
+    const clean = extractCleanArabicForTts(raw);
+    expect(clean).toBe('وَعَلَيْكُمُ السَّلَامْ ! فِينْ غَادِي أَخُويَا ؟');
+  });
+
+  it('élimine les balises orphelines, caractères latins, chiffres et parenthèses', () => {
+    const raw = '[AR] (مَرْحْبَا) bghit nemchi 123 [/AR]';
+    const clean = extractCleanArabicForTts(raw);
+    expect(clean).toBe('مَرْحْبَا');
+  });
+
+  it('gère une chaîne déjà propre ou du texte arabe pur', () => {
+    const raw = 'أَهْلًا بيكْ ! شْنُو نْجِيبْ لِكْ تْشْرَبْ ؟';
+    const clean = extractCleanArabicForTts(raw);
+    expect(clean).toBe('أَهْلًا بيكْ ! شْنُو نْجِيبْ لِكْ تْشْرَبْ ؟');
+  });
+
+  it('gère les chaînes vides', () => {
+    expect(extractCleanArabicForTts('')).toBe('');
   });
 });
