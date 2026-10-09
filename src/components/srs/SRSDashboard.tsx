@@ -13,18 +13,48 @@ export default function SRSDashboard() {
   const { t } = useTranslation();
   const [isReviewing, setIsReviewing] = useState(false);
   const [sessionCards, setSessionCards] = useState<SRSCard[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // Init SRS with all words if empty and activate initial batch of 5 words
   useEffect(() => {
-    if (Object.keys(srsDeck).length === 0) {
-      addCardsToSRS(srsVocabulary.map((v) => v.id));
-      activateNewCards(5);
-    } else {
-      const activeCount = Object.values(srsDeck).filter((c) => c.state !== 'new').length;
-      if (activeCount === 0) {
+    let timeoutId: NodeJS.Timeout | null = null;
+    const initializeCards = async () => {
+      try {
+        setLoading(true);
+        // Timeout de sécurité : si après 2.5 secondes rien n'est chargé, on force l'état local
+        timeoutId = setTimeout(() => {
+          if (Object.keys(useAppStore.getState().srsDeck).length === 0) {
+            addCardsToSRS(srsVocabulary.map((v) => v.id));
+            activateNewCards(5);
+          }
+          setLoading(false);
+        }, 2500);
+
+        if (Object.keys(srsDeck).length === 0) {
+          addCardsToSRS(srsVocabulary.map((v) => v.id));
+          activateNewCards(5);
+        } else {
+          const activeCount = Object.values(srsDeck).filter((c) => c.state !== 'new').length;
+          if (activeCount === 0) {
+            activateNewCards(5);
+          }
+        }
+      } catch (err) {
+        console.error('[SRS Init Error]:', err);
+        // Fallback local immédiat
+        addCardsToSRS(srsVocabulary.map((v) => v.id));
         activateNewCards(5);
+      } finally {
+        setLoading(false);
+        if (timeoutId) clearTimeout(timeoutId);
       }
-    }
+    };
+
+    initializeCards();
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [srsDeck, addCardsToSRS, activateNewCards]);
 
   const currentDueCards = getDueCards();
@@ -73,6 +103,15 @@ export default function SRSDashboard() {
           vocabulary={srsVocabulary}
           onComplete={() => setIsReviewing(false)}
         />
+      </div>
+    );
+  }
+
+  if (loading && Object.keys(srsDeck).length === 0) {
+    return (
+      <div className="bg-[#FDFCF8] p-12 rounded-[28px] shadow-sm border border-[#E8E2D5] flex flex-col items-center justify-center text-center max-w-2xl mx-auto my-8">
+        <div className="w-10 h-10 border-3 border-[#C9A05C]/30 border-t-[#C9A05C] rounded-full animate-spin mb-4" />
+        <p className="text-sm font-semibold text-[#1B2A4A]">Préparation de vos révisions...</p>
       </div>
     );
   }

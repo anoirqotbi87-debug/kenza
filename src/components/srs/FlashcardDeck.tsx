@@ -153,7 +153,14 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
           transition={{ duration: 0.6, type: 'spring', stiffness: 220, damping: 20 }}
         >
           {/* Front of Flashcard */}
-          <div className="absolute inset-0 [backface-visibility:hidden] [-webkit-backface-visibility:hidden] bg-[#FDFCF8] rounded-[28px] shadow-sm border border-[#E8E2D5] p-8 flex flex-col items-center justify-between text-center select-none overflow-hidden">
+          <div 
+            className="absolute inset-0 bg-[#FDFCF8] rounded-[28px] shadow-sm border border-[#E8E2D5] p-8 flex flex-col items-center justify-between text-center select-none overflow-hidden"
+            style={{
+              backfaceVisibility: 'hidden',
+              WebkitBackfaceVisibility: 'hidden',
+              transform: 'rotateY(0deg)',
+            }}
+          >
             
             {/* Petits astérisques discrets aux angles */}
             <span className="absolute top-4 left-4 text-[#C9A05C]/50 text-xs font-display pointer-events-none select-none">✦</span>
@@ -187,7 +194,12 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
 
           {/* Back of Flashcard */}
           <div 
-            className="absolute inset-0 [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)] bg-[#FDFCF8] rounded-[28px] shadow-md border border-[#E8E2D5] p-8 flex flex-col items-center justify-between text-center select-none overflow-hidden"
+            className="absolute inset-0 bg-[#FDFCF8] rounded-[28px] shadow-md border border-[#E8E2D5] p-8 flex flex-col items-center justify-between text-center select-none overflow-hidden"
+            style={{
+              backfaceVisibility: 'hidden',
+              WebkitBackfaceVisibility: 'hidden',
+              transform: 'rotateY(180deg)',
+            }}
           >
             {/* Petits astérisques discrets aux angles */}
             <span className="absolute top-4 left-4 text-[#C9A05C]/50 text-xs font-display pointer-events-none select-none">✦</span>
