@@ -56,9 +56,11 @@ body {
   font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 15px;
 }
+@layer base {
 button, input { font: inherit; }
 button { color: inherit; }
 button:focus-visible, input:focus-visible { outline: 3px solid rgba(214, 155, 71, .65); outline-offset: 3px; }
+}
 ::selection { color: var(--ink); background: #ead7ad; }
 
 /* Règle stricte d'accessibilité & contraste : fond bleu nuit sombre = texte blanc garanti */
