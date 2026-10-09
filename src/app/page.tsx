@@ -18,6 +18,7 @@ import {
   Heart,
   Home as HomeIcon,
   LockKeyhole,
+  LogOut,
   Menu,
   MessageCircle,
   Play,
@@ -191,6 +192,7 @@ export default function Home() {
     user,
     setUser,
     resetData,
+    resetUserProgress,
     soundEnabled,
     toggleSound,
     isPremium,
@@ -203,6 +205,19 @@ export default function Home() {
     audioQuotaExceeded,
     setAudioQuotaExceeded,
   } = useAppStore();
+
+  const router = useRouter();
+  const handleSignOut = useCallback(async () => {
+    try {
+      await supabase.auth.signOut();
+      useAppStore.getState().setUser(null);
+      useAppStore.getState().resetUserProgress();
+      router.push('/');
+    } catch (err) {
+      console.error('[SignOut Error]:', err);
+      router.push('/');
+    }
+  }, [router]);
 
   const { t } = useTranslation();
   const { isGuest } = useAuthUser();
@@ -306,12 +321,12 @@ export default function Home() {
       } else if (event === "SIGNED_OUT") {
         setUser(null);
         setIsPremium(false);
-        resetData();
+        resetUserProgress();
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [setUser, setIsPremium, resetData]);
+  }, [setUser, setIsPremium, resetUserProgress]);
 
   // Retour de Stripe. Le premium n'est JAMAIS accordé sur la seule foi de l'URL : le
   // paramètre `upgrade=success` est forgeable, et l'accorder débloquait le contenu Pro
@@ -778,29 +793,41 @@ export default function Home() {
 
             {/* Connexion Google & Profil */}
             {user ? (
-              <button
-                className="top-avatar"
-                aria-label={t.modules.home.openSpace}
-                onClick={() => switchView("space")}
-                title={user.email || t.nav.profile}
-              >
-                {user.user_metadata?.avatar_url ? (
-                  <Image
-                    src={user.user_metadata.avatar_url}
-                    alt={user.user_metadata?.full_name || trL(lang, "Profil", "Profile", "Perfil", "الملف الشخصي")}
-                    width={32}
-                    height={32}
-                    unoptimized
-                    className="w-full h-full object-cover rounded-full"
-                  />
-                ) : user.user_metadata?.full_name ? (
-                  user.user_metadata.full_name[0].toUpperCase()
-                ) : user.email ? (
-                  user.email[0].toUpperCase()
-                ) : (
-                  "K"
-                )}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  className="top-avatar"
+                  aria-label={t.modules.home.openSpace}
+                  onClick={() => switchView("space")}
+                  title={user.email || t.nav.profile}
+                >
+                  {user.user_metadata?.avatar_url ? (
+                    <Image
+                      src={user.user_metadata.avatar_url}
+                      alt={user.user_metadata?.full_name || trL(lang, "Profil", "Profile", "Perfil", "الملف الشخصي")}
+                      width={32}
+                      height={32}
+                      unoptimized
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : user.user_metadata?.full_name ? (
+                    user.user_metadata.full_name[0].toUpperCase()
+                  ) : user.email ? (
+                    user.email[0].toUpperCase()
+                  ) : (
+                    "K"
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200/80 rounded-full transition-colors"
+                  aria-label={trL(lang, "Se déconnecter", "Sign out", "Cerrar sesión", "تسجيل الخروج")}
+                  title={trL(lang, "Se déconnecter", "Sign out", "Cerrar sesión", "تسجيل الخروج")}
+                >
+                  <LogOut size={13} />
+                  <span className="hidden sm:inline">{trL(lang, "Déconnexion", "Sign out", "Cerrar sesión", "خروج")}</span>
+                </button>
+              </div>
             ) : (
               <button
                 type="button"
@@ -911,6 +938,7 @@ export default function Home() {
               user={user}
               isPremium={isPremium}
               onReset={resetProgress}
+              onSignOut={handleSignOut}
               onOpenPaywall={() => setPricingSource("profile_upgrade")}
               onManageSubscription={handleManageSubscription}
               onToast={showToast}
@@ -1981,6 +2009,7 @@ function SpaceView({
   user,
   isPremium,
   onReset,
+  onSignOut,
   onOpenPaywall,
   onManageSubscription,
 }: {
@@ -1990,6 +2019,7 @@ function SpaceView({
   user: User | null;
   isPremium: boolean;
   onReset: () => void;
+  onSignOut: () => void;
   onOpenPaywall: (source?: string) => void;
   onManageSubscription: () => void;
   onToast: (message: string) => void;
@@ -2013,10 +2043,21 @@ function SpaceView({
   return (
     <div className="space-layout">
       <section className="space-card space-profile">
-        <div className="profile-avatar">
-          {username[0]?.toUpperCase() || "ك"}
+        <div className="profile-avatar overflow-hidden">
+          {user?.user_metadata?.avatar_url ? (
+            <Image
+              src={user.user_metadata.avatar_url}
+              alt={username}
+              width={56}
+              height={56}
+              unoptimized
+              className="w-full h-full object-cover rounded-full"
+            />
+          ) : (
+            username[0]?.toUpperCase() || "ك"
+          )}
         </div>
-        <div className="profile-intro">
+        <div className="profile-intro flex-1">
           <span className="mini-kicker">{trL(lang, "MON COIN KENZA", "MY KENZA CORNER", "MI RINCÓN KENZA", "ركني في كنزة")}</span>
           <h2>Salam, {username} !</h2>
           <p>
@@ -2024,6 +2065,18 @@ function SpaceView({
               ? trL(lang, `Connecté en tant que ${user.email}. Données sauvegardées dans le cloud.`, `Signed in as ${user.email}. Data saved to the cloud.`, `Conectado como ${user.email}. Datos guardados en la nube.`, `متصل بصفة ${user.email}. البيانات محفوظة في السحابة.`)
               : trL(lang, "Mode Invité actif. Ta progression est préservée localement sur cet appareil.", "Guest mode active. Your progress is kept locally on this device.", "Modo invitado activo. Tu progreso se guarda localmente en este dispositivo.", "وضع الضيف مُفعّل. يتم حفظ تقدمك محليًا على هذا الجهاز.")}
           </p>
+          {user && (
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={onSignOut}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors"
+              >
+                <LogOut size={13} />
+                <span>{trL(lang, "Se déconnecter", "Sign out", "Cerrar sesión", "تسجيل الخروج")}</span>
+              </button>
+            </div>
+          )}
         </div>
         <span className="local-badge">
           <span className="privacy-dot" /> {isPremium ? trL(lang, "MEMBRE KENZA PRO", "KENZA PRO MEMBER", "MIEMBRO KENZA PRO", "عضو كَنزة برو") : trL(lang, "VERSION GRATUITE", "FREE VERSION", "VERSIÓN GRATUITA", "النسخة المجانية")}

@@ -17,6 +17,7 @@ const LEADING_ARABIC_DIACRITICS = /^\u061C|^[\u064B-\u065F\u0670]+/;
 
 const clean = (s: string): string =>
   s
+    .replace(/\[\/(AR|ARZ|FR|TR)\]/gi, '')
     .replace(LEADING_GARBAGE, '')
     .replace(LEADING_ARABIC_DIACRITICS, '')
     .trim();
@@ -37,11 +38,12 @@ export function parseAiMessage(content: string): ParsedMessage {
   const arIndex = content.indexOf('[AR]');
   const arzIndex = content.indexOf('[ARZ]');
   const frIndex = content.indexOf('[FR]');
+  const trIndex = content.indexOf('[TR]');
 
   // Fin d'un champ = marqueur reconnu le plus proche strictement après son
   // début. Les marqueurs de tous les types sont des bornes valides, même dans
   // le désordre : un champ ne "mange" jamais le suivant.
-  const markers = [arIndex, arzIndex, frIndex].filter((m) => m !== -1);
+  const markers = [arIndex, arzIndex, frIndex, trIndex].filter((m) => m !== -1);
   const nextMarkerAfter = (start: number): number => {
     let end = content.length;
     for (const m of markers) {
@@ -60,6 +62,8 @@ export function parseAiMessage(content: string): ParsedMessage {
 
   if (frIndex !== -1) {
     fr = clean(content.substring(frIndex + 4, nextMarkerAfter(frIndex + 4)));
+  } else if (trIndex !== -1) {
+    fr = clean(content.substring(trIndex + 4, nextMarkerAfter(trIndex + 4)));
   }
 
   // Repli robuste : si aucune balise reconnue ou si parsing incomplet.

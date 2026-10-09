@@ -82,4 +82,10 @@ describe('parseAiMessage', () => {
     const { ar } = parseAiMessage('[AR] فِينْ غَادِي عَفَاكْ ؟\n[ARZ] Fin ghadi 3afak ?');
     expect(ar).toBe('فِينْ غَادِي عَفَاكْ ؟');
   });
+
+  it('gère le format [AR] ... [/AR] et [TR] ... [/TR]', () => {
+    const { ar, fr } = parseAiMessage('[AR] فِينْ غَادِي أَ خُويَا ؟ [/AR]\n[TR] Où vas-tu mon frère ? [/TR]');
+    expect(ar).toBe('فِينْ غَادِي أَ خُويَا ؟');
+    expect(fr).toBe('Où vas-tu mon frère ?');
+  });
 });

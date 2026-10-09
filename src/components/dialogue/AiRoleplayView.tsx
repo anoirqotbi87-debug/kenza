@@ -48,7 +48,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
   }, [rateLimitCooldown]);
 
   const persona = personas[personaId];
-  const { addCustomWordToSRS, soundEnabled } = useAppStore();
+  const { addCustomWordToSRS, soundEnabled, uiLanguage } = useAppStore();
   const { t } = useTranslation();
   const rp = t.modules.roleplay;
   const [showImmersion, setShowImmersion] = useState(false);
@@ -121,7 +121,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
   const { messages, input, handleInputChange, handleSubmit, isLoading, setInput, reload, error, stop } = useChat({
     api: '/api/roleplay/chat',
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-    body: { personaId },
+    body: { personaId, userLanguage: uiLanguage || 'fr' },
     initialMessages: [],
     onError: (err) => {
       console.error('[AI Chat Error]:', err);

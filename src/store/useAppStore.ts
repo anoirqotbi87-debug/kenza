@@ -55,6 +55,7 @@ interface AppState {
   activateNewCards: (count?: number) => void;
   
   resetData: () => void;
+  resetUserProgress: () => void;
   
   // Onboarding & Premium
   hasCompletedOnboarding: boolean;
@@ -121,7 +122,23 @@ export const useAppStore = create<AppState>()(
         unlockedBadges: [],
         currentLevel: 1,
         completedLessons: [],
-        srsDeck: {}
+        srsDeck: {},
+        customVocabulary: {},
+        isPremium: false,
+      }),
+
+      resetUserProgress: () => set({
+        user: null,
+        xp: 0,
+        streakDays: 1,
+        streakFreezes: 1,
+        activityDates: [],
+        unlockedBadges: [],
+        currentLevel: 1,
+        completedLessons: [],
+        srsDeck: {},
+        customVocabulary: {},
+        isPremium: false,
       }),
       
       addXp: (amount: number) => set((state: AppState) => {

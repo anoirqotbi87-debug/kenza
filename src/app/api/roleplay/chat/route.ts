@@ -103,6 +103,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const messages = body?.messages;
     const personaParam = (body?.personaId || body?.persona) as PersonaId;
+    const userLanguage = (body?.userLanguage || 'fr').toLowerCase();
 
     // 5. Payload Validation & History Sanitization
     if (!messages || !Array.isArray(messages)) {
@@ -155,7 +156,31 @@ export async function POST(req: NextRequest) {
       'openai/gpt-oss-120b',
     ];
 
-    const systemInstruction = `${systemPrompt}\n\nIMPORTANT: Réponds TOUJOURS en Darija marocaine authentique avec le chakl (vocalisation) complet en alphabet arabe. Ne commence jamais par une voyelle ou un caractère invisible.`;
+    let targetLanguageLabel = 'Français';
+    let isArabicImmersion = false;
+    if (userLanguage === 'en') {
+      targetLanguageLabel = 'Anglais (English)';
+    } else if (userLanguage === 'es') {
+      targetLanguageLabel = 'Espagnol (Español)';
+    } else if (userLanguage === 'ar') {
+      isArabicImmersion = true;
+    }
+
+    const linguisticRule = isArabicImmersion
+      ? `RÈGLE LINGUISTIQUE STRICTE :
+1. Réponds UNIQUEMENT en Darija marocaine authentique avec le chakl (vocalisation complète). Ne commence jamais par une voyelle ou un caractère invisible.
+2. Immersion arabe totale : ne fournis AUCUNE traduction dans une langue étrangère.
+Format attendu :
+[AR] phrase en Darija vocalisée [/AR]`
+      : `RÈGLE LINGUISTIQUE STRICTE :
+1. Réponds UNIQUEMENT en Darija marocaine authentique avec chakl (vocalisation complète). Ne commence jamais par une voyelle ou un caractère invisible.
+2. Fournis UNIQUEMENT la traduction en ${targetLanguageLabel}.
+3. Ne génère JAMAIS d'autres langues simultanément (pas d'anglais si l'utilisateur est en français, pas de mélange).
+Format attendu :
+[AR] phrase en Darija vocalisée [/AR]
+[TR] traduction unique en ${targetLanguageLabel} [/TR]`;
+
+    const systemInstruction = `${systemPrompt}\n\n${linguisticRule}`;
 
     let lastError: unknown = null;
     for (const modelId of CANDIDATE_MODELS) {
