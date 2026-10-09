@@ -88,15 +88,15 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 4. Clé API OpenAI
+    // 4. Clé API Groq
     const apiKey =
-      process.env.OPENAI_API_KEY?.trim() ||
-      (process.env.NODE_ENV === 'test' ? 'test-openai-key' : '');
+      process.env.GROQ_API_KEY?.trim() ||
+      (process.env.NODE_ENV === 'test' ? 'test-groq-key' : '');
     if (!apiKey) {
-      console.error('[OpenAI Roleplay] Missing OPENAI_API_KEY');
+      console.error('[Groq Roleplay] Missing GROQ_API_KEY');
       return new Response(JSON.stringify({
         error: 'CONFIG_ERROR',
-        message: 'Clé OPENAI_API_KEY non configurée sur le serveur Vercel.'
+        message: 'Clé GROQ_API_KEY non configurée sur le serveur Vercel.'
       }), { status: 503, headers: { 'Content-Type': 'application/json' } });
     }
 
@@ -143,13 +143,16 @@ export async function POST(req: NextRequest) {
     );
     if (totalChars > 4000) return new Response('Payload too large', { status: 400 });
 
-    // 6. Génération ultra-rapide en streaming avec OpenAI gpt-4o-mini
-    const openaiProvider = createOpenAI({ apiKey });
+    // 6. Streaming avec Llama 3.3 70B via Groq (~200ms de latence)
+    const groq = createOpenAI({
+      baseURL: 'https://api.groq.com/openai/v1',
+      apiKey,
+    });
     const result = await streamText({
-      model: openaiProvider('gpt-4o-mini'),
+      model: groq('llama-3.3-70b-versatile'),
       system: `${systemPrompt}\n\nIMPORTANT: Réponds TOUJOURS en Darija marocaine authentique avec le chakl (vocalisation) complet. Ne commence jamais par une voyelle ou un caractère invisible.`,
       messages: normalizedHistory as CoreMessage[],
-      temperature: 0.7,
+      temperature: 0.6,
       maxTokens: 300,
       maxRetries: 0,
     });
@@ -161,7 +164,7 @@ export async function POST(req: NextRequest) {
       (error as { status?: number; statusCode?: number } | undefined)?.status ??
       (error as { status?: number; statusCode?: number } | undefined)?.statusCode;
 
-    console.error('[OpenAI Roleplay Error]:', {
+    console.error('[Groq Roleplay Error]:', {
       status,
       message: errMsg,
       cause: (error as Error)?.cause,
