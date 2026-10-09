@@ -13,9 +13,9 @@ vi.mock('ai', () => ({
   streamText: (...args: unknown[]) => streamTextMock(...args),
 }));
 
-vi.mock('@ai-sdk/google', () => ({
-  google: vi.fn(),
-  createGoogleGenerativeAI: () => vi.fn(),
+vi.mock('@ai-sdk/openai', () => ({
+  openai: vi.fn(),
+  createOpenAI: () => vi.fn(),
 }));
 
 vi.mock('@supabase/supabase-js', () => ({

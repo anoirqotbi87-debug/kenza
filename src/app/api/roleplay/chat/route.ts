@@ -1,6 +1,7 @@
 import { streamText, type CoreMessage } from 'ai';
-import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { createOpenAI } from '@ai-sdk/openai';
 import { getSystemPrompt, PersonaId } from '@/lib/ai/prompts';
+import { sanitizeHistory } from '@/lib/ai/sanitizeHistory';
 import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
@@ -9,10 +10,9 @@ import crypto from 'crypto';
 
 export const maxDuration = 30;
 
-import { sanitizeHistory } from '@/lib/ai/sanitizeHistory';
-
 export async function POST(req: NextRequest) {
   try {
+    // 1. Contrôle d'origine
     const origin = req.headers.get('origin');
     const referer = req.headers.get('referer');
     const fetchSite = req.headers.get('sec-fetch-site');
@@ -21,7 +21,6 @@ export async function POST(req: NextRequest) {
       return new Response('Forbidden: Missing origin headers', { status: 403 });
     }
     // Bloquer uniquement les requêtes explicitement cross-site.
-    // Autoriser same-origin, same-site et 'none' (PWA standalone, WebView mobile, requêtes directes).
     if (fetchSite === 'cross-site') {
       return new Response('Forbidden: Cross-site request blocked', { status: 403 });
     }
@@ -39,7 +38,8 @@ export async function POST(req: NextRequest) {
 
     const ip = getClientIp(req);
 
-    const perMinute = await checkRateLimit(`roleplay:ip:${ip}`, 10, 60 * 1000);
+    // 2. Rate limiting anti-abus
+    const perMinute = await checkRateLimit(`roleplay:ip:${ip}`, 15, 60 * 1000);
     if (perMinute.error) {
       return new Response('Service Unavailable (DB)', { status: 503 });
     }
@@ -88,17 +88,37 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // 4. Clé API OpenAI
+    const apiKey =
+      process.env.OPENAI_API_KEY?.trim() ||
+      (process.env.NODE_ENV === 'test' ? 'test-openai-key' : '');
+    if (!apiKey) {
+      console.error('[OpenAI Roleplay] Missing OPENAI_API_KEY');
+      return new Response(JSON.stringify({
+        error: 'CONFIG_ERROR',
+        message: 'Clé OPENAI_API_KEY non configurée sur le serveur Vercel.'
+      }), { status: 503, headers: { 'Content-Type': 'application/json' } });
+    }
+
     const body = await req.json();
     const messages = body?.messages;
     const personaParam = (body?.personaId || body?.persona) as PersonaId;
 
-    // 4. Payload Validation & History Sanitization
+    // 5. Payload Validation & History Sanitization
     if (!messages || !Array.isArray(messages)) {
       return new Response('Messages array is required', { status: 400 });
     }
 
     if (messages.length > 15) {
       return new Response('Maximum context length exceeded', { status: 400 });
+    }
+
+    const systemPrompt = getSystemPrompt(personaParam);
+    if (!systemPrompt) {
+      return new Response(JSON.stringify({ error: 'INVALID_PERSONA', message: 'Persona inconnu' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
     const normalizedHistory = sanitizeHistory(messages);
@@ -123,65 +143,17 @@ export async function POST(req: NextRequest) {
     );
     if (totalChars > 4000) return new Response('Payload too large', { status: 400 });
 
-    const systemPrompt = getSystemPrompt(personaParam);
-    if (!systemPrompt) {
-      return new Response('Invalid persona or personaId', { status: 400 });
-    }
+    // 6. Génération ultra-rapide en streaming avec OpenAI gpt-4o-mini
+    const openaiProvider = createOpenAI({ apiKey });
+    const result = await streamText({
+      model: openaiProvider('gpt-4o-mini'),
+      system: `${systemPrompt}\n\nIMPORTANT: Réponds TOUJOURS en Darija marocaine authentique avec le chakl (vocalisation) complet. Ne commence jamais par une voyelle ou un caractère invisible.`,
+      messages: normalizedHistory as CoreMessage[],
+      temperature: 0.7,
+      maxTokens: 300,
+      maxRetries: 0,
+    });
 
-    const apiKey =
-      process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
-      process.env.GEMINI_API_KEY ||
-      (process.env.NODE_ENV === 'test' ? 'test-api-key' : '');
-    if (!apiKey) {
-      console.error('[Roleplay Chat] Missing Google Gemini API key');
-      return new Response(JSON.stringify({
-        error: 'AI_SERVICE_UNAVAILABLE',
-        message: 'Configuration API en cours sur le serveur.'
-      }), { status: 503, headers: { 'Content-Type': 'application/json' } });
-    }
-
-    const googleProvider = createGoogleGenerativeAI({ apiKey });
-    const candidates = [
-      process.env.GEMINI_MODEL?.trim(),
-      'gemini-3.8-flash',
-      'gemini-3.5-flash',
-      'gemini-3.5-flash-lite',
-      'gemini-2.5-flash',
-    ].filter((m): m is string => Boolean(m && m.length > 0));
-
-    let result;
-    let lastErr: unknown;
-
-    for (const modelName of candidates) {
-      try {
-        result = await streamText({
-          model: googleProvider(modelName),
-          system: systemPrompt,
-          messages: normalizedHistory as CoreMessage[],
-          temperature: 0.7,
-          maxTokens: 300,
-          maxRetries: 0,
-        });
-        break;
-      } catch (tryErr: unknown) {
-        lastErr = tryErr;
-        const msg = tryErr instanceof Error ? tryErr.message : String(tryErr);
-        const isNotFound =
-          msg.includes('not found') ||
-          msg.includes('404') ||
-          msg.includes('not supported');
-        if (!isNotFound) {
-          throw tryErr;
-        }
-        console.warn(`[Roleplay Chat] Model ${modelName} returned 404, falling back...`);
-      }
-    }
-
-    if (!result) {
-      throw lastErr;
-    }
-
-    // Return the streaming response immediately
     return result.toDataStreamResponse();
   } catch (error: unknown) {
     const errMsg = error instanceof Error ? error.message : String(error);
@@ -189,18 +161,20 @@ export async function POST(req: NextRequest) {
       (error as { status?: number; statusCode?: number } | undefined)?.status ??
       (error as { status?: number; statusCode?: number } | undefined)?.statusCode;
 
-    console.error('[Roleplay Chat Error Details]:', {
+    console.error('[OpenAI Roleplay Error]:', {
       status,
       message: errMsg,
       cause: (error as Error)?.cause,
     });
 
-    // Gestion du Rate-Limit Google (429 / RESOURCE_EXHAUSTED)
+    // Gestion du Rate-Limit OpenAI (429 / Insufficient quota)
     if (
       status === 429 ||
       errMsg.includes('429') ||
       errMsg.includes('RESOURCE_EXHAUSTED') ||
-      errMsg.includes('Resource exhausted')
+      errMsg.includes('Resource exhausted') ||
+      errMsg.includes('rate_limit') ||
+      errMsg.includes('insufficient_quota')
     ) {
       return new Response(JSON.stringify({
         error: 'RATE_LIMIT_EXCEEDED',
@@ -212,37 +186,23 @@ export async function POST(req: NextRequest) {
       status === 401 ||
       status === 403 ||
       errMsg.includes('API key') ||
+      errMsg.includes('invalid_api_key') ||
       errMsg.includes('authentication') ||
       errMsg.includes('credentials') ||
       errMsg.includes('Permission denied');
 
-    const isNotFound =
-      status === 404 ||
-      errMsg.includes('not found') ||
-      errMsg.includes('is not supported');
-
-    // Sur erreur 401/403 (clé invalide / permission), 404 (modèle non supporté) ou 5xx : renvoyer immédiatement HTTP 503
-    if (
-      isAuth ||
-      isNotFound ||
-      (status !== undefined && status >= 500)
-    ) {
-      let clientMsg = 'Service IA temporairement indisponible. Veuillez réessayer dans un instant.';
-      if (isAuth) {
-        clientMsg = 'Configuration API en cours sur le serveur.';
-      } else if (isNotFound) {
-        clientMsg = 'Modèle Google Gemini introuvable ou non supporté.';
-      }
-
+    if (isAuth || (status !== undefined && status >= 500)) {
       return new Response(JSON.stringify({
         error: 'AI_SERVICE_UNAVAILABLE',
-        message: clientMsg
+        message: isAuth
+          ? 'Configuration API en cours sur le serveur.'
+          : 'Service IA temporairement indisponible. Veuillez réessayer dans un instant.'
       }), { status: 503, headers: { 'Content-Type': 'application/json' } });
     }
 
-    return new Response(JSON.stringify({ error: 'INTERNAL_ERROR', message: errMsg }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(JSON.stringify({
+      error: 'AI_ERROR',
+      message: errMsg || 'Erreur lors de la génération de réponse.'
+    }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 }
