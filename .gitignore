@@ -62,3 +62,6 @@ next-env.d.ts
 *.apk
 !public/downloads/*.apk
 twa/
+
+# local test / audit scripts
+/scripts/

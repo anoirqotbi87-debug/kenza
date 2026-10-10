@@ -43,6 +43,14 @@ export default function PageHeader({ badge, title, backHref = '/', actions }: Pa
           <ArrowLeft className={`w-5 h-5 ${isAr ? 'rotate-180' : ''}`} />
         </Link>
 
+        {/* Logo Kenza permanent sanctuarisé à gauche */}
+        <Link href="/" className="shrink-0 flex items-center gap-2" aria-label="Accueil Kenza">
+          <div className="w-8 h-8 rounded-xl bg-[#142943] text-[#f8f5ec] flex items-center justify-center font-arabic text-lg font-bold shrink-0 border border-[#ddb578]/40 shadow-xs">
+            <span>ك</span>
+          </div>
+          <span className="font-display font-bold text-base tracking-wider text-[#FDFCF8] hidden sm:inline shrink-0">KENZA</span>
+        </Link>
+
         <div className="min-w-0 flex-1">
           <p className="text-[#C9A05C] text-[10px] sm:text-xs font-bold tracking-[0.22em] uppercase truncate">
             {badge}

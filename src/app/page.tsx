@@ -14,7 +14,6 @@ import {
   Compass,
   Flame,
   Globe,
-  Headphones,
   Heart,
   Home as HomeIcon,
   LockKeyhole,

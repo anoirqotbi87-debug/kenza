@@ -5,7 +5,7 @@ import I18nProvider from '../components/I18nProvider';
 import NetworkStatus from '../components/NetworkStatus';
 import DirSync from '../components/DirSync';
 import TrackingProvider from '../components/TrackingProvider';
-import InstallApkBanner from '../components/InstallApkBanner';
+import InstallApkModal from '../components/InstallApkModal';
 
 const dmSans = DM_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-dm-sans", display: "swap" });
 const dmSerif = DM_Serif_Display({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-dm-serif", display: "swap" });
@@ -36,7 +36,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <meta name="theme-color" content="#f7f5ef" />
       </head>
       <body className="antialiased">
-        <InstallApkBanner />
+        <InstallApkModal />
         <DirSync />
         <I18nProvider>
           <NetworkStatus />
