@@ -40,9 +40,9 @@ export default function LanguageSelector({ variant = 'light', className = '', sh
   const wrapperTheme =
     variant === 'dark'
       ? 'bg-white/10 hover:bg-white/20 border-white/20 text-white'
-      : 'bg-slate-100 hover:bg-slate-200 border-transparent hover:border-slate-300 text-slate-700';
+      : 'bg-[#FDFCF8] hover:bg-white border-[#E8E2D5] hover:border-[#D69B47] text-[#15253B] shadow-xs';
 
-  const selectTheme = variant === 'dark' ? 'text-white' : 'text-slate-700';
+  const selectTheme = variant === 'dark' ? 'text-white' : 'text-[#15253B]';
 
   return (
     <label

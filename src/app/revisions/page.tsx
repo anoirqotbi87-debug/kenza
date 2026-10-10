@@ -30,25 +30,25 @@ export default function RevisionsPage() {
       />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-5">
-        <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100/90 rounded-xl mb-4 text-xs font-medium">
+        <div className="grid grid-cols-3 gap-1.5 p-1 bg-[#FDFCF8] border border-[#E8E2D5] rounded-xl mb-4 text-xs font-medium shadow-xs">
           <button
             type="button"
             onClick={() => setTab('smart')}
-            className={`py-2 px-1 text-center rounded-lg transition-all truncate ${tab === 'smart' ? 'bg-[#142943] text-white shadow-sm font-semibold' : 'text-slate-600 hover:text-slate-900'}`}
+            className={`py-2 px-1 text-center rounded-lg transition-all truncate ${tab === 'smart' ? 'bg-[#142943] text-white shadow-sm font-semibold' : 'text-[#7A7670] hover:text-[#142943]'}`}
           >
             Révision
           </button>
           <button
             type="button"
             onClick={() => setTab('decks')}
-            className={`py-2 px-1 text-center rounded-lg transition-all truncate ${tab === 'decks' ? 'bg-[#142943] text-white shadow-sm font-semibold' : 'text-slate-600 hover:text-slate-900'}`}
+            className={`py-2 px-1 text-center rounded-lg transition-all truncate ${tab === 'decks' ? 'bg-[#142943] text-white shadow-sm font-semibold' : 'text-[#7A7670] hover:text-[#142943]'}`}
           >
             Mes paquets
           </button>
           <button
             type="button"
             onClick={() => setTab('badges')}
-            className={`py-2 px-1 text-center rounded-lg transition-all truncate ${tab === 'badges' ? 'bg-[#142943] text-white shadow-sm font-semibold' : 'text-slate-600 hover:text-slate-900'}`}
+            className={`py-2 px-1 text-center rounded-lg transition-all truncate ${tab === 'badges' ? 'bg-[#142943] text-white shadow-sm font-semibold' : 'text-[#7A7670] hover:text-[#142943]'}`}
           >
             Badges
           </button>
