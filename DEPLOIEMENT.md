@@ -21,12 +21,13 @@ Toutes les variables sont documentées dans `.env.example` (versionné, sans sec
 | `SUPABASE_SERVICE_ROLE_KEY` | serveur uniquement | oui | Le webhook ne peut pas écrire `is_premium` : un paiement réussi n'accorde **aucun** accès. |
 | `STRIPE_SECRET_KEY` | serveur uniquement | oui | Checkout et portail renvoient `503`. |
 | `STRIPE_WEBHOOK_SECRET` | serveur uniquement | oui | Le webhook rejette toutes les requêtes (signature invalide). |
-| `GOOGLE_GENERATIVE_AI_API_KEY` | serveur uniquement | oui | Le roleplay IA échoue. |
+| `GROQ_API_KEY` | serveur uniquement | oui | Le roleplay IA renvoie HTTP 503 explicite. |
+| `GROQ_MODEL` | serveur uniquement | non (défaut : `llama-3.3-70b-versatile`) | Modèle principal du catalogue officiel Groq. Repli automatique sur `llama-3.1-8b-instant`. |
 | `NEXT_PUBLIC_APP_URL` | serveur | recommandé | Redirections Stripe vers l'origine par défaut codée en dur. |
 
 > **Ne jamais** préfixer une clé secrète par `NEXT_PUBLIC_` : tout ce préfixe est inliné dans le
 > bundle client et devient public. `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`,
-> `STRIPE_WEBHOOK_SECRET` et `GOOGLE_GENERATIVE_AI_API_KEY` sont strictement serveur.
+> `STRIPE_WEBHOOK_SECRET` et `GROQ_API_KEY` sont strictement serveur.
 
 ## 3. Webhook Stripe
 
@@ -82,3 +83,31 @@ C'est la source unique : le paywall, la CGU et la route Stripe en dérivent tous
 le badge de remise annuelle correspond au prix réellement facturé.
 
 Pour changer un tarif, modifier uniquement ce fichier, puis relancer `npm test`.
+
+## 8. Provider IA & Procédure de bascule
+
+Le moteur de roleplay (`src/app/api/roleplay/chat/route.ts`) utilise l'AI SDK avec le provider Groq (compatible OpenAI API) pour sa latence ultra-faible et son tier gratuit.
+
+### Modèle actif par défaut
+- **Catalogue officiel Groq** : `llama-3.3-70b-versatile` (70 milliards de paramètres, excellent rendu en Darija vocalisée).
+- **Repli automatique** : `llama-3.1-8b-instant` en cas de pic de trafic ou indisponibilité temporaire du 70B.
+- **Variable de configuration** : `GROQ_MODEL` (optionnelle, défaut: `llama-3.3-70b-versatile`).
+
+### Procédure de bascule de provider
+
+Si vous devez changer de fournisseur LLM en production :
+
+1. **Option 1 : Changer de modèle Groq**
+   - Définir `GROQ_MODEL=<identifiant-officiel>` dans Vercel (ex: `llama-3.3-70b-versatile`, `mixtral-8x7b-32768`).
+   - Redéployer : la route bascule immédiatement avec repli sur `llama-3.1-8b-instant`.
+
+2. **Option 2 : Bascule vers OpenAI (ex: gpt-4o-mini)**
+   - Définir `OPENAI_API_KEY` dans Vercel.
+   - Dans `src/app/api/roleplay/chat/route.ts`, instancier `createOpenAI({ apiKey: process.env.OPENAI_API_KEY })` sans `baseURL` personnalisé.
+   - Utiliser `gpt-4o-mini` comme modèle cible.
+
+3. **Option 3 : Bascule vers Google Gemini**
+   - Installer `@ai-sdk/google` (`npm i @ai-sdk/google`).
+   - Définir `GOOGLE_GENERATIVE_AI_API_KEY` dans Vercel.
+   - Importer `createGoogleGenerativeAI` et pointer vers `gemini-1.5-flash` ou `gemini-2.5-flash`.
+

@@ -18,9 +18,13 @@ vi.mock('@ai-sdk/openai', () => ({
   createOpenAI: () => vi.fn(),
 }));
 
+const getUserMock = vi.fn();
+const rpcMock = vi.fn();
+
 vi.mock('@supabase/supabase-js', () => ({
   createClient: () => ({
-    auth: { getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }) },
+    auth: { getUser: () => getUserMock() },
+    rpc: (...args: unknown[]) => rpcMock(...args),
   }),
 }));
 
@@ -34,6 +38,10 @@ beforeEach(() => {
   streamTextMock.mockResolvedValue({
     toDataStreamResponse: () => new Response('streamed-data', { status: 200 }),
   });
+  getUserMock.mockReset();
+  getUserMock.mockResolvedValue({ data: { user: null }, error: null });
+  rpcMock.mockReset();
+  rpcMock.mockResolvedValue({ data: true, error: null });
 });
 
 describe('/api/roleplay/chat security & rate limit', () => {
@@ -145,6 +153,59 @@ describe('/api/roleplay/chat security & rate limit', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        origin: 'https://kenza-dusky.vercel.app',
+      },
+      body: JSON.stringify({ messages: [{ role: 'user', content: 'Salam' }], personaId: 'cafe' }),
+    });
+    const res = await POST(req as unknown as NextRequest);
+    expect(res.status).toBe(403);
+    const data = await res.json();
+    expect(data.error).toBe('QUOTA_EXCEEDED');
+  });
+
+  it('B1 bloquant : rejette avec 401 si un Bearer token invalide ou corrompu est fourni', async () => {
+    getUserMock.mockResolvedValueOnce({ data: { user: null }, error: new Error('Invalid JWT') });
+
+    const req = new Request('http://localhost/api/roleplay/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer token-invalide-ou-pire-attaque',
+        origin: 'https://kenza-dusky.vercel.app',
+      },
+      body: JSON.stringify({ messages: [{ role: 'user', content: 'Salam' }], personaId: 'cafe' }),
+    });
+    const res = await POST(req as unknown as NextRequest);
+    expect(res.status).toBe(401);
+    const data = await res.json();
+    expect(data.error).toBe('UNAUTHORIZED');
+  });
+
+  it('B1 bloquant : rejette avec 401 si le format du Bearer token est trop court ou mal formé', async () => {
+    const req = new Request('http://localhost/api/roleplay/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer 123',
+        origin: 'https://kenza-dusky.vercel.app',
+      },
+      body: JSON.stringify({ messages: [{ role: 'user', content: 'Salam' }], personaId: 'cafe' }),
+    });
+    const res = await POST(req as unknown as NextRequest);
+    expect(res.status).toBe(401);
+    const data = await res.json();
+    expect(data.error).toBe('UNAUTHORIZED');
+  });
+
+  it('B1 bloquant : consomme le quota utilisateur et rejette avec 403 QUOTA_EXCEEDED si épuisé', async () => {
+    getUserMock.mockResolvedValueOnce({ data: { user: { id: 'usr-1' } }, error: null });
+    rpcMock.mockResolvedValueOnce({ data: false, error: null });
+
+    const req = new Request('http://localhost/api/roleplay/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer valid-user-jwt-token-string',
         origin: 'https://kenza-dusky.vercel.app',
       },
       body: JSON.stringify({ messages: [{ role: 'user', content: 'Salam' }], personaId: 'cafe' }),

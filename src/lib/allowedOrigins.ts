@@ -3,11 +3,27 @@
 
 const PRODUCTION_ORIGIN = process.env.NEXT_PUBLIC_APP_URL || 'https://kenza-dusky.vercel.app';
 
-const ALLOWED_ORIGIN_REGEX =
-  /^https:\/\/([a-z0-9][a-z0-9-]*\.)?vercel\.app$|^http:\/\/localhost:\d+$/i;
+const STATIC_ALLOWED_ORIGINS = new Set([
+  'https://kenza.vercel.app',
+  'https://kenza-dusky.vercel.app',
+]);
+
+const LOCALHOST_REGEX = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i;
 
 export function isAllowedOrigin(origin: string): boolean {
-  return origin === PRODUCTION_ORIGIN || ALLOWED_ORIGIN_REGEX.test(origin);
+  if (origin === PRODUCTION_ORIGIN || STATIC_ALLOWED_ORIGINS.has(origin)) {
+    return true;
+  }
+  if (LOCALHOST_REGEX.test(origin)) {
+    return true;
+  }
+  if (process.env.VERCEL_URL && origin === `https://${process.env.VERCEL_URL}`) {
+    return true;
+  }
+  if (process.env.VERCEL_BRANCH_URL && origin === `https://${process.env.VERCEL_BRANCH_URL}`) {
+    return true;
+  }
+  return false;
 }
 
 /**

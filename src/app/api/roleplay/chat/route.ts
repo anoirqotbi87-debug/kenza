@@ -52,25 +52,37 @@ export async function POST(req: NextRequest) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-    if (authHeader && authHeader.startsWith('Bearer ') && authHeader.length > 10) {
-      // Utilisateur connecté avec session Supabase
+    if (authHeader) {
+      if (!authHeader.startsWith('Bearer ') || authHeader.length <= 10) {
+        return new Response(JSON.stringify({
+          error: 'UNAUTHORIZED',
+          message: "Format du jeton d'authentification invalide."
+        }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+      }
+
+      // Utilisateur prétendant être connecté avec session Supabase
       const supabase = createClient(supabaseUrl, supabaseKey, {
         global: { headers: { Authorization: authHeader } }
       });
 
       const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (!authError && user) {
-        const { data: quotaOk, error: quotaError } = await supabase.rpc('consume_ai_quota');
-        if (quotaError) {
-          console.error('[Supabase Quota Error]:', quotaError);
-          return new Response('Service Unavailable (DB)', { status: 503 });
-        }
-        if (!quotaOk) {
-          return new Response(JSON.stringify({
-            error: 'QUOTA_EXCEEDED',
-            message: 'Quota quotidien de 8 messages atteint. Passez à Kenza Pro pour des conversations illimitées !'
-          }), { status: 403, headers: { 'Content-Type': 'application/json' } });
-        }
+      if (authError || !user) {
+        return new Response(JSON.stringify({
+          error: 'UNAUTHORIZED',
+          message: 'Session invalide ou expirée.'
+        }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+      }
+
+      const { data: quotaOk, error: quotaError } = await supabase.rpc('consume_ai_quota');
+      if (quotaError) {
+        console.error('[Supabase Quota Error]:', quotaError);
+        return new Response('Service Unavailable (DB)', { status: 503 });
+      }
+      if (!quotaOk) {
+        return new Response(JSON.stringify({
+          error: 'QUOTA_EXCEEDED',
+          message: 'Quota quotidien de 8 messages atteint. Passez à Kenza Pro pour des conversations illimitées !'
+        }), { status: 403, headers: { 'Content-Type': 'application/json' } });
       }
     } else {
       const userAgent = req.headers.get('user-agent') || '';
@@ -144,16 +156,16 @@ export async function POST(req: NextRequest) {
     );
     if (totalChars > 4000) return new Response('Payload too large', { status: 400 });
 
-    // 6. Streaming ultra-rapide avec Groq (Modèle validé + repli automatique)
+    // 6. Streaming ultra-rapide avec Groq (Modèle officiel + repli automatique)
     const groq = createOpenAI({
       baseURL: 'https://api.groq.com/openai/v1',
       apiKey,
     });
 
+    const configuredModel = process.env.GROQ_MODEL?.trim() || 'llama-3.3-70b-versatile';
     const CANDIDATE_MODELS = [
-      'qwen/qwen3.8-27b',
-      'allam-2-7b',
-      'openai/gpt-oss-120b',
+      configuredModel,
+      ...(configuredModel !== 'llama-3.1-8b-instant' ? ['llama-3.1-8b-instant'] : []),
     ];
 
     let targetLanguageLabel = 'Français';
