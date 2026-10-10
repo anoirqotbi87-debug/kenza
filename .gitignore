@@ -65,3 +65,6 @@ twa/
 
 # local test / audit scripts
 /scripts/
+
+# parasite directories (ex: Dify workflow artefacts)
+/{*
