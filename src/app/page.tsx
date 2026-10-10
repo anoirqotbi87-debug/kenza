@@ -27,6 +27,7 @@ import {
   Star,
   Target,
   Volume2,
+  VolumeX,
   X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -750,24 +751,43 @@ export default function Home() {
       {/* Main Area */}
       <main className="main-area" inert={backgroundInert}>
         <header className="topbar">
-          <button
-            className="icon-button mobile-menu-trigger"
-            aria-label={t.modules.home.langSwitcher}
-            onClick={() => setMobileMenuOpen(true)}
-          >
-            <Menu size={21} />
-          </button>
-          <div className="breadcrumbs">
-            <span>KENZA</span>
-            <ChevronRight size={14} />
-            <span>{currentHeader.eyebrow.toLocaleLowerCase(lang)}</span>
+          {/* Bloc Logo Kenza permanent sanctuarisé à gauche — shrink-0 */}
+          <div className="shrink-0 flex items-center gap-2 sm:gap-3">
+            <button
+              className="icon-button mobile-menu-trigger"
+              aria-label={t.modules.home.langSwitcher}
+              onClick={() => setMobileMenuOpen(true)}
+            >
+              <Menu size={21} />
+            </button>
+
+            <div className="shrink-0 flex items-center gap-2" aria-label="Kenza">
+              <div
+                className="w-8 h-8 rounded-xl bg-[#142943] text-[#f8f5ec] flex items-center justify-center font-arabic text-lg font-bold shrink-0 border border-[#ddb578]/40 shadow-xs"
+                aria-hidden="true"
+              >
+                <span>ك</span>
+              </div>
+              <span className="font-display font-bold text-base tracking-wider text-[#142943] hidden sm:inline shrink-0">
+                KENZA
+              </span>
+            </div>
           </div>
-          <div className="topbar-actions">
+
+          <div className="breadcrumbs min-w-0 flex-1 truncate mx-2">
+            <span className="hidden md:inline">KENZA</span>
+            <ChevronRight size={14} className="hidden md:inline shrink-0" />
+            <span className="truncate">{currentHeader.eyebrow.toLocaleLowerCase(lang)}</span>
+          </div>
+
+          <div className="topbar-actions shrink-0 flex items-center gap-1.5 sm:gap-2.5">
             {/* Badge d'abonnement persistant (Trigger 4) */}
-            <SubscriptionBadge onUpgrade={() => setPricingSource("header_upgrade")} />
+            <div className="hidden lg:block shrink-0">
+              <SubscriptionBadge onUpgrade={() => setPricingSource("header_upgrade")} />
+            </div>
 
             {/* Sélecteur de langue bilingue */}
-            <div className="lang-switcher" role="group" aria-label={tr("Sélecteur de langue", "Language switcher", "Selector de idioma", "مبدل اللغة")}>
+            <div className="lang-switcher shrink-0" role="group" aria-label={tr("Sélecteur de langue", "Language switcher", "Selector de idioma", "مبدل اللغة")}>
               <Globe size={13} className="lang-icon" />
               <button
                 type="button"
@@ -808,20 +828,31 @@ export default function Home() {
 
             {/* Toggle Son */}
             <button
-              className="sound-toggle"
+              className={`sound-toggle shrink-0 ${soundEnabled ? "sound-toggle-active" : "sound-toggle-muted"}`}
               onClick={toggleSound}
-              title={soundEnabled ? trL(lang, "Audio activé", "Audio on", "Audio activado", "الصوت مُفعّل") : trL(lang, "Audio muet", "Audio muted", "Audio silenciado", "الصوت مكتوم")}
+              title={soundEnabled ? trL(lang, "Audio activé — cliquer pour couper", "Audio ON — click to mute", "Audio activado — clic para silenciar", "الصوت مُفعّل — اضغط للكتم") : trL(lang, "Audio coupé — cliquer pour activer", "Audio OFF — click to enable", "Audio silenciado — clic para activar", "الصوت مكتوم — اضغط للتفعيل")}
               aria-label={soundEnabled ? trL(lang, "Couper le son", "Mute sound", "Silenciar", "كتم الصوت") : trL(lang, "Activer le son", "Enable sound", "Activar sonido", "تفعيل الصوت")}
             >
-              <Headphones size={15} />
-              <span>{soundEnabled ? trL(lang, "Son actif", "Sound on", "Sonido activo", "الصوت مُفعّل") : trL(lang, "Son coupé", "Sound off", "Sonido apagado", "الصوت مُغلق")}</span>
+              {soundEnabled ? (
+                <>
+                  <span className="sound-dot sound-dot-on" aria-hidden="true" />
+                  <Volume2 size={15} className="sound-icon-on" />
+                  <span className="hidden md:inline">{trL(lang, "Son actif", "Sound on", "Sonido activo", "الصوت مُفعّل")}</span>
+                </>
+              ) : (
+                <>
+                  <span className="sound-dot sound-dot-off" aria-hidden="true" />
+                  <VolumeX size={15} className="sound-icon-off" />
+                  <span className="hidden md:inline">{trL(lang, "Son coupé", "Sound off", "Sonido apagado", "الصوت مُغلق")}</span>
+                </>
+              )}
             </button>
 
-            {/* Connexion Google & Profil */}
+            {/* Connexion Google & Profil (compacté à 32px à droite) */}
             {user ? (
-              <div className="flex items-center gap-2">
+              <div className="shrink-0 flex items-center gap-1.5 sm:gap-2">
                 <button
-                  className="top-avatar"
+                  className="w-8 h-8 rounded-full border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center bg-[#f1e6d0] text-[#775a34] font-serif text-sm transition-transform hover:scale-105"
                   aria-label={t.modules.home.openSpace}
                   onClick={() => switchView("space")}
                   title={user.email || t.nav.profile}
@@ -833,7 +864,7 @@ export default function Home() {
                       width={32}
                       height={32}
                       unoptimized
-                      className="w-full h-full object-cover rounded-full"
+                      className="w-8 h-8 rounded-full object-cover"
                     />
                   ) : user.user_metadata?.full_name ? (
                     user.user_metadata.full_name[0].toUpperCase()
@@ -846,7 +877,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={handleSignOut}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200/80 rounded-full transition-colors"
+                  className="shrink-0 flex items-center gap-1 px-2 py-1 text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200/80 rounded-full transition-colors"
                   aria-label={trL(lang, "Se déconnecter", "Sign out", "Cerrar sesión", "تسجيل الخروج")}
                   title={trL(lang, "Se déconnecter", "Sign out", "Cerrar sesión", "تسجيل الخروج")}
                 >
@@ -858,7 +889,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={handleGoogleLogin}
-                className="google-login-btn"
+                className="google-login-btn shrink-0"
                 aria-label={trL(lang, "Se connecter avec Google", "Sign in with Google", "Iniciar sesión con Google", "تسجيل الدخول عبر Google")}
                 title={trL(lang, "Se connecter avec Google", "Sign in with Google", "Iniciar sesión con Google", "تسجيل الدخول عبر Google")}
               >
@@ -964,6 +995,7 @@ export default function Home() {
               cardFlipped={cardFlipped}
               setCardFlipped={setCardFlipped}
               onGrade={gradeReview}
+              onPlay={playPhrase}
             />
           )}
 
@@ -1960,11 +1992,13 @@ function ReviewView({
   cardFlipped,
   setCardFlipped,
   onGrade,
+  onPlay,
 }: {
   reviewIndex: number;
   cardFlipped: boolean;
   setCardFlipped: (value: boolean) => void;
   onGrade: (grade: "again" | "hard" | "good" | "easy") => void;
+  onPlay: (darija: string, arabic: string) => void;
 }) {
   const { lang } = useLocalizedContent();
   const cards = [
@@ -2013,31 +2047,48 @@ function ReviewView({
             <Sparkles size={14} /> {trL(lang, "Session tranquille", "Quiet session", "Sesión tranquila", "جلسة هادئة")}
           </span>
         </div>
-        <button
-          className={`flashcard ${cardFlipped ? "flashcard-flipped" : ""}`}
-          onClick={() => setCardFlipped(!cardFlipped)}
-          aria-label={cardFlipped ? trL(lang, "Voir la question", "See the question", "Ver la pregunta", "شاهد السؤال") : trL(lang, "Retourner la carte", "Flip the card", "Girar la tarjeta", "اقلب البطاقة")}
-        >
-          <span className="flashcard-decoration decor-top">✳</span>
-          <span className="flashcard-label">{cardFlipped ? trL(lang, "EN DARIJA", "IN DARIJA", "EN DARIJA", "بالدارجة") : trL(lang, "EN FRANÇAIS", "IN ENGLISH", "EN ESPAÑOL", "بالعربية")}</span>
-          {cardFlipped ? (
-            <>
-              <strong className="flashcard-answer">{card.back}</strong>
-              <span className="flashcard-arabic" dir="rtl">
-                {card.arabic}
-              </span>
-              <p>{card.hint}</p>
-            </>
-          ) : (
-            <>
-              <strong className="flashcard-question">{card.front}</strong>
-              <span className="flashcard-tap">
-                <span className="rotate-symbol">↻</span> {trL(lang, "Touche pour révéler", "Tap to reveal", "Toca para revelar", "المس للكشف")}
-              </span>
-            </>
+        <div className="relative">
+          <button
+            className={`flashcard ${cardFlipped ? "flashcard-flipped" : ""}`}
+            onClick={() => setCardFlipped(!cardFlipped)}
+            aria-label={cardFlipped ? trL(lang, "Voir la question", "See the question", "Ver la pregunta", "شاهد السؤال") : trL(lang, "Retourner la carte", "Flip the card", "Girar la tarjeta", "اقلب البطاقة")}
+          >
+            <span className="flashcard-decoration decor-top">✳</span>
+            <span className="flashcard-label">{cardFlipped ? trL(lang, "EN DARIJA", "IN DARIJA", "EN DARIJA", "بالدارجة") : trL(lang, "EN FRANÇAIS", "IN ENGLISH", "EN ESPAÑOL", "بالعربية")}</span>
+            {cardFlipped ? (
+              <>
+                <strong className="flashcard-answer">{card.back}</strong>
+                <span className="flashcard-arabic" dir="rtl">
+                  {card.arabic}
+                </span>
+                <p>{card.hint}</p>
+              </>
+            ) : (
+              <>
+                <strong className="flashcard-question">{card.front}</strong>
+                <span className="flashcard-tap">
+                  <span className="rotate-symbol">↻</span> {trL(lang, "Touche pour révéler", "Tap to reveal", "Toca para revelar", "المس للكشف")}
+                </span>
+              </>
+            )}
+            <span className="flashcard-decoration decor-bottom">✳</span>
+          </button>
+
+          {cardFlipped && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onPlay(card.back, card.arabic);
+              }}
+              className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-[#142943] text-white hover:bg-[#D69B47] hover:text-[#142943] flex items-center justify-center shadow-md transition-all active:scale-95"
+              title={trL(lang, "Écouter la prononciation", "Listen to pronunciation", "Escuchar la pronunciación", "استمع إلى النطق")}
+              aria-label={trL(lang, "Écouter la prononciation", "Listen to pronunciation", "Escuchar la pronunciación", "استمع إلى النطق")}
+            >
+              <Volume2 size={16} />
+            </button>
           )}
-          <span className="flashcard-decoration decor-bottom">✳</span>
-        </button>
+        </div>
 
         <div className="review-hint">
           <CircleHelp size={15} />

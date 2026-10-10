@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { Volume2 } from 'lucide-react';
 import { DialogueTurn } from '../../types/dialogue';
 import { useTranslation, useAppStore } from '../../store/useAppStore';
+import { playAudio } from '../../lib/audio';
 
 interface DialogueBubbleProps {
   turn: DialogueTurn;
@@ -9,8 +11,13 @@ interface DialogueBubbleProps {
 export default function DialogueBubble({ turn }: DialogueBubbleProps) {
   const { t } = useTranslation();
   const isBot = turn.speaker === 'bot';
-  const { preferredNotation } = useAppStore();
+  const { preferredNotation, soundEnabled } = useAppStore();
   const [showTranslation, setShowTranslation] = useState(false);
+
+  const handlePlay = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    playAudio(turn.arabiziText || turn.arabicText, turn.arabicText, soundEnabled);
+  };
 
   return (
     <div className={`flex w-full mb-6 animate-in fade-in slide-in-from-bottom-2 ${isBot ? 'justify-start' : 'justify-end'}`}>
@@ -25,8 +32,21 @@ export default function DialogueBubble({ turn }: DialogueBubbleProps) {
           ? 'bg-white border border-slate-200 text-slate-800 rounded-tl-none' 
           : 'bg-blue-600 text-white rounded-tr-none'
       }`}>
-        <div className={`text-xs font-bold mb-1 ${isBot ? 'text-amber-600' : 'text-blue-200'}`}>
-          {turn.speakerRole}
+        <div className="flex items-center justify-between gap-2 mb-1">
+          <div className={`text-xs font-bold ${isBot ? 'text-amber-600' : 'text-blue-200'}`}>
+            {turn.speakerRole}
+          </div>
+          {isBot && (
+            <button
+              type="button"
+              onClick={handlePlay}
+              className="p-1 text-slate-400 hover:text-amber-600 rounded-full transition-colors flex items-center gap-1"
+              title="Réécouter la réplique"
+              aria-label="Réécouter la réplique"
+            >
+              <Volume2 className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
         
         {preferredNotation === 'arabic' || preferredNotation === 'duo' ? (

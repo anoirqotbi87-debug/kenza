@@ -135,8 +135,65 @@ button[class*="bg-[#0B2545]"] span {
 .breadcrumbs span:first-child { color: #6f7b80; font-weight: 700; letter-spacing: .15em; }
 .breadcrumbs svg { color: #b9b5aa; }
 .topbar-actions { display: flex; align-items: center; gap: 10px; }
-.sound-toggle { display: flex; align-items: center; gap: 7px; padding: 7px 10px; border: 1px solid #e8e4da; border-radius: 999px; color: #65717a; background: rgba(255,254,250,.6); font-size: 10px; transition: .18s; cursor: pointer; }
-.sound-toggle:hover { background: #fffefa; color: var(--navy); }
+.sound-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  transition: background .18s, border-color .18s, color .18s, box-shadow .18s, transform .16s;
+  cursor: pointer;
+}
+.sound-toggle-active {
+  background: #FFFFFF;
+  border: 1px solid #7A9174;
+  color: #1B2A4A;
+  box-shadow: 0 1px 4px rgba(92, 145, 121, 0.15);
+}
+.sound-toggle-active:hover {
+  background: #F6F9F5;
+  border-color: #5c9179;
+}
+.sound-toggle-muted {
+  background: #F8F6F0;
+  border: 1px solid #D9D3C7;
+  color: #8C8275;
+  opacity: 0.88;
+}
+.sound-toggle-muted:hover {
+  background: #FFFFFF;
+  border-color: #B96A4D;
+  color: #B96A4D;
+  opacity: 1;
+}
+.sound-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.sound-dot-on {
+  background: #3B7A57;
+  box-shadow: 0 0 0 2px rgba(59, 122, 87, 0.2);
+}
+.sound-dot-off {
+  background: #B96A4D;
+  box-shadow: 0 0 0 2px rgba(185, 106, 77, 0.2);
+}
+.sound-icon-on {
+  color: #3B7A57;
+  flex-shrink: 0;
+}
+.sound-icon-off {
+  color: #B96A4D;
+  flex-shrink: 0;
+}
+.sound-toggle:active {
+  transform: scale(0.97);
+}
 .top-avatar { width: 32px; height: 32px; display: grid; place-items: center; border: 1px solid #e5d3b0; border-radius: 50%; color: #775a34; background: #f1e6d0; font-family: "DM Serif Display", serif; font-size: 15px; transition: transform .16s; cursor: pointer; overflow: hidden; }
 .top-avatar:hover { transform: scale(1.06); }
 
@@ -659,8 +716,10 @@ button[class*="bg-[#0B2545]"] span {
   .lang-switcher { height: 28px; padding: 0 6px; font-size: 10px; gap: 3px; }
   .google-login-btn { height: 28px; padding: 0 8px; font-size: 10px; }
   .google-login-btn span { display: none; }
-  .sound-toggle { width: 30px; height: 30px; justify-content: center; padding: 0; }
-  .sound-toggle span { display: none; }
+  .sound-toggle { width: 32px; height: 32px; justify-content: center; padding: 0; }
+  .sound-toggle span:not(.sound-dot) { display: none; }
+  .sound-toggle .sound-dot { display: block; position: absolute; top: 3px; right: 3px; width: 6px; height: 6px; }
+  .sound-toggle { position: relative; }
   .top-avatar { width: 29px; height: 29px; }
   .content-wrap { padding: 27px 17px 22px; }
   .page-heading { align-items: flex-start; margin-bottom: 18px; }

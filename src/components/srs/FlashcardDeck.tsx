@@ -114,7 +114,12 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
 
   const handlePlayAudio = (e: React.MouseEvent) => {
     e.stopPropagation();
-    playAudio(wordData.arabic, wordData.audioUrl, soundEnabled);
+    // Priorité à l'audio statique s'il existe, sinon synthèse vocale marocaine (arabizi + arabe)
+    if (wordData.audioUrl) {
+      playAudio(wordData.arabizi || wordData.arabic, wordData.audioUrl, soundEnabled);
+    } else {
+      playAudio(wordData.arabizi || wordData.arabic, wordData.arabic, soundEnabled);
+    }
   };
 
   return (
