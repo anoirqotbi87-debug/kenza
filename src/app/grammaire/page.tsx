@@ -43,6 +43,7 @@ export default function GrammairePage() {
       <PageHeader
         badge={tp.badge || 'Grammaire Active'}
         title={tp.title || 'Grammaire & Conjugaison'}
+        backHref="/?view=path&tab=grammaire"
       />
 
       <main className="max-w-4xl mx-auto p-6 pb-24 space-y-8">

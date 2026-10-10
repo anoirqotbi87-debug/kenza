@@ -27,6 +27,7 @@ export default function RevisionsPage() {
       <PageHeader
         badge={tp.badge || 'Révisions & Progression'}
         title={tp.title || 'Révisions & Paquets de cartes'}
+        backHref="/?view=path&tab=revision"
       />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-5">

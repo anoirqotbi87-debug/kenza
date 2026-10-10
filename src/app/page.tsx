@@ -69,6 +69,13 @@ import AiRoleplayView from "@/components/dialogue/AiRoleplayView";
 import PaywallModal from "@/components/monetization/PaywallModal";
 import SubscriptionBadge from "@/components/monetization/SubscriptionBadge";
 import OnboardingModal from "@/components/onboarding/OnboardingModal";
+import PathGrammarSection from "@/components/curriculum/PathGrammarSection";
+import PathSpeakingSection from "@/components/curriculum/PathSpeakingSection";
+import SRSDashboard from "@/components/srs/SRSDashboard";
+import ArabiziGuideModal from "@/components/curriculum/ArabiziGuideModal";
+import DialogueView from "@/components/dialogue/DialogueView";
+import type { DialogueScenario } from "@/types/dialogue";
+import type { Lesson } from "@/types/curriculum";
 import OfflineDownloadCard from "@/components/monetization/OfflineDownloadCard";
 import DownloadApkCard from "@/components/DownloadApkCard";
 import InstallPwaBanner from "@/components/pwa/InstallPwaBanner";
@@ -249,6 +256,19 @@ export default function Home() {
   const [checkpointOpen, setCheckpointOpen] = useState<{ id: string; name: string } | null>(null);
   const [showScenarioSelector, setShowScenarioSelector] = useState(false);
   const [activePersonaId, setActivePersonaId] = useState<PersonaId | null>(null);
+  const [activeDialogueScenario, setActiveDialogueScenario] = useState<DialogueScenario | null>(null);
+  const [showArabiziModal, setShowArabiziModal] = useState(false);
+  const [pathTab, setPathTab] = useState<"parcours" | "grammaire" | "parler" | "revision">(() => {
+    if (typeof window === "undefined") return "parcours";
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const t = params.get("tab");
+      if (t === "grammaire" || t === "parler" || t === "revision" || t === "parcours") {
+        return t;
+      }
+    } catch {}
+    return "parcours";
+  });
   const [pricingSource, setPricingSource] = useState<string | null>(null);
 
   // Première visite : le questionnaire de personnalisation s'ouvre une fois le
@@ -377,6 +397,10 @@ export default function Home() {
       const v = params.get("view");
       if (v === "phrases" || v === "path" || v === "review" || v === "space" || v === "today") {
         setView(v as View);
+      }
+      const t = params.get("tab");
+      if (t === "grammaire" || t === "parler" || t === "revision" || t === "parcours") {
+        setPathTab(t);
       }
     };
     window.addEventListener("popstate", handlePopState);
@@ -588,6 +612,8 @@ export default function Home() {
   const backgroundInert =
     showScenarioSelector ||
     activePersonaId !== null ||
+    activeDialogueScenario !== null ||
+    showArabiziModal ||
     checkpointOpen !== null ||
     onboardingOpen ||
     activePricingSource !== null ||
@@ -897,6 +923,18 @@ export default function Home() {
               onOpenRoleplay={() => setShowScenarioSelector(true)}
               onNavigate={switchView}
               isPremium={isPremium}
+              activeTab={pathTab}
+              onTabChange={(newTab) => {
+                setPathTab(newTab);
+                if (typeof window !== "undefined") {
+                  const url = new URL(window.location.href);
+                  url.searchParams.set("view", "path");
+                  url.searchParams.set("tab", newTab);
+                  window.history.pushState({}, "", url.toString());
+                }
+              }}
+              onStartScenario={(scenario) => setActiveDialogueScenario(scenario)}
+              onOpenArabizi={() => setShowArabiziModal(true)}
             />
           )}
 
@@ -987,6 +1025,19 @@ export default function Home() {
             onClose={() => setActivePersonaId(null)}
           />
         </div>
+      )}
+
+      {/* Guided Scenario Dialogue View */}
+      {activeDialogueScenario && (
+        <DialogueView
+          scenario={activeDialogueScenario}
+          onExit={() => setActiveDialogueScenario(null)}
+        />
+      )}
+
+      {/* Arabizi Phonetic Guide Modal */}
+      {showArabiziModal && (
+        <ArabiziGuideModal onClose={() => setShowArabiziModal(false)} />
       )}
 
       {/* Checkpoint Modal */}
@@ -1424,6 +1475,10 @@ function PathView({
   onOpenRoleplay,
   onNavigate,
   isPremium,
+  activeTab = "parcours",
+  onTabChange,
+  onStartScenario,
+  onOpenArabizi,
 }: {
   completedLessons: string[];
   onOpenLesson: (lessonId?: string) => void;
@@ -1432,11 +1487,16 @@ function PathView({
   onOpenRoleplay: () => void;
   onNavigate: (view: View) => void;
   isPremium: boolean;
+  activeTab?: "parcours" | "grammaire" | "parler" | "revision";
+  onTabChange?: (tab: "parcours" | "grammaire" | "parler" | "revision") => void;
+  onStartScenario?: (scenario: DialogueScenario) => void;
+  onOpenArabizi?: () => void;
 }) {
   const { lang } = useLocalizedContent();
   const { hasPassedLevel } = useCheckpointProgress();
-  const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"parcours" | "grammaire" | "parler" | "revision">("parcours");
+  const [localTab, setLocalTab] = useState<"parcours" | "grammaire" | "parler" | "revision">(activeTab);
+  const currentTab = onTabChange ? activeTab : localTab;
+
   const [selectedModule, setSelectedModule] = useState<string>("1");
 
   const modules = useMemo(() => getHomeModules(lang, completedLessons, isPremium), [lang, completedLessons, isPremium]);
@@ -1444,8 +1504,6 @@ function PathView({
   const totalLessons = useMemo(() => modules.reduce((sum, m) => sum + m.lessons, 0), [modules]);
   const totalCompleted = useMemo(() => modules.reduce((sum, m) => sum + m.completed, 0), [modules]);
 
-  // Module selectionne : l'utilisateur choisit via la grille; on retombe sur le
-  // premier module debloque non termine, sinon le module 1 (toujours gratuit).
   const selectedCard = useMemo(() => {
     const explicit = modules.find((m) => m.key === selectedModule && !m.locked);
     if (explicit) return explicit;
@@ -1460,10 +1518,11 @@ function PathView({
   const progressPct = totalLessons ? Math.round((totalCompleted / totalLessons) * 100) : 0;
 
   const handleTab = (tab: "parcours" | "grammaire" | "parler" | "revision") => {
-    if (tab === "parcours") { setActiveTab("parcours"); return; }
-    if (tab === "grammaire") { router.push("/grammaire"); return; }
-    if (tab === "parler") { onOpenRoleplay(); return; }
-    if (tab === "revision") { onNavigate("review"); return; }
+    if (onTabChange) {
+      onTabChange(tab);
+    } else {
+      setLocalTab(tab);
+    }
   };
 
   const pills: Array<{ id: "parcours" | "grammaire" | "parler" | "revision"; emoji: string; label: string }> = [
@@ -1483,9 +1542,9 @@ function PathView({
             type="button"
             onClick={() => handleTab(pill.id)}
             className={
-              activeTab === pill.id
-                ? "rounded-full px-4 py-2 text-sm font-semibold flex items-center gap-2 shadow-sm bg-[#0B2545] text-white"
-                : "rounded-full px-3 py-2 text-sm font-medium flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              currentTab === pill.id
+                ? "rounded-full px-4 py-2 text-sm font-semibold flex items-center gap-2 shadow-sm bg-[#142943] text-white"
+                : "rounded-full px-3.5 py-2 text-sm font-medium flex items-center gap-2 text-[#6B7174] hover:text-[#142943] bg-transparent hover:bg-white/60 transition-colors"
             }
           >
             <span aria-hidden="true">{pill.emoji}</span>
@@ -1494,205 +1553,240 @@ function PathView({
         ))}
       </div>
 
-      {/* B. Hero & carte de progression globale */}
-      <section className="pt-2">
-        <p className="text-[11px] font-semibold tracking-[0.18em] uppercase text-[#8C6D23] mb-2">
-          {trL(lang, "— Parcours complet", "— Full curriculum", "— Recorrido completo", "— المسار الكامل")}
-        </p>
-        <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#0B2545] leading-tight mb-5">
-          {trL(lang, "Ton parcours complet — 7 modules", "Your full curriculum — 7 modules", "Tu recorrido completo — 7 módulos", "مسارك الكامل — 7 وحدات")}
-        </h2>
+      {/* SOUS-VUE 1 : PARCOURS DES 7 MODULES */}
+      {currentTab === "parcours" && (
+        <div className="space-y-6 animate-fadeIn">
+          {/* Hero & carte de progression globale */}
+          <section className="pt-2">
+            <p className="text-[11px] font-semibold tracking-[0.18em] uppercase text-[#8C6D23] mb-2">
+              {trL(lang, "— Parcours complet", "— Full curriculum", "— Recorrido completo", "— المسار الكامل")}
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#142943] leading-tight mb-5">
+              {trL(lang, "Ton parcours complet — 7 modules", "Your full curriculum — 7 modules", "Tu recorrido completo — 7 módulos", "مسارك الكامل — 7 وحدات")}
+            </h2>
 
-        <div className="rounded-2xl bg-white/90 border border-[#E8E2D2] p-4 sm:p-6 shadow-sm mb-6">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-[#0B2545] flex items-center justify-center text-[#C59B27] shrink-0">
-              <Sparkles size={22} />
-            </div>
-            <div className="min-w-0 flex-1">
-              <span className="text-[10px] font-bold tracking-[0.15em] uppercase text-[#8C6D23]">
-                {trL(lang, "Progression", "Progress", "Progreso", "التقدم")}
-              </span>
-              <div className="flex items-baseline gap-2 flex-wrap">
-                <strong className="text-lg font-bold text-[#0B2545]">
-                  {totalCompleted} / {totalLessons}{" "}
-                  <span className="text-xs font-semibold text-[#7A7670]">
-                    {trL(lang, "leçons terminées", "lessons completed", "lecciones completadas", "دروس مُنجزة")}
-                  </span>
-                </strong>
-                <span className="ml-auto text-sm font-bold text-[#0B2545]">{progressPct}%</span>
-              </div>
-              <p className="text-xs text-[#7A7670] mt-1">
-                {trL(lang, "Choisissez un module et reprenez là où vous en êtes.", "Pick a module and resume where you left off.", "Elige un módulo y retoma donde lo dejaste.", "اختر وحدة وتابع من حيث توقفت.")}
-              </p>
-              <div className="h-2 bg-[#E8E2D2] rounded-full overflow-hidden mt-3">
-                <div
-                  className="h-full bg-gradient-to-r from-[#0B2545] to-[#C59B27] rounded-full transition-all"
-                  style={{ width: `${progressPct}%` }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* C. Grille de sélection des modules (2 colonnes) */}
-      <section>
-        <p className="text-[11px] font-semibold tracking-[0.18em] uppercase text-[#8C6D23] mb-1">
-          {trL(lang, "Parcours complet", "Full curriculum", "Recorrido completo", "المسار الكامل")}
-        </p>
-        <h3 className="text-xl font-serif font-bold text-[#0B2545] mb-3">
-          {trL(lang, "Choisissez votre module", "Choose your module", "Elige tu módulo", "اختر وحدتك")}
-        </h3>
-
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-8">
-          {modules.map((mod) => {
-            const modDone = mod.done;
-            const modProgress = mod.lessons ? Math.round((mod.completed / mod.lessons) * 100) : 0;
-            const active = selectedCard?.key === mod.key && !mod.locked;
-
-            return (
-              <button
-                key={mod.key}
-                type="button"
-                disabled={mod.locked}
-                onClick={() => setSelectedModule(mod.key)}
-                className={
-                  active
-                    ? "relative text-left rounded-2xl bg-[#0B2545] text-white p-4 shadow-sm border border-[#0B2545] transition-colors"
-                    : mod.locked
-                    ? "relative text-left rounded-2xl bg-white border border-[#E8E2D2] p-4 opacity-80 cursor-not-allowed transition-colors"
-                    : "relative text-left rounded-2xl bg-white border border-[#E8E2D2] p-4 hover:border-[#C9A05C] transition-colors"
-                }
-                aria-current={active ? "page" : undefined}
-              >
-                <div className="flex items-center justify-between gap-2 mb-2">
-                  <span
-                    className={
-                      active
-                        ? "text-[9px] font-bold tracking-[0.14em] uppercase text-[#C59B27]"
-                        : mod.locked
-                        ? "text-[9px] font-bold tracking-[0.14em] uppercase text-[#B0ACA2]"
-                        : "text-[9px] font-bold tracking-[0.14em] uppercase text-[#C59B27]"
-                    }
-                  >
-                    {tr("Module", "Module", "Módulo", "الوحدة")} {mod.key}
-                  </span>
-                  {mod.locked ? (
-                    <span className="text-[#C59B27] shrink-0" aria-hidden="true">
-                      <LockKeyhole size={14} />
-                    </span>
-                  ) : (
-                    <span className={active ? "text-white" : "text-[#0B2545]"} aria-hidden="true">
-                      <ChevronRight size={16} />
-                    </span>
-                  )}
+            <div className="rounded-2xl bg-white/90 border border-[#E8E2D2] p-4 sm:p-6 shadow-sm mb-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-[#142943] flex items-center justify-center text-[#D69B47] shrink-0">
+                  <Sparkles size={22} />
                 </div>
-                <h4 className={`text-sm font-bold leading-snug mb-3 ${active ? "text-white" : "text-[#0B2545]"}`}>
-                  {mod.title}
-                </h4>
-                <div className={`text-[10px] font-medium ${active ? "text-[#DDE3EC]" : "text-[#7A7670]"}`}>
-                  {mod.completed} / {mod.lessons}{" "}
-                  {trL(lang, "leçons terminées", "lessons completed", "lecciones completadas", "دروس مُنجزة")}
-                </div>
-                {!mod.locked && (
-                  <div className="h-1.5 bg-[#E8E2D2] rounded-full overflow-hidden mt-2">
+                <div className="min-w-0 flex-1">
+                  <span className="text-[10px] font-bold tracking-[0.15em] uppercase text-[#8C6D23]">
+                    {trL(lang, "Progression", "Progress", "Progreso", "التقدم")}
+                  </span>
+                  <div className="flex items-baseline gap-2 flex-wrap">
+                    <strong className="text-lg font-bold text-[#142943]">
+                      {totalCompleted} / {totalLessons}{" "}
+                      <span className="text-xs font-semibold text-[#7A7670]">
+                        {trL(lang, "leçons terminées", "lessons completed", "lecciones completadas", "دروس مُنجزة")}
+                      </span>
+                    </strong>
+                    <span className="ml-auto text-sm font-bold text-[#142943]">{progressPct}%</span>
+                  </div>
+                  <p className="text-xs text-[#7A7670] mt-1">
+                    {trL(lang, "Choisissez un module et reprenez là où vous en êtes.", "Pick a module and resume where you left off.", "Elige un módulo y retoma donde lo dejaste.", "اختر وحدة وتابع من حيث توقفت.")}
+                  </p>
+                  <div className="h-2 bg-[#E8E2D2] rounded-full overflow-hidden mt-3">
                     <div
-                      className={`h-full rounded-full ${active ? "bg-[#C59B27]" : "bg-[#0B2545]"}`}
-                      style={{ width: `${modProgress}%` }}
+                      className="h-full bg-gradient-to-r from-[#142943] to-[#D69B47] rounded-full transition-all"
+                      style={{ width: `${progressPct}%` }}
                     />
                   </div>
-                )}
-                {modDone && !mod.locked && (
-                  <span className="absolute top-2 right-2 flex items-center gap-1 text-[9px] font-bold uppercase text-[#7A9174]">
-                    <CheckCircle2 size={12} /> {trL(lang, "Terminé", "Completed", "Completado", "مكتمل")}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Grille de sélection des modules (2 colonnes) */}
+          <section>
+            <p className="text-[11px] font-semibold tracking-[0.18em] uppercase text-[#8C6D23] mb-1">
+              {trL(lang, "Parcours complet", "Full curriculum", "Recorrido completo", "المسار الكامل")}
+            </p>
+            <h3 className="text-xl font-serif font-bold text-[#142943] mb-3">
+              {trL(lang, "Choisissez votre module", "Choose your module", "Elige tu módulo", "اختر وحدتك")}
+            </h3>
+
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-8">
+              {modules.map((mod) => {
+                const modDone = mod.done;
+                const modProgress = mod.lessons ? Math.round((mod.completed / mod.lessons) * 100) : 0;
+                const active = selectedCard?.key === mod.key && !mod.locked;
+
+                return (
+                  <button
+                    key={mod.key}
+                    type="button"
+                    disabled={mod.locked}
+                    onClick={() => setSelectedModule(mod.key)}
+                    className={
+                      active
+                        ? "relative text-left rounded-2xl bg-[#142943] text-white p-4 shadow-sm border border-[#142943] transition-colors"
+                        : mod.locked
+                        ? "relative text-left rounded-2xl bg-white border border-[#E8E2D2] p-4 opacity-80 cursor-not-allowed transition-colors"
+                        : "relative text-left rounded-2xl bg-white border border-[#E8E2D2] p-4 hover:border-[#D69B47] transition-colors"
+                    }
+                    aria-current={active ? "page" : undefined}
+                  >
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <span
+                        className={
+                          active
+                            ? "text-[9px] font-bold tracking-[0.14em] uppercase text-[#D69B47]"
+                            : mod.locked
+                            ? "text-[9px] font-bold tracking-[0.14em] uppercase text-[#B0ACA2]"
+                            : "text-[9px] font-bold tracking-[0.14em] uppercase text-[#D69B47]"
+                        }
+                      >
+                        {tr("Module", "Module", "Módulo", "الوحدة")} {mod.key}
+                      </span>
+                      {mod.locked ? (
+                        <span className="text-[#D69B47] shrink-0" aria-hidden="true">
+                          <LockKeyhole size={14} />
+                        </span>
+                      ) : (
+                        <span className={active ? "text-white" : "text-[#142943]"} aria-hidden="true">
+                          <ChevronRight size={16} />
+                        </span>
+                      )}
+                    </div>
+                    <h4 className={`text-sm font-bold leading-snug mb-3 ${active ? "text-white" : "text-[#142943]"}`}>
+                      {mod.title}
+                    </h4>
+                    <div className={`text-[10px] font-medium ${active ? "text-[#DDE3EC]" : "text-[#7A7670]"}`}>
+                      {mod.completed} / {mod.lessons}{" "}
+                      {trL(lang, "leçons terminées", "lessons completed", "lecciones completadas", "دروس مُنجزة")}
+                    </div>
+                    {!mod.locked && (
+                      <div className="h-1.5 bg-[#E8E2D2] rounded-full overflow-hidden mt-2">
+                        <div
+                          className={`h-full rounded-full ${active ? "bg-[#D69B47]" : "bg-[#142943]"}`}
+                          style={{ width: `${modProgress}%` }}
+                        />
+                      </div>
+                    )}
+                    {modDone && !mod.locked && (
+                      <span className="absolute top-2 right-2 flex items-center gap-1 text-[9px] font-bold uppercase text-[#7A9174]">
+                        <CheckCircle2 size={12} /> {trL(lang, "Terminé", "Completed", "Completado", "مكتمل")}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Vue détaillée du module sélectionné */}
+          {selectedCard && (
+            <section className="bg-white/90 border border-[#E8E2D2] rounded-2xl p-5 sm:p-6 shadow-sm">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#142943] text-white text-[10px] font-bold tracking-[0.14em] uppercase px-3 py-1.5 mb-3">
+                {tr("Module", "Module", "Módulo", "الوحدة")} {selectedCard.key}
+              </span>
+              <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#142943] mb-4">
+                {selectedCard.title}
+              </h3>
+              <div className="flex items-center gap-3 bg-[#F7F3EA] border border-[#E8E2D2] rounded-xl px-4 py-3 mb-5">
+                <span className="text-lg" aria-hidden="true">📖</span>
+                <span className="text-sm font-semibold text-[#142943]">
+                  {selectedCard.completed} / {selectedCard.lessons}{" "}
+                  {trL(lang, "leçons terminées", "lessons completed", "lecciones completadas", "دروس مُنجزة")}
+                </span>
+                <span className="ml-auto text-sm font-bold text-[#D69B47]">
+                  {selectedCard.lessons ? Math.round((selectedCard.completed / selectedCard.lessons) * 100) : 0}%
+                </span>
+              </div>
+
+              <ul className="space-y-2.5">
+                {selectedLessons.map((lesson) => (
+                  <li key={lesson.id}>
+                    <button
+                      type="button"
+                      onClick={() => (lesson.free || isPremium ? onOpenLesson(lesson.id) : onOpenPaywall())}
+                      className="w-full flex items-center gap-3 text-left bg-[#FDFCF8] border border-[#E8E2D5] rounded-xl p-3 hover:border-[#D69B47] transition-colors"
+                    >
+                      <span
+                        className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                          doneSet.has(lesson.id)
+                            ? "bg-[#7A9174] text-white"
+                            : "bg-[#142943] text-[#FDFCF8]"
+                        }`}
+                      >
+                        {doneSet.has(lesson.id) ? <Check size={14} /> : <BookOpen size={14} />}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-semibold text-[#142943] leading-snug">
+                          {lesson.title}
+                        </span>
+                        <span className="block text-[11px] text-[#7A7670] mt-0.5">
+                          {lesson.steps} {trL(lang, "étapes", "steps", "pasos", "خطوات")}
+                          {!lesson.free && <span className="ml-2 text-[#D69B47] font-bold">Pro</span>}
+                        </span>
+                      </span>
+                      {lesson.done ? (
+                        <CheckCircle2 className="w-4 h-4 text-[#7A9174] shrink-0" />
+                      ) : lesson.free || isPremium ? (
+                        <span className="w-7 h-7 rounded-full bg-[#142943] text-[#FDFCF8] flex items-center justify-center shrink-0">
+                          <Play size={12} />
+                        </span>
+                      ) : (
+                        <LockKeyhole className="w-4 h-4 text-[#D69B47] shrink-0" />
+                      )}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+
+              {/* Acces Checkpoint A1 (premiere palier gratuite) */}
+              <div className="flex items-center justify-between gap-3 bg-[#F7F3EA] border border-[#E8E2D2] rounded-xl px-4 py-3 mt-5">
+                <div>
+                  <span className="text-[10px] font-bold tracking-[0.14em] uppercase text-[#8C6D23]">
+                    {trL(lang, "Palier A1", "Level A1", "Nivel A1", "المستوى A1")}
                   </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* D. Vue détaillée du module sélectionné */}
-      {selectedCard && (
-        <section className="bg-white/90 border border-[#E8E2D2] rounded-2xl p-5 sm:p-6 shadow-sm">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#0B2545] text-white text-[10px] font-bold tracking-[0.14em] uppercase px-3 py-1.5 mb-3">
-            {tr("Module", "Module", "Módulo", "الوحدة")} {selectedCard.key}
-          </span>
-          <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#0B2545] mb-4">
-            {selectedCard.title}
-          </h3>
-          <div className="flex items-center gap-3 bg-[#F7F3EA] border border-[#E8E2D2] rounded-xl px-4 py-3 mb-5">
-            <span className="text-lg" aria-hidden="true">📖</span>
-            <span className="text-sm font-semibold text-[#0B2545]">
-              {selectedCard.completed} / {selectedCard.lessons}{" "}
-              {trL(lang, "leçons terminées", "lessons completed", "lecciones completadas", "دروس مُنجزة")}
-            </span>
-            <span className="ml-auto text-sm font-bold text-[#C59B27]">
-              {selectedCard.lessons ? Math.round((selectedCard.completed / selectedCard.lessons) * 100) : 0}%
-            </span>
-          </div>
-
-          <ul className="space-y-2.5">
-            {selectedLessons.map((lesson) => (
-              <li key={lesson.id}>
+                  <p className="text-xs text-[#7A7670]">
+                    {trL(lang, "Les Fondations — validez vos premiers acquis.", "Foundations — validate your first wins.", "Fundamentos — valida tus primeros logros.", "الأساسيات — أكّد مكتسباتك الأولى.")}
+                  </p>
+                </div>
                 <button
                   type="button"
-                  onClick={() => (lesson.free || isPremium ? onOpenLesson(lesson.id) : onOpenPaywall())}
-                  className="w-full flex items-center gap-3 text-left bg-[#FDFCF8] border border-[#E8E2D5] rounded-xl p-3 hover:border-[#C9A05C] transition-colors"
+                  onClick={() => onOpenCheckpoint("1", trL(lang, "Palier A1 — Fondations", "Level A1 — Foundations", "Nivel A1 — Fundamentos", "المستوى A1 — الأساسيات"))}
+                  className="shrink-0 inline-flex items-center gap-1.5 text-xs font-bold text-[#142943] bg-white border border-[#142943]/20 rounded-full px-3 py-2 hover:bg-[#142943] hover:text-white transition-colors"
                 >
-                  <span
-                    className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                      doneSet.has(lesson.id)
-                        ? "bg-[#7A9174] text-white"
-                        : "bg-[#0B2545] text-[#FDFCF8]"
-                    }`}
-                  >
-                    {doneSet.has(lesson.id) ? <Check size={14} /> : <BookOpen size={14} />}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-semibold text-[#0B2545] leading-snug">
-                      {lesson.title}
-                    </span>
-                    <span className="block text-[11px] text-[#7A7670] mt-0.5">
-                      {lesson.steps} {trL(lang, "étapes", "steps", "pasos", "خطوات")}
-                      {!lesson.free && <span className="ml-2 text-[#C59B27] font-bold">Pro</span>}
-                    </span>
-                  </span>
-                  {lesson.done ? (
-                    <CheckCircle2 className="w-4 h-4 text-[#7A9174] shrink-0" />
-                  ) : lesson.free || isPremium ? (
-                    <span className="w-7 h-7 rounded-full bg-[#0B2545] text-[#FDFCF8] flex items-center justify-center shrink-0">
-                      <Play size={12} />
-                    </span>
-                  ) : (
-                    <LockKeyhole className="w-4 h-4 text-[#C59B27] shrink-0" />
-                  )}
+                  {hasPassedLevel("1") ? trL(lang, "Validé ✓", "Passed ✓", "Aprobado ✓", "ناجح ✓") : trL(lang, "Passer le Checkpoint", "Take the checkpoint", "Pasar el checkpoint", "اجتز نقطة المراجعة")}
+                  <ArrowRight size={13} />
                 </button>
-              </li>
-            ))}
-          </ul>
+              </div>
+            </section>
+          )}
+        </div>
+      )}
 
-          {/* Acces Checkpoint A1 (premiere palier gratuite) */}
-          <div className="flex items-center justify-between gap-3 bg-[#F7F3EA] border border-[#E8E2D2] rounded-xl px-4 py-3 mt-5">
-            <div>
-              <span className="text-[10px] font-bold tracking-[0.14em] uppercase text-[#8C6D23]">
-                {trL(lang, "Palier A1", "Level A1", "Nivel A1", "المستوى A1")}
-              </span>
-              <p className="text-xs text-[#7A7670]">
-                {trL(lang, "Les Fondations — validez vos premiers acquis.", "Foundations — validate your first wins.", "Fundamentos — valida tus primeros logros.", "الأساسيات — أكّد مكتسباتك الأولى.")}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => onOpenCheckpoint("1", trL(lang, "Palier A1 — Fondations", "Level A1 — Foundations", "Nivel A1 — Fundamentos", "المستوى A1 — الأساسيات"))}
-              className="shrink-0 inline-flex items-center gap-1.5 text-xs font-bold text-[#0B2545] bg-white border border-[#0B2545]/20 rounded-full px-3 py-2 hover:bg-[#0B2545] hover:text-white transition-colors"
-            >
-              {hasPassedLevel("1") ? trL(lang, "Validé ✓", "Passed ✓", "Aprobado ✓", "ناجح ✓") : trL(lang, "Passer le Checkpoint", "Take the checkpoint", "Pasar el checkpoint", "اجتز نقطة المراجعة")}
-              <ArrowRight size={13} />
-            </button>
-          </div>
-        </section>
+      {/* SOUS-VUE 2 : GRAMMAIRE ACTIVE INTÉGRÉE */}
+      {currentTab === "grammaire" && (
+        <PathGrammarSection
+          onStartLesson={(lesson) => onOpenLesson(lesson.id)}
+          onOpenPaywall={onOpenPaywall}
+        />
+      )}
+
+      {/* SOUS-VUE 3 : PRATIQUE ORALE & DIALOGUES INTÉGRÉE */}
+      {currentTab === "parler" && (
+        <PathSpeakingSection
+          onStartScenario={(scenario) => {
+            if (onStartScenario) {
+              onStartScenario(scenario);
+            } else {
+              onOpenRoleplay();
+            }
+          }}
+          onOpenPaywall={onOpenPaywall}
+          onOpenArabiziModal={onOpenArabizi}
+        />
+      )}
+
+      {/* SOUS-VUE 4 : RÉVISION SRS INTÉGRÉE */}
+      {currentTab === "revision" && (
+        <div className="space-y-6 animate-fadeIn">
+          <SRSDashboard />
+        </div>
       )}
     </div>
   );

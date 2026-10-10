@@ -84,6 +84,7 @@ export default function EtudierPage() {
       <PageHeader
         badge={tp.badge || 'Parcours complet'}
         title={tp.title || 'Ton parcours complet — 7 modules'}
+        backHref="/?view=path&tab=parcours"
       />
 
       <main className="max-w-4xl mx-auto p-6 pb-24 space-y-8">
