@@ -261,18 +261,30 @@ Format attendu :
 
       return result.toDataStreamResponse();
     } catch (groqError: unknown) {
+      const groqErrMsg = groqError instanceof Error ? groqError.message : String(groqError);
+      const groqStatus =
+        (groqError as { status?: number; statusCode?: number } | undefined)?.status ??
+        (groqError as { status?: number; statusCode?: number } | undefined)?.statusCode;
+
+      // Si l'erreur est un problème d'authentification ou de rate limit, ne pas tenter Gemini
+      const isGroqAuth =
+        groqStatus === 401 ||
+        groqStatus === 403 ||
+        groqErrMsg.includes('API key') ||
+        groqErrMsg.includes('invalid_api_key') ||
+        groqErrMsg.includes('authentication') ||
+        groqErrMsg.includes('credentials') ||
+        groqErrMsg.includes('Permission denied');
+
+      if (isGroqAuth || groqStatus === 429) {
+        throw groqError;
+      }
+
       console.warn('[Groq Roleplay Warning]: Primary Groq call failed, switching to Gemini fallback...', groqError);
       try {
         return await streamGeminiFallback();
       } catch (fallbackError: unknown) {
         console.error('[Gemini Fallback Also Failed]:', fallbackError);
-        // Si le fallback échoue aussi, relancer l'erreur primaire si elle a un code d'erreur spécifique (429/403/503), sinon l'erreur du fallback
-        const groqStatus =
-          (groqError as { status?: number; statusCode?: number } | undefined)?.status ??
-          (groqError as { status?: number; statusCode?: number } | undefined)?.statusCode;
-        if (groqStatus === 429) {
-          throw groqError;
-        }
         throw fallbackError;
       }
     }
