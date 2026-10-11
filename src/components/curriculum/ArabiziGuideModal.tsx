@@ -19,7 +19,9 @@ interface ArabiziGuideModalProps {
  * mode tortue) pour décomposer les consonnes gutturales du darija.
  */
 export default function ArabiziGuideModal({ onClose }: ArabiziGuideModalProps) {
-  const { soundEnabled } = useAppStore();
+  const { soundEnabled, uiLanguage } = useAppStore();
+  const lang = uiLanguage || 'fr';
+  const isAr = lang === 'ar';
   const { dialogRef } = useDialog(true, onClose);
   const [activeIndex, setActiveIndex] = useState(0);
   const [activeSpeed, setActiveSpeed] = useState<'normal' | 'slow'>('normal');
@@ -45,6 +47,7 @@ export default function ArabiziGuideModal({ onClose }: ArabiziGuideModalProps) {
       aria-modal="true"
       aria-labelledby="arabizi-guide-title"
       tabIndex={-1}
+      dir={isAr ? 'rtl' : 'ltr'}
       className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4"
     >
       <div className="bg-[#FDFCF8] rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden border-4 border-[#C9A05C]/60">
@@ -54,10 +57,12 @@ export default function ArabiziGuideModal({ onClose }: ArabiziGuideModalProps) {
             <Sparkles className="w-5 h-5 text-[#C9A05C]" />
             <div>
               <h3 id="arabizi-guide-title" className="font-display font-bold text-[#FDFCF8] text-lg">
-                La Clé des Chiffres Arabizi
+                {isAr ? 'مفتاح أرقام العرابيزي' : 'La Clé des Chiffres Arabizi'}
               </h3>
               <p className="text-[10px] text-[#FDFCF8]/70 font-semibold uppercase tracking-wide">
-                Mini-guide phonétique · 5 sons
+                {isAr
+                  ? 'دليلك الصوتي التفاعلي لنطق الأصوات المغربية (9 · 7 · 5 · 3 · 2)'
+                  : 'Mini-guide phonétique · 5 sons'}
               </p>
             </div>
           </div>
@@ -110,7 +115,7 @@ export default function ArabiziGuideModal({ onClose }: ArabiziGuideModalProps) {
 
           <div className="space-y-3">
             <p className="text-[10px] font-bold uppercase tracking-wider text-[#1B2A4A]">
-              Écoutez et répétez
+              {isAr ? 'استمع وردد' : 'Écoutez et répétez'}
             </p>
             {sound.examples.map((ex) => (
               <div key={ex.arabizi} className="bg-[#F7F3EA] border border-[#E8E2D5] rounded-2xl p-4">
@@ -129,10 +134,10 @@ export default function ArabiziGuideModal({ onClose }: ArabiziGuideModalProps) {
                       type="button"
                       onClick={() => handleListen(ex.arabicWithTashkeel, 'normal')}
                       className="px-3 py-1.5 rounded-full text-[11px] font-bold flex items-center gap-1.5 bg-[#1B2A4A] text-[#FDFCF8] hover:bg-[#1B2A4A]/90 transition-colors"
-                      title="Écouter à vitesse normale"
+                      title={isAr ? 'عادي (1.0x)' : 'Écouter à vitesse normale'}
                     >
                       <Volume2 className="w-3.5 h-3.5 text-[#C9A05C]" />
-                      1.0x
+                      {isAr ? 'عادي (1.0x)' : '1.0x'}
                     </button>
                     <button
                       type="button"
@@ -142,10 +147,10 @@ export default function ArabiziGuideModal({ onClose }: ArabiziGuideModalProps) {
                           ? 'bg-red-500 text-white border-red-500'
                           : 'bg-[#FDFCF8] text-[#1B2A4A] border-[#E8E2D5] hover:bg-[#E8E2D5]/50'
                       }`}
-                      title="Mode Tortue ralenti (0.75x) pour décomposer les phonèmes"
+                      title={isAr ? 'سلحفاة 🐢 (0.75x)' : 'Mode Tortue ralenti (0.75x) pour décomposer les phonèmes'}
                     >
                       <Turtle className="w-3.5 h-3.5 text-[#C9A05C]" />
-                      🐢 0.75x
+                      {isAr ? 'سلحفاة 🐢 (0.75x)' : '🐢 0.75x'}
                     </button>
                   </div>
                 </div>
@@ -154,12 +159,22 @@ export default function ArabiziGuideModal({ onClose }: ArabiziGuideModalProps) {
           </div>
 
           <div className="bg-[#C9A05C]/10 border border-[#C9A05C]/20 rounded-2xl p-4 text-xs text-[#7A7670]">
-            💡 Astuce : au Maroc, les chiffres servent d'orthographe sonore —
-            mémorisez les gestes de gorge plutôt que les lettres, et la prononciation devient naturelle. Un son en boucle ralentie vous entraînera plus vite.
-
-            {activeSpeed === 'slow' ? (
-              <span className="text-red-600 font-semibold"> Mode tortue 🐢 actif : chaque son est ralenti à 0.75x.</span>
-            ) : undefined}
+            {isAr ? (
+              <>
+                💡 نصيحة : في المغرب، تُستعمل الأرقام كأصوات للحروف — ركّز على حركة الحلق بدلاً من الحرف نفسه لتصبح النطق تلقائياً.
+                {activeSpeed === 'slow' ? (
+                  <span className="text-red-600 font-semibold"> وضع السلحفاة 🐢 مفعّل : الصوت مبطّأ إلى 0.75x.</span>
+                ) : null}
+              </>
+            ) : (
+              <>
+                💡 Astuce : au Maroc, les chiffres servent d&apos;orthographe sonore —
+                mémorisez les gestes de gorge plutôt que les lettres, et la prononciation devient naturelle. Un son en boucle ralentie vous entraînera plus vite.
+                {activeSpeed === 'slow' ? (
+                  <span className="text-red-600 font-semibold"> Mode tortue 🐢 actif : chaque son est ralenti à 0.75x.</span>
+                ) : null}
+              </>
+            )}
           </div>
         </div>
       </div>

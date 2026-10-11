@@ -19,7 +19,9 @@ export default function PathSpeakingSection({
   onOpenPaywall,
   onOpenArabiziModal,
 }: PathSpeakingSectionProps) {
-  const { isPremium } = useAppStore();
+  const { isPremium, uiLanguage } = useAppStore();
+  const lang = uiLanguage || 'fr';
+  const isAr = lang === 'ar';
   const { isPremiumReady } = usePremiumStatus();
   const { t } = useTranslation();
   const [activeMode, setActiveMode] = useState<'trainer' | 'dialogue'>('trainer');
@@ -49,7 +51,7 @@ export default function PathSpeakingSection({
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div dir={isAr ? 'rtl' : 'ltr'} className="space-y-6 animate-fadeIn">
       {/* Mode Selector */}
       <div className="flex bg-[#FDFCF8] rounded-full p-1.5 shadow-xs border border-[#E8E2D5] max-w-sm mx-auto">
         <button
@@ -62,7 +64,7 @@ export default function PathSpeakingSection({
           }`}
         >
           <Sparkles className="w-3.5 h-3.5 text-[#D69B47]" />
-          <span>Atelier Phonèmes</span>
+          <span>{isAr ? 'ورشة الأصوات' : 'Atelier Phonèmes'}</span>
         </button>
 
         <button
@@ -75,7 +77,7 @@ export default function PathSpeakingSection({
           }`}
         >
           <MessageSquare className="w-3.5 h-3.5 text-[#D69B47]" />
-          <span>Dialogues</span>
+          <span>{isAr ? 'حوارات' : 'Dialogues'}</span>
         </button>
       </div>
 
@@ -91,9 +93,13 @@ export default function PathSpeakingSection({
                 <Sparkles className="w-4 h-4 text-[#D69B47]" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-bold text-[#142943]">💡 La Clé des Chiffres Arabizi</p>
+                <p className="text-sm font-bold text-[#142943]">
+                  💡 {isAr ? 'مفتاح أرقام العرابيزي' : 'La Clé des Chiffres Arabizi'}
+                </p>
                 <p className="text-xs text-[#6B7174] mt-0.5">
-                  2 · 3 · 5 · 7 · 9 — le décodeur audio interactif des sons gutturaux marocains.
+                  {isAr
+                    ? 'دليلك الصوتي التفاعلي لنطق الأصوات المغربية (9 · 7 · 5 · 3 · 2)'
+                    : '2 · 3 · 5 · 7 · 9 — le décodeur audio interactif des sons gutturaux marocains.'}
                 </p>
               </div>
               <ArrowRight className="w-4 h-4 text-[#D69B47] shrink-0" />

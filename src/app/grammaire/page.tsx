@@ -117,7 +117,7 @@ export default function GrammairePage() {
       {showPaywall && (
         <PaywallModal onClose={() => setShowPaywall(false)} source="module_locked" />
       )}
-      <BottomNav />
+      {!runnerLesson && <BottomNav />}
     </div>
   );
 }

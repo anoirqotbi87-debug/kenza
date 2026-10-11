@@ -64,7 +64,9 @@ export default function ParlerPage() {
             }`}
           >
             <Sparkles className="w-3.5 h-3.5 text-[#C9A05C]" />
-            <span className={activeMode === 'trainer' ? '!text-white' : ''}>Atelier Phonèmes</span>
+            <span className={activeMode === 'trainer' ? '!text-white' : ''}>
+              {isAr ? 'ورشة الأصوات' : 'Atelier Phonèmes'}
+            </span>
           </button>
 
           <button
@@ -77,7 +79,9 @@ export default function ParlerPage() {
             }`}
           >
             <MessageSquare className="w-3.5 h-3.5 text-[#C9A05C]" />
-            <span className={activeMode === 'dialogue' ? '!text-white' : ''}>Dialogues & Mises en situation</span>
+            <span className={activeMode === 'dialogue' ? '!text-white' : ''}>
+              {isAr ? 'حوارات' : 'Dialogues & Mises en situation'}
+            </span>
           </button>
         </div>
 
