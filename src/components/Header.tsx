@@ -79,7 +79,7 @@ export function Header({
             </button>
           )}
 
-          <KenzaLogo size="sm" showWordmark={true} hideWordmarkOnMobile={true} />
+          <KenzaLogo size="sm" showWordmark={true} />
         </div>
 
         {/* 2. Titre optionnel centré si fourni */}

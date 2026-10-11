@@ -645,15 +645,8 @@ export default function Home() {
         className={`sidebar ${mobileMenuOpen ? "sidebar-open" : ""}`}
         inert={backgroundInert}
       >
-        <div className="brand-lockup">
-          <div className="brand-mark" aria-hidden="true">
-            <span>ك</span>
-            <i />
-          </div>
-          <div>
-            <span className="brand-name">KENZA</span>
-            <span className="brand-tagline">{trL(lang, "la darija, en chemin", "darija, one step at a time", "la darija, paso a paso", "الدارجة، على الطريق")}</span>
-          </div>
+        <div className="brand-lockup justify-between">
+          <KenzaLogo size="lg" showWordmark={true} />
           <button
             className="icon-button mobile-close"
             aria-label={tr("Fermer le menu", "Close the menu", "Cerrar el menú", "إغلاق القائمة")}
@@ -779,7 +772,7 @@ export default function Home() {
               <Menu size={21} />
             </button>
 
-            <KenzaLogo size="sm" showWordmark={true} hideWordmarkOnMobile={true} />
+            <KenzaLogo size="sm" showWordmark={true} />
           </div>
 
           {/* Contrôles compacts strictly flex-nowrap à droite */}
@@ -1051,9 +1044,7 @@ export default function Home() {
           )}
 
           <footer className="page-footer">
-            <span>
-              KENZA <span className="footer-arabic">كنزة</span>
-            </span>
+            <KenzaLogo size="sm" showWordmark={true} />
             <span>{trL(lang, "Apprendre une langue, c’est rencontrer des gens.", "Learning a language is meeting people.", "Aprender un idioma es conocer gente.", "تعلم اللغة لقاءٌ بالناس.")}</span>
             <button onClick={() => switchView("space")}>
               {trL(lang, "Passeport Culturel & Données", "Cultural passport & data", "Pasaporte cultural y datos", "الجواز الثقافي والبيانات")} <ArrowRight size={13} />
