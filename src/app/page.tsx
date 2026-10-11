@@ -1794,7 +1794,7 @@ function PathView({
                   <button
                     type="button"
                     onClick={() => onOpenCheckpoint("1", trL(lang, "Palier A1 — Fondations", "Level A1 — Foundations", "Nivel A1 — Fundamentos", "المستوى A1 — الأساسيات"))}
-                    className="bg-emerald-100 text-emerald-800 border border-emerald-300 font-semibold px-2 py-0.5 rounded-full text-xs shrink-0 inline-flex items-center gap-1 hover:bg-emerald-200 transition-colors"
+                    className="inline-flex items-center justify-center px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 shadow-sm shrink-0 hover:bg-emerald-200 transition-colors"
                   >
                     <span>{trL(lang, "Validé ✓", "Passed ✓", "Aprobado ✓", "ناجح ✓")}</span>
                   </button>
@@ -1802,10 +1802,9 @@ function PathView({
                   <button
                     type="button"
                     onClick={() => onOpenCheckpoint("1", trL(lang, "Palier A1 — Fondations", "Level A1 — Foundations", "Nivel A1 — Fundamentos", "المستوى A1 — الأساسيات"))}
-                    className="shrink-0 inline-flex items-center gap-1.5 text-xs font-bold text-[#142943] bg-white border border-[#142943]/20 rounded-full px-3 py-2 hover:bg-[#142943] hover:text-white transition-colors"
+                    className="inline-flex items-center justify-center px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-amber-100 text-amber-900 border border-amber-300 shadow-sm shrink-0 hover:bg-amber-200 transition-colors gap-1.5"
                   >
-                    <span>{trL(lang, "Passer le Checkpoint", "Take the checkpoint", "Pasar el checkpoint", "اجتز نقطة المراجعة")}</span>
-                    <ArrowRight size={13} />
+                    <span>{trL(lang, "Passer l'évaluation →", "Take assessment →", "Pasar la evaluación →", "اجتياز التقييم ←")}</span>
                   </button>
                 )}
               </div>

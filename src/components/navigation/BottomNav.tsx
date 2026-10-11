@@ -19,6 +19,11 @@ export default function BottomNav({ currentView, onSelectView }: BottomNavProps)
   const lang = uiLanguage || 'fr';
   const isAr = lang === 'ar';
 
+  // Masquer systématiquement la BottomNav pendant les leçons actives / parcours d'étude
+  if (pathname.startsWith('/etudier')) {
+    return null;
+  }
+
   const viewParam = searchParams?.get('view');
   const activeView = currentView || viewParam;
 

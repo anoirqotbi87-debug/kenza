@@ -467,21 +467,21 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto p-4 md:p-8 flex items-center justify-center">
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-32 flex items-center justify-center">
         {renderContent()}
       </main>
 
       {/* Bottom Action Bar */}
       <div className={`
-        border-t p-4 md:p-6 transition-colors duration-300
-        ${isAnswerChecked ? (isCorrect ? 'bg-[#7A9174]/15 border-[#7A9174]/40' : 'bg-red-50 border-red-200') : 'bg-[#FDFCF8] border-[#E8E2D5]'}
+        fixed bottom-0 left-0 right-0 z-50 bg-[#FFFEFA]/95 backdrop-blur-sm border-t border-amber-200/60 p-4 pb-safe transition-colors duration-300
+        ${isAnswerChecked ? (isCorrect ? 'bg-[#7A9174]/15 border-[#7A9174]/40' : 'bg-red-50/95 border-red-200') : ''}
       `}>
-        <div className="max-w-5xl mx-auto w-full flex justify-between items-center min-h-[64px]">
+        <div className="max-w-5xl mx-auto w-full flex flex-col sm:flex-row justify-between items-center gap-3 min-h-[64px]">
           
-          <div className="flex-1">
+          <div className="flex-1 w-full sm:w-auto">
             {isAnswerChecked && (
               <div className={`flex items-center gap-4 ${isCorrect ? 'text-[#7A9174]' : 'text-red-700'}`}>
-                <div className={`p-3 rounded-full ${isCorrect ? 'bg-[#7A9174]/20' : 'bg-red-100'}`}>
+                <div className={`p-3 rounded-full shrink-0 ${isCorrect ? 'bg-[#7A9174]/20' : 'bg-red-100'}`}>
                   {isCorrect ? <Check className="w-6 h-6 stroke-[2.5]" /> : <X className="w-6 h-6" />}
                 </div>
                 <div>
@@ -494,22 +494,22 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
             )}
           </div>
 
-          <div>
+          <div className="w-full sm:w-auto">
             {!isAnswerChecked && step.type === 'exercise' ? (
               <button 
                 onClick={handleCheckAnswer}
                 disabled={isCheckDisabled()}
-                className="px-10 py-3.5 bg-[#C9A05C] hover:bg-[#b88f4b] disabled:bg-[#E8E2D5] disabled:text-[#7A7670] text-[#1B2A4A] rounded-full font-bold text-base shadow-md transition-all active:scale-95"
+                className="w-full sm:w-auto px-10 py-3.5 rounded-xl font-bold text-base shadow-md transition-all active:scale-95 disabled:bg-[#E8E2D5] disabled:text-[#7A7670] text-white bg-[#ddb578] hover:bg-[#c9a265]"
               >
                 {t.lessons.check}
               </button>
             ) : (
               <button 
                 onClick={handleNext}
-                className={`px-10 py-3.5 rounded-full font-bold text-base shadow-md transition-all flex items-center gap-2 active:scale-95
+                className={`w-full sm:w-auto px-10 py-3.5 rounded-xl font-bold text-base shadow-md transition-all flex items-center justify-center gap-2 active:scale-95
                   ${isAnswerChecked && isCorrect ? 'bg-[#7A9174] hover:bg-[#687e63] text-white' : ''}
                   ${isAnswerChecked && !isCorrect ? 'bg-red-600 hover:bg-red-700 text-white' : ''}
-                  ${!isAnswerChecked && step.type === 'learning' ? 'bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A]' : ''}
+                  ${!isAnswerChecked && step.type === 'learning' ? 'text-white bg-[#ddb578] hover:bg-[#c9a265]' : ''}
                 `}
               >
                 <span>{t.lessons.continue}</span>

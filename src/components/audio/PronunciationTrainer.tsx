@@ -76,7 +76,9 @@ export default function PronunciationTrainer({
   onCompleteExercise,
   className = '',
 }: PronunciationTrainerProps) {
-  const { soundEnabled, addXp } = useAppStore();
+  const { soundEnabled, addXp, uiLanguage } = useAppStore();
+  const lang = uiLanguage || 'fr';
+  const isAr = lang === 'ar';
   const [currentIndex, setCurrentIndex] = useState(0);
   const [evaluation, setEvaluation] = useState<PronunciationEvaluation | null>(null);
   const [activeSpeed, setActiveSpeed] = useState<'normal' | 'slow'>('normal');
@@ -151,14 +153,14 @@ export default function PronunciationTrainer({
   };
 
   return (
-    <div className={`bg-[#FDFCF8] rounded-3xl p-6 sm:p-8 shadow-xs border border-[#E8E2D5] space-y-6 ${className}`}>
+    <div dir={isAr ? 'rtl' : 'ltr'} className={`bg-[#FDFCF8] rounded-3xl p-6 sm:p-8 shadow-xs border border-[#E8E2D5] space-y-6 ${className}`}>
       
       {/* Exercise progress & header */}
       <div className="flex items-center justify-between border-b border-[#E8E2D5] pb-4">
         <div className="flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-[#C9A05C]" />
           <span className="text-xs font-bold text-[#1B2A4A] tracking-wider uppercase">
-            Atelier de Prononciation
+            {isAr ? 'ورشة النطق الصوتي' : 'Atelier de Prononciation'}
           </span>
         </div>
         <span className="text-xs font-semibold px-3 py-1 bg-[#F7F3EA] rounded-full text-[#7A7670] border border-[#E8E2D5]">
@@ -170,7 +172,7 @@ export default function PronunciationTrainer({
       <div className="bg-[#F7F3EA] rounded-2xl p-6 text-center border border-[#E8E2D5] space-y-3 relative overflow-hidden">
         {currentExercise.focusPhoneme && (
           <div className="inline-block px-3 py-1 bg-[#C9A05C]/15 border border-[#C9A05C]/30 rounded-full text-xs font-bold text-[#1B2A4A] mb-1">
-            Son ciblé : &apos;{currentExercise.focusPhoneme}&apos;
+            {isAr ? `الصوت المستهدف : '${currentExercise.focusPhoneme}'` : `Son ciblé : '${currentExercise.focusPhoneme}'`}
           </div>
         )}
         <div className="text-3xl sm:text-4xl font-arabic text-[#1B2A4A] leading-relaxed select-all">
@@ -193,10 +195,12 @@ export default function PronunciationTrainer({
                 ? 'bg-[#1B2A4A] !text-white shadow-xs'
                 : 'bg-[#FDFCF8] text-[#1B2A4A] border border-[#E8E2D5] hover:bg-[#E8E2D5]/50'
             }`}
-            title="Écouter à vitesse normale"
+            title={isAr ? 'عادي (1.0x)' : 'Écouter à vitesse normale'}
           >
             <Volume2 className="w-4 h-4 text-[#C9A05C]" />
-            <span className={activeSpeed === 'normal' ? '!text-white' : ''}>Normal (1.0x)</span>
+            <span className={activeSpeed === 'normal' ? '!text-white' : ''}>
+              {isAr ? 'عادي (1.0x)' : 'Normal (1.0x)'}
+            </span>
           </button>
 
           <button
@@ -207,10 +211,12 @@ export default function PronunciationTrainer({
                 ? 'bg-[#1B2A4A] !text-white shadow-xs'
                 : 'bg-[#FDFCF8] text-[#1B2A4A] border border-[#E8E2D5] hover:bg-[#E8E2D5]/50'
             }`}
-            title="Mode Tortue ralenti (0.75x) pour décomposer les phonèmes"
+            title={isAr ? 'سلحفاة 🐢 (0.75x)' : 'Mode Tortue ralenti (0.75x) pour décomposer les phonèmes'}
           >
             <Turtle className="w-4 h-4 text-[#C9A05C]" />
-            <span className={activeSpeed === 'slow' ? '!text-white' : ''}>Tortue 🐢 (0.75x)</span>
+            <span className={activeSpeed === 'slow' ? '!text-white' : ''}>
+              {isAr ? 'سلحفاة 🐢 (0.75x)' : 'Tortue (0.75x)'}
+            </span>
           </button>
         </div>
       </div>
@@ -242,17 +248,17 @@ export default function PronunciationTrainer({
 
         <div className="text-xs font-bold text-[#7A7670]">
           {isListening
-            ? 'Écoute en cours... Répétez la phrase à voix haute'
+            ? (isAr ? 'جاري الاستماع... كرر الجملة بصوت واضح' : 'Écoute en cours... Répétez la phrase à voix haute')
             : isSupported
-            ? 'Appuyez sur le micro pour tester votre prononciation'
-            : 'Écoutez le modèle audio ci-dessus'}
+            ? (isAr ? 'اضغط على الميكروفون لاختبار نطقك' : 'Appuyez sur le micro pour tester votre prononciation')
+            : (isAr ? 'استمع إلى النموذج الصوتي أعلاه' : 'Écoutez le modèle audio ci-dessus')}
         </div>
 
         {/* Live captured transcript */}
         {transcript && (
           <div className="w-full max-w-md p-3.5 bg-[#F7F3EA] border border-[#E8E2D5] rounded-2xl text-center space-y-1">
             <span className="text-[10px] uppercase font-bold text-[#7A7670] tracking-wider">
-              Ce que le micro a capté
+              {isAr ? 'ما التقطه الميكروفون' : 'Ce que le micro a capté'}
             </span>
             <p className="font-arabic text-lg text-[#1B2A4A]">{transcript}</p>
           </div>
@@ -262,7 +268,7 @@ export default function PronunciationTrainer({
         {voiceError && (
           <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-2 max-w-md text-xs text-amber-800">
             <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{voiceError} (Vous pouvez continuer en mode écoute).</span>
+            <span>{voiceError} {isAr ? '(يمكنك المتابعة في وضع الاستماع).' : '(Vous pouvez continuer en mode écoute).'}</span>
           </div>
         )}
 
@@ -294,7 +300,7 @@ export default function PronunciationTrainer({
                     {evaluation.badge.text}
                   </div>
                   <div className="text-[11px] text-[#7A7670]">
-                    Précision acoustique : {evaluation.score}%
+                    {isAr ? 'الدقة الصوتية :' : 'Précision acoustique :'} {evaluation.score}%
                   </div>
                 </div>
               </div>
@@ -307,7 +313,7 @@ export default function PronunciationTrainer({
             {evaluation.targetPhonemes.length > 0 && (
               <div className="p-3.5 bg-[#FDFCF8] border border-[#E8E2D5] rounded-2xl space-y-2">
                 <span className="text-[10px] font-bold text-[#7A7670] uppercase tracking-wider block">
-                  Diagnostic des consonnes difficiles :
+                  {isAr ? 'تشخيص الحروف الصعبة :' : 'Diagnostic des consonnes difficiles :'}
                 </span>
                 <div className="grid gap-1.5">
                   {evaluation.targetPhonemes.map((ph) => (
@@ -324,7 +330,7 @@ export default function PronunciationTrainer({
                           {ph.char} ({ph.arabicChar})
                         </span>
                         <span className="text-[11px] opacity-80">
-                          {ph.detected ? 'Bien articulé !' : ph.tip}
+                          {ph.detected ? (isAr ? 'نطق ممتاز !' : 'Bien articulé !') : ph.tip}
                         </span>
                       </div>
                       <span className="text-sm font-bold">
@@ -351,7 +357,7 @@ export default function PronunciationTrainer({
               className="px-4 py-2.5 rounded-full bg-[#F7F3EA] border border-[#E8E2D5] text-[#1B2A4A] text-xs font-bold flex items-center gap-1.5 hover:bg-[#E8E2D5]/50 transition-colors"
             >
               <RefreshCw className="w-3.5 h-3.5" />
-              <span>Réessayer</span>
+              <span>{isAr ? 'إعادة المحاولة' : 'Réessayer'}</span>
             </button>
           )}
 
@@ -360,7 +366,7 @@ export default function PronunciationTrainer({
             onClick={handleNext}
             className="px-6 py-2.5 rounded-full bg-[#1B2A4A] hover:bg-[#1B2A4A]/90 text-[#FDFCF8] text-xs font-bold flex items-center gap-2 transition-all shadow-xs"
           >
-            <span>Phrase suivante</span>
+            <span>{isAr ? 'الجملة التالية' : 'Phrase suivante'}</span>
             <ChevronRight className="w-4 h-4 text-[#C9A05C]" />
           </button>
         </div>

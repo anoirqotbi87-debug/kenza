@@ -181,7 +181,7 @@ export default function EtudierPage() {
       {showArabiziGuide && (
         <ArabiziGuideModal onClose={() => setShowArabiziGuide(false)} />
       )}
-      <BottomNav />
+      {!openLesson && <BottomNav />}
     </div>
   );
 }
