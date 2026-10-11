@@ -54,57 +54,77 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
   const [showImmersion, setShowImmersion] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const activeAudioRef = useRef<HTMLAudioElement | null>(null);
   const [playingKey, setPlayingKey] = useState<string | null>(null);
+  const [audioFeedback, setAudioFeedback] = useState<{ id: string; error: string } | null>(null);
 
   const handlePlayVoice = (messageId: string, rawText: string, speed: 'normal' | 'slow' = 'normal') => {
     if (!rawText) return;
 
-    // Extraction du texte arabe vocalisé avec conversion Arabizi
     const cleanArabic = extractCleanArabicForTts(rawText);
-    if (!cleanArabic) return;
+    if (!cleanArabic || cleanArabic.trim().length === 0) {
+      console.warn('Texte arabe introuvable pour :', rawText);
+      return;
+    }
 
     const key = `${messageId}-${speed}`;
 
-    // Initialiser ou récupérer l'instance audio unique
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
-    }
-    const audio = audioRef.current;
-
-    // Si on clique sur le vocal déjà en cours de lecture, on le met en pause
-    if (playingKey === key && !audio.paused) {
-      audio.pause();
+    // Si on clique sur le vocal en cours de lecture, on le met en pause
+    if (playingKey === key && activeAudioRef.current && !activeAudioRef.current.paused) {
+      activeAudioRef.current.pause();
       setPlayingKey(null);
       return;
     }
 
-    // Stopper proprement toute lecture précédente
-    audio.pause();
-    audio.currentTime = 0;
+    // 1. Nettoyer et libérer complètement l'audio précédent pour éviter toute collision
+    if (activeAudioRef.current) {
+      activeAudioRef.current.onended = null;
+      activeAudioRef.current.onerror = null;
+      activeAudioRef.current.pause();
+      activeAudioRef.current.src = '';
+      activeAudioRef.current = null;
+    }
+
+    setAudioFeedback(null);
+    setPlayingKey(key);
 
     const gender = personaId === 'cafe' || personaId === 'taxi' || personaId === 'souk' || personaId === 'medecin' ? 'male' : 'female';
 
-    // Définir la nouvelle source TTS directement en streaming GET
+    // 2. Créer une nouvelle instance propre dédiée à cette écoute
     const url = `/api/tts?text=${encodeURIComponent(cleanArabic)}&speed=${speed}&gender=${gender}`;
-    audio.src = url;
-    setPlayingKey(key);
+    const audio = new Audio(url);
+    activeAudioRef.current = audio;
 
-    // Gestionnaires de fin et d'erreur
     audio.onended = () => {
-      setPlayingKey(null);
+      if (activeAudioRef.current === audio) {
+        setPlayingKey(null);
+      }
     };
 
-    audio.onerror = () => {
-      console.warn('Erreur de lecture audio pour le message', messageId);
-      setPlayingKey(null);
+    audio.onerror = (e) => {
+      console.error('Erreur élément audio :', e, audio.error);
+      if (activeAudioRef.current === audio) {
+        setPlayingKey(null);
+        setAudioFeedback({ id: messageId, error: 'Erreur audio' });
+        setTimeout(() => setAudioFeedback(null), 3500);
+      }
     };
 
-    // Déclenchement synchrone immédiat (conserve le geste utilisateur sur mobile)
-    audio.play().catch(err => {
-      console.warn('Lecture audio bloquée ou interrompue :', err);
-      setPlayingKey(null);
-    });
+    // 3. Déclenchement synchrone propre avec capture détaillée de l'erreur
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((err) => {
+        console.warn('Audio play() rejected :', err.name, err.message);
+        if (activeAudioRef.current === audio) {
+          setPlayingKey(null);
+          // Si l'erreur est AbortError, c'est une interruption normale, sinon on avertit
+          if (err.name !== 'AbortError') {
+            setAudioFeedback({ id: messageId, error: 'Lecture bloquée' });
+            setTimeout(() => setAudioFeedback(null), 3500);
+          }
+        }
+      });
+    }
   };
 
   const STREAM_TIMEOUT_MS = 30000;
@@ -469,6 +489,12 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
                         <Turtle className="w-3.5 h-3.5" />
                         <span>0.75x</span>
                       </button>
+
+                      {audioFeedback?.id === (m.id || `msg-${idx}`) && (
+                        <span className="text-[10px] text-rose-500 font-medium ml-2 animate-in fade-in">
+                          {audioFeedback.error}
+                        </span>
+                      )}
                     </div>
 
                     {ar && (
