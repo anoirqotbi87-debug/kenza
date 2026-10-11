@@ -72,8 +72,8 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'UNAUTHORIZED_ORIGIN' }, { status: 403 });
       }
     }
-    // Rate limiting durable : 30 requêtes/min par IP
-    const rate = await checkRateLimit(`tts:ip:${getClientIp(req)}`, 30, 60 * 1000);
+    // Rate limiting durable : 60 requêtes/min par IP (conversation fluide sans blocage)
+    const rate = await checkRateLimit(`tts:ip:${getClientIp(req)}`, 60, 60 * 1000);
     if (rate.error) {
       return NextResponse.json({ error: 'SERVICE_UNAVAILABLE' }, { status: 503 });
     }
@@ -130,8 +130,8 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Rate limiting durable : 30 requêtes/min par IP
-    const rate = await checkRateLimit(`tts:ip:${getClientIp(req)}`, 30, 60 * 1000);
+    // Rate limiting durable : 60 requêtes/min par IP (conversation fluide sans blocage)
+    const rate = await checkRateLimit(`tts:ip:${getClientIp(req)}`, 60, 60 * 1000);
     if (rate.error) {
       return NextResponse.json({ error: 'SERVICE_UNAVAILABLE' }, { status: 503 });
     }
