@@ -102,6 +102,30 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
     );
   }
 
+  // Formatage des catégories techniques
+  const formatCategory = (cat?: string) => {
+    if (!cat) return "Vocabulaire";
+    const labels: Record<string, string> = {
+      POLITE_SOCIAL: 'Politesse & Salutations',
+      polite_social: 'Politesse & Salutations',
+      FOOD_DRINK: 'Café & Restauration',
+      food_drink: 'Café & Restauration',
+      NUMBERS_TIME: 'Nombres & Temps',
+      numbers_time: 'Nombres & Temps',
+      EMERGENCY: 'Urgences & Santé',
+      emergency: 'Urgences & Santé',
+      urgencies_health: 'Urgences & Santé',
+      TRAVEL_DIRECTIONS: 'Déplacements & Taxi',
+      travel_directions: 'Déplacements & Taxi',
+      directions: 'Déplacements & Taxi',
+      SHOPPING: 'Achats & Marché',
+      shopping: 'Achats & Marché',
+      souk_bargaining: 'Achats & Marché',
+      housing_riad: 'Hébergement & Riad',
+    };
+    return labels[cat] || cat.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+  };
+
   // Highlight specific phonetic numbers in Arabizi
   const formatArabizi = (text: string) => {
     return text.split(/(3|7|9|kh)/i).map((part, i) => {
@@ -176,7 +200,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
             {/* Kicker supérieur */}
             <div className="flex items-center gap-2 text-[#C9A05C] text-xs font-bold tracking-[0.22em] uppercase">
               <span>—</span>
-              <span>{wordData.category || "Vocabulaire"}</span>
+              <span>{formatCategory(wordData.category)}</span>
             </div>
             
             {/* Illustration & Translation */}
@@ -273,57 +297,57 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
         </motion.div>
       </div>
 
-      {/* Boutons de notation SRS en bas (Encore, Difficile, Bien, Facile) stylisés avec les gains d'XP en sous-texte */}
+      {/* Boutons de notation SRS en bas (Encore, Difficile, Bien, Facile) avec contraste accessible et gains d'XP */}
       <div className={`w-full mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 transition-all duration-300 ${isFlipped ? 'opacity-100 translate-y-0' : 'opacity-40 pointer-events-none'}`}>
         
-        {/* Encore */}
+        {/* Bouton 1 (À revoir / Encore) */}
         <button 
           onClick={(e) => { e.stopPropagation(); handleGrade('again'); }}
-          className="py-3.5 px-3 bg-[#FDFCF8] hover:bg-red-50 border border-red-200 text-red-700 rounded-2xl transition-all shadow-xs flex flex-col items-center justify-center active:scale-95 group"
+          className="py-3.5 px-3 text-rose-800 bg-rose-50 border border-rose-200 font-medium rounded-2xl transition-all shadow-xs flex flex-col items-center justify-center hover:bg-rose-100/70 active:scale-95 group"
         >
           <span className="font-display font-bold text-sm sm:text-base group-hover:scale-105 transition-transform">
             {t.srs?.again || "Encore"}
           </span>
-          <span className="text-[11px] font-semibold text-red-500/80 mt-0.5">
+          <span className="text-[11px] font-semibold text-rose-700/80 mt-0.5">
             +2 XP <span className="opacity-60 text-[10px]">[1]</span>
           </span>
         </button>
 
-        {/* Difficile */}
+        {/* Bouton 2 (Difficile) */}
         <button 
           onClick={(e) => { e.stopPropagation(); handleGrade('hard'); }}
-          className="py-3.5 px-3 bg-[#FDFCF8] hover:bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl transition-all shadow-xs flex flex-col items-center justify-center active:scale-95 group"
+          className="py-3.5 px-3 text-amber-900 bg-amber-50 border border-amber-200 font-medium rounded-2xl transition-all shadow-xs flex flex-col items-center justify-center hover:bg-amber-100/70 active:scale-95 group"
         >
           <span className="font-display font-bold text-sm sm:text-base group-hover:scale-105 transition-transform">
             {t.srs?.hard || "Difficile"}
           </span>
-          <span className="text-[11px] font-semibold text-amber-600 mt-0.5">
+          <span className="text-[11px] font-semibold text-amber-800/80 mt-0.5">
             +5 XP <span className="opacity-60 text-[10px]">[2]</span>
           </span>
         </button>
 
-        {/* Bien */}
+        {/* Bouton 3 (Bon / Bien) */}
         <button 
           onClick={(e) => { e.stopPropagation(); handleGrade('good'); }}
-          className="py-3.5 px-3 bg-[#FDFCF8] hover:bg-[#7A9174]/10 border border-[#7A9174]/50 text-[#7A9174] rounded-2xl transition-all shadow-xs flex flex-col items-center justify-center active:scale-95 group"
+          className="py-3.5 px-3 text-slate-800 bg-slate-50 border border-slate-200 font-medium rounded-2xl transition-all shadow-xs flex flex-col items-center justify-center hover:bg-slate-100/80 active:scale-95 group"
         >
           <span className="font-display font-bold text-sm sm:text-base group-hover:scale-105 transition-transform">
             {t.srs?.good || "Bien"}
           </span>
-          <span className="text-[11px] font-semibold text-[#7A9174] mt-0.5">
+          <span className="text-[11px] font-semibold text-slate-700 mt-0.5">
             +10 XP <span className="opacity-60 text-[10px]">[3]</span>
           </span>
         </button>
 
-        {/* Facile */}
+        {/* Bouton 4 (Facile) */}
         <button 
           onClick={(e) => { e.stopPropagation(); handleGrade('easy'); }}
-          className="py-3.5 px-3 bg-[#FDFCF8] hover:bg-[#1B2A4A]/5 border border-[#1B2A4A]/30 text-[#1B2A4A] rounded-2xl transition-all shadow-xs flex flex-col items-center justify-center active:scale-95 group"
+          className="py-3.5 px-3 text-emerald-900 bg-emerald-50 border border-emerald-300 font-semibold rounded-2xl transition-all shadow-xs flex flex-col items-center justify-center hover:bg-emerald-100/80 active:scale-95 group"
         >
           <span className="font-display font-bold text-sm sm:text-base group-hover:scale-105 transition-transform">
             {t.srs?.easy || "Facile"}
           </span>
-          <span className="text-[11px] font-semibold text-[#C9A05C] mt-0.5">
+          <span className="text-[11px] font-semibold text-emerald-800 mt-0.5">
             +15 XP <span className="opacity-60 text-[10px]">[4]</span>
           </span>
         </button>

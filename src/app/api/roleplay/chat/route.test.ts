@@ -270,7 +270,45 @@ describe('/api/roleplay/chat security & rate limit', () => {
     expect(data.error).toBe('RATE_LIMIT_EXCEEDED');
     expect(data.message).toContain("L'agent reprend son souffle");
   });
+  it('bascule de manière transparente sur Gemini en cas d’erreur Groq sans renvoyer d’erreur 404', async () => {
+    checkRateLimitMock.mockResolvedValue({ allowed: true });
+    // Simuler l'échec Groq (ex: 404 Model Not Found)
+    const groq404 = new Error('The model does not exist');
+    (groq404 as unknown as { statusCode: number }).statusCode = 404;
+    streamTextMock.mockRejectedValueOnce(groq404);
 
+    const mockFetch = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          candidates: [
+            {
+              content: {
+                parts: [{ text: '[AR] مَرْحَبًا بِيكْ [/AR]\n[TR] Bienvenue à toi [/TR]' }],
+              },
+            },
+          ],
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
+      )
+    );
+
+    const req = new Request('http://localhost/api/roleplay/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        origin: 'http://localhost:3000',
+      },
+      body: JSON.stringify({ messages: [{ role: 'user', content: 'Salam' }], personaId: 'cafe' }),
+    });
+
+    const res = await POST(req as unknown as NextRequest);
+    expect(res.status).toBe(200);
+    const bodyText = await res.text();
+    expect(bodyText).toContain('مَرْحَبًا بِيكْ');
+    expect(bodyText).toContain('Bienvenue à toi');
+
+    mockFetch.mockRestore();
+  });
   it('sanitizeHistory : fusionne deux messages consécutifs et retire un message initial assistant', () => {
     const input = [
       { role: 'assistant', content: 'Salam! Marhaban bik.' },
