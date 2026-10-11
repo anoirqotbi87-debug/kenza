@@ -29,7 +29,7 @@ const contentSecurityPolicy = [
   // (aperçus de dev/production) sans ouvrir un `https:` générique.
   "script-src 'self' 'unsafe-inline' https://vercel.live",
   "style-src 'self' 'unsafe-inline'",
-  "font-src 'self' data: https://fonts.gstatic.com https://vercel.live",
+  "font-src 'self' data: https://vercel.live",
   // `https:` retiré : il autorisait l'envoi de données vers n'importe quel
   // domaine. Les avatars Google OAuth sont chargés depuis un sous-domaine
   // `lh3.googleusercontent.com` (identifié par l'audit `csp_violations`).
@@ -37,11 +37,13 @@ const contentSecurityPolicy = [
   `connect-src 'self' ${supabaseOrigin} https://lh3.googleusercontent.com https://vercel.live`,
   "object-src 'none'",
   "base-uri 'self'",
+  "form-action 'self'",
   "frame-ancestors 'none'",
-  'frame-src \'self\' https://js.stripe.com https://vercel.live',
+  "frame-src 'self' https://vercel.live",
   // Les Web Workers locaux (service worker + workers chargés via `blob:`)
   // doivent rester exécutables : Sans `blob:` ici, Chrome bloque leur instantiation.
   "worker-src 'self' blob:",
+  "upgrade-insecure-requests",
   'report-uri /api/csp-report',
 ].join('; ') + ';';
 
