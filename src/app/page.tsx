@@ -145,16 +145,24 @@ export default function Home() {
         if (val === "path" || val === "parcours") return "path";
         if (val === "review" || val === "revision") return "review";
         if (val === "space") return "space";
-        if (val === "today") return "today";
+        if (val === "today" || val === "accueil") return "today";
         return null;
       };
 
       const fromUrl = normalizeView(rawParam);
       if (fromUrl) return fromUrl;
 
+      // Détection d'un rechargement de page (F5 / pull-to-refresh)
+      const navEntries = performance.getEntriesByType?.("navigation") as PerformanceNavigationTiming[] | undefined;
+      const isPageRefresh = navEntries && navEntries.length > 0
+        ? navEntries[0].type === "reload"
+        : (window.performance?.navigation?.type === 1);
+
       const savedTab = localStorage.getItem("kenza_active_tab");
       const fromStorage = normalizeView(savedTab);
-      if (fromStorage) return fromStorage;
+      if (isPageRefresh && fromStorage) {
+        return fromStorage;
+      }
     } catch {}
     return "today";
   });
@@ -373,6 +381,15 @@ export default function Home() {
         setUser(session.user);
         setIsPremium(await fetchPremiumStatus(session.user.id));
         await syncService.syncCloudToLocal(session.user.id);
+        // Après connexion (Google OAuth ou réinitialisation), afficher l'Accueil par défaut
+        setView("today");
+        try {
+          localStorage.setItem("kenza_active_tab", "today");
+          const url = new URL(window.location.href);
+          url.searchParams.delete("tab");
+          url.searchParams.delete("view");
+          window.history.replaceState(null, "", url.pathname + (url.search ? url.search : ""));
+        } catch {}
       } else if (event === "SIGNED_OUT") {
         setUser(null);
         setIsPremium(false);
@@ -430,10 +447,11 @@ export default function Home() {
     const handlePopState = () => {
       const params = new URLSearchParams(window.location.search);
       const v = params.get("tab") || params.get("view");
-      if (v === "phrases" || v === "path" || v === "review" || v === "space" || v === "today") {
-        setView(v as View);
+      if (v === "phrases" || v === "path" || v === "review" || v === "space" || v === "today" || v === "accueil") {
+        const normalized = v === "accueil" ? "today" : (v as View);
+        setView(normalized);
         try {
-          localStorage.setItem("kenza_active_tab", v);
+          localStorage.setItem("kenza_active_tab", normalized);
         } catch {}
       } else if (v === "parcours") {
         setView("path");
