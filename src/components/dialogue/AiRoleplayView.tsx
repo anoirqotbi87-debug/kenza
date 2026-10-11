@@ -54,12 +54,56 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
   const [showImmersion, setShowImmersion] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [playingKey, setPlayingKey] = useState<string | null>(null);
 
-  const handlePlayVoice = (text: string, arabic?: string, speed: 'normal' | 'slow' = 'normal') => {
-    const cleanAr = extractCleanArabicForTts(arabic || text);
-    playAudio(cleanAr || text, cleanAr, soundEnabled, speed === 'slow' ? 0.75 : 1.0, {
-      speed,
-      voice: personaId === 'cafe' || personaId === 'taxi' || personaId === 'souk' || personaId === 'medecin' ? 'male' : 'female',
+  const handlePlayVoice = (messageId: string, rawText: string, speed: 'normal' | 'slow' = 'normal') => {
+    if (!rawText) return;
+
+    // Extraction du texte arabe vocalisé avec conversion Arabizi
+    const cleanArabic = extractCleanArabicForTts(rawText);
+    if (!cleanArabic) return;
+
+    const key = `${messageId}-${speed}`;
+
+    // Initialiser ou récupérer l'instance audio unique
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+    }
+    const audio = audioRef.current;
+
+    // Si on clique sur le vocal déjà en cours de lecture, on le met en pause
+    if (playingKey === key && !audio.paused) {
+      audio.pause();
+      setPlayingKey(null);
+      return;
+    }
+
+    // Stopper proprement toute lecture précédente
+    audio.pause();
+    audio.currentTime = 0;
+
+    const gender = personaId === 'cafe' || personaId === 'taxi' || personaId === 'souk' || personaId === 'medecin' ? 'male' : 'female';
+
+    // Définir la nouvelle source TTS directement en streaming GET
+    const url = `/api/tts?text=${encodeURIComponent(cleanArabic)}&speed=${speed}&gender=${gender}`;
+    audio.src = url;
+    setPlayingKey(key);
+
+    // Gestionnaires de fin et d'erreur
+    audio.onended = () => {
+      setPlayingKey(null);
+    };
+
+    audio.onerror = () => {
+      console.warn('Erreur de lecture audio pour le message', messageId);
+      setPlayingKey(null);
+    };
+
+    // Déclenchement synchrone immédiat (conserve le geste utilisateur sur mobile)
+    audio.play().catch(err => {
+      console.warn('Lecture audio bloquée ou interrompue :', err);
+      setPlayingKey(null);
     });
   };
 
@@ -380,7 +424,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
           </div>
         )}
 
-        {messages.map((m: Message) => {
+        {messages.map((m: Message, idx: number) => {
           const isUser = m.role === 'user';
           const { ar, arz, fr } = isUser ? { ar: '', arz: '', fr: m.content } : parseAiMessage(m.content);
 
@@ -400,21 +444,29 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
                     <div className="flex items-center gap-1.5 pb-1 border-b border-[#E8E2D5]/60">
                       <button
                         type="button"
-                        onClick={() => handlePlayVoice(arz || m.content, ar, 'normal')}
-                        className="p-1 text-[#1B2A4A] hover:text-[#C9A05C] rounded-lg transition-colors flex items-center gap-1 text-[11px] font-bold"
+                        onClick={() => handlePlayVoice(m.id || `msg-${idx}`, ar || m.content, 'normal')}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
+                          playingKey === `${m.id || `msg-${idx}`}-normal`
+                            ? 'bg-[#C9A05C] text-[#1B2A4A] shadow-sm'
+                            : 'bg-amber-100/50 hover:bg-amber-100 text-[#1B2A4A]'
+                        }`}
                         title="Écouter à vitesse normale"
                       >
-                        <Volume2 className="w-3.5 h-3.5 text-[#C9A05C]" />
+                        <Volume2 className="w-3.5 h-3.5" />
                         <span>1.0x</span>
                       </button>
 
                       <button
                         type="button"
-                        onClick={() => handlePlayVoice(arz || m.content, ar, 'slow')}
-                        className="p-1 text-[#7A7670] hover:text-[#1B2A4A] rounded-lg transition-colors flex items-center gap-1 text-[11px] font-bold"
+                        onClick={() => handlePlayVoice(m.id || `msg-${idx}`, ar || m.content, 'slow')}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
+                          playingKey === `${m.id || `msg-${idx}`}-slow`
+                            ? 'bg-[#C9A05C] text-[#1B2A4A] shadow-sm'
+                            : 'bg-amber-100/50 hover:bg-amber-100 text-[#1B2A4A]'
+                        }`}
                         title="Écouter au ralenti (mode tortue)"
                       >
-                        <Turtle className="w-3.5 h-3.5 text-[#C9A05C]" />
+                        <Turtle className="w-3.5 h-3.5" />
                         <span>0.75x</span>
                       </button>
                     </div>
