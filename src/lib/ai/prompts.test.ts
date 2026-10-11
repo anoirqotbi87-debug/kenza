@@ -20,12 +20,13 @@ describe('System prompts Roleplay IA — charte linguistique', () => {
     }
   });
 
-  it('impose le format tripartite [AR] / [ARZ] / [FR] partout', () => {
+  it('impose le format quadri-partite [AR] / [ARZ] / [FR] / [SUGG] partout', () => {
     for (const id of ALL_PERSONAS) {
       const prompt = getSystemPrompt(id)!;
       expect(prompt, `persona ${id}`).toContain('[AR]');
       expect(prompt, `persona ${id}`).toContain('[ARZ]');
       expect(prompt, `persona ${id}`).toContain('[FR]');
+      expect(prompt, `persona ${id}`).toContain('[SUGG]');
     }
   });
 
