@@ -27,6 +27,11 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
     ? (vocabulary.find(v => v.id === currentSRSCard.wordId)
        || getWordFromDictionary(currentSRSCard.wordId)
        || customVocabulary?.[currentSRSCard.wordId]
+       || (currentSRSCard.wordId.startsWith('srs_')
+          ? vocabulary.find(v => v.id === currentSRSCard.wordId.replace('srs_', ''))
+            || getWordFromDictionary(currentSRSCard.wordId.replace('srs_', ''))
+            || customVocabulary?.[currentSRSCard.wordId.replace('srs_', '')]
+          : null)
        || null)
     : null;
 

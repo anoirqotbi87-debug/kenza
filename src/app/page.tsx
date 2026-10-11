@@ -1213,6 +1213,7 @@ function TodayView({
 }) {
   const { t } = useTranslation();
   const { lang } = useLocalizedContent();
+  const isAr = lang === 'ar';
   const totalLessons = getPlayableLessons(lang).length;
 
   return (
@@ -1262,7 +1263,7 @@ function TodayView({
           <div className="next-card-head">
             <span className="mini-kicker">{trL(lang, "TA PROCHAINE ÉTAPE", "YOUR NEXT STEP", "TU PRÓXIMO PASO", "خطوتك التالية")}</span>
             <span className="next-icon">
-              <ArrowDownRight size={17} />
+              <ArrowDownRight size={17} className={isAr ? "rotate-90" : ""} />
             </span>
           </div>
           <div className="lesson-number">
@@ -1287,21 +1288,21 @@ function TodayView({
             <div className="tea-leaf leaf-one" />
             <div className="tea-leaf leaf-two" />
           </div>
-          <div className="next-card-copy">
+          <div className="next-card-copy text-start">
             <span className="lesson-pill">
               {nextLesson
                 ? `${trL(lang, "LEÇON SUIVANTE", "NEXT LESSON", "PRÓXIMA LECCIÓN", "الدرس التالي")} · ${nextLesson.stepsCount} ${tr("étapes", "steps", "pasos", "خطوات")}`
                 : trL(lang, "PARCOURS TERMINÉ", "JOURNEY COMPLETE", "RECORRIDO COMPLETADO", "أتممت المسار")}
             </span>
-            <h3>
+            <h3 className="text-start">
               {nextLesson
                 ? nextLesson.title
                 : trL(lang, "Parcours terminé !", "Journey complete!", "¡Recorrido completado!", "أتممت المسار!")}
             </h3>
-            <p>
+            <p className="text-start">
               {nextLesson
                 ? nextLesson.moduleTitle
-                : trL(lang, "Tous les modules validés. Revois n’importe quelle leçon depuis le parcours complet.", "All modules completed. Revisit any lesson from the full journey.", "Todos los módulos validados. Repasa cualquier lección desde el recorrido completo.", "جميع الوحدات مكتملة. راجع أي درس من المسار الكامل.")}
+                : trL(lang, "Tous les modules validés. Revois n’importe quelle leçon depuis le parcours complet.", "All modules completed. Revisit any lesson from the full journey.", "Tous los módulos validados. Repasa cualquier lección desde el recorrido completo.", "جميع الوحدات مكتملة. راجع أي درس من المسار الكامل.")}
             </p>
           </div>
           <button
@@ -1310,12 +1311,13 @@ function TodayView({
           >
             {nextLesson ? (
               <>
-                {trL(lang, "C’est parti", "Let’s go", "¡Vamos!", "هيا بنا")} <ArrowRight size={15} />
+                {trL(lang, "C’est parti", "Let’s go", "¡Vamos!", "هيا بنا")}{" "}
+                <ArrowRight size={15} className={isAr ? "rotate-180" : ""} />
               </>
             ) : (
               <>
                 {trL(lang, "Passer aux révisions", "Go to reviews", "Ir a repasos", "الانتقال إلى المراجعة")}{" "}
-                <ArrowRight size={15} />
+                <ArrowRight size={15} className={isAr ? "rotate-180" : ""} />
               </>
             )}
           </button>

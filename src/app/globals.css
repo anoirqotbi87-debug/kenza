@@ -339,6 +339,15 @@ button[class*="bg-[#0B2545]"] span {
 .next-card-copy h3 { margin: 11px 0 3px; color: var(--ink); font-family: "DM Serif Display", serif; font-size: 20px; font-weight: 400; letter-spacing: -.01em; }
 .next-card-copy p { margin: 0; color: #8a8c86; font-size: 9px; }
 .text-link { display: inline-flex; align-items: center; gap: 7px; position: absolute; bottom: 17px; left: 18px; padding: 0; border: 0; color: #526f86; background: transparent; font-size: 10px; font-weight: 700; cursor: pointer; }
+
+/* RTL support for next-card */
+[dir="rtl"] .next-card, .rtl .next-card { text-align: right; }
+[dir="rtl"] .lesson-number, .rtl .lesson-number { left: auto; right: 17px; }
+[dir="rtl"] .next-illustration, .rtl .next-illustration { right: auto; left: 19px; }
+[dir="rtl"] .text-link, .rtl .text-link { left: auto; right: 18px; }
+[dir="rtl"] .next-card-copy, .rtl .next-card-copy { text-align: right; }
+[dir="rtl"] .next-card-copy h3, .rtl .next-card-copy h3 { text-align: right; }
+[dir="rtl"] .next-card-copy p, .rtl .next-card-copy p { text-align: right; }
 .stat-strip { display: flex; align-items: center; gap: clamp(12px, 2vw, 24px); min-height: 79px; margin-top: 14px; padding: 12px 20px; border: 1px solid #ebe5d9; border-radius: 14px; background: rgba(255,254,250,.72); }
 .stat-item { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .stat-icon, .space-stat-icon { width: 31px; height: 31px; flex: 0 0 31px; display: grid; place-items: center; border-radius: 10px; }
@@ -740,10 +749,13 @@ button[class*="bg-[#0B2545]"] span {
   .hero-medallion span { font-size: 12px; }
   .next-card { min-height: 196px; padding: 16px; }
   .next-illustration { top: 25px; right: 18px; transform: scale(.9); transform-origin: top right; }
-  .next-card-copy { bottom: 51px; left: 16px; }
+  [dir="rtl"] .next-illustration, .rtl .next-illustration { right: auto; left: 18px; transform-origin: top left; }
+  .next-card-copy { bottom: 51px; left: 16px; right: 16px; }
+  [dir="rtl"] .next-card-copy, .rtl .next-card-copy { text-align: right; }
   .next-card-copy h3 { max-width: 61%; font-size: 19px; }
   .next-card-copy p { max-width: 61%; line-height: 1.45; }
   .text-link { bottom: 15px; left: 16px; }
+  [dir="rtl"] .text-link, .rtl .text-link { left: auto; right: 16px; }
   .stat-strip { display: grid; grid-template-columns: 1fr 1px 1fr; gap: 10px; margin-top: 11px; padding: 13px 11px; }
   .stat-item { gap: 7px; }
   .stat-icon { width: 28px; height: 28px; flex-basis: 28px; }
