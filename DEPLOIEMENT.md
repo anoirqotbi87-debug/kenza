@@ -22,7 +22,7 @@ Toutes les variables sont documentées dans `.env.example` (versionné, sans sec
 | `STRIPE_SECRET_KEY` | serveur uniquement | oui | Checkout et portail renvoient `503`. |
 | `STRIPE_WEBHOOK_SECRET` | serveur uniquement | oui | Le webhook rejette toutes les requêtes (signature invalide). |
 | `GROQ_API_KEY` | serveur uniquement | oui | Le roleplay IA renvoie HTTP 503 explicite. |
-| `GROQ_MODEL` | serveur uniquement | non (défaut : `llama-3.3-70b-versatile`) | Modèle principal du catalogue officiel Groq. Repli automatique sur `llama-3.1-8b-instant`. |
+| `GROQ_MODEL` | serveur uniquement | non (défaut : `llama-3.3-70b-versatile`) | Modèle principal du catalogue officiel Groq (`llama-3.3-70b-versatile`). |
 | `NEXT_PUBLIC_APP_URL` | serveur | recommandé | Redirections Stripe vers l'origine par défaut codée en dur. |
 
 > **Ne jamais** préfixer une clé secrète par `NEXT_PUBLIC_` : tout ce préfixe est inliné dans le

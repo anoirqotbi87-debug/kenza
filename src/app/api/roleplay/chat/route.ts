@@ -162,8 +162,12 @@ export async function POST(req: NextRequest) {
       apiKey,
     });
 
-    // Définition du modèle officiel certifié Groq
-    const groqModel = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+    // Définition du modèle officiel certifié Groq (neutralisation automatique de toute ancienne variable llama-3.1)
+    const rawGroqModel = process.env.GROQ_MODEL?.trim();
+    const groqModel =
+      !rawGroqModel || rawGroqModel.includes('llama-3.1')
+        ? 'llama-3.3-70b-versatile'
+        : rawGroqModel;
 
     let targetLanguageLabel = 'Français';
     let isArabicImmersion = false;
