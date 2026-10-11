@@ -760,16 +760,30 @@ export default function Home() {
               <Menu size={21} />
             </button>
 
-            <div className="shrink-0 flex items-center gap-2" aria-label="Kenza">
-              <div
-                className="w-8 h-8 rounded-xl bg-[#142943] text-[#f8f5ec] flex items-center justify-center font-arabic text-lg font-bold shrink-0 border border-[#ddb578]/40 shadow-xs"
+            <div className="shrink-0 flex items-center gap-2.5" aria-label="Kenza">
+              {/* Carré asymétrique bleu nuit avec lettre arabe et losange doré */}
+              <div 
+                className="w-9 h-9 relative grid place-items-center overflow-hidden bg-[#142943] text-[#f8f5ec] shadow-xs shrink-0"
+                style={{ borderRadius: '13px 13px 13px 5px' }}
                 aria-hidden="true"
               >
-                <span>ك</span>
+                <span className="font-['Noto_Sans_Arabic',sans-serif] text-[20px] leading-none -translate-y-px text-[#f8f5ec]">
+                  ك
+                </span>
+                <i 
+                  className="absolute w-2 h-2 border border-[#ddb578] rounded-[2px] right-[5px] bottom-[5px] rotate-45 pointer-events-none" 
+                />
               </div>
-              <span className="font-display font-bold text-base tracking-wider text-[#142943] hidden sm:inline shrink-0">
-                KENZA
-              </span>
+
+              {/* Wordmark KENZA en DM Serif Display et signature */}
+              <div className="hidden sm:flex flex-col text-left">
+                <span className="font-['DM_Serif_Display',serif] text-[18px] tracking-[0.17em] leading-tight text-[#142943] block">
+                  KENZA
+                </span>
+                <span className="text-[9px] tracking-[0.045em] text-[#8a8b83] block -mt-0.5">
+                  la darija, en chemin
+                </span>
+              </div>
             </div>
           </div>
 
@@ -1769,21 +1783,31 @@ function PathView({
               {/* Acces Checkpoint A1 (premiere palier gratuite) */}
               <div className="flex items-center justify-between gap-3 bg-[#F7F3EA] border border-[#E8E2D2] rounded-xl px-4 py-3 mt-5">
                 <div>
-                  <span className="text-[10px] font-bold tracking-[0.14em] uppercase text-[#8C6D23]">
-                    {trL(lang, "Palier A1", "Level A1", "Nivel A1", "المستوى A1")}
-                  </span>
-                  <p className="text-xs text-[#7A7670]">
+                  <h4 className="text-[#142943] font-bold text-sm sm:text-base">
+                    {trL(lang, "Palier A1 : Les Fondations", "Level A1: Foundations", "Nivel A1: Fundamentos", "المستوى A1 : الأساسيات")}
+                  </h4>
+                  <p className="text-slate-600 text-xs mt-0.5">
                     {trL(lang, "Les Fondations — validez vos premiers acquis.", "Foundations — validate your first wins.", "Fundamentos — valida tus primeros logros.", "الأساسيات — أكّد مكتسباتك الأولى.")}
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => onOpenCheckpoint("1", trL(lang, "Palier A1 — Fondations", "Level A1 — Foundations", "Nivel A1 — Fundamentos", "المستوى A1 — الأساسيات"))}
-                  className="shrink-0 inline-flex items-center gap-1.5 text-xs font-bold text-[#142943] bg-white border border-[#142943]/20 rounded-full px-3 py-2 hover:bg-[#142943] hover:text-white transition-colors"
-                >
-                  {hasPassedLevel("1") ? trL(lang, "Validé ✓", "Passed ✓", "Aprobado ✓", "ناجح ✓") : trL(lang, "Passer le Checkpoint", "Take the checkpoint", "Pasar el checkpoint", "اجتز نقطة المراجعة")}
-                  <ArrowRight size={13} />
-                </button>
+                {hasPassedLevel("1") ? (
+                  <button
+                    type="button"
+                    onClick={() => onOpenCheckpoint("1", trL(lang, "Palier A1 — Fondations", "Level A1 — Foundations", "Nivel A1 — Fundamentos", "المستوى A1 — الأساسيات"))}
+                    className="bg-emerald-100 text-emerald-800 border border-emerald-300 font-semibold px-2 py-0.5 rounded-full text-xs shrink-0 inline-flex items-center gap-1 hover:bg-emerald-200 transition-colors"
+                  >
+                    <span>{trL(lang, "Validé ✓", "Passed ✓", "Aprobado ✓", "ناجح ✓")}</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => onOpenCheckpoint("1", trL(lang, "Palier A1 — Fondations", "Level A1 — Foundations", "Nivel A1 — Fundamentos", "المستوى A1 — الأساسيات"))}
+                    className="shrink-0 inline-flex items-center gap-1.5 text-xs font-bold text-[#142943] bg-white border border-[#142943]/20 rounded-full px-3 py-2 hover:bg-[#142943] hover:text-white transition-colors"
+                  >
+                    <span>{trL(lang, "Passer le Checkpoint", "Take the checkpoint", "Pasar el checkpoint", "اجتز نقطة المراجعة")}</span>
+                    <ArrowRight size={13} />
+                  </button>
+                )}
               </div>
             </section>
           )}

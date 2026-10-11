@@ -162,11 +162,8 @@ export async function POST(req: NextRequest) {
       apiKey,
     });
 
-    const configuredModel = process.env.GROQ_MODEL?.trim() || 'llama-3.3-70b-versatile';
-    const CANDIDATE_MODELS = [
-      configuredModel,
-      ...(configuredModel !== 'llama-3.1-8b-instant' ? ['llama-3.1-8b-instant'] : []),
-    ];
+    // Définition du modèle officiel certifié Groq
+    const groqModel = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
 
     let targetLanguageLabel = 'Français';
     let isArabicImmersion = false;
@@ -194,43 +191,16 @@ Format attendu :
 
     const systemInstruction = `${systemPrompt}\n\n${linguisticRule}`;
 
-    let lastError: unknown = null;
-    for (const modelId of CANDIDATE_MODELS) {
-      try {
-        const result = await streamText({
-          model: groq(modelId),
-          system: systemInstruction,
-          messages: normalizedHistory as CoreMessage[],
-          temperature: 0.35,
-          maxTokens: 120,
-          maxRetries: 0,
-        });
+    const result = await streamText({
+      model: groq(groqModel),
+      system: systemInstruction,
+      messages: normalizedHistory as CoreMessage[],
+      temperature: 0.35,
+      maxTokens: 120,
+      maxRetries: 0,
+    });
 
-        return result.toDataStreamResponse();
-      } catch (err: unknown) {
-        lastError = err;
-        const errStatus =
-          (err as { status?: number; statusCode?: number } | undefined)?.status ??
-          (err as { status?: number; statusCode?: number } | undefined)?.statusCode;
-        const errStr = err instanceof Error ? err.message : String(err);
-
-        // Si l'erreur est liée aux droits ou aux quotas (401, 403, 429), inutile de boucler sur les autres modèles
-        if (
-          errStatus === 401 ||
-          errStatus === 403 ||
-          errStatus === 429 ||
-          errStr.includes('429') ||
-          errStr.includes('Resource exhausted') ||
-          errStr.includes('rate_limit')
-        ) {
-          throw err;
-        }
-
-        console.warn(`[Groq Model Warning] Échec avec ${modelId}, tentative sur modèle de repli...`, err);
-      }
-    }
-
-    throw lastError;
+    return result.toDataStreamResponse();
   } catch (error: unknown) {
     const errMsg = error instanceof Error ? error.message : String(error);
     const status =

@@ -90,7 +90,6 @@ Le moteur de roleplay (`src/app/api/roleplay/chat/route.ts`) utilise l'AI SDK av
 
 ### Modèle actif par défaut
 - **Catalogue officiel Groq** : `llama-3.3-70b-versatile` (70 milliards de paramètres, excellent rendu en Darija vocalisée).
-- **Repli automatique** : `llama-3.1-8b-instant` en cas de pic de trafic ou indisponibilité temporaire du 70B.
 - **Variable de configuration** : `GROQ_MODEL` (optionnelle, défaut: `llama-3.3-70b-versatile`).
 
 ### Procédure de bascule de provider
@@ -98,8 +97,8 @@ Le moteur de roleplay (`src/app/api/roleplay/chat/route.ts`) utilise l'AI SDK av
 Si vous devez changer de fournisseur LLM en production :
 
 1. **Option 1 : Changer de modèle Groq**
-   - Définir `GROQ_MODEL=<identifiant-officiel>` dans Vercel (ex: `llama-3.3-70b-versatile`, `mixtral-8x7b-32768`).
-   - Redéployer : la route bascule immédiatement avec repli sur `llama-3.1-8b-instant`.
+   - Définir `GROQ_MODEL=<identifiant-officiel>` dans Vercel (ex: `llama-3.3-70b-versatile`).
+   - Redéployer : la route bascule immédiatement.
 
 2. **Option 2 : Bascule vers OpenAI (ex: gpt-4o-mini)**
    - Définir `OPENAI_API_KEY` dans Vercel.
