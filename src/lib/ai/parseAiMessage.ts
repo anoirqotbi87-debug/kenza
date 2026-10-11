@@ -2,6 +2,7 @@ export interface ParsedMessage {
   ar: string;
   arz: string;
   fr: string;
+  suggestions?: string[];
 }
 
 // Tableau global de caractères jamais légitimes en tête d'un champ :
@@ -17,14 +18,14 @@ const LEADING_ARABIC_DIACRITICS = /^\u061C|^[\u064B-\u065F\u0670]+/;
 
 const clean = (s: string): string =>
   s
-    .replace(/\[\/(AR|ARZ|FR|TR)\]/gi, '')
+    .replace(/\[\/(AR|ARZ|FR|TR|SUGG)\]/gi, '')
     .replace(LEADING_GARBAGE, '')
     .replace(LEADING_ARABIC_DIACRITICS, '')
     .trim();
 
 /**
  * Parse la réponse du roleplay, qui doit suivre le format :
- *   [AR] <arabe> [ARZ] <arabizi> [FR] <français>
+ *   [AR] <arabe> [ARZ] <arabizi> [FR] <français> [SUGG] <sugg1 | sugg2>
  *
  * Garantit que le premier caractère de chaque champ n'est jamais altéré :
  * les caractères invisibles de tête (BOM, ZWSP, marques de direction …) sont
@@ -34,16 +35,18 @@ export function parseAiMessage(content: string): ParsedMessage {
   let ar = '';
   let arz = '';
   let fr = '';
+  let suggestions: string[] | undefined = undefined;
 
   const arIndex = content.indexOf('[AR]');
   const arzIndex = content.indexOf('[ARZ]');
   const frIndex = content.indexOf('[FR]');
   const trIndex = content.indexOf('[TR]');
+  const suggIndex = content.indexOf('[SUGG]');
 
   // Fin d'un champ = marqueur reconnu le plus proche strictement après son
   // début. Les marqueurs de tous les types sont des bornes valides, même dans
   // le désordre : un champ ne "mange" jamais le suivant.
-  const markers = [arIndex, arzIndex, frIndex, trIndex].filter((m) => m !== -1);
+  const markers = [arIndex, arzIndex, frIndex, trIndex, suggIndex].filter((m) => m !== -1);
   const nextMarkerAfter = (start: number): number => {
     let end = content.length;
     for (const m of markers) {
@@ -66,6 +69,16 @@ export function parseAiMessage(content: string): ParsedMessage {
     fr = clean(content.substring(trIndex + 4, nextMarkerAfter(trIndex + 4)));
   }
 
+  if (suggIndex !== -1) {
+    const rawSugg = clean(content.substring(suggIndex + 6, nextMarkerAfter(suggIndex + 6)));
+    if (rawSugg) {
+      suggestions = rawSugg
+        .split('|')
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+    }
+  }
+
   // Repli robuste : si aucune balise reconnue ou si parsing incomplet.
   if (!ar && !arz && !fr) {
     const hasArabicChars = /[\u0600-\u06FF]/.test(content);
@@ -77,23 +90,36 @@ export function parseAiMessage(content: string): ParsedMessage {
     }
   }
 
-  return { ar, arz, fr };
+  return { ar, arz, fr, ...(suggestions && suggestions.length > 0 ? { suggestions } : {}) };
 }
 
 /**
- * Nettoyage strict du texte envoyé au TTS :
- * Extrait uniquement l'arabe pur vocalisé, sans balises, sans caractères latins/chiffres,
- * sans parenthèses et sans tanwīn classique (ً ٌ ٍ).
+ * Nettoyage strict et conversion phonétique du texte envoyé au TTS :
+ * 1. Convertit les chiffres Arabizi (3->ع, 7->ح, 9->ق, 5->خ) avant tout nettoyage pour éviter les sons tronqués.
+ * 2. Conserve les diacritiques (chakl : fat-ha, damma, kasra, sukūn, shadda) et supprime les balises et caractères latins parasites.
+ * 3. Supprime le tanwīn classique (ً ٌ ٍ) et parenthèses.
  */
 export function sanitizeTtsArabic(raw: string): string {
   if (!raw) return '';
   const match = raw.match(/\[AR\]([\s\S]*?)\[\/AR\]/i);
-  const text = match ? match[1] : raw;
+  let text = match ? match[1] : raw;
+
+  // Si aucun bloc [AR] n'était présent (texte Arabizi passé directement au TTS),
+  // on remplace les chiffres Arabizi par leurs consonnes arabes correspondantes.
+  if (!match) {
+    text = text
+      .replace(/3/g, 'ع')
+      .replace(/7/g, 'ح')
+      .replace(/9/g, 'ق')
+      .replace(/5/g, 'خ');
+  }
+
   return text
-    .replace(/\[\/?(AR|ARZ|FR|TR)\]/gi, '') // Supprime les balises
+    .replace(/\[\/?(AR|ARZ|FR|TR|SUGG)\]/gi, '') // Supprime les balises
     .replace(/[a-zA-Z0-9_\-#]/g, '')       // Supprime le latin et chiffres
     .replace(/[()]/g, '')                   // Supprime parenthèses
     .replace(/[\u064B\u064C\u064D]/g, '')   // Supprime tanwin Fusha classique
+    .replace(/\s+/g, ' ')                   // Normalise les espaces multiples
     .trim();
 }
 

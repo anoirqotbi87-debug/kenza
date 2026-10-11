@@ -285,6 +285,29 @@ export default function RoleplayChat({
 
       {/* Input bar with integrated microphone */}
       <div className="p-3 bg-[#F7F3EA] border-t border-[#E8E2D5]">
+        {/* Suggestion pills if available from last assistant message */}
+        {(() => {
+          const lastMsg = messages[messages.length - 1];
+          if (!lastMsg || lastMsg.role !== 'assistant') return null;
+          const parsed = parseAiMessage(lastMsg.content);
+          if (!parsed.suggestions || parsed.suggestions.length === 0) return null;
+          return (
+            <div className="flex flex-wrap items-center gap-1.5 mb-2.5 px-1">
+              <span className="text-[11px] font-semibold text-[#7A7670] mr-1">Suggestions :</span>
+              {parsed.suggestions.map((sugg, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setInput(sugg)}
+                  className="px-2.5 py-1 text-xs font-medium rounded-full bg-[#FDFCF8] hover:bg-[#E8E2D5] text-[#1B2A4A] border border-[#E8E2D5] transition-all hover:scale-[1.02] active:scale-95 text-left shadow-2xs"
+                >
+                  💡 {sugg}
+                </button>
+              ))}
+            </div>
+          );
+        })()}
+
         <form
           onSubmit={(e) => {
             setStreamTimeoutHit(false);

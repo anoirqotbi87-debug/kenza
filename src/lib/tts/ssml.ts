@@ -36,7 +36,19 @@ export function getProsodyRate(speed?: TtsSpeed | string): string {
 }
 
 /**
+ * Inserts breathing micro-pauses (150ms) on commas for natural cadence.
+ */
+export function injectBreathingPauses(escapedText: string): string {
+  return escapedText
+    .replace(/،/g, '،<break time="150ms"/>')
+    .replace(/,/g, ',<break time="150ms"/>');
+}
+
+/**
  * Builds a strict, well-formed SSML payload for msedge-tts.
+ * - speed === 'slow': rate="-25%" pitch="+2Hz"
+ * - speed === 'normal': rate="-5%"
+ * - injection de micro-pauses 150ms sur les virgules
  */
 export function buildSsml(
   text: string,
@@ -45,9 +57,11 @@ export function buildSsml(
 ): { ssml: string; voiceName: string; rate: string } {
   const voiceName = getVoiceName(voice);
   const rate = getProsodyRate(speed);
+  const pitchAttr = speed === 'slow' ? ' pitch="+2Hz"' : '';
   const escapedText = escapeXml(text);
+  const textWithPauses = injectBreathingPauses(escapedText);
 
-  const ssml = `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="ar-MA"><voice name="${voiceName}"><prosody rate="${rate}">${escapedText}</prosody></voice></speak>`;
+  const ssml = `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="ar-MA"><voice name="${voiceName}"><prosody rate="${rate}"${pitchAttr}>${textWithPauses}</prosody></voice></speak>`;
 
   return { ssml, voiceName, rate };
 }

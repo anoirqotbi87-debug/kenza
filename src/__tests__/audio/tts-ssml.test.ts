@@ -67,6 +67,7 @@ describe('TTS SSML Builder (msedge-tts Moroccan Darija)', () => {
       expect(result.rate).toBe('-25%');
       expect(result.ssml).toContain('name="ar-MA-JamalNeural"');
       expect(result.ssml).toContain('rate="-25%"');
+      expect(result.ssml).toContain('pitch="+2Hz"');
       expect(result.ssml).toContain('Fin ghadi 3afak ?');
     });
 
@@ -74,6 +75,12 @@ describe('TTS SSML Builder (msedge-tts Moroccan Darija)', () => {
       const result = buildSsml('Atay & Qahwa <nss-nss>', 'female', 'normal');
       expect(result.ssml).toContain('Atay &amp; Qahwa &lt;nss-nss&gt;');
       expect(result.ssml).not.toContain('<nss-nss>');
+    });
+
+    it('injects breathing micro-pauses (150ms) on Arabic and Latin commas', () => {
+      const result = buildSsml('مرحبا، كيف داير, لاباس', 'female', 'normal');
+      expect(result.ssml).toContain('،<break time="150ms"/>');
+      expect(result.ssml).toContain(',<break time="150ms"/>');
     });
   });
 });

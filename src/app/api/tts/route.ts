@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json().catch(() => ({}));
-    const { text, arabicText, voice, speed } = body;
+    const { text, arabicText, voice, gender, speed } = body;
     const normalizedArabic = typeof arabicText === 'string' && arabicText.trim().length > 0
       ? arabicText.trim()
       : undefined;
@@ -94,7 +94,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'TEXT_TOO_LONG' }, { status: 400 });
     }
 
-    const ttsVoice: TtsVoice = voice === 'male' || voice === 'ar-MA-JamalNeural' ? 'male' : 'female';
+    const isMale = gender === 'male' || voice === 'male' || voice === 'ar-MA-JamalNeural';
+    const isFemale = gender === 'female' || voice === 'female' || voice === 'ar-MA-MounaNeural';
+    const ttsVoice: TtsVoice = isMale ? 'male' : (isFemale ? 'female' : 'male');
     const ttsSpeed: TtsSpeed = speed === 'slow' ? 'slow' : 'normal';
 
     return await synthesize(text, normalizedArabic, ttsVoice, ttsSpeed);
@@ -141,6 +143,7 @@ export async function GET(req: NextRequest) {
     const text = searchParams.get('text');
     const arabicText = searchParams.get('arabicText') || undefined;
     const voiceParam = searchParams.get('voice');
+    const genderParam = searchParams.get('gender');
     const speedParam = searchParams.get('speed');
     const normalizedArabic = typeof arabicText === 'string' && arabicText.trim().length > 0
       ? arabicText.trim()
@@ -153,7 +156,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'TEXT_TOO_LONG' }, { status: 400 });
     }
 
-    const ttsVoice: TtsVoice = voiceParam === 'male' || voiceParam === 'ar-MA-JamalNeural' ? 'male' : 'female';
+    const isMale = genderParam === 'male' || voiceParam === 'male' || voiceParam === 'ar-MA-JamalNeural';
+    const isFemale = genderParam === 'female' || voiceParam === 'female' || voiceParam === 'ar-MA-MounaNeural';
+    const ttsVoice: TtsVoice = isMale ? 'male' : (isFemale ? 'female' : 'male');
     const ttsSpeed: TtsSpeed = speedParam === 'slow' ? 'slow' : 'normal';
 
     return await synthesize(text, normalizedArabic, ttsVoice, ttsSpeed);

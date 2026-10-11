@@ -112,6 +112,15 @@ describe('extractCleanArabicForTts / sanitizeTtsArabic', () => {
     expect(clean).toBe('أَهْلا بيكْ ! شْنُو نْجِيبْ لِكْ تْشْرَبْ ؟');
   });
 
+  it('convertit les chiffres Arabizi (3->ع, 7->ح, 9->ق, 5->خ) avant nettoyage', () => {
+    const raw = '3afak bghit 9hwa 7lwa bla 5obz';
+    const clean = extractCleanArabicForTts(raw);
+    expect(clean).toContain('ع');
+    expect(clean).toContain('ق');
+    expect(clean).toContain('ح');
+    expect(clean).toContain('خ');
+  });
+
   it('gère une chaîne déjà propre en Darija', () => {
     const raw = 'أَهْلا بيكْ ! شْنُو نْجِيبْ لِكْ تْشْرَبْ ؟';
     const clean = extractCleanArabicForTts(raw);
@@ -121,5 +130,18 @@ describe('extractCleanArabicForTts / sanitizeTtsArabic', () => {
   it('gère les chaînes vides', () => {
     expect(extractCleanArabicForTts('')).toBe('');
     expect(sanitizeTtsArabic('')).toBe('');
+  });
+
+  it('extrait correctement les suggestions rapides de réponse [SUGG]', () => {
+    const raw = `[AR] وَعَلَيْكُمُ السَّلَامْ ! فِينْ غَادِي أَخُويَا ؟ [/AR]
+[ARZ] Wa 3alaykoum salam ! Fin ghadi a khoya ? [/ARZ]
+[FR] Bonjour ! Où vas-tu mon frère ? [/FR]
+[SUGG] Bghit nemchi l Bab Boujloud | Chhal l-kuntour afak ? [/SUGG]`;
+    const parsed = parseAiMessage(raw);
+    expect(parsed.suggestions).toBeDefined();
+    expect(parsed.suggestions).toEqual([
+      'Bghit nemchi l Bab Boujloud',
+      'Chhal l-kuntour afak ?',
+    ]);
   });
 });

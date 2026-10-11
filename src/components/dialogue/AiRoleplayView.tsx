@@ -459,6 +459,29 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
       {/* INPUT AREA OR COMPLETION */}
       <div className="absolute bottom-0 left-0 right-0 bg-[#FDFCF8] border-t border-[#E8E2D5] p-4 pb-safe z-20">
         
+        {/* Suggestion pills if available from last assistant message */}
+        {(() => {
+          const lastMsg = messages[messages.length - 1];
+          if (!lastMsg || lastMsg.role !== 'assistant') return null;
+          const parsed = parseAiMessage(lastMsg.content);
+          if (!parsed.suggestions || parsed.suggestions.length === 0) return null;
+          return (
+            <div className="flex flex-wrap items-center gap-1.5 mb-2.5 max-w-4xl mx-auto px-1">
+              <span className="text-[11px] font-semibold text-[#7A7670] mr-1">Suggestions :</span>
+              {parsed.suggestions.map((sugg, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setInput(sugg)}
+                  className="px-2.5 py-1 text-xs font-medium rounded-full bg-[#F7F3EA] hover:bg-[#E8E2D5] text-[#1B2A4A] border border-[#E8E2D5] transition-all hover:scale-[1.02] active:scale-95 text-left"
+                >
+                  💡 {sugg}
+                </button>
+              ))}
+            </div>
+          );
+        })()}
+
         {messages.length >= 8 ? (
           <div className="flex flex-col items-center gap-3">
             <p className="text-sm font-bold text-[#7A9174]">{rp.missionComplete}</p>
