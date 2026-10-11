@@ -28,16 +28,30 @@ export function Header({
     <header className="w-full h-16 px-4 sm:px-6 bg-[#FFFEFA] border-b border-[#E8E2D5] flex items-center justify-between gap-3">
       {/* 1. Logo Kenza sanctuarisé à gauche — permanent et shrink-0 */}
       <div className="shrink-0 flex items-center gap-2">
-        <Link href="/" className="flex items-center gap-2" aria-label="Accueil Kenza">
-          <div
-            className="w-8 h-8 rounded-xl bg-[#142943] text-[#f8f5ec] flex items-center justify-center font-arabic text-lg font-bold shrink-0 border border-[#ddb578]/40 shadow-xs"
+        <Link href="/" className="flex items-center gap-2.5 shrink-0" aria-label="Accueil Kenza">
+          {/* Carré asymétrique bleu nuit avec lettre arabe et losange doré */}
+          <div 
+            className="w-9 h-9 relative grid place-items-center overflow-hidden bg-[#142943] text-[#f8f5ec] shadow-xs shrink-0"
+            style={{ borderRadius: '13px 13px 13px 5px' }}
             aria-hidden="true"
           >
-            <span>ك</span>
+            <span className="font-['Noto_Sans_Arabic',sans-serif] text-[20px] leading-none -translate-y-px text-[#f8f5ec]">
+              ك
+            </span>
+            <i 
+              className="absolute w-2 h-2 border border-[#ddb578] rounded-[2px] right-[5px] bottom-[5px] rotate-45 pointer-events-none" 
+            />
           </div>
-          <span className="font-display font-bold text-base tracking-wider text-[#142943] hidden sm:inline shrink-0">
-            KENZA
-          </span>
+
+          {/* Wordmark KENZA en DM Serif Display et signature */}
+          <div className="flex flex-col text-left">
+            <span className="font-['DM_Serif_Display',serif] text-[18px] tracking-[0.17em] leading-tight text-[#142943] block">
+              KENZA
+            </span>
+            <span className="text-[9px] tracking-[0.045em] text-[#8a8b83] block -mt-0.5">
+              la darija, en chemin
+            </span>
+          </div>
         </Link>
       </div>
 
