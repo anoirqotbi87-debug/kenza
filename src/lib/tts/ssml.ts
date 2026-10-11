@@ -36,19 +36,18 @@ export function getProsodyRate(speed?: TtsSpeed | string): string {
 }
 
 /**
- * Inserts breathing micro-pauses (150ms) on commas for natural cadence.
+ * Kept for backwards-compatibility: returns text as-is without injecting SSML breaks.
+ * Moroccan voice models (ar-MA-JamalNeural / ar-MA-MounaNeural) natively pause on Arabic (،) and Latin (,) commas.
  */
 export function injectBreathingPauses(escapedText: string): string {
-  return escapedText
-    .replace(/،/g, '،<break time="150ms"/>')
-    .replace(/,/g, ',<break time="150ms"/>');
+  return escapedText;
 }
 
 /**
  * Builds a strict, well-formed SSML payload for msedge-tts.
  * - speed === 'slow': rate="-25%" pitch="+2Hz"
  * - speed === 'normal': rate="-5%"
- * - injection de micro-pauses 150ms sur les virgules
+ * - No internal <break/> tags injected to guarantee stability with Edge TTS WebSocket.
  */
 export function buildSsml(
   text: string,
@@ -59,9 +58,8 @@ export function buildSsml(
   const rate = getProsodyRate(speed);
   const pitchAttr = speed === 'slow' ? ' pitch="+2Hz"' : '';
   const escapedText = escapeXml(text);
-  const textWithPauses = injectBreathingPauses(escapedText);
 
-  const ssml = `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="ar-MA"><voice name="${voiceName}"><prosody rate="${rate}"${pitchAttr}>${textWithPauses}</prosody></voice></speak>`;
+  const ssml = `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="ar-MA"><voice name="${voiceName}"><prosody rate="${rate}"${pitchAttr}>${escapedText}</prosody></voice></speak>`;
 
   return { ssml, voiceName, rate };
 }

@@ -77,10 +77,10 @@ describe('TTS SSML Builder (msedge-tts Moroccan Darija)', () => {
       expect(result.ssml).not.toContain('<nss-nss>');
     });
 
-    it('injects breathing micro-pauses (150ms) on Arabic and Latin commas', () => {
+    it('leaves Arabic and Latin commas intact without injecting problematic break tags', () => {
       const result = buildSsml('مرحبا، كيف داير, لاباس', 'female', 'normal');
-      expect(result.ssml).toContain('،<break time="150ms"/>');
-      expect(result.ssml).toContain(',<break time="150ms"/>');
+      expect(result.ssml).toContain('مرحبا، كيف داير, لاباس');
+      expect(result.ssml).not.toContain('<break');
     });
   });
 });
