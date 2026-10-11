@@ -54,7 +54,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
   const [showImmersion, setShowImmersion] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const activeAudioRef = useRef<HTMLAudioElement | null>(null);
+  const domAudioRef = useRef<HTMLAudioElement | null>(null);
   const [playingKey, setPlayingKey] = useState<string | null>(null);
   const [audioFeedback, setAudioFeedback] = useState<{ id: string; error: string } | null>(null);
 
@@ -67,61 +67,51 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
       return;
     }
 
+    const audio = domAudioRef.current;
+    if (!audio) {
+      console.warn('Élément audio DOM non disponible');
+      return;
+    }
+
     const key = `${messageId}-${speed}`;
 
-    // Si on clique sur le vocal en cours de lecture, on le met en pause
-    if (playingKey === key && activeAudioRef.current && !activeAudioRef.current.paused) {
-      activeAudioRef.current.pause();
+    // Mettre en pause si on re-clique sur le même message en cours
+    if (playingKey === key && !audio.paused) {
+      audio.pause();
       setPlayingKey(null);
       return;
     }
 
-    // 1. Nettoyer et libérer complètement l'audio précédent pour éviter toute collision
-    if (activeAudioRef.current) {
-      activeAudioRef.current.onended = null;
-      activeAudioRef.current.onerror = null;
-      activeAudioRef.current.pause();
-      activeAudioRef.current.src = '';
-      activeAudioRef.current = null;
-    }
-
+    // Stopper et réinitialiser l'audio existant
+    audio.pause();
+    audio.currentTime = 0;
     setAudioFeedback(null);
-    setPlayingKey(key);
 
     const gender = personaId === 'cafe' || personaId === 'taxi' || personaId === 'souk' || personaId === 'medecin' ? 'male' : 'female';
-
-    // 2. Créer une nouvelle instance propre dédiée à cette écoute
     const url = `/api/tts?text=${encodeURIComponent(cleanArabic)}&speed=${speed}&gender=${gender}`;
-    const audio = new Audio(url);
-    activeAudioRef.current = audio;
+    audio.src = url;
+    setPlayingKey(key);
 
     audio.onended = () => {
-      if (activeAudioRef.current === audio) {
-        setPlayingKey(null);
-      }
+      setPlayingKey(null);
     };
 
-    audio.onerror = (e) => {
-      console.error('Erreur élément audio :', e, audio.error);
-      if (activeAudioRef.current === audio) {
-        setPlayingKey(null);
-        setAudioFeedback({ id: messageId, error: 'Erreur audio' });
-        setTimeout(() => setAudioFeedback(null), 3500);
-      }
+    audio.onerror = () => {
+      console.error('Erreur audio élément DOM :', audio.error);
+      setPlayingKey(null);
+      setAudioFeedback({ id: messageId, error: 'Erreur réseau audio' });
+      setTimeout(() => setAudioFeedback(null), 3000);
     };
 
-    // 3. Déclenchement synchrone propre avec capture détaillée de l'erreur
+    // Déclenchement synchrone sur l'élément DOM
     const playPromise = audio.play();
     if (playPromise !== undefined) {
       playPromise.catch((err) => {
-        console.warn('Audio play() rejected :', err.name, err.message);
-        if (activeAudioRef.current === audio) {
-          setPlayingKey(null);
-          // Si l'erreur est AbortError, c'est une interruption normale, sinon on avertit
-          if (err.name !== 'AbortError') {
-            setAudioFeedback({ id: messageId, error: 'Lecture bloquée' });
-            setTimeout(() => setAudioFeedback(null), 3500);
-          }
+        console.warn('Audio play() rejected sur élément DOM :', err.name, err.message);
+        setPlayingKey(null);
+        if (err.name !== 'AbortError') {
+          setAudioFeedback({ id: messageId, error: 'Lecture bloquée' });
+          setTimeout(() => setAudioFeedback(null), 3000);
         }
       });
     }
@@ -305,6 +295,8 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
       tabIndex={-1}
       className="flex flex-col h-full bg-[#F7F3EA] relative animate-in fade-in zoom-in-95 duration-200"
     >
+      {/* Lecteur audio DOM permanent pour la compatibilité stricte des navigateurs mobiles */}
+      <audio ref={domAudioRef} playsInline preload="auto" className="hidden" aria-hidden="true" />
       
       {toastMessage && (
         <div
