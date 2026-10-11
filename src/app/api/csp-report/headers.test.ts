@@ -58,10 +58,11 @@ describe('assainissement de la CSP', () => {
     expect(await csp()).toContain("script-src 'self' 'unsafe-inline'");
   });
 
-  it('autorise Vercel Live et fonts.gstatic.com dans font-src pour la Vercel Toolbar', async () => {
+  it('autorise Vercel Live dans font-src pour la Vercel Toolbar (polices servies localement)', async () => {
     const value = await csp();
     expect(value).not.toContain('fonts.googleapis.com');
-    expect(value).toContain("font-src 'self' data: https://fonts.gstatic.com https://vercel.live");
+    expect(value).not.toContain('fonts.gstatic.com');
+    expect(value).toContain("font-src 'self' data: https://vercel.live");
   });
 
   it("n'autorise plus `https:` en bloc pour les images, mais blanchit les avatars Google OAuth", async () => {
@@ -96,12 +97,15 @@ describe('assainissement de la CSP', () => {
     expect(workerSrc!.trim()).toBe("worker-src 'self' blob:");
   });
 
-  it('déclare les directives manquantes', async () => {
+  it('déclare les directives manquantes et le durcissement final', async () => {
     const value = await csp();
     expect(value).toContain("object-src 'none'");
     expect(value).toContain("base-uri 'self'");
+    expect(value).toContain("form-action 'self'");
     expect(value).toContain("frame-ancestors 'none'");
-    expect(value).toContain('frame-src \'self\' https://js.stripe.com https://vercel.live');
+    expect(value).toContain("frame-src 'self' https://vercel.live");
+    expect(value).not.toContain('https://js.stripe.com');
+    expect(value).toContain("upgrade-insecure-requests");
   });
 });
 
