@@ -156,18 +156,12 @@ export async function POST(req: NextRequest) {
     );
     if (totalChars > 4000) return new Response('Payload too large', { status: 400 });
 
-    // 6. Streaming ultra-rapide avec Groq (Modèle officiel + repli automatique)
-    const groq = createOpenAI({
-      baseURL: 'https://api.groq.com/openai/v1',
-      apiKey,
-    });
-
-    // Définition du modèle officiel certifié Groq (neutralisation automatique de toute ancienne variable llama-3.1)
+    // Modèle Groq actif (qwen3.8-27b ou process.env.GROQ_MODEL)
     const rawGroqModel = process.env.GROQ_MODEL?.trim();
     const groqModel =
-      !rawGroqModel || rawGroqModel.includes('llama-3.1')
-        ? 'llama-3.3-70b-versatile'
-        : rawGroqModel;
+      rawGroqModel && !rawGroqModel.includes('llama-3.1')
+        ? rawGroqModel
+        : 'qwen/qwen3.8-27b';
 
     let targetLanguageLabel = 'Français';
     let isArabicImmersion = false;
@@ -195,16 +189,93 @@ Format attendu :
 
     const systemInstruction = `${systemPrompt}\n\n${linguisticRule}`;
 
-    const result = await streamText({
-      model: groq(groqModel),
-      system: systemInstruction,
-      messages: normalizedHistory as CoreMessage[],
-      temperature: 0.35,
-      maxTokens: 120,
-      maxRetries: 0,
+    const groq = createOpenAI({
+      baseURL: 'https://api.groq.com/openai/v1',
+      apiKey,
     });
 
-    return result.toDataStreamResponse();
+    // Helper de repli résilient sur Google Gemini
+    const streamGeminiFallback = async () => {
+      console.warn('[Roleplay Fallback] Activating Gemini fallback...');
+      const googleApiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY?.trim() || '';
+
+      const contents = (normalizedHistory as CoreMessage[]).map((msg) => ({
+        role: msg.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content) }],
+      }));
+
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${googleApiKey}`;
+      let geminiRes: Response;
+      try {
+        geminiRes = await fetch(geminiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            system_instruction: {
+              parts: [{ text: systemInstruction }],
+            },
+            contents,
+            generationConfig: {
+              temperature: 0.35,
+              maxOutputTokens: 160,
+            },
+          }),
+        });
+      } catch (networkErr: unknown) {
+        console.error('[Gemini Network Error]:', networkErr);
+        throw networkErr;
+      }
+
+      if (!geminiRes.ok) {
+        const geminiErrorText = await geminiRes.text();
+        console.error('[Gemini Fallback Error]:', geminiRes.status, geminiErrorText);
+        const gErr = new Error(`Gemini fallback failed (${geminiRes.status}): ${geminiErrorText}`);
+        Object.assign(gErr, { status: geminiRes.status, statusCode: geminiRes.status });
+        throw gErr;
+      }
+
+      const geminiJson = await geminiRes.json();
+      const generatedText =
+        geminiJson?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+      // Format standard AI SDK data stream (0:"text"\n)
+      const streamPayload = `0:${JSON.stringify(generatedText)}\n`;
+      return new Response(streamPayload, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'X-Vercel-AI-Data-Stream': 'v1',
+        },
+      });
+    };
+
+    try {
+      const result = await streamText({
+        model: groq(groqModel),
+        system: systemInstruction,
+        messages: normalizedHistory as CoreMessage[],
+        temperature: 0.35,
+        maxTokens: 120,
+        maxRetries: 0,
+      });
+
+      return result.toDataStreamResponse();
+    } catch (groqError: unknown) {
+      console.warn('[Groq Roleplay Warning]: Primary Groq call failed, switching to Gemini fallback...', groqError);
+      try {
+        return await streamGeminiFallback();
+      } catch (fallbackError: unknown) {
+        console.error('[Gemini Fallback Also Failed]:', fallbackError);
+        // Si le fallback échoue aussi, relancer l'erreur primaire si elle a un code d'erreur spécifique (429/403/503), sinon l'erreur du fallback
+        const groqStatus =
+          (groqError as { status?: number; statusCode?: number } | undefined)?.status ??
+          (groqError as { status?: number; statusCode?: number } | undefined)?.statusCode;
+        if (groqStatus === 429) {
+          throw groqError;
+        }
+        throw fallbackError;
+      }
+    }
   } catch (error: unknown) {
     const errMsg = error instanceof Error ? error.message : String(error);
     const status =
