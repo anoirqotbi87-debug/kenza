@@ -79,7 +79,7 @@ export default function BottomNav({ currentView, onSelectView }: BottomNavProps)
       </Link>
 
       <Link
-        href="/?view=phrases"
+        href="/?tab=phrases&view=phrases"
         onClick={handlePhrasesClick}
         className={isPhrasesActive ? 'mobile-nav-active' : ''}
         aria-current={isPhrasesActive ? 'page' : undefined}
