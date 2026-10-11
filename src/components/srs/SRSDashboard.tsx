@@ -10,10 +10,17 @@ import { SRSCard } from '../../types/srs';
 
 export default function SRSDashboard() {
   const { getDueCards, addCardsToSRS, activateNewCards, srsDeck } = useAppStore();
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [isReviewing, setIsReviewing] = useState(false);
   const [sessionCards, setSessionCards] = useState<SRSCard[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const backToOverviewText = {
+    fr: "Retour à l'aperçu SRS",
+    en: "Back to SRS overview",
+    es: "Volver a la vista general",
+    ar: "العودة إلى المراجعة"
+  }[lang] || "Retour à l'aperçu SRS";
 
   // Init SRS with all words if empty and activate initial batch of 5 words
   useEffect(() => {
@@ -95,7 +102,7 @@ export default function SRSDashboard() {
           className="inline-flex items-center gap-2 text-xs font-semibold text-[#7A7670] hover:text-[#1B2A4A] transition-colors py-2 px-3 rounded-full hover:bg-[#E8E2D5]/40"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Retour à l'aperçu SRS</span>
+          <span>{backToOverviewText}</span>
         </button>
 
         <FlashcardDeck

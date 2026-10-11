@@ -217,3 +217,61 @@ describe('SRS SM-2 Algorithm & Due Date Scheduling', () => {
     });
   });
 });
+
+describe('SRS Dictionary & Resilient Word Resolver', () => {
+  // Dynamically import getWordFromDictionary
+  it('resolves all 7 essential SRS words by exact ID and prefix-less ID', async () => {
+    const { getWordFromDictionary } = await import('@/data/srs-deck');
+    const targetWords = [
+      'srs_dor',
+      'srs_fin',
+      'srs_9hwa',
+      'srs_lyoum',
+      'srs_machi',
+      'srs_chhal',
+      'srs_wakhed',
+      'srs_dyal'
+    ];
+
+    for (const wordId of targetWords) {
+      const result = getWordFromDictionary(wordId);
+      expect(result, `Word ${wordId} should be found`).toBeDefined();
+      expect(result?.arabic).toBeTruthy();
+      expect(result?.translation).toBeTruthy();
+    }
+  });
+
+  it('resolves essential words via common phonetic aliases and Arabizi variations', async () => {
+    const { getWordFromDictionary } = await import('@/data/srs-deck');
+    const testCases = [
+      { input: 'dor', expectedArabizi: 'dor' },
+      { input: 'dour', expectedArabizi: 'dor' },
+      { input: 'fin', expectedArabizi: 'fin' },
+      { input: 'fayn', expectedArabizi: 'fin' },
+      { input: '9hwa', expectedArabizi: '9hwa' },
+      { input: 'qahwa', expectedArabizi: '9hwa' },
+      { input: 'lyoum', expectedArabizi: 'lyoum' },
+      { input: 'l-youm', expectedArabizi: 'lyoum' },
+      { input: 'machi', expectedArabizi: 'machi' },
+      { input: 'mashi', expectedArabizi: 'machi' },
+      { input: 'chhal', expectedArabizi: 'ch7al' },
+      { input: 'ch7al', expectedArabizi: 'ch7al' },
+      { input: 'wakhed', expectedArabizi: 'wa7ed' },
+      { input: 'wahed', expectedArabizi: 'wa7ed' },
+      { input: 'dyal', expectedArabizi: 'dyal' },
+    ];
+
+    for (const { input, expectedArabizi } of testCases) {
+      const word = getWordFromDictionary(input);
+      expect(word, `Variant ${input} should resolve to a valid word`).toBeDefined();
+      expect(word?.arabizi.toLowerCase()).toBe(expectedArabizi.toLowerCase());
+    }
+  });
+
+  it('gracefully returns undefined for unknown queries without crashing', async () => {
+    const { getWordFromDictionary } = await import('@/data/srs-deck');
+    expect(getWordFromDictionary('')).toBeUndefined();
+    expect(getWordFromDictionary('unknown_nonexistent_word_xyz')).toBeUndefined();
+  });
+});
+

@@ -22,18 +22,44 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
   const { preferredNotation, soundEnabled, reviewCard, customVocabulary } = useAppStore();
   const { lang, t } = useTranslation();
 
-  const currentSRSCard = cards[currentIndex];
-  const wordData = currentSRSCard
-    ? (vocabulary.find(v => v.id === currentSRSCard.wordId)
-       || getWordFromDictionary(currentSRSCard.wordId)
-       || customVocabulary?.[currentSRSCard.wordId]
-       || (currentSRSCard.wordId.startsWith('srs_')
-          ? vocabulary.find(v => v.id === currentSRSCard.wordId.replace('srs_', ''))
-            || getWordFromDictionary(currentSRSCard.wordId.replace('srs_', ''))
-            || customVocabulary?.[currentSRSCard.wordId.replace('srs_', '')]
-          : null)
-       || null)
-    : null;
+  // Helper de résolution de carte
+  const resolveCardWord = useCallback((wordId: string): VocabularySRSData | null => {
+    if (!wordId) return null;
+    return (
+      vocabulary.find(v => v.id === wordId) ||
+      getWordFromDictionary(wordId) ||
+      (customVocabulary?.[wordId] ? (customVocabulary[wordId] as unknown as VocabularySRSData) : null) ||
+      (wordId.startsWith('srs_')
+        ? vocabulary.find(v => v.id === wordId.replace('srs_', '')) ||
+          getWordFromDictionary(wordId.replace('srs_', '')) ||
+          (customVocabulary?.[wordId.replace('srs_', '')] ? (customVocabulary[wordId.replace('srs_', '')] as unknown as VocabularySRSData) : null)
+        : null) ||
+      null
+    );
+  }, [vocabulary, customVocabulary]);
+
+  // Filtrage proactif des cartes valides au lancement
+  const validCards = React.useMemo(() => {
+    const filtered = cards.filter(c => resolveCardWord(c.wordId || c.id) !== null);
+    return filtered.length > 0 ? filtered : cards;
+  }, [cards, resolveCardWord]);
+
+  const currentSRSCard = validCards[currentIndex];
+  const wordData = currentSRSCard ? resolveCardWord(currentSRSCard.wordId || currentSRSCard.id) : null;
+
+  // Auto-skip silencieux si une carte orpheline subsiste pour ne jamais bloquer l'apprenant
+  useEffect(() => {
+    if (validCards.length > 0 && !wordData && currentIndex < validCards.length) {
+      const timer = setTimeout(() => {
+        if (currentIndex < validCards.length - 1) {
+          setCurrentIndex(prev => prev + 1);
+        } else {
+          onComplete();
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [wordData, currentIndex, validCards.length, onComplete]);
 
   const handleGrade = useCallback((grade: ReviewGrade) => {
     if (!currentSRSCard) return;
@@ -42,13 +68,13 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
     
     setIsFlipped(false);
     setTimeout(() => {
-      if (currentIndex < cards.length - 1) {
+      if (currentIndex < validCards.length - 1) {
         setCurrentIndex(prev => prev + 1);
       } else {
         onComplete();
       }
     }, 150);
-  }, [currentSRSCard, currentIndex, cards.length, onComplete, reviewCard]);
+  }, [currentSRSCard, currentIndex, validCards.length, onComplete, reviewCard]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -71,15 +97,42 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isFlipped, wordData, handleGrade]);
 
+  const localizedLabels = {
+    skipCard: {
+      fr: 'Passer cette carte',
+      en: 'Skip this card',
+      es: 'Saltar esta tarjeta',
+      ar: 'تخطي هذه البطاقة'
+    }[lang] || 'Passer cette carte',
+    completeSession: {
+      fr: 'Terminer la session',
+      en: 'Complete session',
+      es: 'Finalizar sesión',
+      ar: 'إنهاء الجلسة'
+    }[lang] || 'Terminer la session',
+    notFoundTitle: {
+      fr: 'Expression introuvable dans le dictionnaire',
+      en: 'Expression not found in dictionary',
+      es: 'Expresión no encontrada en el diccionario',
+      ar: 'العبارة غير موجودة في القاموس'
+    }[lang] || 'Expression introuvable dans le dictionnaire',
+    cardId: {
+      fr: 'ID de la carte :',
+      en: 'Card ID:',
+      es: 'ID de tarjeta:',
+      ar: 'معرف البطاقة:'
+    }[lang] || 'ID de la carte :'
+  };
+
   if (!wordData) {
-    const canSkip = currentIndex < cards.length - 1;
+    const canSkip = currentIndex < validCards.length - 1;
     return (
       <div className="bg-[#FDFCF8] p-8 rounded-2xl border border-[#E8E2D5] max-w-md mx-auto my-12 text-center space-y-4 shadow-sm">
         <p className="text-sm font-semibold text-[#1B2A4A]">
-          Expression introuvable dans le dictionnaire
+          {localizedLabels.notFoundTitle}
         </p>
         <p className="text-xs text-[#7A7670]">
-          ID de la carte : <code className="bg-[#E8E2D5]/50 px-2 py-0.5 rounded font-mono">{currentSRSCard?.wordId || 'inconnu'}</code>
+          {localizedLabels.cardId} <code className="bg-[#E8E2D5]/50 px-2 py-0.5 rounded font-mono">{currentSRSCard?.wordId || 'inconnu'}</code>
         </p>
         <div className="pt-2">
           {canSkip ? (
@@ -91,7 +144,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
               }}
               className="px-5 py-2.5 bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] text-xs font-bold rounded-full transition-colors shadow-xs"
             >
-              Passer cette carte
+              {localizedLabels.skipCard}
             </button>
           ) : (
             <button
@@ -99,13 +152,14 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
               onClick={onComplete}
               className="px-5 py-2.5 bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] text-xs font-bold rounded-full transition-colors shadow-xs"
             >
-              Terminer la session
+              {localizedLabels.completeSession}
             </button>
           )}
         </div>
       </div>
     );
   }
+
 
   // Formatage des catégories techniques
   const formatCategory = (cat?: string) => {
@@ -158,10 +212,10 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
       <div className="w-full mb-6 flex justify-between items-center text-xs font-semibold text-[#7A7670] px-2">
         <span className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-[#C9A05C]" />
-          <span>{t.dashboard?.remainingCards || "Cartes restantes :"} <strong className="text-[#1B2A4A]">{cards.length - currentIndex}</strong></span>
+          <span>{t.dashboard?.remainingCards || "Cartes restantes :"} <strong className="text-[#1B2A4A]">{validCards.length - currentIndex}</strong></span>
         </span>
         <div className="flex gap-1.5">
-          {cards.slice(0, 15).map((_, i) => (
+          {validCards.slice(0, 15).map((_, i) => (
             <div 
               key={i} 
               className={`h-1.5 rounded-full transition-all duration-300 ${
