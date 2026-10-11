@@ -837,9 +837,9 @@ button[class*="bg-[#0B2545]"] span {
 }
 /* kenza-ui-responsive-patch */
 @media (max-width: 720px) {
-  .topbar { flex-wrap: wrap; height: auto; min-height: 52px; padding: 6px 12px; gap: 4px 8px; }
-  .topbar-actions { flex-wrap: wrap; justify-content: flex-end; gap: 4px; }
-  .lang-switcher { gap: 1px; padding: 0 5px; font-size: 10px; height: 26px; overflow-x: auto; max-width: 46vw; scrollbar-width: none; }
+  .topbar { flex-wrap: nowrap; height: 56px; min-height: 56px; padding: 0 12px; gap: 8px; }
+  .topbar-actions { flex-wrap: nowrap; justify-content: flex-end; gap: 6px; }
+  .lang-switcher { gap: 1px; padding: 0 5px; font-size: 10px; height: 26px; scrollbar-width: none; }
   .lang-btn { padding: 2px 3px; white-space: nowrap; }
   .lang-sep { display: none; }
 }

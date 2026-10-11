@@ -28,12 +28,14 @@ import {
   Volume2,
   VolumeX,
   X,
+  ChevronDown,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useAppStore, useTranslation } from "@/store/useAppStore";
 import type { User } from "@supabase/supabase-js";
+import { KenzaLogo } from "@/components/ui/KenzaLogo";
 
 const tr = (fr: string, en: string, es: string, ar: string) => {
   const lang = useAppStore.getState().uiLanguage;
@@ -189,6 +191,23 @@ export default function Home() {
     setMobileMenuOpen(false);
   }
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [topbarLangOpen, setTopbarLangOpen] = useState(false);
+  const [topbarProfileOpen, setTopbarProfileOpen] = useState(false);
+  const topbarLangRef = useRef<HTMLDivElement>(null);
+  const topbarProfileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (topbarLangRef.current && !topbarLangRef.current.contains(e.target as Node)) {
+        setTopbarLangOpen(false);
+      }
+      if (topbarProfileRef.current && !topbarProfileRef.current.contains(e.target as Node)) {
+        setTopbarProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Zustand Store Integration
   const {
@@ -751,7 +770,7 @@ export default function Home() {
       <main className="main-area" inert={backgroundInert}>
         <header className="topbar">
           {/* Bloc Logo Kenza permanent sanctuarisé à gauche — shrink-0 */}
-          <div className="shrink-0 flex items-center gap-2 sm:gap-3">
+          <div className="shrink-0 flex items-center gap-1.5 sm:gap-2.5">
             <button
               className="icon-button mobile-menu-trigger"
               aria-label={t.modules.home.langSwitcher}
@@ -760,115 +779,92 @@ export default function Home() {
               <Menu size={21} />
             </button>
 
-            <div className="shrink-0 flex items-center gap-2.5" aria-label="Kenza">
-              {/* Carré asymétrique bleu nuit avec lettre arabe et losange doré */}
-              <div 
-                className="w-9 h-9 relative grid place-items-center overflow-hidden bg-[#142943] text-[#f8f5ec] shadow-xs shrink-0"
-                style={{ borderRadius: '13px 13px 13px 5px' }}
-                aria-hidden="true"
-              >
-                <span className="font-['Noto_Sans_Arabic',sans-serif] text-[20px] leading-none -translate-y-px text-[#f8f5ec]">
-                  ك
-                </span>
-                <i 
-                  className="absolute w-2 h-2 border border-[#ddb578] rounded-[2px] right-[5px] bottom-[5px] rotate-45 pointer-events-none" 
-                />
-              </div>
-
-              {/* Wordmark KENZA en DM Serif Display et signature */}
-              <div className="hidden sm:flex flex-col text-left">
-                <span className="font-['DM_Serif_Display',serif] text-[18px] tracking-[0.17em] leading-tight text-[#142943] block">
-                  KENZA
-                </span>
-                <span className="text-[9px] tracking-[0.045em] text-[#8a8b83] block -mt-0.5">
-                  la darija, en chemin
-                </span>
-              </div>
-            </div>
+            <KenzaLogo size="sm" showWordmark={true} hideWordmarkOnMobile={true} />
           </div>
 
-          <div className="breadcrumbs min-w-0 flex-1 truncate mx-2">
-            <span className="hidden md:inline">KENZA</span>
-            <ChevronRight size={14} className="hidden md:inline shrink-0" />
-            <span className="truncate">{currentHeader.eyebrow.toLocaleLowerCase(lang)}</span>
-          </div>
-
-          <div className="topbar-actions shrink-0 flex items-center gap-1.5 sm:gap-2.5">
-            {/* Badge d'abonnement persistant (Trigger 4) */}
-            <div className="hidden lg:block shrink-0">
+          {/* Contrôles compacts strictly flex-nowrap à droite */}
+          <div className="topbar-actions shrink-0 flex items-center gap-1.5 sm:gap-2">
+            {/* Badge d'abonnement persistant sur grands écrans uniquement */}
+            <div className="hidden xl:block shrink-0">
               <SubscriptionBadge onUpgrade={() => setPricingSource("header_upgrade")} />
             </div>
 
-            {/* Sélecteur de langue bilingue */}
-            <div className="lang-switcher shrink-0" role="group" aria-label={tr("Sélecteur de langue", "Language switcher", "Selector de idioma", "مبدل اللغة")}>
-              <Globe size={13} className="lang-icon" />
+            {/* Sélecteur de langue compact (Dropdown popover) */}
+            <div ref={topbarLangRef} className="relative shrink-0">
               <button
                 type="button"
-                onClick={() => setLanguage("fr")}
-                className={`lang-btn ${uiLanguage === "fr" ? "lang-btn-active" : ""}`}
-                aria-label={t.modules.home.switchToFr}
+                onClick={() => {
+                  setTopbarLangOpen((prev) => !prev);
+                  setTopbarProfileOpen(false);
+                }}
+                className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold bg-amber-50/80 hover:bg-amber-100/80 border border-amber-200/80 text-[#142943] transition-colors shadow-2xs"
+                aria-label={tr("Sélecteur de langue", "Language switcher", "Selector de idioma", "مبدل اللغة")}
+                aria-expanded={topbarLangOpen}
               >
-                FR
+                <Globe size={13} className="text-[#142943]/80" />
+                <span>{uiLanguage.toUpperCase()}</span>
+                <ChevronDown size={12} className={`transition-transform duration-200 ${topbarLangOpen ? 'rotate-180' : ''}`} />
               </button>
-              <span className="lang-sep">|</span>
-              <button
-                type="button"
-                onClick={() => setLanguage("en")}
-                className={`lang-btn ${uiLanguage === "en" ? "lang-btn-active" : ""}`}
-                aria-label={t.modules.home.switchToEn}
-              >
-                EN
-              </button>
-              <span className="lang-sep">|</span>
-              <button
-                type="button"
-                onClick={() => setLanguage("es")}
-                className={`lang-btn ${uiLanguage === "es" ? "lang-btn-active" : ""}`}
-                aria-label={t.modules.home.switchToEs}
-              >
-                ES
-              </button>
-              <span className="lang-sep">|</span>
-              <button
-                type="button"
-                onClick={() => setLanguage("ar")}
-                className={`lang-btn ${uiLanguage === "ar" ? "lang-btn-active" : ""}`}
-                aria-label={t.modules.home.switchToAr}
-              >
-                AR
-              </button>
+
+              {topbarLangOpen && (
+                <div className="absolute right-0 mt-1.5 w-36 bg-[#FFFEFA] border border-amber-200/80 rounded-2xl shadow-xl py-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+                  {[
+                    { code: 'fr' as const, label: 'Français', flag: '🇫🇷' },
+                    { code: 'en' as const, label: 'English', flag: '🇬🇧' },
+                    { code: 'es' as const, label: 'Español', flag: '🇪🇸' },
+                    { code: 'ar' as const, label: 'العربية', flag: '🇲🇦' },
+                  ].map((item) => (
+                    <button
+                      key={item.code}
+                      type="button"
+                      onClick={() => {
+                        setLanguage(item.code);
+                        setTopbarLangOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between px-3 py-2 text-xs text-left transition-colors ${
+                        uiLanguage === item.code
+                          ? 'bg-amber-100/70 font-bold text-[#142943]'
+                          : 'text-slate-700 hover:bg-amber-50'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2">
+                        <span>{item.flag}</span>
+                        <span>{item.label}</span>
+                      </span>
+                      {uiLanguage === item.code && <span className="text-[#C9A05C]">✓</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Toggle Son */}
+            {/* Toggle Son compact */}
             <button
-              className={`sound-toggle shrink-0 ${soundEnabled ? "sound-toggle-active" : "sound-toggle-muted"}`}
+              className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 border transition-colors ${
+                soundEnabled
+                  ? "bg-amber-50/80 border-amber-200/80 text-[#142943] hover:bg-amber-100/80"
+                  : "bg-slate-100 border-slate-200 text-slate-400 hover:bg-slate-200"
+              }`}
               onClick={toggleSound}
               title={soundEnabled ? trL(lang, "Audio activé — cliquer pour couper", "Audio ON — click to mute", "Audio activado — clic para silenciar", "الصوت مُفعّل — اضغط للكتم") : trL(lang, "Audio coupé — cliquer pour activer", "Audio OFF — click to enable", "Audio silenciado — clic para activar", "الصوت مكتوم — اضغط للتفعيل")}
               aria-label={soundEnabled ? trL(lang, "Couper le son", "Mute sound", "Silenciar", "كتم الصوت") : trL(lang, "Activer le son", "Enable sound", "Activar sonido", "تفعيل الصوت")}
             >
-              {soundEnabled ? (
-                <>
-                  <span className="sound-dot sound-dot-on" aria-hidden="true" />
-                  <Volume2 size={15} className="sound-icon-on" />
-                  <span className="hidden md:inline">{trL(lang, "Son actif", "Sound on", "Sonido activo", "الصوت مُفعّل")}</span>
-                </>
-              ) : (
-                <>
-                  <span className="sound-dot sound-dot-off" aria-hidden="true" />
-                  <VolumeX size={15} className="sound-icon-off" />
-                  <span className="hidden md:inline">{trL(lang, "Son coupé", "Sound off", "Sonido apagado", "الصوت مُغلق")}</span>
-                </>
-              )}
+              {soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
             </button>
 
-            {/* Connexion Google & Profil (compacté à 32px à droite) */}
+            {/* Avatar & Profil utilisateur avec popover (déconnexion intégrée) */}
             {user ? (
-              <div className="shrink-0 flex items-center gap-1.5 sm:gap-2">
+              <div ref={topbarProfileRef} className="relative shrink-0">
                 <button
-                  className="w-8 h-8 rounded-full border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center bg-[#f1e6d0] text-[#775a34] font-serif text-sm transition-transform hover:scale-105"
+                  type="button"
+                  onClick={() => {
+                    setTopbarProfileOpen((prev) => !prev);
+                    setTopbarLangOpen(false);
+                  }}
+                  className="w-8 h-8 rounded-full border border-amber-200/80 overflow-hidden shrink-0 flex items-center justify-center bg-[#f1e6d0] text-[#775a34] font-serif text-sm transition-transform hover:scale-105 shadow-2xs focus:outline-none"
                   aria-label={t.modules.home.openSpace}
-                  onClick={() => switchView("space")}
                   title={user.email || t.nav.profile}
+                  aria-expanded={topbarProfileOpen}
                 >
                   {user.user_metadata?.avatar_url ? (
                     <Image
@@ -887,16 +883,42 @@ export default function Home() {
                     "K"
                   )}
                 </button>
-                <button
-                  type="button"
-                  onClick={handleSignOut}
-                  className="shrink-0 flex items-center gap-1 px-2 py-1 text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200/80 rounded-full transition-colors"
-                  aria-label={trL(lang, "Se déconnecter", "Sign out", "Cerrar sesión", "تسجيل الخروج")}
-                  title={trL(lang, "Se déconnecter", "Sign out", "Cerrar sesión", "تسجيل الخروج")}
-                >
-                  <LogOut size={13} />
-                  <span className="hidden sm:inline">{trL(lang, "Déconnexion", "Sign out", "Cerrar sesión", "خروج")}</span>
-                </button>
+
+                {topbarProfileOpen && (
+                  <div className="absolute right-0 mt-1.5 w-52 bg-[#FFFEFA] border border-amber-200/80 rounded-2xl shadow-xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="px-2.5 py-1.5 border-b border-slate-100 mb-1">
+                      <p className="text-xs font-bold text-[#142943] truncate">
+                        {user.user_metadata?.full_name || trL(lang, "Mon Espace", "My Space", "Mi Espacio", "مساحتي")}
+                      </p>
+                      <p className="text-[11px] text-slate-500 truncate">
+                        {user.email || ''}
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTopbarProfileOpen(false);
+                        switchView("space");
+                      }}
+                      className="w-full flex items-center gap-2 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-amber-50 rounded-xl transition-colors mb-0.5"
+                    >
+                      <span>{trL(lang, "Passeport & Statistiques", "Passport & Stats", "Pasaporte y Estadísticas", "جواز السفر والإحصائيات")}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTopbarProfileOpen(false);
+                        handleSignOut();
+                      }}
+                      className="w-full flex items-center gap-2 px-2.5 py-2 text-xs font-medium text-rose-700 hover:bg-rose-50 rounded-xl transition-colors"
+                    >
+                      <LogOut size={14} />
+                      <span>{trL(lang, "Se déconnecter", "Sign out", "Cerrar sesión", "تسجيل الخروج")}</span>
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <button
