@@ -32,31 +32,41 @@ export default function PageHeader({ badge, title, backHref = '/', actions }: Pa
   return (
     <header
       dir={isAr ? 'rtl' : 'ltr'}
-      className="bg-[#1B2A4A] text-[#FDFCF8] px-4 sm:px-6 py-5"
+      className="bg-[#1B2A4A] text-[#FDFCF8] px-3 sm:px-6 py-3.5 sm:py-5 border-b border-[#253961]"
     >
-      <div className="max-w-4xl mx-auto flex items-center gap-3 sm:gap-4">
-        <Link
-          href={backHref}
-          className="p-2 hover:bg-white/10 rounded-full transition-colors shrink-0"
-          aria-label={backLabel}
-          title={backLabel}
-        >
-          <ArrowLeft className={`w-5 h-5 ${isAr ? 'rotate-180' : ''}`} />
-        </Link>
+      <div className="max-w-4xl mx-auto flex items-center justify-between gap-2 sm:gap-4 flex-nowrap">
+        {/* Côté gauche : Bouton retour + Titre de la page (avec logo masqué sur mobile pour laisser 100% de place au titre) */}
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+          <Link
+            href={backHref}
+            className="p-1.5 sm:p-2 hover:bg-white/10 rounded-full transition-colors shrink-0 text-[#f8f5ec]"
+            aria-label={backLabel}
+            title={backLabel}
+          >
+            <ArrowLeft className={`w-5 h-5 ${isAr ? 'rotate-180' : ''}`} />
+          </Link>
 
-        {/* Logo Kenza unifié permanent sanctuarisé à gauche */}
-        <KenzaLogo size="sm" textColor="#f8f5ec" taglineColor="#C9A05C" />
+          {/* Logo visible uniquement sur écran sm+ pour ne pas écraser le titre sur mobile */}
+          <div className="hidden sm:block shrink-0">
+            <KenzaLogo size="sm" showWordmark={false} />
+          </div>
 
-        <div className="min-w-0 flex-1">
-          <p className="text-[#C9A05C] text-[10px] sm:text-xs font-bold tracking-[0.22em] uppercase truncate">
-            {badge}
-          </p>
-          <h1 className="font-display text-base sm:text-2xl font-bold leading-snug line-clamp-2">{title}</h1>
+          <div className="min-w-0 flex-1">
+            {badge && (
+              <p className="text-[#C9A05C] text-[9px] sm:text-xs font-bold tracking-[0.2em] uppercase truncate">
+                {badge}
+              </p>
+            )}
+            <h1 className="font-display text-sm sm:text-xl md:text-2xl font-bold leading-tight truncate text-[#FDFCF8]">
+              {title}
+            </h1>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        {/* Côté droit : Actions optionnelles + Sélecteur de langue compact */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {actions}
-          <LanguageSelector variant="dark" />
+          <LanguageSelector variant="dark" compact={true} className="px-2 py-1" />
         </div>
       </div>
     </header>

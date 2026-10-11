@@ -2302,13 +2302,42 @@ export const srsVocabulary: VocabularySRSData[] = [
       }
     }
   },
+  {
+    id: 'srs_dyal',
+    arabizi: 'dyal',
+    arabic: 'دْيَالْ',
+    translation: {
+      fr: 'de / à (possession)',
+      en: 'of / belonging to',
+      es: 'de / perteneciente a',
+      ar: 'ديال / لـ (ملكية)'
+    },
+    category: 'grammar_basics',
+    illustration: { iconName: 'Book' },
+    example: {
+      arabizi: 'Hada d-dar dyali',
+      arabic: 'هَادَا الدَّارْ دْيَالِي',
+      translation: {
+        fr: 'Ceci est ma maison',
+        en: 'This is my house',
+        es: 'Esta es mi casa',
+        ar: 'هذا بيتي'
+      }
+    }
+  },
 ];
 
 
 export const getWordFromDictionary = (id: string): VocabularySRSData | undefined => { 
-  const cleanId = id.replace(/^(word_srs_|Word_srs_|word_|srs_)/i, '');
+  if (!id) return undefined;
+  // Match direct
+  const directMatch = srsVocabulary.find(w => w.id === id);
+  if (directMatch) return directMatch;
+
+  // Match en nettoyant les préfixes word_srs_, srs_, word_
+  const cleanId = id.replace(/^(word_srs_|Word_srs_|word_|srs_)/i, '').toLowerCase();
   return srsVocabulary.find(w => {
-    const wCleanId = w.id.replace(/^(word_srs_|Word_srs_|word_|srs_)/i, '');
-    return wCleanId === cleanId || w.id === id;
+    const wCleanId = w.id.replace(/^(word_srs_|Word_srs_|word_|srs_)/i, '').toLowerCase();
+    return wCleanId === cleanId || w.id.toLowerCase() === id.toLowerCase();
   }); 
 };
