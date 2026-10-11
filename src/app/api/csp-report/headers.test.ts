@@ -97,6 +97,12 @@ describe('assainissement de la CSP', () => {
     expect(workerSrc!.trim()).toBe("worker-src 'self' blob:");
   });
 
+  it("autorise les sources audio/médias locales via 'self' et blob:", async () => {
+    const mediaSrc = (await csp()).split(';').find((d) => d.trim().startsWith('media-src'));
+    expect(mediaSrc).toBeDefined();
+    expect(mediaSrc!.trim()).toBe("media-src 'self' blob:");
+  });
+
   it('déclare les directives manquantes et le durcissement final', async () => {
     const value = await csp();
     expect(value).toContain("object-src 'none'");

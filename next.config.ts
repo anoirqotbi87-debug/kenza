@@ -34,6 +34,7 @@ const contentSecurityPolicy = [
   // domaine. Les avatars Google OAuth sont chargés depuis un sous-domaine
   // `lh3.googleusercontent.com` (identifié par l'audit `csp_violations`).
   "img-src 'self' data: blob: https://lh3.googleusercontent.com",
+  "media-src 'self' blob:",
   `connect-src 'self' ${supabaseOrigin} https://lh3.googleusercontent.com https://vercel.live`,
   "object-src 'none'",
   "base-uri 'self'",
