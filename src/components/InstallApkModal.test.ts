@@ -6,31 +6,29 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-describe('InstallApkModal component', () => {
-  const componentPath = resolve(__dirname, 'InstallApkModal.tsx');
+describe('InstallApkBanner component', () => {
+  const componentPath = resolve(__dirname, 'InstallApkBanner.tsx');
   const source = readFileSync(componentPath, 'utf-8');
 
-  it('gère la persistance de fermeture dans localStorage via kenza_apk_modal_dismissed', () => {
-    expect(source).toContain("localStorage.getItem('kenza_apk_modal_dismissed')");
-    expect(source).toContain("localStorage.setItem('kenza_apk_modal_dismissed', 'true')");
+  it('gère la persistance de fermeture dans localStorage via kenza_apk_banner_dismissed', () => {
+    expect(source).toContain("localStorage.getItem('kenza_apk_banner_dismissed')");
+    expect(source).toContain("localStorage.setItem('kenza_apk_banner_dismissed'");
   });
 
-  it('propose les deux boutons explicites Télécharger et Annuler', () => {
-    expect(source).toContain('Annuler');
-    expect(source).toContain('Télécharger');
+  it('propose le téléchargement direct de l’APK officiel', () => {
     expect(source).toContain('/downloads/kenza-v1.0.apk');
+    expect(source).toContain('Télécharger');
   });
 
-  it('applique le design modal clair (ivoire/blanc, bordure ambrée et coins arrondis)', () => {
-    expect(source).toContain('bg-[#FFFEFA]');
-    expect(source).toContain('border-amber-200');
+  it('applique le design bannière flottante bleu nuit (#142943) avec accent doré', () => {
+    expect(source).toContain('bg-[#142943]');
+    expect(source).toContain('bg-[#ddb578]');
     expect(source).toContain('rounded-2xl');
-    expect(source).toContain('shadow-2xl');
+    expect(source).toContain('fixed bottom-20');
   });
 
-  it('intègre les attributs d’accessibilité pour le pattern dialogue modal', () => {
-    expect(source).toContain('role="dialog"');
-    expect(source).toContain('aria-modal="true"');
-    expect(source).toContain('aria-labelledby="apk-modal-title"');
+  it('intègre les attributs d’accessibilité pour le pattern notification/banner', () => {
+    expect(source).toContain('role="region"');
+    expect(source).toContain('aria-label="Application Android Kenza"');
   });
 });
