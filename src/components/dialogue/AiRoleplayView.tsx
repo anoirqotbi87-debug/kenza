@@ -267,10 +267,17 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
           </div>
         </div>
         <button 
+          type="button"
           onClick={() => setShowImmersion(!showImmersion)}
-          className={`text-xs px-3 py-1.5 rounded-full font-bold transition-colors border ${showImmersion ? 'bg-[#C9A05C]/20 border-[#C9A05C]/40 text-[#1B2A4A]' : 'bg-[#F7F3EA] border-[#E8E2D5] text-[#7A7670]'}`}
+          title={showImmersion ? "Masquer la phonétique et la traduction française" : "Afficher la phonétique et la traduction française"}
+          className={`text-xs px-3 py-1.5 rounded-full font-bold transition-all border flex items-center gap-1.5 shadow-2xs ${
+            showImmersion 
+              ? 'bg-[#1B2A4A] text-[#FDFCF8] border-[#1B2A4A]' 
+              : 'bg-[#C9A05C]/15 border-[#C9A05C]/40 text-[#1B2A4A] hover:bg-[#C9A05C]/25'
+          }`}
         >
-          {showImmersion ? 'Immersion: ON' : 'Immersion: OFF'}
+          <span className={`w-2 h-2 rounded-full ${showImmersion ? 'bg-slate-400' : 'bg-[#7A9174]'}`} />
+          <span>{showImmersion ? 'Aide : Masquée' : 'Aide : Activée'}</span>
         </button>
       </div>
 
