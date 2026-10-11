@@ -135,10 +135,26 @@ export default function Home() {
     if (typeof window === "undefined") return "today";
     try {
       const params = new URLSearchParams(window.location.search);
-      const v = params.get("view");
-      if (v === "phrases" || v === "path" || v === "review" || v === "space" || v === "today") {
-        return v as View;
-      }
+      const tabParam = params.get("tab");
+      const viewParam = params.get("view");
+      const rawParam = tabParam || viewParam;
+      
+      const normalizeView = (val: string | null): View | null => {
+        if (!val) return null;
+        if (val === "phrases") return "phrases";
+        if (val === "path" || val === "parcours") return "path";
+        if (val === "review" || val === "revision") return "review";
+        if (val === "space") return "space";
+        if (val === "today") return "today";
+        return null;
+      };
+
+      const fromUrl = normalizeView(rawParam);
+      if (fromUrl) return fromUrl;
+
+      const savedTab = localStorage.getItem("kenza_active_tab");
+      const fromStorage = normalizeView(savedTab);
+      if (fromStorage) return fromStorage;
     } catch {}
     return "today";
   });
@@ -402,7 +418,7 @@ export default function Home() {
     const handleShortcut = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
-        setView("phrases");
+        switchView("phrases");
         window.setTimeout(() => searchInputRef.current?.focus(), 60);
       }
     };
@@ -413,9 +429,22 @@ export default function Home() {
   useEffect(() => {
     const handlePopState = () => {
       const params = new URLSearchParams(window.location.search);
-      const v = params.get("view");
+      const v = params.get("tab") || params.get("view");
       if (v === "phrases" || v === "path" || v === "review" || v === "space" || v === "today") {
         setView(v as View);
+        try {
+          localStorage.setItem("kenza_active_tab", v);
+        } catch {}
+      } else if (v === "parcours") {
+        setView("path");
+        try {
+          localStorage.setItem("kenza_active_tab", "path");
+        } catch {}
+      } else if (v === "revision") {
+        setView("review");
+        try {
+          localStorage.setItem("kenza_active_tab", "review");
+        } catch {}
       }
       const t = params.get("tab");
       if (t === "grammaire" || t === "parler" || t === "revision" || t === "parcours") {
@@ -453,8 +482,19 @@ export default function Home() {
       let cat = trL(lang, tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات"), "Essentials", "Lo esencial", "الأساسيات");
       if (w.category === "polite_social") cat = trL(lang, tr("Saluer", "Greeting", "Saludar", "التحية"), "Greeting", "Saludar", "التحية");
       else if (w.category === "food_drink") cat = trL(lang, tr("Au café", "At the café", "En el café", "في المقهى"), "At the café", "En el café", "في المقهى");
-      else if (w.category === "directions") cat = trL(lang, tr("Se déplacer", "Getting around", "Desplazarse", "التنقل"), "Getting around", "Desplazarse", "التنقل");
-      else if (w.category) cat = w.category;
+      else if (w.category === "directions" || w.category === "travel_directions" || w.category === "travel_direction" || w.category === "transport") {
+        cat = trL(lang, tr("Déplacements & Taxi", "Getting around & Taxi", "Desplazamientos y Taxi", "مواصلات ونقل"), "Getting around & Taxi", "Desplazamientos y Taxi", "مواصلات ونقل");
+      } else if (w.category === "shopping" || w.category === "souk_bargaining" || w.category === "souk") {
+        cat = trL(lang, tr("Achats & Souk", "Shopping & Souk", "Compras y Zoco", "التسوق والسوق"), "Shopping & Souk", "Compras y Zoco", "التسوق والسوق");
+      } else if (w.category === "numbers_time" || w.category === "time") {
+        cat = trL(lang, tr("Nombres & Temps", "Numbers & Time", "Números y Tiempo", "الأرقام والوقت"), "Numbers & Time", "Números y Tiempo", "الأرقام والوقت");
+      } else if (w.category === "emergency" || w.category === "urgencies_health" || w.category === "health") {
+        cat = trL(lang, tr("Urgences & Santé", "Emergency & Health", "Urgencias y Salud", "الطوارئ والصحة"), "Emergency & Health", "Urgencias y Salud", "الطوارئ والصحة");
+      } else if (w.category === "grammar_basics" || w.category === "grammar") {
+        cat = trL(lang, tr("Grammaire & Bases", "Grammar & Basics", "Gramática y Bases", "قواعد وأساسيات"), "Grammar & Basics", "Gramática y Bases", "قواعد وأساسيات");
+      } else if (w.category) {
+        cat = w.category.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+      }
 
       return {
         id: w.id || `vocab_${idx}`,
@@ -550,9 +590,10 @@ export default function Home() {
   };
 
   const playPhrase = (darija: string, arabic: string) => {
-    if (!darija && !arabic) return;
-    playAudio(darija || "", arabic || "", true);
-    showToast(tr("Prononciation audio de la phrase.", "Natural voice pronunciation of the phrase.", "Pronunciación de voz natural de la frase.", "نطق صوتي طبيعي للعبارة."));
+    const textToSpeak = arabic?.trim() || darija?.trim();
+    if (!textToSpeak) return;
+    playAudio(textToSpeak, arabic?.trim() || undefined, true);
+    showToast(tr("Prononciation audio de la phrase.", "Natural voice pronunciation of the phrase.", "Pronunciación de voz natural de la phrase.", "نطق صوتي طبيعي للعبارة."));
   };
 
   const copyPhrase = async (phrase: Phrase) => {
@@ -587,6 +628,15 @@ export default function Home() {
   const switchView = (next: View) => {
     setView(next);
     setMobileMenuOpen(false);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("kenza_active_tab", next);
+        const url = new URL(window.location.href);
+        url.searchParams.set("tab", next);
+        url.searchParams.set("view", next);
+        window.history.replaceState(null, "", url.toString());
+      } catch {}
+    }
   };
 
   const headerTitle: Record<View, { eyebrow: string; title: string; description: string }> = {
