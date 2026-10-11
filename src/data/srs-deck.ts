@@ -1,7 +1,115 @@
 import { VocabularySRSData } from '../types/srs';
+import { allVocabulary } from './vocabulary';
 
 export type SRSDictionaryItem = VocabularySRSData;
+
+export interface EssentialSRSWord extends VocabularySRSData {
+  aliases?: string[];
+}
+
+export const ESSENTIAL_SRS_WORDS: EssentialSRSWord[] = [
+  {
+    id: 'srs_dor',
+    aliases: ['dor', 'dour', 'srs_dour', 'dor_limen', 'dor_lisir'],
+    arabizi: 'dor',
+    arabic: 'دُورْ',
+    translation: { fr: 'tourne / tourner', en: 'turn', es: 'gira / doblar', ar: 'دُر / انعطف' },
+    category: 'travel_directions',
+    illustration: { iconName: 'Compass' },
+    example: {
+      arabizi: 'Dor 3la l-limen',
+      arabic: 'دُورْ عَلَى اللِّيمْنْ',
+      translation: { fr: 'Tourne à droite', en: 'Turn right', es: 'Gira a la derecha', ar: 'انعطف يميناً' }
+    }
+  },
+  {
+    id: 'srs_fin',
+    aliases: ['fin', 'fayn', 'fen', 'srs_fayn', 'fin_ghadi'],
+    arabizi: 'fin',
+    arabic: 'فِينْ',
+    translation: { fr: 'où', en: 'where', es: 'dónde', ar: 'أين' },
+    category: 'travel_directions',
+    illustration: { iconName: 'MapPin' },
+    example: {
+      arabizi: 'Fin ghadi ?',
+      arabic: 'فِينْ غَادِي ؟',
+      translation: { fr: 'Où vas-tu ?', en: 'Where are you going?', es: '¿A dónde vas?', ar: 'إلى أين أنت ذاهب؟' }
+    }
+  },
+  {
+    id: 'srs_9hwa',
+    aliases: ['9hwa', 'qahwa', 'qhwa', 'srs_qahwa', 'qhwa_nss'],
+    arabizi: '9hwa',
+    arabic: 'قَهْوَة',
+    translation: { fr: 'café', en: 'coffee', es: 'café', ar: 'قهوة' },
+    category: 'food_drink',
+    illustration: { iconName: 'Coffee' },
+    example: {
+      arabizi: 'Bghit wahed l-qahwa',
+      arabic: 'بْغِيتْ وَاحِدْ القَهْوَة',
+      translation: { fr: 'Je veux un café', en: 'I want a coffee', es: 'Quiero un café', ar: 'أريد قهوة' }
+    }
+  },
+  {
+    id: 'srs_lyoum',
+    aliases: ['lyoum', 'l-youm', 'el-youm', 'srs_l-youm', 'srs_el-youm'],
+    arabizi: 'lyoum',
+    arabic: 'اليُومْ',
+    translation: { fr: "aujourd'hui", en: 'today', es: 'hoy', ar: 'اليوم' },
+    category: 'numbers_time',
+    illustration: { iconName: 'Calendar' },
+    example: {
+      arabizi: 'Lyoum kayn ch-chms',
+      arabic: 'اليُومْ كَايْنْ الشَّمْسْ',
+      translation: { fr: "Aujourd’hui il y a du soleil", en: 'Today it is sunny', es: 'Hoy hace sol', ar: 'اليوم مشمس' }
+    }
+  },
+  {
+    id: 'srs_machi',
+    aliases: ['machi', 'mashi', 'srs_mashi', 'mashi_moshkil'],
+    arabizi: 'machi',
+    arabic: 'مَاشِي',
+    translation: { fr: "ce n'est pas / pas", en: 'not / it is not', es: 'no / no es', ar: 'ليس / غير' },
+    category: 'grammar_basics',
+    illustration: { iconName: 'HelpCircle' },
+    example: {
+      arabizi: 'Hada machi dyali',
+      arabic: 'هَادَا مَاشِي دْيَالِي',
+      translation: { fr: "Ce n’est pas à moi", en: 'This is not mine', es: 'Esto no es mío', ar: 'هذا ليس لي' }
+    }
+  },
+  {
+    id: 'srs_chhal',
+    aliases: ['chhal', 'ch7al', 'bchhal', 'bch7al', 'srs_ch7al'],
+    arabizi: 'ch7al',
+    arabic: 'شْحَالْ',
+    translation: { fr: 'combien', en: 'how much', es: 'cuánto', ar: 'كم' },
+    category: 'shopping',
+    illustration: { iconName: 'Coins' },
+    example: {
+      arabizi: 'Bchhal hada ?',
+      arabic: 'بْشْحَالْ هَادَا ؟',
+      translation: { fr: 'Combien ça coûte ?', en: 'How much is this?', es: '¿Cuánto cuesta esto?', ar: 'بكم هذا؟' }
+    }
+  },
+  {
+    id: 'srs_wakhed',
+    aliases: ['wakhed', 'wahed', 'wa7ed', 'srs_wahed', 'srs_wa7ed'],
+    arabizi: 'wa7ed',
+    arabic: 'وَاحِدْ',
+    translation: { fr: 'un (1)', en: 'one (1)', es: 'uno (1)', ar: 'واحد (1)' },
+    category: 'numbers_time',
+    illustration: { iconName: 'FileText' },
+    example: {
+      arabizi: 'A3tini wahed atay',
+      arabic: 'أَعْطِينِي وَاحِدْ أَتَايْ',
+      translation: { fr: 'Donne-moi un thé', en: 'Give me a tea', es: 'Dame un té', ar: 'أعطني شاي' }
+    }
+  }
+];
+
 export const srsVocabulary: VocabularySRSData[] = [
+  ...ESSENTIAL_SRS_WORDS,
   {
     id: 'srs_salam',
     arabizi: 'Salam',
@@ -2328,16 +2436,75 @@ export const srsVocabulary: VocabularySRSData[] = [
 ];
 
 
-export const getWordFromDictionary = (id: string): VocabularySRSData | undefined => { 
+export const getWordFromDictionary = (id: string): VocabularySRSData | undefined => {
   if (!id) return undefined;
-  // Match direct
-  const directMatch = srsVocabulary.find(w => w.id === id);
+
+  const rawTrimmed = id.trim();
+  // 1. Match direct exact
+  const directMatch = srsVocabulary.find(w => w.id === rawTrimmed);
   if (directMatch) return directMatch;
 
-  // Match en nettoyant les préfixes word_srs_, srs_, word_
-  const cleanId = id.replace(/^(word_srs_|Word_srs_|word_|srs_)/i, '').toLowerCase();
-  return srsVocabulary.find(w => {
-    const wCleanId = w.id.replace(/^(word_srs_|Word_srs_|word_|srs_)/i, '').toLowerCase();
-    return wCleanId === cleanId || w.id.toLowerCase() === id.toLowerCase();
-  }); 
+  // 2. Normalisation de base
+  const lowerId = rawTrimmed.toLowerCase();
+  const cleanId = lowerId.replace(/^(word_srs_|word_|srs_)/i, '');
+  const strippedId = cleanId.replace(/[-_]/g, '');
+
+  // 3. Match dans srsVocabulary (id, aliases, ou arabizi normalisé)
+  const srsMatch = srsVocabulary.find((w: EssentialSRSWord) => {
+    const wLower = w.id.toLowerCase();
+    const wClean = wLower.replace(/^(word_srs_|word_|srs_)/i, '');
+    const wStripped = wClean.replace(/[-_]/g, '');
+    const wArabiziStripped = w.arabizi.toLowerCase().replace(/[-_ ]/g, '');
+
+    if (wLower === lowerId || wClean === cleanId || wStripped === strippedId) return true;
+    if (wArabiziStripped === strippedId || wArabiziStripped === cleanId) return true;
+
+    if (w.aliases && Array.isArray(w.aliases)) {
+      return w.aliases.some(alias => {
+        const aLower = alias.toLowerCase();
+        const aClean = aLower.replace(/^(word_srs_|word_|srs_)/i, '');
+        const aStripped = aClean.replace(/[-_]/g, '');
+        return aLower === lowerId || aClean === cleanId || aStripped === strippedId;
+      });
+    }
+
+    return false;
+  });
+
+  if (srsMatch) return srsMatch;
+
+  // 4. Recherche dans tout le vocabulaire du curriculum (allVocabulary)
+  const vocabMatch = allVocabulary.find(v => {
+    const vLower = v.id.toLowerCase();
+    const vClean = vLower.replace(/^(vocab_|word_srs_|word_|srs_)/i, '');
+    const vStripped = vClean.replace(/[-_]/g, '');
+    const vArabiziStripped = v.arabizi.toLowerCase().replace(/[-_ ]/g, '');
+
+    return (
+      vLower === lowerId ||
+      vClean === cleanId ||
+      vStripped === strippedId ||
+      vArabiziStripped === strippedId ||
+      vArabiziStripped === cleanId
+    );
+  });
+
+  if (vocabMatch) {
+    return {
+      id: vocabMatch.id,
+      arabizi: vocabMatch.arabizi,
+      arabic: vocabMatch.arabic,
+      translation: vocabMatch.translation,
+      category: vocabMatch.category || 'grammar_basics',
+      illustration: { iconName: 'Book' },
+      example: vocabMatch.example ? {
+        arabizi: vocabMatch.example.arabizi,
+        arabic: vocabMatch.example.arabic,
+        translation: vocabMatch.example.translation
+      } : undefined
+    };
+  }
+
+  return undefined;
 };
+
