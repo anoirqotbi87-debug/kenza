@@ -19,34 +19,39 @@ async function synthesize(
   voice: TtsVoice = 'female',
   speed: TtsSpeed = 'normal'
 ) {
-  const sanitizedArabic = arabicText ? extractCleanArabicForTts(arabicText) : undefined;
-  const sanitizedText = extractCleanArabicForTts(text) || text;
-  const textToSpeak = normalizeDarija(sanitizedText, sanitizedArabic);
-  const { ssml, voiceName } = buildSsml(textToSpeak, voice, speed);
+  try {
+    const sanitizedArabic = arabicText ? extractCleanArabicForTts(arabicText) : undefined;
+    const sanitizedText = extractCleanArabicForTts(text) || text;
+    const textToSpeak = normalizeDarija(sanitizedText, sanitizedArabic);
+    const { ssml, voiceName } = buildSsml(textToSpeak, voice, speed);
 
-  const tts = new MsEdgeTTS();
-  await tts.setMetadata(voiceName, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
-  const readable = tts.rawToStream(ssml);
-  const chunks: Buffer[] = [];
+    const tts = new MsEdgeTTS();
+    await tts.setMetadata(voiceName, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
+    const readable = tts.rawToStream(ssml);
+    const chunks: Buffer[] = [];
 
-  return new Promise<NextResponse>((resolve) => {
-    readable.audioStream.on('data', (chunk: Buffer) => chunks.push(chunk));
-    readable.audioStream.on('end', () => {
-      const audioBuffer = Buffer.concat(chunks);
-      resolve(
-        new NextResponse(audioBuffer, {
-          headers: {
-            'Content-Type': 'audio/mpeg',
-            'Cache-Control': 'public, max-age=604800, immutable',
-          },
-        })
-      );
+    return await new Promise<NextResponse>((resolve) => {
+      readable.audioStream.on('data', (chunk: Buffer) => chunks.push(chunk));
+      readable.audioStream.on('end', () => {
+        const audioBuffer = Buffer.concat(chunks);
+        resolve(
+          new NextResponse(audioBuffer, {
+            headers: {
+              'Content-Type': 'audio/mpeg',
+              'Cache-Control': 'public, max-age=604800, immutable',
+            },
+          })
+        );
+      });
+      readable.audioStream.on('error', (err: Error) => {
+        console.error('TTS Stream Error:', err);
+        resolve(NextResponse.json({ error: 'TTS_GENERATION_FAILED' }, { status: 500 }));
+      });
     });
-    readable.audioStream.on('error', (err: Error) => {
-      console.error('TTS Stream Error:', err);
-      resolve(NextResponse.json({ error: 'TTS_GENERATION_FAILED' }, { status: 500 }));
-    });
-  });
+  } catch (err) {
+    console.error('Edge TTS Synthesis Setup Error:', err);
+    return NextResponse.json({ error: 'TTS_GENERATION_FAILED' }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -72,8 +77,8 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'UNAUTHORIZED_ORIGIN' }, { status: 403 });
       }
     }
-    // Rate limiting durable : 60 requêtes/min par IP (conversation fluide sans blocage)
-    const rate = await checkRateLimit(`tts:ip:${getClientIp(req)}`, 60, 60 * 1000);
+    // Rate limiting durable : 120 requêtes/min par IP (conversation fluide sans blocage)
+    const rate = await checkRateLimit(`tts:ip:${getClientIp(req)}`, 120, 60 * 1000);
     if (rate.error) {
       return NextResponse.json({ error: 'SERVICE_UNAVAILABLE' }, { status: 503 });
     }
@@ -130,8 +135,8 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Rate limiting durable : 60 requêtes/min par IP (conversation fluide sans blocage)
-    const rate = await checkRateLimit(`tts:ip:${getClientIp(req)}`, 60, 60 * 1000);
+    // Rate limiting durable : 120 requêtes/min par IP (conversation fluide sans blocage)
+    const rate = await checkRateLimit(`tts:ip:${getClientIp(req)}`, 120, 60 * 1000);
     if (rate.error) {
       return NextResponse.json({ error: 'SERVICE_UNAVAILABLE' }, { status: 503 });
     }
