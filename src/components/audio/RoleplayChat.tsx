@@ -5,7 +5,7 @@ import { useChat } from 'ai/react';
 import { PersonaId, personas } from '@/lib/ai/prompts';
 import { parseAiMessage, extractCleanArabicForTts, sanitizeTtsArabic } from '@/lib/ai/parseAiMessage';
 import { useVoiceRecognition } from '@/hooks/useVoiceRecognition';
-import { playAudio } from '@/lib/audio';
+import { playAudio, stopAudio } from '@/lib/audio';
 import {
   Send,
   Mic,
@@ -119,11 +119,10 @@ export default function RoleplayChat({
     }
   };
 
-  const activeAudioRef = useRef<HTMLAudioElement | null>(null);
   const [playingKey, setPlayingKey] = useState<string | null>(null);
   const [audioFeedback, setAudioFeedback] = useState<{ id: string; error: string } | null>(null);
 
-  const handlePlayVoice = (messageId: string, rawText: string, speed: 'normal' | 'slow' = 'normal') => {
+  const handlePlayVoice = async (messageId: string, rawText: string, speed: 'normal' | 'slow' = 'normal') => {
     if (!rawText) return;
 
     const cleanArabic = extractCleanArabicForTts(rawText);
@@ -131,59 +130,38 @@ export default function RoleplayChat({
 
     const key = `${messageId}-${speed}`;
 
-    // Si l'utilisateur re-clique sur le même audio en cours, on le met en pause
-    if (playingKey === key && activeAudioRef.current && !activeAudioRef.current.paused) {
-      activeAudioRef.current.pause();
+    // Si l'utilisateur re-clique sur le même audio en cours, on l'arrête
+    if (playingKey === key) {
+      stopAudio();
       setPlayingKey(null);
       return;
     }
 
-    // 1. Arrêter et purger l'audio précédent proprement
-    if (activeAudioRef.current) {
-      activeAudioRef.current.onended = null;
-      activeAudioRef.current.onerror = null;
-      activeAudioRef.current.pause();
-      activeAudioRef.current.removeAttribute('src');
-      activeAudioRef.current = null;
-    }
-
+    // Arrêter l'audio précédent
+    stopAudio();
     setAudioFeedback(null);
     setPlayingKey(key);
 
-    // 2. URL directe de streaming 'self' (100% conforme CSP)
     const gender = personaId === 'cafe' || personaId === 'taxi' || personaId === 'souk' || personaId === 'medecin' ? 'male' : 'female';
-    const url = `/api/tts?text=${encodeURIComponent(cleanArabic)}&speed=${speed}&gender=${gender}`;
-    const audio = new Audio(url);
-    activeAudioRef.current = audio;
 
-    audio.onended = () => {
-      if (activeAudioRef.current === audio) {
-        setPlayingKey(null);
-      }
-    };
-
-    audio.onerror = (e) => {
-      console.error('Erreur audio élément direct :', e, audio.error);
-      if (activeAudioRef.current === audio) {
-        setPlayingKey(null);
-        setAudioFeedback({ id: messageId, error: 'Erreur audio' });
-        setTimeout(() => setAudioFeedback(null), 3500);
-      }
-    };
-
-    // 3. Déclenchement de la lecture
-    const playPromise = audio.play();
-    if (playPromise !== undefined) {
-      playPromise.catch((err) => {
-        console.warn('Audio play() error :', err.name, err.message);
-        if (activeAudioRef.current === audio) {
-          setPlayingKey(null);
-          if (err.name !== 'AbortError') {
-            setAudioFeedback({ id: messageId, error: `${err.name}` });
-            setTimeout(() => setAudioFeedback(null), 3500);
-          }
+    try {
+      await playAudio(
+        cleanArabic,
+        undefined,
+        true,
+        speed === 'slow' ? 0.75 : 1.0,
+        {
+          speed,
+          voice: gender,
+          consumeQuota: false,
         }
-      });
+      );
+    } catch (err: unknown) {
+      console.warn('Erreur lecture Web Audio roleplay :', err);
+      setAudioFeedback({ id: messageId, error: 'Erreur audio' });
+      setTimeout(() => setAudioFeedback(null), 3500);
+    } finally {
+      setPlayingKey((current) => (current === key ? null : current));
     }
   };
 

@@ -8,6 +8,7 @@ import {
 
 // Web Audio API context
 let audioCtx: AudioContext | null = null;
+let currentSourceNode: AudioBufferSourceNode | null = null;
 const audioCache = new Map<string, AudioBuffer>();
 
 function getAudioContext(): AudioContext {
@@ -17,6 +18,20 @@ function getAudioContext(): AudioContext {
   }
   return audioCtx;
 }
+
+/**
+ * Arrête immédiatement tout son en cours de lecture via le Web Audio API.
+ */
+export const stopAudio = (): void => {
+  if (currentSourceNode) {
+    try {
+      currentSourceNode.stop();
+    } catch {
+      // Ignorer si la source est déjà stoppée
+    }
+    currentSourceNode = null;
+  }
+};
 
 /**
  * Preload an audio file into the Web Audio API cache.
@@ -80,6 +95,7 @@ function audioQuotaStorage(): Storage | null {
 export interface AudioOptions {
   speed?: number | 'normal' | 'slow';
   voice?: 'female' | 'male' | 'ar-MA-JamalNeural' | 'ar-MA-MounaNeural';
+  consumeQuota?: boolean;
 }
 
 export { sanitizeTtsArabic } from './ai/parseAiMessage';
@@ -111,8 +127,9 @@ export const playAudio = async (
   const voiceParam: 'female' | 'male' =
     options?.voice === 'male' || options?.voice === 'ar-MA-JamalNeural' ? 'male' : 'female';
 
-  // Quota des écoutes gratuites : on refuse AVANT toute requête réseau
-  if (shouldConsumeAudioQuota(text, audioUrl)) {
+  // Quota des écoutes gratuites : on refuse AVANT toute requête réseau (sauf si explicitement exempté)
+  const shouldCheckQuota = options?.consumeQuota !== false && shouldConsumeAudioQuota(text, audioUrl);
+  if (shouldCheckQuota) {
     const { isPremium, setAudioQuotaExceeded } = useAppStore.getState();
     const storage = audioQuotaStorage();
     const now = new Date();
@@ -123,6 +140,9 @@ export const playAudio = async (
     }
     if (!isPremium) recordAudioPlay(storage, now);
   }
+
+  // Arrêter tout audio Web Audio précédemment en cours
+  stopAudio();
 
   const ctx = getAudioContext();
   if (ctx.state === 'suspended') {
@@ -180,10 +200,16 @@ export const playAudio = async (
 
       return new Promise<void>((resolve) => {
         const source = ctx.createBufferSource();
+        currentSourceNode = source;
         source.buffer = audioBuffer;
         source.playbackRate.value = numericSpeed;
         source.connect(ctx.destination);
-        source.onended = () => resolve();
+        source.onended = () => {
+          if (currentSourceNode === source) {
+            currentSourceNode = null;
+          }
+          resolve();
+        };
         source.start();
       });
     } catch (e) {
@@ -240,10 +266,16 @@ export const playAudio = async (
 
       return new Promise<void>((resolve) => {
         const source = ctx.createBufferSource();
+        currentSourceNode = source;
         source.buffer = audioBuffer;
         source.playbackRate.value = numericSpeed;
         source.connect(ctx.destination);
-        source.onended = () => resolve();
+        source.onended = () => {
+          if (currentSourceNode === source) {
+            currentSourceNode = null;
+          }
+          resolve();
+        };
         source.start();
       });
     } catch (e) {
