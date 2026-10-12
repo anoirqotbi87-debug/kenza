@@ -58,7 +58,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
   const [playingKey, setPlayingKey] = useState<string | null>(null);
   const [audioFeedback, setAudioFeedback] = useState<{ id: string; error: string } | null>(null);
 
-  const handlePlayVoice = async (messageId: string, rawText: string, speed: 'normal' | 'slow' = 'normal') => {
+  const handlePlayVoice = (messageId: string, rawText: string, speed: 'normal' | 'slow' = 'normal') => {
     if (!rawText) return;
 
     const cleanArabic = extractCleanArabicForTts(rawText);
@@ -66,56 +66,59 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
 
     const key = `${messageId}-${speed}`;
 
+    // Si l'utilisateur re-clique sur le même audio en cours, on le met en pause
     if (playingKey === key && activeAudioRef.current && !activeAudioRef.current.paused) {
       activeAudioRef.current.pause();
       setPlayingKey(null);
       return;
     }
 
+    // 1. Arrêter et purger l'audio précédent proprement
     if (activeAudioRef.current) {
+      activeAudioRef.current.onended = null;
+      activeAudioRef.current.onerror = null;
       activeAudioRef.current.pause();
+      activeAudioRef.current.removeAttribute('src');
       activeAudioRef.current = null;
     }
 
     setAudioFeedback(null);
     setPlayingKey(key);
 
+    // 2. URL directe de streaming 'self' (100% conforme CSP)
     const gender = personaId === 'cafe' || personaId === 'taxi' || personaId === 'souk' || personaId === 'medecin' ? 'male' : 'female';
     const url = `/api/tts?text=${encodeURIComponent(cleanArabic)}&speed=${speed}&gender=${gender}`;
+    const audio = new Audio(url);
+    activeAudioRef.current = audio;
 
-    try {
-      const res = await fetch(url);
-      if (!res.ok) {
-        console.error(`[TTS Network Error] HTTP ${res.status}`);
+    audio.onended = () => {
+      if (activeAudioRef.current === audio) {
         setPlayingKey(null);
-        setAudioFeedback({ id: messageId, error: `Erreur serveur (${res.status})` });
-        setTimeout(() => setAudioFeedback(null), 4000);
-        return;
       }
+    };
 
-      const blob = await res.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      const audio = new Audio(blobUrl);
-      activeAudioRef.current = audio;
-
-      audio.onended = () => {
+    audio.onerror = (e) => {
+      console.error('Erreur audio élément direct :', e, audio.error);
+      if (activeAudioRef.current === audio) {
         setPlayingKey(null);
-        URL.revokeObjectURL(blobUrl);
-      };
+        setAudioFeedback({ id: messageId, error: 'Erreur audio' });
+        setTimeout(() => setAudioFeedback(null), 3500);
+      }
+    };
 
-      audio.onerror = () => {
-        setPlayingKey(null);
-        URL.revokeObjectURL(blobUrl);
-        setAudioFeedback({ id: messageId, error: 'Format audio non supporté' });
-      };
-
-      await audio.play();
-    } catch (err: unknown) {
-      const errorObj = err as { name?: string };
-      console.error('[Audio Playback Error] :', err);
-      setPlayingKey(null);
-      setAudioFeedback({ id: messageId, error: `${errorObj?.name || 'Erreur'}` });
-      setTimeout(() => setAudioFeedback(null), 4000);
+    // 3. Déclenchement de la lecture
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((err) => {
+        console.warn('Audio play() error :', err.name, err.message);
+        if (activeAudioRef.current === audio) {
+          setPlayingKey(null);
+          if (err.name !== 'AbortError') {
+            setAudioFeedback({ id: messageId, error: `${err.name}` });
+            setTimeout(() => setAudioFeedback(null), 3500);
+          }
+        }
+      });
     }
   };
 
