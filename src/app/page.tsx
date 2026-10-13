@@ -607,9 +607,20 @@ export default function Home() {
     saveFavorites(updated);
   };
 
-  const playPhrase = (darija: string, arabic: string) => {
+  const playPhrase = (darija: string, arabic: string, phraseId?: string) => {
     const textToSpeak = arabic?.trim() || darija?.trim();
     if (!textToSpeak) return;
+
+    if (phraseId) {
+      const staticAudio = new Audio(`/audio/phrases/${phraseId}.mp3`);
+      staticAudio.play().catch(() => {
+        // Fallback transparent vers la synthèse en ligne
+        playAudio(textToSpeak, arabic?.trim() || undefined, true);
+      });
+      showToast(tr("Prononciation audio de la phrase.", "Natural voice pronunciation of the phrase.", "Pronunciación de voz natural de la phrase.", "نطق صوتي طبيعي للعبارة."));
+      return;
+    }
+
     playAudio(textToSpeak, arabic?.trim() || undefined, true);
     showToast(tr("Prononciation audio de la phrase.", "Natural voice pronunciation of the phrase.", "Pronunciación de voz natural de la phrase.", "نطق صوتي طبيعي للعبارة."));
   };
@@ -1957,7 +1968,7 @@ function PhrasesView({
   favoritesOnly: boolean;
   setFavoritesOnly: (value: boolean) => void;
   onFavorite: (id: string) => void;
-  onPlay: (darija: string, arabic: string) => void;
+  onPlay: (darija: string, arabic: string, phraseId?: string) => void;
   onCopy: (phrase: Phrase) => void;
 }) {
   const { lang } = useLocalizedContent();
@@ -2051,7 +2062,7 @@ function PhrasesView({
                 <p className="phrase-meaning">{meaningText}</p>
                 {phrase.note ? <p className="phrase-note">{phrase.note}</p> : null}
                 <div className="phrase-actions">
-                  <button onClick={() => onPlay(darijaText, arabicText)}>
+                  <button onClick={() => onPlay(darijaText, arabicText, phrase.id)}>
                     <Volume2 size={15} /> {tr("Écouter", "Listen", "Escuchar", "استمع")}
                   </button>
                   <button onClick={() => onCopy(phrase)}>
