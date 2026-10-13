@@ -93,34 +93,26 @@ export function parseAiMessage(content: string): ParsedMessage {
   return { ar, arz, fr, ...(suggestions && suggestions.length > 0 ? { suggestions } : {}) };
 }
 
+import { prepareDarijaForTts } from '@/lib/tts/darijaPhonetic';
+
 /**
  * Nettoyage strict et conversion phonétique du texte envoyé au TTS :
- * 1. Convertit les chiffres Arabizi (3->ع, 7->ح, 9->ق, 5->خ) avant tout nettoyage pour éviter les sons tronqués.
- * 2. Conserve les diacritiques (chakl : fat-ha, damma, kasra, sukūn, shadda) et supprime les balises et caractères latins parasites.
- * 3. Supprime le tanwīn classique (ً ٌ ٍ) et parenthèses.
+ * 1. Extrait le bloc [AR] s'il existe.
+ * 2. Prépare la phonétique Darija via prepareDarijaForTts (suppression sukūns, voyelles brèves Fusha,
+ *    conversion chiffres Arabizi, respelling marocain et coussin acoustique).
  */
 export function sanitizeTtsArabic(raw: string): string {
   if (!raw) return '';
   const match = raw.match(/\[AR\]([\s\S]*?)\[\/AR\]/i);
   let text = match ? match[1] : raw;
 
-  // Si aucun bloc [AR] n'était présent (texte Arabizi passé directement au TTS),
-  // on remplace les chiffres Arabizi par leurs consonnes arabes correspondantes.
-  if (!match) {
-    text = text
-      .replace(/3/g, 'ع')
-      .replace(/7/g, 'ح')
-      .replace(/9/g, 'ق')
-      .replace(/5/g, 'خ');
+  // Si on est dans un bloc [AR] contenant des bouts de phrases parasites en latin (ex: "bghit nemchi 123")
+  if (match) {
+    // Supprimer le latin et les chiffres ordinaires pour ne garder que l'arabe du bloc [AR]
+    text = text.replace(/[a-zA-Z0-9_\-#]/g, '');
   }
 
-  return text
-    .replace(/\[\/?(AR|ARZ|FR|TR|SUGG)\]/gi, '') // Supprime les balises
-    .replace(/[a-zA-Z0-9_\-#]/g, '')       // Supprime le latin et chiffres
-    .replace(/[()]/g, '')                   // Supprime parenthèses
-    .replace(/[\u064B\u064C\u064D]/g, '')   // Supprime tanwin Fusha classique
-    .replace(/\s+/g, ' ')                   // Normalise les espaces multiples
-    .trim();
+  return prepareDarijaForTts(text);
 }
 
 export const extractCleanArabicForTts = sanitizeTtsArabic;

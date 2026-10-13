@@ -91,25 +91,31 @@ describe('parseAiMessage', () => {
 });
 
 describe('extractCleanArabicForTts / sanitizeTtsArabic', () => {
-  it('extrait chirurgicalement le texte arabe pur depuis une réponse tripartite', () => {
+  it('extrait chirurgicalement le texte arabe pur et applique la préparation phonétique Darija', () => {
     const raw = `[AR] وَعَلَيْكُمُ السَّلَامْ ! فِينْ غَادِي أَخُويَا ؟ [/AR]
 [ARZ] Wa 3alaykoum salam ! Fin ghadi a khoya ? [/ARZ]
 [FR] Bonjour ! Où vas-tu mon frère ? [/FR]`;
     const clean = extractCleanArabicForTts(raw);
-    expect(clean).toBe('وَعَلَيْكُمُ السَّلَامْ ! فِينْ غَادِي أَخُويَا ؟');
-    expect(sanitizeTtsArabic(raw)).toBe('وَعَلَيْكُمُ السَّلَامْ ! فِينْ غَادِي أَخُويَا ؟');
+    expect(clean).toContain('اسّلام');
+    expect(clean).toContain('فين غادي');
+    expect(clean).toContain('آ خويا');
+    expect(clean.endsWith(' . ')).toBe(true);
+    expect(sanitizeTtsArabic(raw)).toBe(clean);
   });
 
   it('élimine les balises orphelines, caractères latins, chiffres et parenthèses', () => {
     const raw = '[AR] (مَرْحْبَا) bghit nemchi 123 [/AR]';
     const clean = extractCleanArabicForTts(raw);
-    expect(clean).toBe('مَرْحْبَا');
+    expect(clean).toBe('مرحبا . ');
   });
 
-  it('élimine les tanwins classiques de fin de mot (ً ٌ ٍ)', () => {
+  it('élimine les tanwins classiques de fin de mot (ً ٌ ٍ) et sukūns', () => {
     const raw = '[AR] أَهْلًا بيكْ ! شْنُو نْجِيبْ لِكْ تْشْرَبْ ؟ [/AR]';
     const clean = sanitizeTtsArabic(raw);
-    expect(clean).toBe('أَهْلا بيكْ ! شْنُو نْجِيبْ لِكْ تْشْرَبْ ؟');
+    expect(clean).not.toContain('\u064B');
+    expect(clean).not.toContain('\u0652');
+    expect(clean).toContain('شنو');
+    expect(clean.endsWith(' . ')).toBe(true);
   });
 
   it('convertit les chiffres Arabizi (3->ع, 7->ح, 9->ق, 5->خ) avant nettoyage', () => {
@@ -119,12 +125,14 @@ describe('extractCleanArabicForTts / sanitizeTtsArabic', () => {
     expect(clean).toContain('ق');
     expect(clean).toContain('ح');
     expect(clean).toContain('خ');
+    expect(clean.endsWith(' . ')).toBe(true);
   });
 
-  it('gère une chaîne déjà propre en Darija', () => {
-    const raw = 'أَهْلا بيكْ ! شْنُو نْجِيبْ لِكْ تْشْرَبْ ؟';
+  it('gère une chaîne en Darija et applique le coussin acoustique', () => {
+    const raw = 'أهْلا بيكْ ! شْنُو نْجِيبْ لِكْ تْشْرَبْ ؟';
     const clean = extractCleanArabicForTts(raw);
-    expect(clean).toBe('أَهْلا بيكْ ! شْنُو نْجِيبْ لِكْ تْشْرَبْ ؟');
+    expect(clean).toContain('شنو');
+    expect(clean.endsWith(' . ')).toBe(true);
   });
 
   it('gère les chaînes vides', () => {

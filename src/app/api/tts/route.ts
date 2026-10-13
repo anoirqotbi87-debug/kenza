@@ -7,6 +7,8 @@ import { extractCleanArabicForTts } from '@/lib/ai/parseAiMessage';
 
 import { synthesizeEdgeTts } from '@/lib/tts/synthesizeEdgeTts';
 
+import { prepareDarijaForTts } from '@/lib/tts/darijaPhonetic';
+
 export type TTSRequest = {
   text: string;
   voice?: 'female' | 'male';
@@ -21,9 +23,9 @@ async function synthesize(
   speed: TtsSpeed = 'normal'
 ) {
   try {
-    const sanitizedArabic = arabicText ? extractCleanArabicForTts(arabicText) : undefined;
-    const sanitizedText = extractCleanArabicForTts(text) || text;
-    const textToSpeak = normalizeDarija(sanitizedText, sanitizedArabic);
+    const rawToProcess = arabicText?.trim() || text;
+    const normalizedPhonetic = prepareDarijaForTts(rawToProcess);
+    const textToSpeak = normalizeDarija(normalizedPhonetic, normalizedPhonetic);
     const { ssml } = buildSsml(textToSpeak, voice, speed);
 
     const audioBuffer = await synthesizeEdgeTts(ssml);
