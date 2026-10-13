@@ -3,8 +3,33 @@ import { DialogueScenario } from '../../types/dialogue';
 export const cafeFesScenario: DialogueScenario = {
   id: 'cafeFes',
   title: 'Au Café Populaire / F-L-Gahwa',
+  titleI18n: {
+    fr: 'Au Café Populaire / F-L-Gahwa',
+    ar: 'فالقهوة الشعبية',
+    en: 'At the Local Café',
+    es: 'En el café popular',
+  },
   category: 'restaurant',
+  categoryI18n: {
+    fr: 'Café & restauration',
+    ar: 'مقهى ومطاعم',
+    en: 'Café & Dining',
+    es: 'Cafetería y comida',
+  },
   location: 'Fès - Ville Nouvelle',
+  locationI18n: {
+    fr: 'Fès - Ville Nouvelle',
+    ar: 'فاس - المدينة الجديدة',
+    en: 'Fez - New City',
+    es: 'Fez - Ciudad Nueva',
+  },
+  npcRole: 'Dialogue guidé',
+  npcRoleI18n: {
+    fr: 'Dialogue guidé',
+    ar: 'حوار موجّه',
+    en: 'Guided dialogue',
+    es: 'Diálogo guiado',
+  },
   level: 'A1',
   turns: [
     {

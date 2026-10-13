@@ -3,8 +3,33 @@ import { DialogueScenario } from '../../types/dialogue';
 export const taxiFesScenario: DialogueScenario = {
   id: 'taxiFes',
   title: 'Le Petit Taxi vers Bab Boujloud',
+  titleI18n: {
+    fr: 'Le Petit Taxi vers Bab Boujloud',
+    ar: 'طّاكسي صغير لباب بوجلود',
+    en: 'Petit Taxi to Bab Boujloud',
+    es: 'Taxi pequeño a Bab Boujloud',
+  },
   category: 'transport',
+  categoryI18n: {
+    fr: 'Transport',
+    ar: 'مواصلات ونقل',
+    en: 'Transport',
+    es: 'Transporte',
+  },
   location: 'Fès',
+  locationI18n: {
+    fr: 'Fès',
+    ar: 'فاس',
+    en: 'Fez',
+    es: 'Fez',
+  },
+  npcRole: 'Dialogue guidé',
+  npcRoleI18n: {
+    fr: 'Dialogue guidé',
+    ar: 'حوار موجّه',
+    en: 'Guided dialogue',
+    es: 'Diálogo guiado',
+  },
   level: 'A1',
   turns: [
     {
