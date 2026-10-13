@@ -3,8 +3,33 @@ import { DialogueScenario } from '../../types/dialogue';
 export const soukFesScenario: DialogueScenario = {
   id: 'soukFes',
   title: 'Négociation au Souk / F-S-Souq',
+  titleI18n: {
+    fr: 'Négociation au Souk / F-S-Souq',
+    ar: 'المشاطرة فالسوق',
+    en: 'Bargaining at the Souk',
+    es: 'Regateo en el zoco',
+  },
   category: 'souk',
+  categoryI18n: {
+    fr: 'Achats & Souk',
+    ar: 'تسوق وسوق',
+    en: 'Shopping & Market',
+    es: 'Compras y zoco',
+  },
   location: 'Fès - Médina',
+  locationI18n: {
+    fr: 'Fès - Médina',
+    ar: 'فاس - المدينة القديمة',
+    en: 'Fez - Medina',
+    es: 'Fez - Medina',
+  },
+  npcRole: 'Dialogue guidé',
+  npcRoleI18n: {
+    fr: 'Dialogue guidé',
+    ar: 'حوار موجّه',
+    en: 'Guided dialogue',
+    es: 'Diálogo guiado',
+  },
   level: 'A2',
   turns: [
     {

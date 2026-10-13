@@ -24,14 +24,51 @@ export default function ParlerPage() {
   const isAr = lang === 'ar';
   const tp = t.pages.parler;
 
-  const getCategoryLabel = (category?: DialogueScenario['category']) => {
-    switch (category) {
-      case 'transport': return 'Transport';
-      case 'restaurant': return 'Café & restauration';
-      case 'souk': return 'Au souk';
-      case 'daily': return 'Vie quotidienne';
-      default: return 'Conversation';
+  const getScenarioTitle = (scenario: DialogueScenario) => {
+    if (scenario.titleI18n) {
+      return scenario.titleI18n[lang as keyof typeof scenario.titleI18n] || scenario.titleI18n.fr || scenario.title;
     }
+    return scenario.titleFr || scenario.title;
+  };
+
+  const getScenarioCategory = (scenario: DialogueScenario) => {
+    if (scenario.categoryI18n) {
+      return scenario.categoryI18n[lang as keyof typeof scenario.categoryI18n] || scenario.categoryI18n.fr;
+    }
+    switch (scenario.category) {
+      case 'transport':
+        return isAr ? 'مواصلات ونقل' : lang === 'es' ? 'Transporte' : lang === 'en' ? 'Transport' : 'Transport';
+      case 'restaurant':
+        return isAr ? 'مقهى ومطاعم' : lang === 'es' ? 'Cafetería y comida' : lang === 'en' ? 'Café & Dining' : 'Café & restauration';
+      case 'souk':
+        return isAr ? 'تسوق وسوق' : lang === 'es' ? 'Compras y zoco' : lang === 'en' ? 'Shopping & Market' : 'Achats & Souk';
+      case 'daily':
+        return isAr ? 'حياة يومية' : lang === 'es' ? 'Vida diaria' : lang === 'en' ? 'Daily Life' : 'Vie quotidienne';
+      default:
+        return isAr ? 'محادثة' : lang === 'es' ? 'Conversación' : lang === 'en' ? 'Conversation' : 'Conversation';
+    }
+  };
+
+  const getScenarioLocation = (scenario: DialogueScenario) => {
+    if (scenario.locationI18n) {
+      return scenario.locationI18n[lang as keyof typeof scenario.locationI18n] || scenario.locationI18n.fr || scenario.location;
+    }
+    return scenario.location;
+  };
+
+  const getScenarioRole = (scenario: DialogueScenario) => {
+    if (scenario.npcRoleI18n) {
+      return scenario.npcRoleI18n[lang as keyof typeof scenario.npcRoleI18n] || scenario.npcRoleI18n.fr;
+    }
+    if (scenario.npcRole) return scenario.npcRole;
+    return isAr ? 'حوار موجّه' : lang === 'es' ? 'Diálogo guiado' : lang === 'en' ? 'Guided dialogue' : 'Dialogue guidé';
+  };
+
+  const getTurnsLabel = (count: number) => {
+    if (isAr) return `${count} جولات`;
+    if (lang === 'es') return `${count} ${count === 1 ? 'turno' : 'turnos'}`;
+    if (lang === 'en') return `${count} ${count === 1 ? 'turn' : 'turns'}`;
+    return `${count} ${count === 1 ? 'tour' : 'tours'}`;
   };
 
   const startScenario = (scenario: DialogueScenario) => {
@@ -106,16 +143,16 @@ export default function ParlerPage() {
                     type="button"
                     onClick={() => startScenario(scenario)}
                     disabled={scenario.tier === 'premium' && !isPremiumReady}
-                    className="text-left bg-[#F7F3EA] border border-[#E8E2D5] rounded-2xl p-4 hover:border-[#C9A05C] disabled:cursor-wait transition-colors group"
+                    className="text-left rtl:text-right bg-[#F7F3EA] border border-[#E8E2D5] rounded-2xl p-4 hover:border-[#C9A05C] disabled:cursor-wait transition-colors group"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="font-bold text-sm text-[#1B2A4A]">{scenario.titleFr || scenario.title}</p>
+                        <p className="font-bold text-sm text-[#1B2A4A]">{getScenarioTitle(scenario)}</p>
                         <p className="text-xs text-[#7A7670] mt-1 flex items-center gap-1">
-                          <MapPin className="w-3 h-3 text-[#C9A05C]" />
-                          {scenario.location} · {scenario.turns.length} {scenario.turns.length === 1 ? 'tour' : 'tours'}
+                          <MapPin className="w-3 h-3 text-[#C9A05C] shrink-0" />
+                          <span>{getScenarioLocation(scenario)} · {getTurnsLabel(scenario.turns.length)}</span>
                         </p>
-                        <p className="text-[10px] text-[#7A7670] mt-2">{scenario.level || 'A1'} · {scenario.npcRole || 'Dialogue guidé'}</p>
+                        <p className="text-[10px] text-[#7A7670] mt-2">{scenario.level || 'A1'} · {getScenarioRole(scenario)}</p>
                       </div>
                       {locked ? (
                         <span className="bg-[#C9A05C]/15 text-[#C9A05C] border border-[#C9A05C]/30 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 shrink-0">
@@ -123,13 +160,13 @@ export default function ParlerPage() {
                         </span>
                       ) : (
                         <span className="w-8 h-8 rounded-full bg-[#1B2A4A] text-[#FDFCF8] flex items-center justify-center shrink-0 group-hover:bg-[#C9A05C] group-hover:text-[#1B2A4A] transition-colors">
-                          <Play className="w-3.5 h-3.5" />
+                          <Play className="w-3.5 h-3.5 rtl:rotate-180" />
                         </span>
                       )}
                     </div>
                     <div className="mt-3 pt-3 border-t border-[#E8E2D5] text-xs font-semibold text-[#7A7670] flex items-center justify-between">
-                      <span>{getCategoryLabel(scenario.category)}</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-[#C9A05C]" />
+                      <span>{getScenarioCategory(scenario)}</span>
+                      <ArrowRight className="w-3.5 h-3.5 text-[#C9A05C] rtl:rotate-180" />
                     </div>
                   </button>
                 );
