@@ -39,15 +39,15 @@ describe('TTS SSML Builder (msedge-tts Moroccan Darija)', () => {
       expect(VOICE_MALE).toBe('ar-MA-JamalNeural');
     });
 
-    it('resolves normal speed to -5% rate (fluent spoken Darija)', () => {
+    it('resolves normal speed to -8% rate (fluent spoken Darija with consonant articulation)', () => {
       expect(getProsodyRate('normal')).toBe(RATE_NORMAL);
-      expect(RATE_NORMAL).toBe('-5%');
+      expect(RATE_NORMAL).toBe('-8%');
       expect(getProsodyRate()).toBe(RATE_NORMAL);
     });
 
-    it('resolves slow speed to -25% rate (0.75x turtle mode for phoneme clarity)', () => {
+    it('resolves slow speed to -28% rate (0.72x turtle mode for phoneme clarity)', () => {
       expect(getProsodyRate('slow')).toBe(RATE_SLOW);
-      expect(RATE_SLOW).toBe('-25%');
+      expect(RATE_SLOW).toBe('-28%');
     });
   });
 
@@ -55,18 +55,18 @@ describe('TTS SSML Builder (msedge-tts Moroccan Darija)', () => {
     it('generates valid well-formed SSML with female voice and normal speed', () => {
       const result = buildSsml('Salam kidayr', 'female', 'normal');
       expect(result.voiceName).toBe('ar-MA-MounaNeural');
-      expect(result.rate).toBe('-5%');
+      expect(result.rate).toBe('-8%');
       expect(result.ssml).toBe(
-        '<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="ar-MA"><voice name="ar-MA-MounaNeural"><prosody rate="-5%">Salam kidayr</prosody></voice></speak>'
+        '<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="ar-MA"><voice name="ar-MA-MounaNeural"><prosody rate="-8%">Salam kidayr</prosody></voice></speak>'
       );
     });
 
     it('generates well-formed SSML with male voice and slow turtle speed', () => {
       const result = buildSsml('Fin ghadi 3afak ?', 'male', 'slow');
       expect(result.voiceName).toBe('ar-MA-JamalNeural');
-      expect(result.rate).toBe('-25%');
+      expect(result.rate).toBe('-28%');
       expect(result.ssml).toContain('name="ar-MA-JamalNeural"');
-      expect(result.ssml).toContain('rate="-25%"');
+      expect(result.ssml).toContain('rate="-28%"');
       expect(result.ssml).toContain('pitch="+2Hz"');
       expect(result.ssml).toContain('Fin ghadi 3afak ?');
     });

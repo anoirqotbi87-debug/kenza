@@ -4,8 +4,8 @@ export type TtsSpeed = 'normal' | 'slow';
 export const VOICE_FEMALE = 'ar-MA-MounaNeural';
 export const VOICE_MALE = 'ar-MA-JamalNeural';
 
-export const RATE_NORMAL = '-5%';  // Natural Moroccan spoken cadence
-export const RATE_SLOW = '-25%';   // 0.75x Turtle mode for pharyngeal/guttural clarity
+export const RATE_NORMAL = '-8%';  // Natural Moroccan spoken cadence with distinct consonant release
+export const RATE_SLOW = '-28%';   // 0.72x Turtle mode for pharyngeal/guttural clarity
 
 /**
  * Escapes reserved XML characters to ensure valid SSML structure.
