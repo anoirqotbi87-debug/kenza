@@ -125,7 +125,7 @@ const SOLAR_LETTERS = new Set(['ت', 'ث', 'د', 'ذ', 'ر', 'ز', 'س', 'ش', '
 export function sanitizeArabicForDarijaTts(arabic: string): string {
   if (!arabic) return '';
 
-  let res = arabic
+  const res = arabic
     // 1. Suppression des Tanween (arabe classique absent en Darija)
     .replace(/[\u064B\u064C\u064D]/g, '')
     // 2. Remplacement des ponctuations ou artefacts

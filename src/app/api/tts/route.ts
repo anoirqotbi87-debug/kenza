@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { MsEdgeTTS, OUTPUT_FORMAT } from 'msedge-tts';
 import { normalizeDarija } from '@/lib/tts/darijaPhonetics';
 import { buildSsml, TtsVoice, TtsSpeed } from '@/lib/tts/ssml';
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 import { isAllowedOrigin } from '@/lib/allowedOrigins';
 import { extractCleanArabicForTts } from '@/lib/ai/parseAiMessage';
+
+import { synthesizeEdgeTts } from '@/lib/tts/synthesizeEdgeTts';
 
 export type TTSRequest = {
   text: string;
@@ -23,30 +24,15 @@ async function synthesize(
     const sanitizedArabic = arabicText ? extractCleanArabicForTts(arabicText) : undefined;
     const sanitizedText = extractCleanArabicForTts(text) || text;
     const textToSpeak = normalizeDarija(sanitizedText, sanitizedArabic);
-    const { ssml, voiceName } = buildSsml(textToSpeak, voice, speed);
+    const { ssml } = buildSsml(textToSpeak, voice, speed);
 
-    const tts = new MsEdgeTTS();
-    await tts.setMetadata(voiceName, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
-    const readable = tts.rawToStream(ssml);
-    const chunks: Buffer[] = [];
+    const audioBuffer = await synthesizeEdgeTts(ssml);
 
-    return await new Promise<NextResponse>((resolve) => {
-      readable.audioStream.on('data', (chunk: Buffer) => chunks.push(chunk));
-      readable.audioStream.on('end', () => {
-        const audioBuffer = Buffer.concat(chunks);
-        resolve(
-          new NextResponse(audioBuffer, {
-            headers: {
-              'Content-Type': 'audio/mpeg',
-              'Cache-Control': 'public, max-age=604800, immutable',
-            },
-          })
-        );
-      });
-      readable.audioStream.on('error', (err: Error) => {
-        console.error('TTS Stream Error:', err);
-        resolve(NextResponse.json({ error: 'TTS_GENERATION_FAILED' }, { status: 500 }));
-      });
+    return new NextResponse(new Uint8Array(audioBuffer), {
+      headers: {
+        'Content-Type': 'audio/mpeg',
+        'Cache-Control': 'public, max-age=604800, immutable',
+      },
     });
   } catch (err) {
     console.error('Edge TTS Synthesis Setup Error:', err);

@@ -350,6 +350,20 @@ export default function Home() {
     setView("path");
   };
 
+  const switchView = (next: View) => {
+    setView(next);
+    setMobileMenuOpen(false);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("kenza_active_tab", next);
+        const url = new URL(window.location.href);
+        url.searchParams.set("tab", next);
+        url.searchParams.set("view", next);
+        window.history.replaceState(null, "", url.toString());
+      } catch {}
+    }
+  };
+
   const saveFavorites = (next: string[]) => {
     const safeNext = Array.isArray(next) ? next : [];
     setFavorites(safeNext);
@@ -652,20 +666,6 @@ export default function Home() {
     localStorage.removeItem("kenza_favorites");
     setFavorites([]);
     showToast(t.modules.home.resetDone);
-  };
-
-  const switchView = (next: View) => {
-    setView(next);
-    setMobileMenuOpen(false);
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.setItem("kenza_active_tab", next);
-        const url = new URL(window.location.href);
-        url.searchParams.set("tab", next);
-        url.searchParams.set("view", next);
-        window.history.replaceState(null, "", url.toString());
-      } catch {}
-    }
   };
 
   const headerTitle: Record<View, { eyebrow: string; title: string; description: string }> = {

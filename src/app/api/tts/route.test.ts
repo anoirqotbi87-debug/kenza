@@ -8,21 +8,8 @@ vi.mock('@/lib/rateLimit', () => ({
   getClientIp: () => '127.0.0.1',
 }));
 
-vi.mock('msedge-tts', () => ({
-  OUTPUT_FORMAT: { AUDIO_24KHZ_48KBITRATE_MONO_MP3: 'audio-mp3' },
-  MsEdgeTTS: vi.fn(function () {
-    return {
-      setMetadata: vi.fn().mockResolvedValue(undefined),
-      rawToStream: vi.fn().mockReturnValue({
-        audioStream: {
-          on: (event: string, cb: (data?: unknown) => void) => {
-            if (event === 'data') cb(Buffer.from('fake-audio'));
-            if (event === 'end') cb();
-          },
-        },
-      }),
-    };
-  }),
+vi.mock('@/lib/tts/synthesizeEdgeTts', () => ({
+  synthesizeEdgeTts: vi.fn().mockResolvedValue(Buffer.from('fake-audio')),
 }));
 
 const { POST, GET } = await import('./route');
