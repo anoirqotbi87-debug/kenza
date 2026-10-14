@@ -71,14 +71,7 @@ export async function synthesizeEdgeTts(
       const buf = Buffer.isBuffer(data) ? data : Buffer.from(data as ArrayBuffer);
       const str = buf.toString('utf8');
 
-      if (str.includes('Path:turn.end')) {
-        clearTimeout(timer);
-        try {
-          ws.close();
-        } catch {}
-        const audioBuffer = Buffer.concat(chunks);
-        resolve(audioBuffer);
-      } else if (str.includes('Path:audio')) {
+      if (str.includes('Path:audio')) {
         const delim = Buffer.from('Path:audio\r\n');
         const idx = buf.indexOf(delim);
         if (idx !== -1) {
@@ -87,6 +80,15 @@ export async function synthesizeEdgeTts(
             chunks.push(audioPart);
           }
         }
+      }
+
+      if (str.includes('Path:turn.end')) {
+        clearTimeout(timer);
+        try {
+          ws.close();
+        } catch {}
+        const audioBuffer = Buffer.concat(chunks);
+        resolve(audioBuffer);
       }
     });
 

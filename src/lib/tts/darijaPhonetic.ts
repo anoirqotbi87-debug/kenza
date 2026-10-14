@@ -1,13 +1,18 @@
 /**
  * Normaliseur Phonétique Darija pour synthèse vocale neuronale (ar-MA-JamalNeural / ar-MA-MounaNeural).
  * 
- * Règle d'or :
- * Le modèle neuronal Edge TTS marocain bascule en prononciation Fusha livresque ou dégradée
- * et étouffe la dernière lettre des mots lorsqu'on lui fournit du tashkīl manuel classique
- * ou des sukūns (\u0652).
- * 
- * Ce module transforme la chaîne envoyée au moteur TTS tout en préservant
- * le texte original complet (avec chakl) pour l'affichage visuel utilisateur.
+ * Principes linguistiques et audio :
+ * 1. Le modèle neuronal Edge TTS DOIT respecter la vocalisation complète (chakl : fat-ha, damma, kasra),
+ *    la shadda et les sukūns internes et initiaux fournis par les leçons et le Roleplay.
+ * 2. Problème de coupure de la dernière consonne :
+ *    Si un mot en fin de proposition ou de phrase porte un sukūn explicite (\u0652) sur sa toute dernière lettre
+ *    (ex: بْغِيتْ, عَافَاكْ, لَابَاسْ, خَدَّامْ), Edge TTS traite le sukūn + la pause finale comme un arrêt
+ *    abrupt, coupant la consonne finale.
+ *    En revanche, sans sukūn sur cette ultime consonne finale, la règle naturelle de Waqf arabe
+ *    l'articule nettement, tout en conservant 100% des sukūns et voyelles sur toutes les autres lettres !
+ * 3. Coussin acoustique :
+ *    Une virgule arabe espacée (' ، ') est ajoutée en fin de chaîne pour empêcher le flux WebSocket
+ *    de tronquer les 150 dernières millisecondes de l'audio.
  */
 
 /** Dictionnaire de réécriture phonétique marocaine (Phonetic Respelling) */
@@ -38,15 +43,22 @@ const SOLAR_LETTERS = new Set([
 ]);
 
 /**
+ * Retire le sukūn (\u0652) UNIQUEMENT s'il se trouve sur la toute dernière consonne du mot.
+ * Tous les sukūns internes et initiaux (ex: بْـ dans بْغِيت) ainsi que toutes les voyelles sont 100% préservés.
+ */
+export function removeTrailingSukun(word: string): string {
+  if (!word) return '';
+  // Si le mot se termine par un sukūn (\u0652), on le retire
+  return word.replace(/\u0652+$/, '');
+}
+
+/**
  * Prépare une chaîne arabe / arabizi pour la synthèse vocale Edge TTS en Darija :
- * 1. Convertit les chiffres Arabizi résiduels (3->ع, 7->ح, 9->ق, 5->خ).
- * 2. Supprime systématiquement tous les sukūns (\u0652) et les tanwīns (\u064B, \u064C, \u064D).
- * 3. Supprime les voyelles brèves classiques (\u064E fat-ha, \u064F damma, \u0650 kasra)
- *    tout en préservant la shadda (\u0651) sur les consonnes géminées.
- * 4. Applique le dictionnaire de réécriture phonétique marocaine.
- * 5. Applique l'assimilation solaire de l'article 'ال'.
- * 6. Ajoute un coussin acoustique en fin de phrase (' . ') pour que le décodeur neuronal
- *    relâche et articule complètement la dernière consonne sans la tronquer.
+ * - Préserve 100% des voyelles (fat-ha \u064E, damma \u064F, kasra \u0650), shadda (\u0651) et sukūns (\u0652) internes et initiaux.
+ * - Convertit les chiffres Arabizi résiduels (3->ع, 7->ح, 9->ق, 5->خ).
+ * - Nettoie les balises [AR], [ARZ], [FR], [SUGG] et délimiteurs parasites.
+ * - Supprime uniquement le sukūn de la DERNIÈRE lettre des mots pour éviter l'amputation de fin de mot.
+ * - Ajoute en fin de chaîne un coussin acoustique (' ، ') pour empêcher la troncature WebSocket.
  */
 export function prepareDarijaForTts(text: string): string {
   if (!text || typeof text !== 'string') return '';
@@ -72,44 +84,39 @@ export function prepareDarijaForTts(text: string): string {
     .replace(/[a-zA-Z0-9_\-#]/g, '')
     .trim();
 
-  // 3. Supprimer systématiquement les sukūns et tanwīns
-  // Sukūn: \u0652 | Tanwīns: \u064B, \u064C, \u064D
-  cleaned = cleaned.replace(/[\u064B\u064C\u064D\u0652]/g, '');
-
-  // 4. Supprimer les voyelles brèves classiques (fat-ha \u064E, damma \u064F, kasra \u0650)
-  // Conserver la shadda (\u0651)
-  cleaned = cleaned.replace(/[\u064E\u064F\u0650]/g, '');
-
-  // 5. Normalisation des espaces et ponctuation
+  // 4. Découper en mots en préservant le chakl complet
   const words = cleaned.split(/\s+/).filter(Boolean);
 
-  // 6. Application du dictionnaire de réécriture phonétique + assimilation solaire
   const processedWords = words.map((w) => {
-    // Retirer ponctuation attachée temporairement pour le matching
+    // Isoler ponctuation attachée (début / fin)
     const match = w.match(/^([،!؟?.]*)(.*?)([،!؟?.]*)$/);
     if (!match) return w;
     const prefix = match[1];
     let core = match[2];
     const suffix = match[3];
 
-    // Vérifier dans le dictionnaire phonétique (sans shadda résiduelle si applicable)
-    const coreWithoutShadda = core.replace(/\u0651/g, '');
+    // Vérifier respelling sur version dé-diacritisée si pas de chakl, ou forme exacte
+    const bareCore = core.replace(/[\u064B-\u0652]/g, '');
     if (DARIJA_RESPEL_MAP[core]) {
       core = DARIJA_RESPEL_MAP[core];
-    } else if (DARIJA_RESPEL_MAP[coreWithoutShadda]) {
-      core = DARIJA_RESPEL_MAP[coreWithoutShadda];
+    } else if (DARIJA_RESPEL_MAP[bareCore] && core === bareCore) {
+      core = DARIJA_RESPEL_MAP[bareCore];
     }
 
-    // Assimilation solaire de l'article 'ال'
+    // Assimilation solaire de l'article 'ال' si non déjà assimilé
     const articleMatch = core.match(/^([إأاٱ]ل)([\u0621-\u064A])(.*)$/);
     if (articleMatch) {
       const secondLetter = articleMatch[2];
       if (SOLAR_LETTERS.has(secondLetter)) {
         const rest = articleMatch[3];
-        const hasShadda = rest.startsWith('\u0651');
+        // Ne pas ajouter de shadda si la lettre ou la suite contient déjà une shadda
+        const hasShadda = rest.includes('\u0651');
         core = `ا${secondLetter}${hasShadda ? '' : 'ّ'}${rest}`;
       }
     }
+
+    // Règle d'or consonne finale : retirer le sukūn UNIQUEMENT sur la dernière lettre du mot
+    core = removeTrailingSukun(core);
 
     return `${prefix}${core}${suffix}`;
   });
@@ -117,9 +124,7 @@ export function prepareDarijaForTts(text: string): string {
   let result = processedWords.join(' ').trim();
   if (result.length === 0) return '';
 
-  // 7. Coussin acoustique en fin de phrase :
-  // Retirer les points finaux éventuels et ajouter " . " pour obliger le décodeur neuronal
-  // à relâcher complètement la dernière consonne sans l'avaler.
-  result = result.replace(/[.\s]+$/, '');
-  return `${result} . `;
+  // 5. Retirer la ponctuation finale résiduelle éventuelle et ajouter le coussin acoustique ' ، '
+  result = result.replace(/[،!؟?.\s]+$/, '');
+  return `${result} ، `;
 }
