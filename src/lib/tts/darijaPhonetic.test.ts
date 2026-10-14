@@ -1,7 +1,27 @@
 import { describe, it, expect } from 'vitest';
-import { prepareDarijaForTts, DARIJA_RESPEL_MAP } from './darijaPhonetic';
+import { prepareDarijaForTts, removeTrailingSukun } from './darijaPhonetic';
 
 describe('prepareDarijaForTts', () => {
+  it('préserve 100% du chakl complet (fat-ha, damma, kasra, shadda) et les sukūns internes et initiaux', () => {
+    // Dans بْغِيتْ : le sukūn initial sur بْ doit être PRÉSERVÉ, seul le sukūn final sur تْ est retiré
+    const input = 'بْغِيتْ وَاحِدْ أَتَايْ، عَافَاكْ';
+    const result = prepareDarijaForTts(input);
+
+    expect(result).toContain('بْ'); // Sukūn interne/initial préservé !
+    expect(result).toContain('غِ'); // Kasra préservée !
+    expect(result).toContain('وَاحِد'); // Sukūn final retiré
+    expect(result).toContain('أَتَاي');  // Sukūn final retiré
+    expect(result).toContain('عَافَاك'); // Sukūn final retiré
+    expect(result.endsWith(' ، ')).toBe(true);
+  });
+
+  it('retire UNIQUEMENT le sukūn final sans altérer les voyelles et sukūns précédents', () => {
+    expect(removeTrailingSukun('بْغِيتْ')).toBe('بْغِيت');
+    expect(removeTrailingSukun('خَدَّامْ')).toBe('خَدَّام');
+    expect(removeTrailingSukun('لَابَاسْ')).toBe('لَابَاس');
+    expect(removeTrailingSukun('عَافَاكْ')).toBe('عَافَاك');
+  });
+
   it('convertit les chiffres Arabizi résiduels', () => {
     const input = '3afak bghit 9hwa 7lwa bla 5obz';
     const result = prepareDarijaForTts(input);
@@ -9,28 +29,10 @@ describe('prepareDarijaForTts', () => {
     expect(result).toContain('ق');
     expect(result).toContain('ح');
     expect(result).toContain('خ');
-    expect(result.endsWith(' . ')).toBe(true);
+    expect(result.endsWith(' ، ')).toBe(true);
   });
 
-  it('supprime systématiquement tous les sukūns et tanwīns', () => {
-    const input = 'شُكْرًا جَزِيلًا لَكَ مَعَ السَّلَامْ';
-    const result = prepareDarijaForTts(input);
-    expect(result).not.toContain('\u0652'); // Sukūn
-    expect(result).not.toContain('\u064B'); // Tanwīn fat-ha
-    expect(result).not.toContain('\u064C'); // Tanwīn damma
-    expect(result).not.toContain('\u064D'); // Tanwīn kasra
-  });
-
-  it('supprime les voyelles brèves classiques tout en conservant la shadda interne', () => {
-    const input = 'بِالسَّلَامَةْ وَبِالصَّحَّةْ';
-    const result = prepareDarijaForTts(input);
-    expect(result).not.toContain('\u064E'); // Fat-ha
-    expect(result).not.toContain('\u064F'); // Damma
-    expect(result).not.toContain('\u0650'); // Kasra
-    expect(result).toContain('\u0651');     // Shadda préservée
-  });
-
-  it('applique le dictionnaire de réécriture phonétique marocaine', () => {
+  it('applique le dictionnaire de réécriture phonétique marocaine sur mots non diacritisés', () => {
     expect(prepareDarijaForTts('عفاك')).toContain('عافاك');
     expect(prepareDarijaForTts('لباس')).toContain('لاباس');
     expect(prepareDarijaForTts('هدا')).toContain('هادا');
@@ -44,9 +46,9 @@ describe('prepareDarijaForTts', () => {
     expect(result).toContain('اسّوق');
   });
 
-  it('ajoute un coussin acoustique en fin de phrase pour relâcher la dernière consonne', () => {
+  it('ajoute un coussin acoustique (" ، ") en fin de phrase pour empêcher la coupure WebSocket', () => {
     const result = prepareDarijaForTts('مرحبا بك');
-    expect(result.endsWith(' . ')).toBe(true);
+    expect(result.endsWith(' ، ')).toBe(true);
   });
 
   it('gère les chaînes vides', () => {
