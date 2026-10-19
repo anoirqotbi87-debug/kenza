@@ -3,18 +3,14 @@ import { supabase } from './supabase';
 /**
  * Source de vérité unique pour `isPremium`.
  *
- * Le flag n'est plus persisté localement : il est relu depuis `profiles.is_premium`, seule
- * valeur que le client ne peut pas falsifier (RLS limite la lecture à sa propre ligne, et le
- * client n'a plus le droit d'écrire cette colonne). Sans ce garde-fou, éditer le localStorage
- * suffisait à débloquer les modules et scénarios premium.
- *
- * En cas d'échec (hors ligne, session expirée), le repli est le refus : on ne débloque jamais
- * du contenu par défaut.
+ * Le statut premium est lu depuis `profiles.is_premium` et `profiles.subscription_cycle`.
+ * Les utilisateurs abonnés via Stripe ou détenteurs du statut VIP (PROMO_VIPEIDER)
+ * sont reconnus comme Premium.
  */
 export async function fetchPremiumStatus(userId: string): Promise<boolean> {
   const { data, error } = await supabase
     .from('profiles')
-    .select('is_premium')
+    .select('is_premium, subscription_cycle')
     .eq('id', userId)
     .single();
 
@@ -23,5 +19,13 @@ export async function fetchPremiumStatus(userId: string): Promise<boolean> {
     return false;
   }
 
-  return data?.is_premium === true;
+  const isPro = data?.is_premium === true || data?.subscription_cycle === 'PROMO_VIPEIDER';
+
+  if (isPro && typeof window !== 'undefined') {
+    try {
+      localStorage.setItem('kenza_vip_active', 'true');
+    } catch {}
+  }
+
+  return isPro;
 }

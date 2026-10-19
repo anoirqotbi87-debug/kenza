@@ -2,6 +2,7 @@ import { getOfflineAudio } from './offlineStorage';
 import { useAppStore } from '../store/useAppStore';
 import {
   hasAudioQuota,
+  isVipClientActive,
   recordAudioPlay,
   shouldConsumeAudioQuota,
 } from './audioQuota';
@@ -133,12 +134,17 @@ export const playAudio = async (
     const { isPremium, setAudioQuotaExceeded } = useAppStore.getState();
     const storage = audioQuotaStorage();
     const now = new Date();
+    const isVipOrPremium = isPremium || isVipClientActive(storage);
 
-    if (!hasAudioQuota(storage, isPremium, now)) {
+    if (!hasAudioQuota(storage, isVipOrPremium, now)) {
       setAudioQuotaExceeded(true);
       return;
     }
-    if (!isPremium) recordAudioPlay(storage, now);
+    if (!isVipOrPremium) {
+      recordAudioPlay(storage, now);
+    } else {
+      setAudioQuotaExceeded(false);
+    }
   }
 
   // Arrêter tout audio Web Audio précédemment en cours

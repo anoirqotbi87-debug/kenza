@@ -70,6 +70,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Code VIP activé ! Votre accès Premium est débloqué.',
+      is_premium: true,
+      subscription_cycle: 'PROMO_VIPEIDER',
     });
   } catch (error: unknown) {
     console.error('[Promo API Uncaught Error]:', error);

@@ -7,6 +7,8 @@ import {
   recordAudioPlay,
   remainingAudioQuota,
   shouldConsumeAudioQuota,
+  isVipClientActive,
+  resetAudioQuota,
   type StorageLike,
 } from './audioQuota';
 
@@ -16,6 +18,7 @@ function makeStorage(): StorageLike & { dump: () => Record<string, string> } {
   return {
     getItem: (k: string) => (map.has(k) ? map.get(k)! : null),
     setItem: (k: string, v: string) => void map.set(k, v),
+    removeItem: (k: string) => void map.delete(k),
     dump: () => Object.fromEntries(map),
   };
 }
@@ -43,14 +46,42 @@ describe('audioQuota — cle de stockage par jour calendaire', () => {
   });
 });
 
-describe('audioQuota — utilisateur premium', () => {
-  it('bypass total : toujours autorise, meme apres 999 ecoutes', () => {
+describe('audioQuota — utilisateur premium & VIP', () => {
+  it('bypass total : toujours autorise, meme apres 999 ecoutes (isPremium = true)', () => {
     storage.setItem(audioQuotaStorageKey(J1), '999');
     expect(hasAudioQuota(storage, true, J1)).toBe(true);
   });
 
   it('remaining renvoie null (illimite) et n incremente jamais le compteur', () => {
     expect(remainingAudioQuota(storage, true, J1)).toBeNull();
+    expect(readAudioQuota(storage, J1)).toBe(0);
+  });
+
+  it('déverrouillage VIP via kenza_vip_active dans le storage (même si isPremium est false)', () => {
+    storage.setItem(audioQuotaStorageKey(J1), '10');
+    // Sans VIP et non premium : bloqué
+    expect(hasAudioQuota(storage, false, J1)).toBe(false);
+
+    // Activation du VIP dans le storage
+    storage.setItem('kenza_vip_active', 'true');
+    expect(isVipClientActive(storage)).toBe(true);
+    expect(hasAudioQuota(storage, false, J1)).toBe(true);
+    expect(remainingAudioQuota(storage, false, J1)).toBeNull();
+  });
+
+  it('recordAudioPlay n’incrémente pas le compteur si VIP est actif', () => {
+    storage.setItem('kenza_vip_active', 'true');
+    for (let i = 0; i < 20; i++) {
+      expect(recordAudioPlay(storage, J1)).toBe(0);
+    }
+    expect(readAudioQuota(storage, J1)).toBe(0);
+    expect(hasAudioQuota(storage, false, J1)).toBe(true);
+  });
+
+  it('resetAudioQuota réinitialise proprement le compteur d’écoute du jour', () => {
+    storage.setItem(audioQuotaStorageKey(J1), '10');
+    expect(readAudioQuota(storage, J1)).toBe(10);
+    resetAudioQuota(storage, J1);
     expect(readAudioQuota(storage, J1)).toBe(0);
   });
 });

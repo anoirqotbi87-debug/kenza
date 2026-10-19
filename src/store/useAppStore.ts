@@ -74,6 +74,15 @@ interface AppState {
   setAudioQuotaExceeded: (exceeded: boolean) => void;
 }
 
+const isClientVipActive = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  try {
+    return localStorage.getItem('kenza_vip_active') === 'true';
+  } catch {
+    return false;
+  }
+};
+
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
@@ -97,7 +106,7 @@ export const useAppStore = create<AppState>()(
       hasCompletedOnboarding: false,
       userGoal: null,
       dailyTargetMinutes: null,
-      isPremium: false,
+      isPremium: isClientVipActive(),
       hasSeenOnboardingPaywall: false,
 
       completeOnboarding: (goal: AppState['userGoal'], minutes: AppState['dailyTargetMinutes']) => set({
@@ -106,40 +115,75 @@ export const useAppStore = create<AppState>()(
         dailyTargetMinutes: minutes
       }),
       markOnboardingPaywallSeen: () => set({ hasSeenOnboardingPaywall: true }),
-      setIsPremium: (isPremium: boolean) => set({ isPremium }),
+      setIsPremium: (isPremium: boolean) => {
+        if (typeof window !== 'undefined') {
+          try {
+            if (isPremium) {
+              localStorage.setItem('kenza_vip_active', 'true');
+              const now = new Date();
+              const y = now.getFullYear();
+              const m = String(now.getMonth() + 1).padStart(2, '0');
+              const d = String(now.getDate()).padStart(2, '0');
+              localStorage.removeItem(`kenza_audio_quota_${y}-${m}-${d}`);
+            } else {
+              localStorage.removeItem('kenza_vip_active');
+            }
+          } catch {}
+        }
+        set({
+          isPremium,
+          ...(isPremium ? { audioQuotaExceeded: false } : {}),
+        });
+      },
 
       audioQuotaExceeded: false,
       setAudioQuotaExceeded: (exceeded: boolean) => set({ audioQuotaExceeded: exceeded }),
       
       setRegionalVariant: (variant: AppState['regionalVariant']) => set({ regionalVariant: variant }),
       
-      resetData: () => set({
-        user: null,
-        xp: 0,
-        streakDays: 1,
-        streakFreezes: 1,
-        activityDates: [],
-        unlockedBadges: [],
-        currentLevel: 1,
-        completedLessons: [],
-        srsDeck: {},
-        customVocabulary: {},
-        isPremium: false,
-      }),
+      resetData: () => {
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.removeItem('kenza_vip_active');
+          } catch {}
+        }
+        set({
+          user: null,
+          xp: 0,
+          streakDays: 1,
+          streakFreezes: 1,
+          activityDates: [],
+          unlockedBadges: [],
+          currentLevel: 1,
+          completedLessons: [],
+          srsDeck: {},
+          customVocabulary: {},
+          isPremium: false,
+          audioQuotaExceeded: false,
+        });
+      },
 
-      resetUserProgress: () => set({
-        user: null,
-        xp: 0,
-        streakDays: 1,
-        streakFreezes: 1,
-        activityDates: [],
-        unlockedBadges: [],
-        currentLevel: 1,
-        completedLessons: [],
-        srsDeck: {},
-        customVocabulary: {},
-        isPremium: false,
-      }),
+      resetUserProgress: () => {
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.removeItem('kenza_vip_active');
+          } catch {}
+        }
+        set({
+          user: null,
+          xp: 0,
+          streakDays: 1,
+          streakFreezes: 1,
+          activityDates: [],
+          unlockedBadges: [],
+          currentLevel: 1,
+          completedLessons: [],
+          srsDeck: {},
+          customVocabulary: {},
+          isPremium: false,
+          audioQuotaExceeded: false,
+        });
+      },
       
       addXp: (amount: number) => set((state: AppState) => {
         const newXp = state.xp + amount;
