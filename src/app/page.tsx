@@ -2274,6 +2274,7 @@ function SpaceView({
   onSignOut,
   onOpenPaywall,
   onManageSubscription,
+  onToast,
 }: {
   completedCount: number;
   xp: number;
