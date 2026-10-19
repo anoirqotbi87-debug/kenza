@@ -77,6 +77,7 @@ export async function POST(req: NextRequest) {
       mode: 'subscription',
       customer_email: customerEmail,
       client_reference_id: userId || undefined,
+      allow_promotion_codes: true,
       ...(subscriptionData ? { subscription_data: subscriptionData } : {}),
       line_items: [
         {
