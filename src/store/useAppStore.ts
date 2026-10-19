@@ -72,6 +72,10 @@ interface AppState {
   /** UI seulement : vrai quand le quota audio du jour est epuise (non persiste). */
   audioQuotaExceeded: boolean;
   setAudioQuotaExceeded: (exceeded: boolean) => void;
+
+  /** Modale interactive du guide d'utilisation / onboarding */
+  userGuideOpen: boolean;
+  setUserGuideOpen: (open: boolean) => void;
 }
 
 const isClientVipActive = (): boolean => {
@@ -138,6 +142,8 @@ export const useAppStore = create<AppState>()(
 
       audioQuotaExceeded: false,
       setAudioQuotaExceeded: (exceeded: boolean) => set({ audioQuotaExceeded: exceeded }),
+      userGuideOpen: false,
+      setUserGuideOpen: (open: boolean) => set({ userGuideOpen: open }),
       
       setRegionalVariant: (variant: AppState['regionalVariant']) => set({ regionalVariant: variant }),
       
@@ -388,6 +394,7 @@ export const useAppStore = create<AppState>()(
         const {
           isPremium: _isPremium,
           audioQuotaExceeded: _audioQuotaExceeded,
+          userGuideOpen: _userGuideOpen,
           ...rest
         } = state;
         return rest;

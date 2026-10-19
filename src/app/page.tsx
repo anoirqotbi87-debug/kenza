@@ -255,6 +255,7 @@ export default function Home() {
     markOnboardingPaywallSeen,
     audioQuotaExceeded,
     setAudioQuotaExceeded,
+    setUserGuideOpen,
   } = useAppStore();
 
   const router = useRouter();
@@ -923,6 +924,17 @@ export default function Home() {
               aria-label={soundEnabled ? trL(lang, "Couper le son", "Mute sound", "Silenciar", "كتم الصوت") : trL(lang, "Activer le son", "Enable sound", "Activar sonido", "تفعيل الصوت")}
             >
               {soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
+            </button>
+
+            {/* Bouton Guide d'utilisation permanent */}
+            <button
+              type="button"
+              onClick={() => setUserGuideOpen(true)}
+              className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-amber-200/80 bg-amber-50/80 text-[#142943] hover:bg-amber-100/80 transition-colors shadow-2xs"
+              title={trL(lang, "Guide d'utilisation & Démarrage", "User Guide & Getting Started", "Guía de uso y Primeros pasos", "دليل الاستخدام والبداية")}
+              aria-label={trL(lang, "Guide d'utilisation & Démarrage", "User Guide & Getting Started", "Guía de uso y Primeros pasos", "دليل الاستخدام والبداية")}
+            >
+              <CircleHelp size={15} />
             </button>
 
             {/* Avatar & Profil utilisateur avec popover (déconnexion intégrée) */}
@@ -2289,6 +2301,7 @@ function SpaceView({
 }) {
   const { t } = useTranslation();
   const { lang } = useLocalizedContent();
+  const setUserGuideOpen = useAppStore((s) => s.setUserGuideOpen);
   const totalLessons = useMemo(() => getPlayableLessons(lang).length, [lang]);
   const username =
     user?.user_metadata?.full_name || user?.email?.split("@")[0] || t.common.guest;
@@ -2328,8 +2341,16 @@ function SpaceView({
               ? trL(lang, `Connecté en tant que ${user.email}. Données sauvegardées dans le cloud.`, `Signed in as ${user.email}. Data saved to the cloud.`, `Conectado como ${user.email}. Datos guardados en la nube.`, `متصل بصفة ${user.email}. البيانات محفوظة في السحابة.`)
               : trL(lang, "Mode Invité actif. Ta progression est préservée localement sur cet appareil.", "Guest mode active. Your progress is kept locally on this device.", "Modo invitado activo. Tu progreso se guarda localmente en este dispositivo.", "وضع الضيف مُفعّل. يتم حفظ تقدمك محليًا على هذا الجهاز.")}
           </p>
-          {user && (
-            <div className="pt-2">
+          {/* Actions Profil & Guide d'utilisation */}
+          <div className="pt-2 flex items-center gap-2 flex-wrap">
+            <button
+              type="button"
+              onClick={() => setUserGuideOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#142943] bg-amber-100/80 hover:bg-amber-200 border border-amber-300/80 rounded-lg transition-colors shadow-2xs"
+            >
+              <span>❓ {trL(lang, "Guide d'utilisation & Démarrage", "User Guide & Getting Started", "Guía de uso y Primeros pasos", "دليل الاستخدام والبداية")}</span>
+            </button>
+            {user && (
               <button
                 type="button"
                 onClick={onSignOut}
@@ -2338,8 +2359,8 @@ function SpaceView({
                 <LogOut size={13} />
                 <span>{trL(lang, "Se déconnecter", "Sign out", "Cerrar sesión", "تسجيل الخروج")}</span>
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
         <span className="local-badge">
           <span className="privacy-dot" /> {isPremium ? trL(lang, "MEMBRE KENZA PRO", "KENZA PRO MEMBER", "MIEMBRO KENZA PRO", "عضو كَنزة برو") : trL(lang, "VERSION GRATUITE", "FREE VERSION", "VERSIÓN GRATUITA", "النسخة المجانية")}
