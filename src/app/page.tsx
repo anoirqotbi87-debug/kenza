@@ -90,7 +90,7 @@ import { dismissSavePrompt, getSavePromptVariant } from "@/lib/savePrompt";
 import AuthModal from "@/components/auth/AuthModal";
 import SaveProgressCard from "@/components/auth/SaveProgressCard";
 import BottomNav from "@/components/navigation/BottomNav";
-import VipPromoCard from "@/components/promo/VipPromoCard";
+import VipPromoCard, { SpaceHelpCenterCard } from "@/components/views/SpaceView";
 
 export type View = "today" | "path" | "phrases" | "review" | "space";
 
@@ -2434,6 +2434,8 @@ function SpaceView({
         </article>
 
         <VipPromoCard user={user} isPremium={isPremium} onToast={onToast} />
+
+        <SpaceHelpCenterCard />
 
         <OfflineDownloadCard
           isPremium={isPremium}
