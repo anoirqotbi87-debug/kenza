@@ -91,6 +91,9 @@ import AuthModal from "@/components/auth/AuthModal";
 import SaveProgressCard from "@/components/auth/SaveProgressCard";
 import BottomNav from "@/components/navigation/BottomNav";
 import VipPromoCard from "@/components/views/SpaceView";
+import LiveInteractiveTour from "@/components/guide/LiveInteractiveTour";
+import HeaderHelpPopover from "@/components/guide/HeaderHelpPopover";
+import HelpCenterView from "@/components/guide/HelpCenterView";
 
 export type View = "today" | "path" | "phrases" | "review" | "space";
 
@@ -218,8 +221,24 @@ export default function Home() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [topbarLangOpen, setTopbarLangOpen] = useState(false);
   const [topbarProfileOpen, setTopbarProfileOpen] = useState(false);
+  const [liveTourOpen, setLiveTourOpen] = useState(false);
+  const [faqModalOpen, setFaqModalOpen] = useState(false);
   const topbarLangRef = useRef<HTMLDivElement>(null);
   const topbarProfileRef = useRef<HTMLDivElement>(null);
+
+  // Déclenchement automatique de la visite guidée en direct lors de la 1ère visite
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const completed = localStorage.getItem("kenza_live_tour_completed");
+      if (!completed) {
+        const timer = window.setTimeout(() => {
+          setLiveTourOpen(true);
+        }, 700);
+        return () => window.clearTimeout(timer);
+      }
+    } catch {}
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -863,8 +882,8 @@ export default function Home() {
               <SubscriptionBadge onUpgrade={() => setPricingSource("header_upgrade")} />
             </div>
 
-            {/* Sélecteur de langue compact (Dropdown popover) */}
-            <div ref={topbarLangRef} className="relative shrink-0">
+            {/* Sélecteur de langue compact (Dropdown popover) — Étape 1 du tour */}
+            <div ref={topbarLangRef} id="tour-header-lang" className="relative shrink-0">
               <button
                 type="button"
                 onClick={() => {
@@ -926,16 +945,18 @@ export default function Home() {
               {soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
             </button>
 
-            {/* Bouton Guide d'utilisation permanent */}
-            <button
-              type="button"
-              onClick={() => setUserGuideOpen(true)}
-              className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-amber-200/80 bg-amber-50/80 text-[#142943] hover:bg-amber-100/80 transition-colors shadow-2xs"
-              title={trL(lang, "Guide d'utilisation & Démarrage", "User Guide & Getting Started", "Guía de uso y Primeros pasos", "دليل الاستخدام والبداية")}
-              aria-label={trL(lang, "Guide d'utilisation & Démarrage", "User Guide & Getting Started", "Guía de uso y Primeros pasos", "دليل الاستخدام والبداية")}
-            >
-              <CircleHelp size={15} />
-            </button>
+            {/* Point d'entrée unique d'Aide & Démarrage dans le Header */}
+            <HeaderHelpPopover
+              onStartLiveTour={() => setLiveTourOpen(true)}
+              onOpenFaq={() => setFaqModalOpen(true)}
+              onOpenVipPromo={() => {
+                switchView("space");
+                window.setTimeout(() => {
+                  const vipElem = document.getElementById("tour-space-vip");
+                  if (vipElem) vipElem.scrollIntoView({ behavior: "smooth", block: "center" });
+                }, 150);
+              }}
+            />
 
             {/* Avatar & Profil utilisateur avec popover (déconnexion intégrée) */}
             {user ? (
@@ -1261,6 +1282,19 @@ export default function Home() {
         />
       )}
 
+      {/* Visite guidée en direct fléchée (Live Interactive Spotlight Tour) */}
+      <LiveInteractiveTour
+        isOpen={liveTourOpen}
+        onClose={() => setLiveTourOpen(false)}
+        onNavigateTab={(tab) => switchView(tab)}
+      />
+
+      {/* Modale FAQ & Centre d'aide */}
+      <HelpCenterView
+        isOpen={faqModalOpen}
+        onClose={() => setFaqModalOpen(false)}
+      />
+
       <InstallPwaBanner />
     </div>
   );
@@ -1342,7 +1376,7 @@ function TodayView({
           </div>
         </article>
 
-        <article className="next-card">
+        <article id="tour-today-next-step" className="next-card">
           <div className="next-card-head">
             <span className="mini-kicker">{trL(lang, "TA PROCHAINE ÉTAPE", "YOUR NEXT STEP", "TU PRÓXIMO PASO", "خطوتك التالية")}</span>
             <span className="next-icon">
@@ -1707,7 +1741,7 @@ function PathView({
 
       {/* SOUS-VUE 1 : PARCOURS DES 7 MODULES */}
       {currentTab === "parcours" && (
-        <div className="space-y-6 animate-fadeIn">
+        <div id="tour-path-modules" className="space-y-6 animate-fadeIn">
           {/* Hero & carte de progression globale */}
           <section className="pt-2">
             <p className="text-[11px] font-semibold tracking-[0.18em] uppercase text-[#8C6D23] mb-2">
@@ -2011,7 +2045,7 @@ function PhrasesView({
         </button>
       </section>
 
-      <div className="category-tabs" role="tablist" aria-label={trL(lang, "Catégories de phrases", "Phrase categories", "Categorías de frases", "فئات العبارات")}>
+      <div id="tour-phrases-categories" className="category-tabs" role="tablist" aria-label={trL(lang, "Catégories de phrases", "Phrase categories", "Categorías de frases", "فئات العبارات")}>
         {(categories || []).map((item) => (
           <button
             role="tab"
@@ -2166,7 +2200,7 @@ function ReviewView({
   const card = cards[reviewIndex % cards.length];
 
   return (
-    <div className="review-layout">
+    <div id="tour-review-flashcard" className="review-layout">
       <section className="review-main">
         <div className="review-card-top">
           <span className="mini-kicker">
@@ -2433,7 +2467,9 @@ function SpaceView({
           )}
         </article>
 
-        <VipPromoCard user={user} isPremium={isPremium} onToast={onToast} />
+        <div id="tour-space-vip">
+          <VipPromoCard user={user} isPremium={isPremium} onToast={onToast} />
+        </div>
 
         <OfflineDownloadCard
           isPremium={isPremium}

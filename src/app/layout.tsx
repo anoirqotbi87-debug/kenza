@@ -8,8 +8,6 @@ import TrackingProvider from '../components/TrackingProvider';
 import InstallApkBanner from '../components/InstallApkBanner';
 import AuthAndPremiumSync from '../components/auth/AuthAndPremiumSync';
 import UserGuideModal from '../components/guide/UserGuideModal';
-import AppSpotlightTour from '../components/guide/AppSpotlightTour';
-import FloatingHelpHub from '../components/guide/FloatingHelpHub';
 
 const dmSans = DM_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-dm-sans", display: "swap" });
 const dmSerif = DM_Serif_Display({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-dm-serif", display: "swap" });
@@ -42,8 +40,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="antialiased">
         <AuthAndPremiumSync />
         <UserGuideModal />
-        <AppSpotlightTour />
-        <FloatingHelpHub />
         <InstallApkBanner />
         <DirSync />
         <I18nProvider>
