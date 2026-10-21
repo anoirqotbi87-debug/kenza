@@ -3,7 +3,6 @@ import { normalizeDarija } from '@/lib/tts/darijaPhonetics';
 import { buildSsml, TtsVoice, TtsSpeed } from '@/lib/tts/ssml';
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 import { isAllowedOrigin } from '@/lib/allowedOrigins';
-import { extractCleanArabicForTts } from '@/lib/ai/parseAiMessage';
 
 import { synthesizeEdgeTts } from '@/lib/tts/synthesizeEdgeTts';
 

@@ -77,7 +77,6 @@ import SRSDashboard from "@/components/srs/SRSDashboard";
 import ArabiziGuideModal from "@/components/curriculum/ArabiziGuideModal";
 import DialogueView from "@/components/dialogue/DialogueView";
 import type { DialogueScenario } from "@/types/dialogue";
-import type { Lesson } from "@/types/curriculum";
 import OfflineDownloadCard from "@/components/monetization/OfflineDownloadCard";
 import DownloadApkCard from "@/components/DownloadApkCard";
 import InstallPwaBanner from "@/components/pwa/InstallPwaBanner";
@@ -274,7 +273,6 @@ export default function Home() {
     markOnboardingPaywallSeen,
     audioQuotaExceeded,
     setAudioQuotaExceeded,
-    setUserGuideOpen,
   } = useAppStore();
 
   const router = useRouter();
@@ -1666,7 +1664,7 @@ function PathView({
   onOpenCheckpoint,
   onOpenPaywall,
   onOpenRoleplay,
-  onNavigate,
+  onNavigate: _onNavigate,
   isPremium,
   activeTab = "parcours",
   onTabChange,

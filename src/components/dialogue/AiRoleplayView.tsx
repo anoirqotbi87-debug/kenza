@@ -48,7 +48,7 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
   }, [rateLimitCooldown]);
 
   const persona = personas[personaId];
-  const { addCustomWordToSRS, soundEnabled, uiLanguage } = useAppStore();
+  const { addCustomWordToSRS, uiLanguage } = useAppStore();
   const { t } = useTranslation();
   const rp = t.modules.roleplay;
   const [showImmersion, setShowImmersion] = useState(false);

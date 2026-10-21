@@ -17,7 +17,6 @@ import {
   Sparkles,
   RefreshCw,
 } from 'lucide-react';
-import { useAppStore } from '@/store/useAppStore';
 
 export interface RoleplayChatProps {
   personaId: PersonaId;
@@ -35,7 +34,6 @@ export default function RoleplayChat({
   authToken,
 }: RoleplayChatProps) {
   const persona = personas[personaId] || personas.taxi;
-  const { soundEnabled } = useAppStore();
   const [showTranslations, setShowTranslations] = useState<Record<number, boolean>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
 

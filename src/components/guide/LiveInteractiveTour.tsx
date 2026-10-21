@@ -5,7 +5,6 @@ import {
   Globe,
   Compass,
   Bookmark,
-  Sparkles,
   Award,
   ArrowRight,
   ArrowLeft,
@@ -444,7 +443,10 @@ export default function LiveInteractiveTour({
   // Initialisation à l'ouverture
   useEffect(() => {
     if (!isOpen) return;
-    executeStepTransition(0);
+    const initTimer = window.setTimeout(() => {
+      executeStepTransition(0);
+    }, 0);
+    return () => window.clearTimeout(initTimer);
   }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Mise à jour sur resize / scroll

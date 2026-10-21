@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import type { User } from '@supabase/supabase-js';
-import { Menu, Globe, Volume2, VolumeX, ChevronDown, LogOut, User as UserIcon } from 'lucide-react';
+import { Menu, Globe, Volume2, VolumeX, ChevronDown, LogOut } from 'lucide-react';
 import { useAppStore, useTranslation } from '@/store/useAppStore';
 import { UILanguage } from '@/lib/i18n/translations';
 import { KenzaLogo } from '@/components/ui/KenzaLogo';
