@@ -7,25 +7,24 @@ import { TOUR_STEPS } from './LiveInteractiveTour';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-describe('LiveInteractiveTour 7 Steps & Drawer Navigation', () => {
+describe('LiveInteractiveTour 6 Steps & Non-overlapping Compact Tooltip', () => {
   const tourPath = resolve(__dirname, 'LiveInteractiveTour.tsx');
   const tourSource = readFileSync(tourPath, 'utf-8');
 
-  it('intègre exactement les 7 étapes interactives avec les étapes du menu latéral', () => {
+  it('intègre exactement les 6 étapes interactives avec l’icône ☰ du menu', () => {
     const keys = TOUR_STEPS.map((s) => s.key);
     expect(keys).toEqual([
       'header-lang',
+      'header-menu',
       'today-resume',
-      'drawer-explorer',
-      'drawer-roleplay',
       'path-curriculum',
       'phrases-heading',
       'space-vip',
     ]);
-    expect(TOUR_STEPS.length).toBe(7);
+    expect(TOUR_STEPS.length).toBe(6);
   });
 
-  it('fournit les traductions complètes FR, EN, ES, AR pour toutes les 7 étapes', () => {
+  it('fournit les traductions complètes FR, EN, ES, AR pour toutes les 6 étapes', () => {
     const languages = ['fr', 'en', 'es', 'ar'] as const;
 
     TOUR_STEPS.forEach((step) => {
@@ -37,7 +36,6 @@ describe('LiveInteractiveTour 7 Steps & Drawer Navigation', () => {
         expect(step.explanation[lang].length).toBeGreaterThan(15);
 
         expect(step.badge[lang]).toBeTruthy();
-        expect(step.actionAdvice[lang]).toBeTruthy();
       });
     });
   });
@@ -46,49 +44,36 @@ describe('LiveInteractiveTour 7 Steps & Drawer Navigation', () => {
     const selectors = TOUR_STEPS.map((s) => s.targetSelector);
     expect(selectors).toEqual([
       '#tour-header-lang',
+      '#tour-hamburger-btn',
       '#tour-today-hero',
-      '#tour-sidebar-explorer',
-      '#tour-sidebar-roleplay',
       '#tour-path-module-1',
       '#tour-heading-phrases',
       '#tour-space-vip',
     ]);
   });
 
-  it('gère l’ouverture automatique du tiroir pour les étapes de grammaire et roleplay', () => {
-    const drawerExplorer = TOUR_STEPS.find((s) => s.key === 'drawer-explorer');
-    const drawerRoleplay = TOUR_STEPS.find((s) => s.key === 'drawer-roleplay');
-
-    expect(drawerExplorer?.openDrawer).toBe(true);
-    expect(drawerRoleplay?.openDrawer).toBe(true);
-    expect(drawerRoleplay?.closeDrawerAfter).toBe(true);
+  it('cadre proprement le menu burger avec le texte sur la Grammaire et le Roleplay Karim', () => {
+    const menuStep = TOUR_STEPS.find((s) => s.key === 'header-menu');
+    expect(menuStep).toBeDefined();
+    expect(menuStep?.targetSelector).toBe('#tour-hamburger-btn');
+    expect(menuStep?.title.fr).toContain('Menu complet');
+    expect(menuStep?.explanation.fr).toContain('Grammaire active');
+    expect(menuStep?.explanation.fr).toContain('Roleplay avec Karim');
   });
 
-  it('assure la synchronisation temporelle fluide avec masquage/réaffichage simultané', () => {
+  it('assure la synchronisation temporelle fluide avec défilement centré doux', () => {
     expect(tourSource).toContain('executeStepTransition');
     expect(tourSource).toContain('isTransitioning');
-    expect(tourSource).toContain('boxShadow');
     expect(tourSource).toContain('scrollIntoView');
+    expect(tourSource).toContain("behavior: 'smooth'");
   });
 
-  it('sécurise l’ouverture réelle du tiroir via clic natif sur le bouton burger et fermeture', () => {
-    expect(tourSource).toContain('#tour-hamburger-btn');
-    expect(tourSource).toContain('burgerBtn.click()');
-    expect(tourSource).toContain('#tour-drawer-close');
-    expect(tourSource).toContain('closeBtn.click()');
-  });
-
-  it('garantit la sécurité anti-dépassement du viewport pour la bulle d’explication', () => {
+  it('garantit le positionnement vertical décalé avec 24px de marge sans recouvrir la cible', () => {
+    expect(tourSource).toContain('targetRect.bottom + 24');
+    expect(tourSource).toContain('targetRect.top - tooltipHeight - 24');
     expect(tourSource).toContain('safeTop');
     expect(tourSource).toContain('safeLeft');
     expect(tourSource).toContain('Math.max(16,');
-    expect(tourSource).toContain('z-[10005]');
-    expect(tourSource).toContain('z-[10002]');
-  });
-
-  it('ne tronque aucun titre d’en-tête (absence de truncate sur le titre)', () => {
-    // Vérifie que le titre h3 dans la bulle ne possède pas la classe 'truncate'
-    expect(tourSource).not.toContain('<h3 className="text-sm font-bold text-[#142943] truncate">');
   });
 
   it('assure la compatibilité RTL pour l’arabe', () => {

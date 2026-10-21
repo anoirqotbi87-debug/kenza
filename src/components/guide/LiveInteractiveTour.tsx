@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Globe,
+  Menu,
+  Target,
   Compass,
   Bookmark,
   Award,
@@ -10,17 +12,13 @@ import {
   ArrowLeft,
   Check,
   X,
-  Target,
-  BookOpen,
-  MessageCircle,
 } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 
 export type TourStepKey =
   | 'header-lang'
+  | 'header-menu'
   | 'today-resume'
-  | 'drawer-explorer'
-  | 'drawer-roleplay'
   | 'path-curriculum'
   | 'phrases-heading'
   | 'space-vip';
@@ -29,8 +27,6 @@ export interface TourStepConfig {
   key: TourStepKey;
   targetView: 'today' | 'path' | 'phrases' | 'review' | 'space';
   targetSelector: string;
-  openDrawer?: boolean;
-  closeDrawerAfter?: boolean;
   icon: React.ComponentType<{ size?: number; className?: string }>;
   iconBg: string;
   badge: {
@@ -51,12 +47,6 @@ export interface TourStepConfig {
     es: string;
     ar: string;
   };
-  actionAdvice: {
-    fr: string;
-    en: string;
-    es: string;
-    ar: string;
-  };
 }
 
 export const TOUR_STEPS: TourStepConfig[] = [
@@ -68,32 +58,53 @@ export const TOUR_STEPS: TourStepConfig[] = [
     icon: Globe,
     iconBg: 'bg-amber-100 text-amber-900',
     badge: {
-      fr: 'Étape 1 / 7 · En-tête & Réglages',
-      en: 'Step 1 / 7 · Header & Settings',
-      es: 'Paso 1 / 7 · Encabezado y Ajustes',
-      ar: 'الخطوة 1 / 7 · الشريط العلوي والإعدادات',
+      fr: 'Étape 1 / 6 · En-tête & Réglages',
+      en: 'Step 1 / 6 · Header & Settings',
+      es: 'Paso 1 / 6 · Encabezado y Ajustes',
+      ar: 'الخطوة 1 / 6 · الشريط العلوي والإعدادات',
     },
     title: {
-      fr: '🌐 Choisissez votre langue à tout moment',
-      en: '🌐 Choose your language anytime',
-      es: '🌐 Elige tu idioma en cualquier momento',
-      ar: '🌐 اختر لغتك المفضلة في أي وقت',
+      fr: '🌐 Choisissez votre langue',
+      en: '🌐 Choose your language',
+      es: '🌐 Elige tu idioma',
+      ar: '🌐 اختر لغتك المفضلة',
     },
     explanation: {
-      fr: 'Basculez facilement entre Français (FR), Anglais (EN), Espagnol (ES) et Arabe (AR). L\'ensemble des explications, transcriptions et l\'orientation de lecture (RTL) s\'adaptent instantanément.',
-      en: 'Easily switch between French (FR), English (EN), Spanish (ES), and Arabic (AR). All explanations, transcriptions, and layout direction (RTL) adapt in real time.',
-      es: 'Cambia fácilmente entre francés (FR), inglés (EN), español (ES) y árabe (AR). Todas las explicaciones, transcripciones y la orientación (RTL) se adaptan al instante.',
-      ar: 'بدّل بسهولة بين الفرنسية (FR)، الإنجليزية (EN)، الإسبانية (ES)، والعربية (AR). تتكيف جميع الشروحات والنصوص واتجاه القراءة (RTL) في الحال.',
-    },
-    actionAdvice: {
-      fr: '💡 Vous pouvez également couper ou activer l\'audio ou réouvrir ce guide avec l\'icône ❓ juste à côté.',
-      en: '💡 You can also mute audio or reopen this guide using the ❓ icon right next to it.',
-      es: '💡 También puedes silenciar el audio o reabrir esta guía con el icono ❓ contiguo.',
-      ar: '💡 يمكنك أيضاً كتم الصوت أو إعادة فتح هذا الدليل من أيقونة ❓ المجاورة.',
+      fr: 'Basculez facilement entre Français (FR), Anglais (EN), Espagnol (ES) et Arabe (AR). L’application s’adapte instantanément.',
+      en: 'Easily switch between French, English, Spanish, and Arabic. All explanations and transcriptions adapt instantly.',
+      es: 'Cambia fácilmente entre francés, inglés, español y árabe. La app se adapta al instante.',
+      ar: 'بدّل بسهولة بين الفرنسية، الإنجليزية، الإسبانية، والعربية. تتكيف جميع الشروحات والنصوص في الحال.',
     },
   },
 
-  // Étape 2 : Accueil & Reprise
+  // Étape 2 : Menu Latéral Pro (Ciblage de l'icône ☰ dans le Header)
+  {
+    key: 'header-menu',
+    targetView: 'today',
+    targetSelector: '#tour-hamburger-btn',
+    icon: Menu,
+    iconBg: 'bg-indigo-100 text-indigo-900',
+    badge: {
+      fr: 'Étape 2 / 6 · Menu Latéral',
+      en: 'Step 2 / 6 · Side Menu',
+      es: 'Paso 2 / 6 · Menú Lateral',
+      ar: 'الخطوة 2 / 6 · القائمة الجانبية',
+    },
+    title: {
+      fr: '☰ Menu complet',
+      en: '☰ Full Menu',
+      es: '☰ Menú completo',
+      ar: '☰ القائمة الكاملة',
+    },
+    explanation: {
+      fr: 'Retrouvez ici la Grammaire active, les ateliers audio et le Roleplay avec Karim !',
+      en: 'Access Active Grammar, audio workshops, and AI Roleplay with Karim right here!',
+      es: '¡Encuentra aquí la Gramática activa, talleres de audio y el Roleplay con Karim!',
+      ar: 'ستجد هنا القواعد التفاعلية، ورشات الصوت والمحادثة مع كريم!',
+    },
+  },
+
+  // Étape 3 : Accueil & Reprise
   {
     key: 'today-resume',
     targetView: 'today',
@@ -101,101 +112,26 @@ export const TOUR_STEPS: TourStepConfig[] = [
     icon: Target,
     iconBg: 'bg-orange-100 text-orange-900',
     badge: {
-      fr: 'Étape 2 / 7 · Tableau de Bord Quotidien',
-      en: 'Step 2 / 7 · Daily Dashboard',
-      es: 'Paso 2 / 7 · Tablero Diario',
-      ar: 'الخطوة 2 / 7 · لوحة الانطلاق اليومية',
+      fr: 'Étape 3 / 6 · Tableau de Bord',
+      en: 'Step 3 / 6 · Daily Launchpad',
+      es: 'Paso 3 / 6 · Tablero Diario',
+      ar: 'الخطوة 3 / 6 · لوحة الانطلاق',
     },
     title: {
-      fr: '🎯 Salam, on s’y remet ? Votre point de reprise',
-      en: '🎯 Welcome back! Your daily launchpad',
-      es: '🎯 ¡Bienvenido de nuevo! Tu punto de partida',
-      ar: '🎯 مرحباً بك من جديد! نقطة انطلاقك اليومية',
+      fr: '🎯 Salam, on s’y remet ?',
+      en: '🎯 Welcome back!',
+      es: '🎯 ¡Bienvenido de nuevo!',
+      ar: '🎯 مرحباً بك من جديد!',
     },
     explanation: {
-      fr: 'Votre raccourci quotidien : un seul clic suffit pour reprendre exactement là où vous vous étiez arrêté, suivre votre série de jours et écouter la phrase du jour à vitesse normale ou ralentie (0.75x).',
-      en: 'Your daily shortcut: a single click resumes exactly where you left off, tracks your streak, and lets you listen to the daily phrase at normal or slowed (0.75x) speed.',
-      es: 'Tu acceso rápido diario: un solo clic para retomar donde lo dejaste, seguir tu racha y escuchar la frase del día a velocidad normal o pausada (0.75x).',
-      ar: 'اختصارك اليومي: نقرة واحدة تكفي لمتابعة التعلم من حيث توقفت، متابعة عداد الالتزام، والاستماع لعبارة اليوم بالسرعة العادية أو البطيئة (0.75x).',
-    },
-    actionAdvice: {
-      fr: '🚀 Visez 10 minutes par jour pour ancrer le dialecte sans effort.',
-      en: '🚀 Aim for 10 minutes a day to naturally anchor vocabulary.',
-      es: '🚀 Dedica 10 minutos al día para afianzar el dialecto.',
-      ar: '🚀 خصص 10 دقائق يومياً لترسيخ الكلمات بسلاسة ومتعة.',
+      fr: 'Un seul clic pour reprendre exactement où vous en étiez, suivre votre série et écouter la phrase du jour.',
+      en: 'One click resumes exactly where you left off, tracks your streak, and plays the daily phrase.',
+      es: 'Un solo clic para retomar donde lo dejaste, seguir tu racha y escuchar la frase del día.',
+      ar: 'نقرة واحدة لمتابعة التعلم من حيث توقفت، متابعة التزامك، والاستماع لعبارة اليوم.',
     },
   },
 
-  // Étape 3 : Menu Latéral — Grammaire & Ateliers
-  {
-    key: 'drawer-explorer',
-    targetView: 'today',
-    targetSelector: '#tour-sidebar-explorer',
-    openDrawer: true,
-    icon: BookOpen,
-    iconBg: 'bg-indigo-100 text-indigo-900',
-    badge: {
-      fr: 'Étape 3 / 7 · Menu Latéral — Explorer',
-      en: 'Step 3 / 7 · Sidebar Menu — Explore',
-      es: 'Paso 3 / 7 · Menú Lateral — Explorar',
-      ar: 'الخطوة 3 / 7 · القائمة الجانبية — استكشف',
-    },
-    title: {
-      fr: '📚 Grammaire active & Ateliers de prononciation',
-      en: '📚 Active Grammar & Speech Workshops',
-      es: '📚 Gramática Activa y Talleres de Pronunciación',
-      ar: '📚 القواعد النشطة وورشات النطق الصوتي',
-    },
-    explanation: {
-      fr: 'Retrouvez ici la grammaire simplifiée et les ateliers audio pour travailler votre prononciation à vitesse ralentie (0.75x). Une immersion complète pour comprendre la structure de la Darija.',
-      en: 'Discover simplified grammar rules and audio workshops to train your pronunciation at slowed speed (0.75x). A complete toolkit to grasp Darija structures.',
-      es: 'Encuentra aquí gramática simplificada y talleres de audio para perfeccionar tu pronunciación a velocidad pausada (0.75x).',
-      ar: 'اكتشف هنا قواعد الدارجة المبسطة والورشات الصوتية لصقل نطقك بالسرعة البطيئة (0.75x). بيئة تدريبية شاملة لفهم تراكيب اللغة.',
-    },
-    actionAdvice: {
-      fr: '💡 Accessible à tout moment via l\'icône menu ☰ en haut à gauche.',
-      en: '💡 Always accessible via the ☰ menu icon at the top left.',
-      es: '💡 Accesible en todo momento mediante el icono de menú ☰ arriba a la izquierda.',
-      ar: '💡 متاح دائماً عبر زر القائمة ☰ أعلى يمين/يسار الشاشة.',
-    },
-  },
-
-  // Étape 4 : Menu Latéral — Roleplay IA Karim
-  {
-    key: 'drawer-roleplay',
-    targetView: 'today',
-    targetSelector: '#tour-sidebar-roleplay',
-    openDrawer: true,
-    closeDrawerAfter: true,
-    icon: MessageCircle,
-    iconBg: 'bg-amber-100 text-amber-900',
-    badge: {
-      fr: 'Étape 4 / 7 · Menu Latéral — Coach IA',
-      en: 'Step 4 / 7 · Sidebar Menu — AI Coach',
-      es: 'Paso 4 / 7 · Menú Lateral — Coach IA',
-      ar: 'الخطوة 4 / 7 · القائمة الجانبية — المدرب الذكي',
-    },
-    title: {
-      fr: '🚕 Karim le Chauffeur de Taxi : Roleplay IA',
-      en: '🚕 Karim the Taxi Driver: Interactive AI Roleplay',
-      es: '🚕 Karim el Taxista: Roleplay con Inteligencia Artificial',
-      ar: '🚕 كريم سائق التاكسي: محاكاة حوارية ذكية',
-    },
-    explanation: {
-      fr: 'Montez à bord du petit taxi à Casablanca : échangez en direct avec Karim par la voix ou par texte avec traduction immédiate ! Le meilleur moyen de vaincre la peur de parler.',
-      en: 'Hop into a Casablanca red taxi: talk directly with Karim via voice or text with instant translation! The ultimate way to speak Darija with zero stress.',
-      es: 'Sube al taxi en Casablanca: ¡conversa en directo con Karim por voz o texto con traducción inmediata! La mejor forma de soltarte a hablar sin miedo.',
-      ar: 'اركب في التاكسي الصغير بالدار البيضاء: تحدث مباشرة مع كريم بالصوت أو النص مع ترجمة فورية تحت كل رد! أفضل وسيلة لكسر حاجز الخوف والتحدث بطلاقة.',
-    },
-    actionAdvice: {
-      fr: '🎙️ Activez le microphone pour lui répondre directement en parlant.',
-      en: '🎙️ Tap the microphone button to practice speaking out loud.',
-      es: '🎙️ Activa el micrófono para responderle hablando en directo.',
-      ar: '🎙️ فعّل الميكروفون للرد عليه بصوتك والتمرن على النطق.',
-    },
-  },
-
-  // Étape 5 : Mon Parcours (Modules 1 à 7)
+  // Étape 4 : Mon Parcours (Modules 1 à 7)
   {
     key: 'path-curriculum',
     targetView: 'path',
@@ -203,32 +139,26 @@ export const TOUR_STEPS: TourStepConfig[] = [
     icon: Compass,
     iconBg: 'bg-blue-100 text-blue-900',
     badge: {
-      fr: 'Étape 5 / 7 · Le Cœur du Curriculum',
-      en: 'Step 5 / 7 · The Curriculum Core',
-      es: 'Paso 5 / 7 · El Núcleo del Currículo',
-      ar: 'الخطوة 5 / 7 · جوهر المسار التعليمي',
+      fr: 'Étape 4 / 6 · Mon Parcours',
+      en: 'Step 4 / 6 · Curriculum Path',
+      es: 'Paso 4 / 6 · Mi Recorrido',
+      ar: 'الخطوة 4 / 6 · مسار التعلم',
     },
     title: {
-      fr: '🗺️ Mon Parcours : 7 Modules Progressifs',
-      en: '🗺️ My Journey: 7 Guided Progressive Modules',
-      es: '🗺️ Mi Ruta: 7 Módulos Progresivos Guiados',
-      ar: '🗺️ مساري: 7 وحدات تعليمية متدرجة',
+      fr: '🗺️ 7 Modules Progressifs',
+      en: '🗺️ 7 Guided Modules',
+      es: '🗺️ 7 Módulos Progresivos',
+      ar: '🗺️ 7 وحدات تعليمية',
     },
     explanation: {
-      fr: 'Le cœur de votre apprentissage : 7 modules guidés du grand débutant à la conversation fluide, avec écoute normale (1.0x) et ralentie (0.75x), arabe vocalisé (chakl) et phonétique latine (Arabizi).',
-      en: 'The core of your learning: 7 guided modules from absolute beginner to conversational fluency, with normal and slowed audio, fully vocalized Arabic, and Arabizi phonetics.',
-      es: 'El corazón del aprendizaje: 7 módulos guiados desde principiante hasta conversación fluida, con audio normal y pausado, árabe vocalizado y fonética latina.',
-      ar: 'قلب مسارك التعليمي: 7 وحدات تدريبية متدرجة، مع استماع عادي وبطيء، وتشكيل عربي دقيق وكتابة صوتية بحروف لاتينية (عربيزي).',
-    },
-    actionAdvice: {
-      fr: '📖 Les modules 1 et 2 sont entièrement gratuits pour tous les apprenants.',
-      en: '📖 Modules 1 and 2 are 100% free for all learners.',
-      es: '📖 Los módulos 1 y 2 son completamente gratuitos para todos.',
-      ar: '📖 الوحدتان 1 و2 متاحتان بالكامل مجاناً لجميع المتعلمين.',
+      fr: 'Du grand débutant à la conversation fluide : audio normal et ralenti (0.75x), arabe vocalisé et phonétique Arabizi.',
+      en: 'From absolute beginner to conversational fluency: normal and slowed audio, vocalized Arabic, and Arabizi phonetics.',
+      es: 'De principiante a conversación fluida: audio normal y pausado, árabe vocalizado y transcripción fonética.',
+      ar: 'من البداية إلى الطلاقة: استماع عادي وبطيء (0.75x)، وتشكيل عربي دقيق وكتابة صوتية عربيزي.',
     },
   },
 
-  // Étape 6 : Carnet de Phrases
+  // Étape 5 : Carnet de Phrases
   {
     key: 'phrases-heading',
     targetView: 'phrases',
@@ -236,32 +166,26 @@ export const TOUR_STEPS: TourStepConfig[] = [
     icon: Bookmark,
     iconBg: 'bg-emerald-100 text-emerald-900',
     badge: {
-      fr: 'Étape 6 / 7 · Carnet Pratique',
-      en: 'Step 6 / 7 · Practical Phrasebook',
-      es: 'Paso 6 / 7 · Cuaderno de Frases',
-      ar: 'الخطوة 6 / 7 · دفتر العبارات',
+      fr: 'Étape 5 / 6 · Carnet de Phrases',
+      en: 'Step 5 / 6 · Practical Phrasebook',
+      es: 'Paso 5 / 6 · Cuaderno de Frases',
+      ar: 'الخطوة 5 / 6 · دفتر العبارات',
     },
     title: {
-      fr: '📖 Carnet de Phrases : Vos Expressions au Maroc',
-      en: '📖 Phrasebook: Ready Expressions for Morocco',
-      es: '📖 Cuaderno: Expresiones Útiles para Marruecos',
-      ar: '📖 دفتر العبارات: تعابيرك الجاهزة لكل المواقف',
+      fr: '📖 Vos Expressions au Maroc',
+      en: '📖 Expressions for Morocco',
+      es: '📖 Frases para Marruecos',
+      ar: '📖 تعابيرك الجاهزة',
     },
     explanation: {
-      fr: 'Des phrases prêtes à l\'emploi avec audio authentique et transcription vocalisée pour toutes les situations au Maroc : Taxi, Souk, Café, Salutations et Urgences.',
-      en: 'Ready-to-use phrases with authentic native audio and vocalized script for everyday situations in Morocco: Taxi, Souk, Café, Greetings, and Emergencies.',
-      es: 'Frases listas para usar con audio nativo y transcripción con diacríticos para situaciones cotidianas en Marruecos: Taxi, Zoco, Café, Saludos y Urgencias.',
-      ar: 'تعابير جاهزة للاستخدام الفوري بنطق أصيل وتشكيل كامل لجميع مواقف الحياة اليومية في المغرب: التاكسي، السوق، المقهى، التحيات، وحالات الطوارئ.',
-    },
-    actionAdvice: {
-      fr: '⭐ Cliquez sur le cœur d\'une phrase pour la retrouver instantanément même hors-ligne.',
-      en: '⭐ Tap the heart on any phrase to save it and access it even offline.',
-      es: '⭐ Pulsa el corazón en cualquier frase para guardarla y acceder incluso sin conexión.',
-      ar: '⭐ اضغط على رمز القلب لحفظ أي عبارة في المفضلة والرجوع إليها دون إنترنت.',
+      fr: 'Phrases prêtes à l’emploi pour toutes les situations : Taxi, Souk, Café, Salutations et Urgences avec audio natif.',
+      en: 'Ready expressions for everyday situations: Taxi, Souk, Café, Greetings, and Emergencies with native audio.',
+      es: 'Frases listas para usar en cualquier situación: Taxi, Zoco, Café, Saludos y Urgencias con audio nativo.',
+      ar: 'تعابير جاهزة لكل مواقف الحياة اليومية: التاكسي، السوق، المقهى، التحيات، وحالات الطوارئ مع صوت أصيل.',
     },
   },
 
-  // Étape 7 : Mon Espace & Code VIP
+  // Étape 6 : Mon Espace & Code VIP
   {
     key: 'space-vip',
     targetView: 'space',
@@ -269,28 +193,22 @@ export const TOUR_STEPS: TourStepConfig[] = [
     icon: Award,
     iconBg: 'bg-emerald-100 text-emerald-900',
     badge: {
-      fr: 'Étape 7 / 7 · Passeport & Accès VIP',
-      en: 'Step 7 / 7 · Passport & VIP Access',
-      es: 'Paso 7 / 7 · Pasaporte y Acceso VIP',
-      ar: 'الخطوة 7 / 7 · جواز السفر وتفعيل VIP',
+      fr: 'Étape 6 / 6 · Passeport & VIP',
+      en: 'Step 6 / 6 · Passport & VIP',
+      es: 'Paso 6 / 6 · Pasaporte y VIP',
+      ar: 'الخطوة 6 / 6 · جواز السفر وVIP',
     },
     title: {
-      fr: '👑 Mon Espace : Passeport & Code VIP',
-      en: '👑 My Space: Cultural Passport & VIP Code',
-      es: '👑 Mi Espacio: Pasaporte Cultural y Código VIP',
-      ar: '👑 مساحتي: الجواز الثقافي ورمز VIP',
+      fr: '👑 Passeport & Code VIP',
+      en: '👑 Passport & VIP Code',
+      es: '👑 Pasaporte y Código VIP',
+      ar: '👑 الجواز ورمز VIP',
     },
     explanation: {
-      fr: 'Retrouvez votre passeport officiel de certification culturelle et saisissez votre code promotionnel VIP (ex: VIPEIDER) pour débloquer l\'accès complet et illimité sans carte bancaire !',
-      en: 'Find your official cultural certification passport and enter your VIP promo code (e.g., VIPEIDER) to unlock 100% full unlimited access with no credit card required!',
-      es: 'Consulta tu pasaporte oficial de certificación cultural e introduce tu código promocional VIP (ej: VIPEIDER) para desbloquear acceso ilimitado sin tarjeta.',
-      ar: 'تابع جوازك الثقافي الرسمي وشهاداتك، وأدخل رمزك الخاص (مثل VIPEIDER) لفتح جميع ميزات التطبيق بلا حدود ودون الحاجة لبطاقة بنكية!',
-    },
-    actionAdvice: {
-      fr: '🎉 Félicitations, vous connaissez maintenant les fonctionnalités majeures de Kenza pour réussir !',
-      en: '🎉 Congratulations, you now know all major features of Kenza to succeed!',
-      es: '🎉 ¡Enhorabuena! Ya conoces las funciones principales de Kenza para triunfar.',
-      ar: '🎉 تهانينا! أنت الآن على دراية كاملة بأهم ميزات كنزة للانطلاق بثقة.',
+      fr: 'Consultez votre passeport officiel et activez votre code VIP (ex: VIPEIDER) pour débloquer l’accès complet sans carte bancaire.',
+      en: 'Check your official passport and enter your VIP code (e.g. VIPEIDER) to unlock full access with no credit card.',
+      es: 'Consulta tu pasaporte oficial e introduce tu código VIP (ej: VIPEIDER) para desbloquear acceso ilimitado sin tarjeta.',
+      ar: 'تابع جوازك الثقافي وأدخل رمزك الخاص (مثل VIPEIDER) لفتح جميع ميزات التطبيق بلا حدود ودون بطاقة بنكية.',
     },
   },
 ];
@@ -314,7 +232,6 @@ export default function LiveInteractiveTour({
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
-  const [placement, setPlacement] = useState<'top' | 'bottom' | 'center'>('bottom');
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   const transitionTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -331,27 +248,13 @@ export default function LiveInteractiveTour({
       const element = document.querySelector(selector) as HTMLElement | null;
 
       if (element) {
-        // Défilement instantané pendant que le halo est masqué (évite tout saut visuel)
-        element.scrollIntoView({ behavior: 'auto', block: 'center' });
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
         const rect = element.getBoundingClientRect();
         setTargetRect(rect);
-
-        const viewportHeight = window.innerHeight;
-        const spaceBelow = viewportHeight - rect.bottom;
-        const spaceAbove = rect.top;
-
-        if (spaceBelow >= 270) {
-          setPlacement('bottom');
-        } else if (spaceAbove >= 270) {
-          setPlacement('top');
-        } else {
-          setPlacement('center');
-        }
         return true;
       }
 
       setTargetRect(null);
-      setPlacement('center');
       return false;
     },
     [isOpen]
@@ -366,12 +269,12 @@ export default function LiveInteractiveTour({
     }
   }, [isOpen, currentIndex, measureElement]);
 
-  // Synchronisation temporelle parfaite :
-  // 1. Masquage simultané (opacity: 0)
-  // 2. Navigation d'onglet et ouverture/fermeture du tiroir latéral
-  // 3. Attente 200ms de stabilisation du DOM et de l'animation CSS
-  // 4. Recalcul getBoundingClientRect()
-  // 5. Réaffichage simultané (opacity: 1)
+  // Synchronisation temporelle fluide et sans saccade :
+  // 1. Masquage simultané halo + bulle (opacity: 0)
+  // 2. Navigation d'onglet
+  // 3. Défilement centré doux
+  // 4. Attente de 250ms de fin d'animation
+  // 5. Recalcul getBoundingClientRect() et réaffichage fluide (opacity: 1)
   const executeStepTransition = useCallback(
     (targetIndex: number) => {
       if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
@@ -384,39 +287,16 @@ export default function LiveInteractiveTour({
 
       setCurrentIndex(targetIndex);
 
-      // Gérer l'ouverture / fermeture du tiroir latéral
-      if (nextConfig.openDrawer) {
-        // Déclenche le clic natif sur le bouton burger existant dans le header
-        const burgerBtn = document.querySelector<HTMLButtonElement>(
-          '#tour-hamburger-btn, button.mobile-menu-trigger, button[aria-label*="menu" i], button[aria-label*="Menu"]'
-        );
-        const sidebar = document.querySelector('.sidebar');
-        const isMenuCurrentlyOpen = sidebar?.classList.contains('sidebar-open');
-        if (burgerBtn && !isMenuCurrentlyOpen) {
-          burgerBtn.click();
-        }
-        if (onToggleMenu) {
-          onToggleMenu(true);
-        }
-      } else {
-        // Referme le tiroir avant de basculer sur l'onglet suivant
-        const closeBtn = document.querySelector<HTMLButtonElement>(
-          '#tour-drawer-close, .mobile-close, [aria-label*="close" i], [aria-label*="fermer" i]'
-        );
-        if (closeBtn) {
-          closeBtn.click();
-        }
-        if (onToggleMenu) {
-          onToggleMenu(false);
-        }
-      }
-
-      // Basculer l'onglet cible
+      // Bascule l'onglet cible
       onNavigateTab(nextConfig.targetView);
 
-      // Attendre 300-320ms que l'animation CSS du tiroir (230ms) et le DOM soient totalement stabilisés
-      const waitTime = nextConfig.openDrawer || currentStep?.openDrawer ? 320 : 200;
+      // Lance le défilement centré si l'élément cible est déjà dans le DOM
+      const preElem = document.querySelector(nextConfig.targetSelector) as HTMLElement | null;
+      if (preElem) {
+        preElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
 
+      // Attends 250ms que l'animation de défilement soit stabilisée
       transitionTimerRef.current = setTimeout(() => {
         const found = measureElement(nextConfig.targetSelector);
         setIsTransitioning(false);
@@ -427,9 +307,9 @@ export default function LiveInteractiveTour({
             measureElement(nextConfig.targetSelector);
           }, 120);
         }
-      }, waitTime);
+      }, 250);
     },
-    [onNavigateTab, onToggleMenu, measureElement, currentStep]
+    [onNavigateTab, measureElement]
   );
 
   // Nettoyage des timers
@@ -470,12 +350,6 @@ export default function LiveInteractiveTour({
       }
     } catch {}
 
-    const closeBtn = document.querySelector<HTMLButtonElement>(
-      '#tour-drawer-close, .mobile-close, [aria-label*="close" i], [aria-label*="fermer" i]'
-    );
-    if (closeBtn) {
-      closeBtn.click();
-    }
     if (onToggleMenu) {
       onToggleMenu(false);
     }
@@ -505,25 +379,31 @@ export default function LiveInteractiveTour({
 
   const Icon = currentStep.icon;
 
-  // Calcul précis du positionnement de la bulle avec Sécurité Anti-Dépassement du Viewport
+  // Calcul précis du positionnement compact de la bulle (Ne JAMAIS recouvrir la cible)
   const PADDING = 14;
-  const tooltipHeight = 290;
-  const tooltipWidth = typeof window !== 'undefined' ? Math.min(400, window.innerWidth - 32) : 360;
+  const tooltipHeight = 135;
+  const tooltipWidth = typeof window !== 'undefined' ? Math.min(380, window.innerWidth - 32) : 348;
 
-  let calculatedTop = typeof window !== 'undefined' ? window.innerHeight / 2 - tooltipHeight / 2 : 200;
+  let calculatedTop = typeof window !== 'undefined' ? window.innerHeight / 2 - tooltipHeight / 2 : 100;
   let calculatedLeft = typeof window !== 'undefined' ? window.innerWidth / 2 - tooltipWidth / 2 : 16;
+  let effectivePlacement: 'top' | 'bottom' = 'bottom';
 
-  if (targetRect) {
+  if (targetRect && typeof window !== 'undefined') {
     calculatedLeft = targetRect.left + targetRect.width / 2 - tooltipWidth / 2;
+    const targetCenterY = targetRect.top + targetRect.height / 2;
 
-    if (placement === 'bottom') {
-      calculatedTop = targetRect.bottom + 16;
-    } else if (placement === 'top') {
-      calculatedTop = targetRect.top - tooltipHeight - 16;
+    if (targetCenterY < window.innerHeight / 2) {
+      // Cible dans la moitié haute : place la bulle en dessous avec 24px d'écart
+      effectivePlacement = 'bottom';
+      calculatedTop = targetRect.bottom + 24;
+    } else {
+      // Cible dans la moitié basse : place la bulle au-dessus avec 24px d'écart
+      effectivePlacement = 'top';
+      calculatedTop = targetRect.top - tooltipHeight - 24;
     }
   }
 
-  // Toujours un padding minimal de 16px par rapport aux bords de l'écran (zéro bulle coupée en haut)
+  // Clamping strict : garde toujours un padding minimal de 16px par rapport aux bords de l'écran
   const safeTop = typeof window !== 'undefined'
     ? Math.max(16, Math.min(window.innerHeight - tooltipHeight - 16, calculatedTop))
     : 16;
@@ -535,9 +415,13 @@ export default function LiveInteractiveTour({
     position: 'fixed',
     top: `${safeTop}px`,
     left: `${safeLeft}px`,
-    maxWidth: '400px',
+    maxWidth: '380px',
     width: 'calc(100vw - 32px)',
   };
+
+  const arrowLeft = targetRect
+    ? Math.max(20, Math.min(tooltipWidth - 20, targetRect.left + targetRect.width / 2 - safeLeft))
+    : tooltipWidth / 2;
 
   return (
     <div
@@ -555,7 +439,7 @@ export default function LiveInteractiveTour({
       {/* 2. Spotlight physique entourant l'élément exact */}
       {targetRect && (
         <div
-          className={`fixed pointer-events-none rounded-2xl transition-all duration-250 ease-out z-[10002] ${
+          className={`fixed pointer-events-none rounded-2xl transition-all duration-200 ease-out z-[10002] ${
             isTransitioning ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
           }`}
           style={{
@@ -569,51 +453,51 @@ export default function LiveInteractiveTour({
         />
       )}
 
-      {/* 3. Bulle explicative avec flèche directionnelle (Zéro texte tronqué, anti-dépassement garanti) */}
+      {/* 3. Bulle explicative compacte & décalée (Ne JAMAIS recouvrir la cible) */}
       <div
         style={cardStyle}
-        className={`z-[10005] bg-[#FFFEFC] border-2 border-amber-300 rounded-3xl shadow-2xl p-5 text-[#142943] transition-all duration-250 ease-out pointer-events-auto ${
+        className={`z-[10005] bg-[#FFFEFC] border-2 border-amber-300 rounded-2xl shadow-xl p-3.5 text-[#142943] transition-all duration-200 ease-out pointer-events-auto ${
           isTransitioning
-            ? 'opacity-0 translate-y-2 pointer-events-none'
+            ? 'opacity-0 translate-y-1 pointer-events-none'
             : 'opacity-100 translate-y-0'
         }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Flèche fine pointant dynamiquement vers l'élément exact */}
-        {targetRect && placement === 'bottom' && (
+        {targetRect && effectivePlacement === 'bottom' && (
           <div
-            className="absolute -top-3 w-0 h-0 border-x-8 border-x-transparent border-b-8 border-b-amber-300 pointer-events-none"
+            className="absolute -top-2 w-0 h-0 border-x-[6px] border-x-transparent border-b-[8px] border-b-amber-300 pointer-events-none"
             style={{
-              left: `${Math.max(24, Math.min(tooltipWidth - 24, targetRect.left + targetRect.width / 2 - safeLeft))}px`,
+              left: `${arrowLeft}px`,
               transform: 'translateX(-50%)',
             }}
             aria-hidden="true"
           />
         )}
-        {targetRect && placement === 'top' && (
+        {targetRect && effectivePlacement === 'top' && (
           <div
-            className="absolute -bottom-3 w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-amber-300 pointer-events-none"
+            className="absolute -bottom-2 w-0 h-0 border-x-[6px] border-x-transparent border-t-[8px] border-t-amber-300 pointer-events-none"
             style={{
-              left: `${Math.max(24, Math.min(tooltipWidth - 24, targetRect.left + targetRect.width / 2 - safeLeft))}px`,
+              left: `${arrowLeft}px`,
               transform: 'translateX(-50%)',
             }}
             aria-hidden="true"
           />
         )}
 
-        {/* En-tête de la bulle (sans aucun truncate) */}
-        <div className="flex items-start justify-between gap-3 pb-3 mb-3 border-b border-amber-100">
-          <div className="flex items-start gap-2.5 min-w-0">
+        {/* En-tête compact sur 1 ligne */}
+        <div className="flex items-center justify-between gap-2 mb-1.5">
+          <div className="flex items-center gap-2 min-w-0">
             <div
-              className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${currentStep.iconBg}`}
+              className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${currentStep.iconBg}`}
             >
-              <Icon size={19} />
+              <Icon size={15} />
             </div>
             <div className="min-w-0">
-              <span className="block text-[10px] font-extrabold uppercase tracking-wider text-amber-800">
+              <span className="block text-[9px] font-extrabold uppercase tracking-wider text-amber-800 leading-none">
                 {currentStep.badge[langKey]}
               </span>
-              <h3 className="text-sm sm:text-base font-bold text-[#142943] leading-snug">
+              <h3 className="text-xs sm:text-sm font-bold text-[#142943] truncate leading-tight mt-0.5">
                 {currentStep.title[langKey]}
               </h3>
             </div>
@@ -623,25 +507,19 @@ export default function LiveInteractiveTour({
             type="button"
             onClick={handleFinish}
             aria-label={labels.skip}
-            className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center shrink-0 transition-colors"
+            className="w-6 h-6 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center shrink-0 transition-colors"
           >
-            <X size={15} />
+            <X size={13} />
           </button>
         </div>
 
-        {/* Corps descriptif complet */}
-        <p className="text-xs sm:text-sm text-slate-700 leading-relaxed mb-3">
+        {/* Corps descriptif condensé en 2 lignes max */}
+        <p className="text-xs text-slate-700 leading-snug line-clamp-2 mb-2.5">
           {currentStep.explanation[langKey]}
         </p>
 
-        {/* Conseil / Astuce */}
-        <div className="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200/80 text-[11px] font-medium text-amber-950 mb-4">
-          {currentStep.actionAdvice[langKey]}
-        </div>
-
-        {/* Stepper Dots & Navigation Précédent / Suivant */}
+        {/* Stepper Dots & Navigation Précédent / Suivant compacte */}
         <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
-          {/* Stepper Dots */}
           <div className="flex items-center gap-1.5">
             {TOUR_STEPS.map((s, idx) => (
               <button
@@ -649,22 +527,21 @@ export default function LiveInteractiveTour({
                 type="button"
                 onClick={() => executeStepTransition(idx)}
                 aria-label={`Étape ${idx + 1}`}
-                className={`h-2 rounded-full transition-all duration-200 ${
-                  idx === currentIndex ? 'w-6 bg-[#142943]' : 'w-2 bg-slate-200 hover:bg-slate-300'
+                className={`h-1.5 rounded-full transition-all duration-200 ${
+                  idx === currentIndex ? 'w-5 bg-[#142943]' : 'w-1.5 bg-slate-200 hover:bg-slate-300'
                 }`}
               />
             ))}
           </div>
 
-          {/* Boutons d'action */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {!isFirst && (
               <button
                 type="button"
                 onClick={() => executeStepTransition(Math.max(0, currentIndex - 1))}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
               >
-                {isRtl ? <ArrowRight size={13} /> : <ArrowLeft size={13} />}
+                {isRtl ? <ArrowRight size={11} /> : <ArrowLeft size={11} />}
                 <span>{labels.prev}</span>
               </button>
             )}
@@ -678,7 +555,7 @@ export default function LiveInteractiveTour({
                   executeStepTransition(Math.min(TOUR_STEPS.length - 1, currentIndex + 1));
                 }
               }}
-              className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold text-white shadow-sm transition-all active:scale-95 ${
+              className={`inline-flex items-center gap-1 px-3 py-1 rounded-lg text-[11px] font-bold text-white shadow-xs transition-all active:scale-95 ${
                 isLast
                   ? 'bg-emerald-600 hover:bg-emerald-700 ring-2 ring-emerald-400/50'
                   : 'bg-[#142943] hover:bg-[#1b3557]'
@@ -686,11 +563,11 @@ export default function LiveInteractiveTour({
             >
               <span>{isLast ? labels.finish : labels.next}</span>
               {isLast ? (
-                <Check size={14} />
+                <Check size={12} />
               ) : isRtl ? (
-                <ArrowLeft size={13} />
+                <ArrowLeft size={11} />
               ) : (
-                <ArrowRight size={13} />
+                <ArrowRight size={11} />
               )}
             </button>
           </div>
