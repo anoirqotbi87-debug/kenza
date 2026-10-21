@@ -775,7 +775,7 @@ export default function Home() {
         </nav>
 
         <div className="sidebar-label">{trL(lang, "EXPLORER", "EXPLORE", "EXPLORAR", "استكشف")}</div>
-        <nav className="side-nav" aria-label={trL(lang, "Ressources d'étude", "Study resources", "Recursos de estudio", "موارد الدراسة")}>
+        <nav id="tour-sidebar-explorer" className="side-nav" aria-label={trL(lang, "Ressources d'étude", "Study resources", "Recursos de estudio", "موارد الدراسة")}>
           <a href="/etudier" onClick={() => setMobileMenuOpen(false)} className="nav-item">
             <span>{trL(lang, "Étudier — Modules complets", "Study — Full modules", "Estudiar — Módulos completos", "الدراسة — الوحدات الكاملة")}</span>
           </a>
@@ -791,16 +791,18 @@ export default function Home() {
         </nav>
 
         <div className="sidebar-label sidebar-label-spaced">{t.side.oral || tr("PRATIQUE ORALE & IA", "SPEAKING & AI", "PRÁCTICA ORAL E IA", "المحادثة والذكاء الاصطناعي")}</div>
-        <button
-          onClick={() => {
-            setMobileMenuOpen(false);
-            setShowScenarioSelector(true);
-          }}
-          className="nav-item"
-        >
-          <MessageCircle size={19} strokeWidth={1.8} />
-          <span>{trL(lang, "Roleplay IA", "AI roleplay", "Roleplay IA", "حوار مع الذكاء الاصطناعي")}</span>
-        </button>
+        <div id="tour-sidebar-roleplay">
+          <button
+            onClick={() => {
+              setMobileMenuOpen(false);
+              setShowScenarioSelector(true);
+            }}
+            className="nav-item w-full"
+          >
+            <MessageCircle size={19} strokeWidth={1.8} />
+            <span>{trL(lang, "Roleplay IA", "AI roleplay", "Roleplay IA", "حوار مع الذكاء الاصطناعي")}</span>
+          </button>
+        </div>
 
         <div className="sidebar-label sidebar-label-spaced">{t.side.space || tr("TON ESPACE", "YOUR SPACE", "TU ESPACIO", "فضاؤك")}</div>
         <button
@@ -1047,7 +1049,7 @@ export default function Home() {
         </header>
 
         <div className="content-wrap">
-          <section className="page-heading">
+          <section id="tour-heading-phrases" className="page-heading">
             <div>
               <div className="eyebrow">
                 <span className="eyebrow-line" />
@@ -1287,6 +1289,7 @@ export default function Home() {
         isOpen={liveTourOpen}
         onClose={() => setLiveTourOpen(false)}
         onNavigateTab={(tab) => switchView(tab)}
+        onToggleMenu={(open) => setMobileMenuOpen(open)}
       />
 
       {/* Modale FAQ & Centre d'aide */}
@@ -1335,7 +1338,7 @@ function TodayView({
 
   return (
     <>
-      <div className="today-grid">
+      <div id="tour-today-hero" className="today-grid">
         <article className="hero-panel">
           <div className="hero-texture" />
           <div className="hero-copy">
