@@ -200,7 +200,7 @@ export const TOUR_STEPS: TourStepConfig[] = [
   {
     key: 'path-curriculum',
     targetView: 'path',
-    targetSelector: '#tour-path-modules',
+    targetSelector: '#tour-path-module-1',
     icon: Compass,
     iconBg: 'bg-blue-100 text-blue-900',
     badge: {
@@ -318,48 +318,74 @@ export default function LiveInteractiveTour({
   const [placement, setPlacement] = useState<'top' | 'bottom' | 'center'>('bottom');
   const [isTransitioning, setIsTransitioning] = useState(false);
 
+  const transitionTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const retryTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   const currentStep = TOUR_STEPS[currentIndex];
   const isFirst = currentIndex === 0;
   const isLast = currentIndex === TOUR_STEPS.length - 1;
 
-  // Calcul fluide des coordonnées de l'élément cible
-  const updateTargetBounds = useCallback(() => {
-    if (!isOpen) return;
+  // Mesure et calcul fluide des coordonnées de l'élément cible
+  const measureElement = useCallback(
+    (selector: string) => {
+      if (!isOpen || typeof document === 'undefined') return false;
+      const element = document.querySelector(selector) as HTMLElement | null;
 
-    const selector = currentStep.targetSelector;
-    const element = document.querySelector(selector) as HTMLElement | null;
+      if (element) {
+        // Défilement instantané pendant que le halo est masqué (évite tout saut visuel)
+        element.scrollIntoView({ behavior: 'auto', block: 'center' });
+        const rect = element.getBoundingClientRect();
+        setTargetRect(rect);
 
-    if (element) {
-      // Scroll doux vers l'élément
-      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      const rect = element.getBoundingClientRect();
-      setTargetRect(rect);
+        const viewportHeight = window.innerHeight;
+        const spaceBelow = viewportHeight - rect.bottom;
+        const spaceAbove = rect.top;
 
-      const viewportHeight = window.innerHeight;
-      const spaceBelow = viewportHeight - rect.bottom;
-      const spaceAbove = rect.top;
-
-      if (spaceBelow >= 270) {
-        setPlacement('bottom');
-      } else if (spaceAbove >= 270) {
-        setPlacement('top');
-      } else {
-        setPlacement('center');
+        if (spaceBelow >= 270) {
+          setPlacement('bottom');
+        } else if (spaceAbove >= 270) {
+          setPlacement('top');
+        } else {
+          setPlacement('center');
+        }
+        return true;
       }
-    } else {
+
       setTargetRect(null);
       setPlacement('center');
-    }
-  }, [isOpen, currentStep.targetSelector]);
+      return false;
+    },
+    [isOpen]
+  );
 
-  // Synchronisation temporelle parfaite : masquer simultanément (120ms), basculer l'état (150ms), mesurer et réafficher
+  // Recalcul en temps réel (resize, orientation, scroll)
+  const updateTargetBounds = useCallback(() => {
+    if (!isOpen) return;
+    const step = TOUR_STEPS[currentIndex];
+    if (step) {
+      measureElement(step.targetSelector);
+    }
+  }, [isOpen, currentIndex, measureElement]);
+
+  // Synchronisation temporelle parfaite :
+  // 1. Masquage simultané (opacity: 0)
+  // 2. Navigation d'onglet et ouverture/fermeture du tiroir latéral
+  // 3. Attente 200ms de stabilisation du DOM et de l'animation CSS
+  // 4. Recalcul getBoundingClientRect()
+  // 5. Réaffichage simultané (opacity: 1)
   const executeStepTransition = useCallback(
     (targetIndex: number) => {
+      if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
+      if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+
       setIsTransitioning(true);
 
       const nextConfig = TOUR_STEPS[targetIndex];
+      if (!nextConfig) return;
 
-      // Gérer l'ouverture/fermeture du tiroir
+      setCurrentIndex(targetIndex);
+
+      // Gérer l'ouverture / fermeture du tiroir latéral
       if (onToggleMenu) {
         if (nextConfig.openDrawer) {
           onToggleMenu(true);
@@ -371,18 +397,29 @@ export default function LiveInteractiveTour({
       // Basculer l'onglet cible
       onNavigateTab(nextConfig.targetView);
 
-      // Laisser le DOM et les animations d'ouverture se stabiliser avant de remesurer
-      window.setTimeout(() => {
-        setCurrentIndex(targetIndex);
+      // Laisser le DOM et les transitions CSS (drawer, tab) se stabiliser à 200ms
+      transitionTimerRef.current = setTimeout(() => {
+        const found = measureElement(nextConfig.targetSelector);
+        setIsTransitioning(false);
 
-        window.setTimeout(() => {
-          updateTargetBounds();
-          setIsTransitioning(false);
-        }, 150);
-      }, 120);
+        // Si l'élément cible tarde à monter (ex: rendu initial d'un onglet), re-mesure rapide
+        if (!found) {
+          retryTimerRef.current = setTimeout(() => {
+            measureElement(nextConfig.targetSelector);
+          }, 100);
+        }
+      }, 200);
     },
-    [onNavigateTab, onToggleMenu, updateTargetBounds]
+    [onNavigateTab, onToggleMenu, measureElement]
   );
+
+  // Nettoyage des timers
+  useEffect(() => {
+    return () => {
+      if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
+      if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+    };
+  }, []);
 
   // Initialisation à l'ouverture
   useEffect(() => {

@@ -42,6 +42,19 @@ describe('LiveInteractiveTour 7 Steps & Drawer Navigation', () => {
     });
   });
 
+  it('configure précisément les sélecteurs cibles de chaque étape sans encadrer la page entière', () => {
+    const selectors = TOUR_STEPS.map((s) => s.targetSelector);
+    expect(selectors).toEqual([
+      '#tour-header-lang',
+      '#tour-today-hero',
+      '#tour-sidebar-explorer',
+      '#tour-sidebar-roleplay',
+      '#tour-path-module-1',
+      '#tour-heading-phrases',
+      '#tour-space-vip',
+    ]);
+  });
+
   it('gère l’ouverture automatique du tiroir pour les étapes de grammaire et roleplay', () => {
     const drawerExplorer = TOUR_STEPS.find((s) => s.key === 'drawer-explorer');
     const drawerRoleplay = TOUR_STEPS.find((s) => s.key === 'drawer-roleplay');

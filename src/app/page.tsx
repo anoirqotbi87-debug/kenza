@@ -1796,7 +1796,7 @@ function PathView({
             </h3>
 
             <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-8">
-              {modules.map((mod) => {
+              {modules.map((mod, idx) => {
                 const modDone = mod.done;
                 const modProgress = mod.lessons ? Math.round((mod.completed / mod.lessons) * 100) : 0;
                 const active = selectedCard?.key === mod.key && !mod.locked;
@@ -1804,6 +1804,7 @@ function PathView({
                 return (
                   <button
                     key={mod.key}
+                    id={idx === 0 ? "tour-path-module-1" : undefined}
                     type="button"
                     disabled={mod.locked}
                     onClick={() => setSelectedModule(mod.key)}
