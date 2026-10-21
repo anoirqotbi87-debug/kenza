@@ -637,9 +637,12 @@ button[class*="bg-[#0B2545]"] span {
     transition: transform .23s cubic-bezier(.23,1,.32,1);
     box-shadow: none;
   }
-  .sidebar-open {
+  .sidebar.sidebar-open {
     transform: translateX(0);
     box-shadow: 15px 0 45px rgba(17,32,47,.15);
+  }
+  .sidebar.tour-sidebar-elevated {
+    z-index: 10001 !important;
   }
   /* RTL : la sidebar est ancrée à DROITE → l'état fermé doit glisser vers la DROITE */
   [dir="rtl"] .sidebar {

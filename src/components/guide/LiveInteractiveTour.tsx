@@ -386,10 +386,28 @@ export default function LiveInteractiveTour({
       setCurrentIndex(targetIndex);
 
       // Gérer l'ouverture / fermeture du tiroir latéral
-      if (onToggleMenu) {
-        if (nextConfig.openDrawer) {
+      if (nextConfig.openDrawer) {
+        // Déclenche le clic natif sur le bouton burger existant dans le header
+        const burgerBtn = document.querySelector<HTMLButtonElement>(
+          '#tour-hamburger-btn, button.mobile-menu-trigger, button[aria-label*="menu" i], button[aria-label*="Menu"]'
+        );
+        const sidebar = document.querySelector('.sidebar');
+        const isMenuCurrentlyOpen = sidebar?.classList.contains('sidebar-open');
+        if (burgerBtn && !isMenuCurrentlyOpen) {
+          burgerBtn.click();
+        }
+        if (onToggleMenu) {
           onToggleMenu(true);
-        } else {
+        }
+      } else {
+        // Referme le tiroir avant de basculer sur l'onglet suivant
+        const closeBtn = document.querySelector<HTMLButtonElement>(
+          '#tour-drawer-close, .mobile-close, [aria-label*="close" i], [aria-label*="fermer" i]'
+        );
+        if (closeBtn) {
+          closeBtn.click();
+        }
+        if (onToggleMenu) {
           onToggleMenu(false);
         }
       }
@@ -397,7 +415,9 @@ export default function LiveInteractiveTour({
       // Basculer l'onglet cible
       onNavigateTab(nextConfig.targetView);
 
-      // Laisser le DOM et les transitions CSS (drawer, tab) se stabiliser à 200ms
+      // Attendre 300-320ms que l'animation CSS du tiroir (230ms) et le DOM soient totalement stabilisés
+      const waitTime = nextConfig.openDrawer || currentStep?.openDrawer ? 320 : 200;
+
       transitionTimerRef.current = setTimeout(() => {
         const found = measureElement(nextConfig.targetSelector);
         setIsTransitioning(false);
@@ -406,11 +426,11 @@ export default function LiveInteractiveTour({
         if (!found) {
           retryTimerRef.current = setTimeout(() => {
             measureElement(nextConfig.targetSelector);
-          }, 100);
+          }, 120);
         }
-      }, 200);
+      }, waitTime);
     },
-    [onNavigateTab, onToggleMenu, measureElement]
+    [onNavigateTab, onToggleMenu, measureElement, currentStep]
   );
 
   // Nettoyage des timers
@@ -447,6 +467,13 @@ export default function LiveInteractiveTour({
         localStorage.setItem('kenza_onboarding_completed', 'true');
       }
     } catch {}
+
+    const closeBtn = document.querySelector<HTMLButtonElement>(
+      '#tour-drawer-close, .mobile-close, [aria-label*="close" i], [aria-label*="fermer" i]'
+    );
+    if (closeBtn) {
+      closeBtn.click();
+    }
     if (onToggleMenu) {
       onToggleMenu(false);
     }
@@ -476,54 +503,57 @@ export default function LiveInteractiveTour({
 
   const Icon = currentStep.icon;
 
-  // Calcul précis du positionnement de la bulle
-  let cardStyle: React.CSSProperties = {};
+  // Calcul précis du positionnement de la bulle avec Sécurité Anti-Dépassement du Viewport
   const PADDING = 14;
+  const tooltipHeight = 290;
+  const tooltipWidth = typeof window !== 'undefined' ? Math.min(400, window.innerWidth - 32) : 360;
 
-  if (targetRect && placement === 'bottom') {
-    cardStyle = {
-      position: 'fixed',
-      top: `${Math.min(window.innerHeight - 320, targetRect.bottom + 18)}px`,
-      left: `${Math.max(16, Math.min(window.innerWidth - 410, targetRect.left + targetRect.width / 2 - 200))}px`,
-      maxWidth: '400px',
-      width: 'calc(100vw - 32px)',
-    };
-  } else if (targetRect && placement === 'top') {
-    cardStyle = {
-      position: 'fixed',
-      bottom: `${Math.min(window.innerHeight - 80, window.innerHeight - targetRect.top + 18)}px`,
-      left: `${Math.max(16, Math.min(window.innerWidth - 410, targetRect.left + targetRect.width / 2 - 200))}px`,
-      maxWidth: '400px',
-      width: 'calc(100vw - 32px)',
-    };
-  } else {
-    cardStyle = {
-      position: 'fixed',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-      maxWidth: '420px',
-      width: 'calc(100vw - 32px)',
-    };
+  let calculatedTop = typeof window !== 'undefined' ? window.innerHeight / 2 - tooltipHeight / 2 : 200;
+  let calculatedLeft = typeof window !== 'undefined' ? window.innerWidth / 2 - tooltipWidth / 2 : 16;
+
+  if (targetRect) {
+    calculatedLeft = targetRect.left + targetRect.width / 2 - tooltipWidth / 2;
+
+    if (placement === 'bottom') {
+      calculatedTop = targetRect.bottom + 16;
+    } else if (placement === 'top') {
+      calculatedTop = targetRect.top - tooltipHeight - 16;
+    }
   }
+
+  // Toujours un padding minimal de 16px par rapport aux bords de l'écran (zéro bulle coupée en haut)
+  const safeTop = typeof window !== 'undefined'
+    ? Math.max(16, Math.min(window.innerHeight - tooltipHeight - 16, calculatedTop))
+    : 16;
+  const safeLeft = typeof window !== 'undefined'
+    ? Math.max(16, Math.min(window.innerWidth - tooltipWidth - 16, calculatedLeft))
+    : 16;
+
+  const cardStyle: React.CSSProperties = {
+    position: 'fixed',
+    top: `${safeTop}px`,
+    left: `${safeLeft}px`,
+    maxWidth: '400px',
+    width: 'calc(100vw - 32px)',
+  };
 
   return (
     <div
       role="dialog"
       aria-modal="true"
       dir={isRtl ? 'rtl' : 'ltr'}
-      className="fixed inset-0 z-[150] overflow-hidden pointer-events-auto"
+      className="fixed inset-0 z-[10000] overflow-hidden pointer-events-none"
     >
       {/* 1. Backdrop assombrissant */}
       <div
-        className="fixed inset-0 bg-black/65 transition-opacity duration-200"
+        className="fixed inset-0 z-[10000] bg-black/65 transition-opacity duration-200 pointer-events-auto"
         onClick={handleFinish}
       />
 
       {/* 2. Spotlight physique entourant l'élément exact */}
       {targetRect && (
         <div
-          className={`fixed pointer-events-none rounded-2xl transition-all duration-250 ease-out z-[151] ${
+          className={`fixed pointer-events-none rounded-2xl transition-all duration-250 ease-out z-[10002] ${
             isTransitioning ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
           }`}
           style={{
@@ -537,26 +567,34 @@ export default function LiveInteractiveTour({
         />
       )}
 
-      {/* 3. Bulle explicative avec flèche directionnelle (Zéro texte tronqué) */}
+      {/* 3. Bulle explicative avec flèche directionnelle (Zéro texte tronqué, anti-dépassement garanti) */}
       <div
         style={cardStyle}
-        className={`z-[155] bg-[#FFFEFC] border-2 border-amber-300 rounded-3xl shadow-2xl p-5 text-[#142943] transition-all duration-250 ease-out ${
+        className={`z-[10005] bg-[#FFFEFC] border-2 border-amber-300 rounded-3xl shadow-2xl p-5 text-[#142943] transition-all duration-250 ease-out pointer-events-auto ${
           isTransitioning
             ? 'opacity-0 translate-y-2 pointer-events-none'
-            : 'opacity-100 translate-y-0 pointer-events-auto'
+            : 'opacity-100 translate-y-0'
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Flèche fine pointant vers l'élément */}
+        {/* Flèche fine pointant dynamiquement vers l'élément exact */}
         {targetRect && placement === 'bottom' && (
           <div
-            className="absolute -top-3 left-1/2 -translate-x-1/2 w-0 h-0 border-x-8 border-x-transparent border-b-8 border-b-amber-300"
+            className="absolute -top-3 w-0 h-0 border-x-8 border-x-transparent border-b-8 border-b-amber-300 pointer-events-none"
+            style={{
+              left: `${Math.max(24, Math.min(tooltipWidth - 24, targetRect.left + targetRect.width / 2 - safeLeft))}px`,
+              transform: 'translateX(-50%)',
+            }}
             aria-hidden="true"
           />
         )}
         {targetRect && placement === 'top' && (
           <div
-            className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-amber-300"
+            className="absolute -bottom-3 w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-amber-300 pointer-events-none"
+            style={{
+              left: `${Math.max(24, Math.min(tooltipWidth - 24, targetRect.left + targetRect.width / 2 - safeLeft))}px`,
+              transform: 'translateX(-50%)',
+            }}
             aria-hidden="true"
           />
         )}

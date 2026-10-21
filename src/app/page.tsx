@@ -742,12 +742,15 @@ export default function Home() {
     <div className="app-shell">
       {/* Sidebar Desktop & Mobile Slideout */}
       <aside
-        className={`sidebar ${mobileMenuOpen ? "sidebar-open" : ""}`}
+        id="tour-mobile-sidebar"
+        className={`sidebar ${mobileMenuOpen ? "sidebar-open" : ""} ${liveTourOpen && mobileMenuOpen ? "tour-sidebar-elevated !z-[10001]" : ""}`}
+        style={liveTourOpen && mobileMenuOpen ? { zIndex: 10001 } : undefined}
         inert={backgroundInert}
       >
         <div className="brand-lockup justify-between">
           <KenzaLogo size="lg" showWordmark={true} />
           <button
+            id="tour-drawer-close"
             className="icon-button mobile-close"
             aria-label={tr("Fermer le menu", "Close the menu", "Cerrar el menú", "إغلاق القائمة")}
             onClick={() => setMobileMenuOpen(false)}
@@ -855,7 +858,7 @@ export default function Home() {
 
       {mobileMenuOpen && (
         <button
-          className="mobile-scrim"
+          className={`mobile-scrim ${liveTourOpen ? "hidden pointer-events-none" : ""}`}
           aria-label={tr("Fermer le menu", "Close the menu", "Cerrar el menú", "إغلاق القائمة")}
           onClick={() => setMobileMenuOpen(false)}
         />
@@ -867,8 +870,9 @@ export default function Home() {
           {/* Bloc Logo Kenza permanent sanctuarisé à gauche — shrink-0 */}
           <div className="shrink-0 flex items-center gap-1.5 sm:gap-2.5">
             <button
+              id="tour-hamburger-btn"
               className="icon-button mobile-menu-trigger"
-              aria-label={t.modules.home.langSwitcher}
+              aria-label={tr("Menu", "Menu", "Menú", "القائمة")}
               onClick={() => setMobileMenuOpen(true)}
             >
               <Menu size={21} />

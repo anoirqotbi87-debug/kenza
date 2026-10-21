@@ -71,6 +71,21 @@ describe('LiveInteractiveTour 7 Steps & Drawer Navigation', () => {
     expect(tourSource).toContain('scrollIntoView');
   });
 
+  it('sécurise l’ouverture réelle du tiroir via clic natif sur le bouton burger et fermeture', () => {
+    expect(tourSource).toContain('#tour-hamburger-btn');
+    expect(tourSource).toContain('burgerBtn.click()');
+    expect(tourSource).toContain('#tour-drawer-close');
+    expect(tourSource).toContain('closeBtn.click()');
+  });
+
+  it('garantit la sécurité anti-dépassement du viewport pour la bulle d’explication', () => {
+    expect(tourSource).toContain('safeTop');
+    expect(tourSource).toContain('safeLeft');
+    expect(tourSource).toContain('Math.max(16,');
+    expect(tourSource).toContain('z-[10005]');
+    expect(tourSource).toContain('z-[10002]');
+  });
+
   it('ne tronque aucun titre d’en-tête (absence de truncate sur le titre)', () => {
     // Vérifie que le titre h3 dans la bulle ne possède pas la classe 'truncate'
     expect(tourSource).not.toContain('<h3 className="text-sm font-bold text-[#142943] truncate">');
