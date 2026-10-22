@@ -36,6 +36,7 @@ interface AppState {
   // Actions
   addXp: (amount: number) => void;
   completeLesson: (lessonId: string) => void;
+  setCompletedLessons: (lessons: string[]) => void;
   unlockBadge: (badgeId: string) => void;
   useStreakFreeze: () => void;
   recordActivity: () => void;
@@ -215,6 +216,8 @@ export const useAppStore = create<AppState>()(
         
         return { completedLessons: completed, unlockedBadges: newBadges };
       }),
+
+      setCompletedLessons: (lessons: string[]) => set({ completedLessons: lessons }),
 
       unlockBadge: (badgeId: string) => set((state: AppState) => ({
         unlockedBadges: state.unlockedBadges.includes(badgeId)
