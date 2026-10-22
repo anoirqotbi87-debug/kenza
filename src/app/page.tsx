@@ -330,22 +330,6 @@ export default function Home() {
   const onboardingOpen = hydrated && !hasCompletedOnboarding && !onboardingDismissed;
   const isPlanModalOpen = onboardingOpen;
 
-  // Déclenchement automatique de la visite guidée en direct après complétion du plan (séquencement strict)
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (isPlanModalOpen) return;
-    try {
-      const planCompleted = Boolean(localStorage.getItem("kenza_plan_completed")) || hasCompletedOnboarding;
-      const tourCompleted = Boolean(localStorage.getItem("kenza_live_tour_completed"));
-      if (planCompleted && !tourCompleted && !liveTourOpen) {
-        const timer = window.setTimeout(() => {
-          setLiveTourOpen(true);
-        }, 400);
-        return () => window.clearTimeout(timer);
-      }
-    } catch {}
-  }, [isPlanModalOpen, hasCompletedOnboarding, liveTourOpen]);
-
   // Trigger 1 : paywall personnalisé juste après l'onboarding, une seule fois
   // par cycle de vie. Trigger 2 : paywall quand le quota audio gratuit du jour
   // est épuisé. Les deux sont dérivés de l'état, sans effet ni état dupliqué.
@@ -359,11 +343,37 @@ export default function Home() {
 
   const derivedPricingSource = onboardingPaywallSource ?? (audioQuotaExceeded ? "audio_quota_exceeded" : null);
   const activePricingSource = pricingSource ?? derivedPricingSource;
+  const isPaywallOpen = Boolean(activePricingSource);
+
+  // Déclenchement automatique de la visite guidée en direct (séquencement strict : après plan ET après paywall)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (isPlanModalOpen || isPaywallOpen) return;
+    try {
+      const planCompleted = Boolean(localStorage.getItem("kenza_plan_completed")) || hasCompletedOnboarding;
+      const tourCompleted = Boolean(localStorage.getItem("kenza_live_tour_completed"));
+      if (planCompleted && !tourCompleted && !liveTourOpen) {
+        const timer = window.setTimeout(() => {
+          setLiveTourOpen(true);
+        }, 400);
+        return () => window.clearTimeout(timer);
+      }
+    } catch {}
+  }, [isPlanModalOpen, isPaywallOpen, hasCompletedOnboarding, liveTourOpen]);
 
   const closePaywall = () => {
     setPricingSource(null);
     if (onboardingPaywallSource) markOnboardingPaywallSeen();
     if (audioQuotaExceeded) setAudioQuotaExceeded(false);
+    window.setTimeout(() => {
+      try {
+        const planCompleted = Boolean(localStorage.getItem("kenza_plan_completed")) || hasCompletedOnboarding;
+        const tourCompleted = Boolean(localStorage.getItem("kenza_live_tour_completed"));
+        if (planCompleted && !tourCompleted) {
+          setLiveTourOpen(true);
+        }
+      } catch {}
+    }, 400);
   };
 
   /** Ferme le paywall de fin d'onboarding et emmène l'utilisateur au module 1. */
@@ -391,14 +401,6 @@ export default function Home() {
       localStorage.setItem("kenza_plan_completed", "true");
     } catch {}
     setOnboardingDismissed(true);
-    window.setTimeout(() => {
-      try {
-        const tourCompleted = Boolean(localStorage.getItem("kenza_live_tour_completed"));
-        if (!tourCompleted) {
-          setLiveTourOpen(true);
-        }
-      } catch {}
-    }, 400);
   };
 
   const handleSelectIntermediate = () => {
@@ -1313,7 +1315,7 @@ export default function Home() {
       )}
 
       {/* Visite guidée en direct fléchée (Live Interactive Spotlight Tour) */}
-      {!isPlanModalOpen && (
+      {!isPlanModalOpen && !isPaywallOpen && (
         <LiveInteractiveTour
           isOpen={liveTourOpen}
           onClose={() => setLiveTourOpen(false)}

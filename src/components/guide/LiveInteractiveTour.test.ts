@@ -61,19 +61,27 @@ describe('LiveInteractiveTour 6 Steps & Non-overlapping Compact Tooltip', () => 
     expect(menuStep?.explanation.fr).toContain('Roleplay avec Karim');
   });
 
-  it('assure la synchronisation temporelle fluide avec défilement centré doux', () => {
+  it('assure la synchronisation temporelle fluide avec défilement orienté et attente 350ms', () => {
     expect(tourSource).toContain('executeStepTransition');
     expect(tourSource).toContain('isTransitioning');
     expect(tourSource).toContain('scrollIntoView');
     expect(tourSource).toContain("behavior: 'smooth'");
+    expect(tourSource).toContain('350');
   });
 
-  it('garantit le positionnement vertical décalé avec 24px de marge sans recouvrir la cible', () => {
-    expect(tourSource).toContain('targetRect.bottom + 24');
-    expect(tourSource).toContain('targetRect.top - tooltipHeight - 24');
+  it('garantit le positionnement vertical décalé avec marge stricte sans recouvrir la cible', () => {
     expect(tourSource).toContain('safeTop');
     expect(tourSource).toContain('safeLeft');
-    expect(tourSource).toContain('Math.max(16,');
+    expect(tourSource).toContain("maxHeight: '130px'");
+    expect(tourSource).toContain('targetRect.bottom');
+    expect(tourSource).toContain('targetRect.top');
+  });
+
+  it('verrouille le démarrage du tour interactif tant que le paywall ou la modale des prix est active dans page.tsx', () => {
+    const pagePath = resolve(__dirname, '../../app/page.tsx');
+    const pageSource = readFileSync(pagePath, 'utf-8');
+    expect(pageSource).toContain('isPaywallOpen');
+    expect(pageSource).toContain('!isPlanModalOpen && !isPaywallOpen');
   });
 
   it('assure la compatibilité RTL pour l’arabe', () => {

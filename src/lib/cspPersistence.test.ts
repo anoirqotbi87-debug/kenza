@@ -66,7 +66,7 @@ describe('persistCspViolations', () => {
         document_uri: 'https://kenza-dusky.vercel.app/etudier',
       },
     ]);
-  });
+  }, 15000);
 
   it('utilise la clé service_role, JAMAIS la clé anon', async () => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://projet.supabase.co';

@@ -241,14 +241,13 @@ export default function LiveInteractiveTour({
   const isFirst = currentIndex === 0;
   const isLast = currentIndex === TOUR_STEPS.length - 1;
 
-  // Mesure et calcul fluide des coordonnées de l'élément cible
+  // Mesure et calcul fluide des coordonnées finales de l'élément cible
   const measureElement = useCallback(
     (selector: string) => {
       if (!isOpen || typeof document === 'undefined') return false;
       const element = document.querySelector(selector) as HTMLElement | null;
 
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
         const rect = element.getBoundingClientRect();
         setTargetRect(rect);
         return true;
@@ -260,26 +259,31 @@ export default function LiveInteractiveTour({
     [isOpen]
   );
 
-  // Recalcul en temps réel (resize, orientation, scroll)
+  // Recalcul en temps réel (resize, orientation, scroll manuel) uniquement hors transition
   const updateTargetBounds = useCallback(() => {
-    if (!isOpen) return;
+    if (!isOpen || isTransitioning) return;
     const step = TOUR_STEPS[currentIndex];
     if (step) {
-      measureElement(step.targetSelector);
+      const element = document.querySelector(step.targetSelector) as HTMLElement | null;
+      if (element) {
+        setTargetRect(element.getBoundingClientRect());
+      }
     }
-  }, [isOpen, currentIndex, measureElement]);
+  }, [isOpen, isTransitioning, currentIndex]);
 
   // Synchronisation temporelle fluide et sans saccade :
-  // 1. Masquage simultané halo + bulle (opacity: 0)
+  // 1. Masquage immédiat simultané halo + bulle (opacity: 0, pointer-events: none)
   // 2. Navigation d'onglet
-  // 3. Défilement centré doux
-  // 4. Attente de 250ms de fin d'animation
-  // 5. Recalcul getBoundingClientRect() et réaffichage fluide (opacity: 1)
+  // 3. Défilement ciblé doux (start avec marge pour le haut, end pour le bas)
+  // 4. Attente de 350ms : le défilement inertiel est STRICTEMENT terminé et la page 100% immobile
+  // 5. Mesure directe des coordonnées finales getBoundingClientRect()
+  // 6. Réaffichage en un fondu doux (opacity: 1, transition 150ms) SANS jamais bouger
   const executeStepTransition = useCallback(
     (targetIndex: number) => {
       if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
       if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
 
+      // Masque immédiatement bulle et halo
       setIsTransitioning(true);
 
       const nextConfig = TOUR_STEPS[targetIndex];
@@ -290,24 +294,42 @@ export default function LiveInteractiveTour({
       // Bascule l'onglet cible
       onNavigateTab(nextConfig.targetView);
 
-      // Lance le défilement centré si l'élément cible est déjà dans le DOM
-      const preElem = document.querySelector(nextConfig.targetSelector) as HTMLElement | null;
-      if (preElem) {
-        preElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      // Lance le défilement orienté vers la cible
+      const triggerScroll = () => {
+        if (typeof document === 'undefined') return;
+        const isHeader = nextConfig.targetSelector.includes('header');
+        if (isHeader) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
 
-      // Attends 250ms que l'animation de défilement soit stabilisée
+        const elem = document.querySelector(nextConfig.targetSelector) as HTMLElement | null;
+        if (elem) {
+          // Si l'élément est dans la partie basse (ex: Espace VIP), scroll vers le bas
+          if (nextConfig.key === 'space-vip') {
+            elem.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          } else {
+            // Éléments du haut / milieu : scroll vers le haut sous le header fixe (76px)
+            elem.style.scrollMarginTop = '76px';
+            elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+      };
+
+      triggerScroll();
+
+      // Attends 350ms que le défilement inertiel soit strictement terminé et la page 100% immobile
       transitionTimerRef.current = setTimeout(() => {
         const found = measureElement(nextConfig.targetSelector);
-        setIsTransitioning(false);
-
-        // Si l'élément cible tarde à monter (ex: rendu initial d'un onglet), re-mesure rapide
         if (!found) {
           retryTimerRef.current = setTimeout(() => {
             measureElement(nextConfig.targetSelector);
-          }, 120);
+            setIsTransitioning(false);
+          }, 150);
+        } else {
+          setIsTransitioning(false);
         }
-      }, 250);
+      }, 350);
     },
     [onNavigateTab, measureElement]
   );
@@ -379,10 +401,10 @@ export default function LiveInteractiveTour({
 
   const Icon = currentStep.icon;
 
-  // Calcul précis du positionnement compact de la bulle (Ne JAMAIS recouvrir la cible)
-  const PADDING = 14;
-  const tooltipHeight = 135;
-  const tooltipWidth = typeof window !== 'undefined' ? Math.min(380, window.innerWidth - 32) : 348;
+  // Calcul précis du positionnement ultra-compact de la bulle (Ne JAMAIS recouvrir la cible)
+  const PADDING = 10;
+  const tooltipHeight = 125;
+  const tooltipWidth = typeof window !== 'undefined' ? Math.min(360, window.innerWidth - 32) : 328;
 
   let calculatedTop = typeof window !== 'undefined' ? window.innerHeight / 2 - tooltipHeight / 2 : 100;
   let calculatedLeft = typeof window !== 'undefined' ? window.innerWidth / 2 - tooltipWidth / 2 : 16;
@@ -392,31 +414,44 @@ export default function LiveInteractiveTour({
     calculatedLeft = targetRect.left + targetRect.width / 2 - tooltipWidth / 2;
     const targetCenterY = targetRect.top + targetRect.height / 2;
 
+    // Si la cible est dans la moitié haute : place la bulle sous la cible avec 20px d'écart avec le halo
     if (targetCenterY < window.innerHeight / 2) {
-      // Cible dans la moitié haute : place la bulle en dessous avec 24px d'écart
       effectivePlacement = 'bottom';
-      calculatedTop = targetRect.bottom + 24;
+      calculatedTop = targetRect.bottom + PADDING + 20;
     } else {
-      // Cible dans la moitié basse : place la bulle au-dessus avec 24px d'écart
+      // Cible dans la moitié basse : place la bulle au-dessus de la cible avec 20px d'écart avec le halo
       effectivePlacement = 'top';
-      calculatedTop = targetRect.top - tooltipHeight - 24;
+      calculatedTop = targetRect.top - PADDING - 20 - tooltipHeight;
     }
   }
 
-  // Clamping strict : garde toujours un padding minimal de 16px par rapport aux bords de l'écran
-  const safeTop = typeof window !== 'undefined'
-    ? Math.max(16, Math.min(window.innerHeight - tooltipHeight - 16, calculatedTop))
-    : 16;
+  // Clamping strict : la bulle ne doit JAMAIS recouvrir la cible, même sur petit écran
+  let safeTop = calculatedTop;
+  if (targetRect && typeof window !== 'undefined') {
+    if (effectivePlacement === 'bottom') {
+      const minTop = targetRect.bottom + PADDING + 16;
+      const maxTop = window.innerHeight - tooltipHeight - 12;
+      safeTop = Math.max(minTop, Math.min(maxTop, calculatedTop));
+    } else {
+      const minTop = 12;
+      const maxTop = targetRect.top - PADDING - 16 - tooltipHeight;
+      safeTop = Math.max(minTop, Math.min(maxTop, calculatedTop));
+    }
+  } else if (typeof window !== 'undefined') {
+    safeTop = Math.max(12, Math.min(window.innerHeight - tooltipHeight - 12, calculatedTop));
+  }
+
   const safeLeft = typeof window !== 'undefined'
-    ? Math.max(16, Math.min(window.innerWidth - tooltipWidth - 16, calculatedLeft))
-    : 16;
+    ? Math.max(12, Math.min(window.innerWidth - tooltipWidth - 12, calculatedLeft))
+    : 12;
 
   const cardStyle: React.CSSProperties = {
     position: 'fixed',
     top: `${safeTop}px`,
     left: `${safeLeft}px`,
-    maxWidth: '380px',
-    width: 'calc(100vw - 32px)',
+    maxWidth: '360px',
+    width: 'calc(100vw - 24px)',
+    maxHeight: '130px',
   };
 
   const arrowLeft = targetRect
@@ -436,11 +471,11 @@ export default function LiveInteractiveTour({
         onClick={handleFinish}
       />
 
-      {/* 2. Spotlight physique entourant l'élément exact */}
+      {/* 2. Spotlight physique entourant l'élément exact (transition opacité uniquement, zéro effet d'ascenseur) */}
       {targetRect && (
         <div
-          className={`fixed pointer-events-none rounded-2xl transition-all duration-200 ease-out z-[10002] ${
-            isTransitioning ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
+          className={`fixed pointer-events-none rounded-2xl transition-opacity duration-150 ease-out z-[10002] ${
+            isTransitioning ? 'opacity-0' : 'opacity-100'
           }`}
           style={{
             top: `${Math.max(0, targetRect.top - PADDING)}px`,
@@ -453,13 +488,13 @@ export default function LiveInteractiveTour({
         />
       )}
 
-      {/* 3. Bulle explicative compacte & décalée (Ne JAMAIS recouvrir la cible) */}
+      {/* 3. Bulle explicative compacte & décalée (Ne JAMAIS recouvrir la cible, transition opacité uniquement) */}
       <div
         style={cardStyle}
-        className={`z-[10005] bg-[#FFFEFC] border-2 border-amber-300 rounded-2xl shadow-xl p-3.5 text-[#142943] transition-all duration-200 ease-out pointer-events-auto ${
+        className={`z-[10005] bg-[#FFFEFC] border-2 border-amber-300 rounded-2xl shadow-xl p-3 text-[#142943] transition-opacity duration-150 ease-out pointer-events-auto flex flex-col justify-between overflow-hidden ${
           isTransitioning
-            ? 'opacity-0 translate-y-1 pointer-events-none'
-            : 'opacity-100 translate-y-0'
+            ? 'opacity-0 pointer-events-none'
+            : 'opacity-100'
         }`}
         onClick={(e) => e.stopPropagation()}
       >
@@ -486,12 +521,12 @@ export default function LiveInteractiveTour({
         )}
 
         {/* En-tête compact sur 1 ligne */}
-        <div className="flex items-center justify-between gap-2 mb-1.5">
+        <div className="flex items-center justify-between gap-2 mb-1">
           <div className="flex items-center gap-2 min-w-0">
             <div
-              className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${currentStep.iconBg}`}
+              className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${currentStep.iconBg}`}
             >
-              <Icon size={15} />
+              <Icon size={14} />
             </div>
             <div className="min-w-0">
               <span className="block text-[9px] font-extrabold uppercase tracking-wider text-amber-800 leading-none">
@@ -507,19 +542,19 @@ export default function LiveInteractiveTour({
             type="button"
             onClick={handleFinish}
             aria-label={labels.skip}
-            className="w-6 h-6 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center shrink-0 transition-colors"
+            className="w-5 h-5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center shrink-0 transition-colors"
           >
-            <X size={13} />
+            <X size={12} />
           </button>
         </div>
 
         {/* Corps descriptif condensé en 2 lignes max */}
-        <p className="text-xs text-slate-700 leading-snug line-clamp-2 mb-2.5">
+        <p className="text-[11px] sm:text-xs text-slate-700 leading-snug line-clamp-2 mb-1.5">
           {currentStep.explanation[langKey]}
         </p>
 
         {/* Stepper Dots & Navigation Précédent / Suivant compacte */}
-        <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
+        <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-slate-100">
           <div className="flex items-center gap-1.5">
             {TOUR_STEPS.map((s, idx) => (
               <button
@@ -539,7 +574,7 @@ export default function LiveInteractiveTour({
               <button
                 type="button"
                 onClick={() => executeStepTransition(Math.max(0, currentIndex - 1))}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] sm:text-[11px] font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
               >
                 {isRtl ? <ArrowRight size={11} /> : <ArrowLeft size={11} />}
                 <span>{labels.prev}</span>
@@ -555,7 +590,7 @@ export default function LiveInteractiveTour({
                   executeStepTransition(Math.min(TOUR_STEPS.length - 1, currentIndex + 1));
                 }
               }}
-              className={`inline-flex items-center gap-1 px-3 py-1 rounded-lg text-[11px] font-bold text-white shadow-xs transition-all active:scale-95 ${
+              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[10px] sm:text-[11px] font-bold text-white shadow-xs transition-all active:scale-95 ${
                 isLast
                   ? 'bg-emerald-600 hover:bg-emerald-700 ring-2 ring-emerald-400/50'
                   : 'bg-[#142943] hover:bg-[#1b3557]'
@@ -563,7 +598,7 @@ export default function LiveInteractiveTour({
             >
               <span>{isLast ? labels.finish : labels.next}</span>
               {isLast ? (
-                <Check size={12} />
+                <Check size={11} />
               ) : isRtl ? (
                 <ArrowLeft size={11} />
               ) : (
