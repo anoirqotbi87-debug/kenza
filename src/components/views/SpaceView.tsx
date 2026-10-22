@@ -11,15 +11,13 @@ import { useAppStore } from '@/store/useAppStore';
 export { default as VipPromoCard } from '@/components/promo/VipPromoCard';
 
 export function SpaceGuideButton({ onOpenGuide }: { onOpenGuide?: () => void }) {
-  const setUserGuideOpen = useAppStore((s) => s.setUserGuideOpen);
   const uiLanguage = useAppStore((s) => s.uiLanguage);
-  const handleOpen = onOpenGuide || (() => setUserGuideOpen(true));
 
   const labels = {
-    fr: "❓ Guide d'utilisation & Démarrage",
-    en: "❓ User Guide & Getting Started",
-    es: "❓ Guía de uso y Primeros pasos",
-    ar: "❓ دليل الاستخدام والبداية",
+    fr: "🧭 Visite guidée interactive",
+    en: "🧭 Interactive Guided Tour",
+    es: "🧭 Visita guiada interactiva",
+    ar: "🧭 جولة إرشادية تفاعلية",
   };
 
   const label = labels[uiLanguage] || labels.fr;
@@ -27,7 +25,7 @@ export function SpaceGuideButton({ onOpenGuide }: { onOpenGuide?: () => void }) 
   return (
     <button
       type="button"
-      onClick={handleOpen}
+      onClick={onOpenGuide}
       className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#142943] bg-amber-100/80 hover:bg-amber-200 border border-amber-300/80 rounded-lg transition-colors shadow-2xs"
     >
       <span>{label}</span>

@@ -376,10 +376,9 @@ export default function Home() {
     }, 400);
   };
 
-  /** Ferme le paywall de fin d'onboarding et emmène l'utilisateur au module 1. */
+  /** Ferme le paywall de fin d'onboarding. L'écran d'accueil reste actif et lance la visite guidée interactive. */
   const continueWithFreeVersion = () => {
     closePaywall();
-    setView("path");
   };
 
   const switchView = (next: View) => {
@@ -1182,6 +1181,7 @@ export default function Home() {
               onOpenPaywall={() => setPricingSource("profile_upgrade")}
               onManageSubscription={handleManageSubscription}
               onToast={showToast}
+              onStartLiveTour={() => setLiveTourOpen(true)}
             />
           )}
 
@@ -1328,6 +1328,10 @@ export default function Home() {
       <HelpCenterView
         isOpen={faqModalOpen}
         onClose={() => setFaqModalOpen(false)}
+        onOpenTour={() => {
+          setFaqModalOpen(false);
+          setLiveTourOpen(true);
+        }}
       />
 
       <InstallPwaBanner />
@@ -2357,6 +2361,7 @@ function SpaceView({
   onOpenPaywall,
   onManageSubscription,
   onToast,
+  onStartLiveTour,
 }: {
   completedCount: number;
   xp: number;
@@ -2368,10 +2373,10 @@ function SpaceView({
   onOpenPaywall: (source?: string) => void;
   onManageSubscription: () => void;
   onToast: (message: string) => void;
+  onStartLiveTour: () => void;
 }) {
   const { t } = useTranslation();
   const { lang } = useLocalizedContent();
-  const setUserGuideOpen = useAppStore((s) => s.setUserGuideOpen);
   const totalLessons = useMemo(() => getPlayableLessons(lang).length, [lang]);
   const username =
     user?.user_metadata?.full_name || user?.email?.split("@")[0] || t.common.guest;
@@ -2415,10 +2420,10 @@ function SpaceView({
           <div className="pt-2 flex items-center gap-2 flex-wrap">
             <button
               type="button"
-              onClick={() => setUserGuideOpen(true)}
+              onClick={onStartLiveTour}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#142943] bg-amber-100/80 hover:bg-amber-200 border border-amber-300/80 rounded-lg transition-colors shadow-2xs"
             >
-              <span>❓ {trL(lang, "Guide d'utilisation & Démarrage", "User Guide & Getting Started", "Guía de uso y Primeros pasos", "دليل الاستخدام والبداية")}</span>
+              <span>🧭 {trL(lang, "Visite guidée interactive", "Interactive Guided Tour", "Visita guiada interactiva", "جولة إرشادية تفاعلية")}</span>
             </button>
             {user && (
               <button

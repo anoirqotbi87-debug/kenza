@@ -18,6 +18,7 @@ import { useAppStore } from '@/store/useAppStore';
 interface HelpCenterViewProps {
   isOpen?: boolean;
   onClose?: () => void;
+  onOpenTour?: () => void;
   inline?: boolean;
 }
 
@@ -316,9 +317,8 @@ const UI_STRINGS = {
   },
 };
 
-export default function HelpCenterView({ isOpen, onClose, inline = false }: HelpCenterViewProps) {
+export default function HelpCenterView({ isOpen, onClose, onOpenTour, inline = false }: HelpCenterViewProps) {
   const uiLanguage = useAppStore((s) => s.uiLanguage);
-  const setUserGuideOpen = useAppStore((s) => s.setUserGuideOpen);
 
   const langKey = (uiLanguage === 'ar' ? 'ar' : uiLanguage === 'en' ? 'en' : uiLanguage === 'es' ? 'es' : 'fr') as 'fr' | 'en' | 'es' | 'ar';
   const isRtl = langKey === 'ar';
@@ -344,7 +344,7 @@ export default function HelpCenterView({ isOpen, onClose, inline = false }: Help
 
   const handleOpenInteractiveGuide = () => {
     if (onClose) onClose();
-    setUserGuideOpen(true);
+    if (onOpenTour) onOpenTour();
   };
 
   const content = (
