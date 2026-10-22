@@ -10,6 +10,7 @@ import { getLocalTodayDateString, getDaysDifference } from '../utils/dateUtils';
 
 import { srsService, normalizeDateToUtcMidnight } from '../services/srsService';
 import { migrateLegacyLessonIds } from '../data/homeCurriculum';
+import { fullCurriculum } from '../data/curriculum';
 interface AppState {
   // User Progress
   user: User | null;
@@ -37,6 +38,7 @@ interface AppState {
   addXp: (amount: number) => void;
   completeLesson: (lessonId: string) => void;
   setCompletedLessons: (lessons: string[]) => void;
+  setCompletedModules: (modules: string[]) => void;
   unlockBadge: (badgeId: string) => void;
   useStreakFreeze: () => void;
   recordActivity: () => void;
@@ -218,6 +220,16 @@ export const useAppStore = create<AppState>()(
       }),
 
       setCompletedLessons: (lessons: string[]) => set({ completedLessons: lessons }),
+
+      setCompletedModules: (moduleIds: string[]) => set((state: AppState) => {
+        const lessonIds: string[] = [];
+        moduleIds.forEach((mId) => {
+          const modLessons = fullCurriculum[mId]?.lessons?.map((l) => l.id) || [];
+          lessonIds.push(...modLessons);
+        });
+        const merged = Array.from(new Set([...state.completedLessons, ...lessonIds]));
+        return { completedLessons: merged };
+      }),
 
       unlockBadge: (badgeId: string) => set((state: AppState) => ({
         unlockedBadges: state.unlockedBadges.includes(badgeId)

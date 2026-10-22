@@ -36,8 +36,7 @@ describe('Onboarding & Placement Store Logic', () => {
     expect(m2Lessons.length).toBeGreaterThan(0);
 
     const store = useAppStore.getState();
-    const allCompleted = Array.from(new Set([...store.completedLessons, ...m1Lessons, ...m2Lessons]));
-    store.setCompletedLessons(allCompleted);
+    store.setCompletedModules(['1', '2']);
     store.addXp(60);
     store.completeOnboarding('travel', 10);
 

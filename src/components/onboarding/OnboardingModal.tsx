@@ -19,7 +19,6 @@ import {
 } from 'lucide-react';
 import { useAppStore, useTranslation } from '../../store/useAppStore';
 import { useDialog } from '../../hooks/useDialog';
-import { fullCurriculum } from '@/data/curriculum';
 
 interface OnboardingModalProps {
   onComplete: () => void;
@@ -39,7 +38,7 @@ export default function OnboardingModal({
   const isRtl = langKey === 'ar';
 
   const completeOnboarding = useAppStore((s) => s.completeOnboarding);
-  const setCompletedLessons = useAppStore((s) => s.setCompletedLessons);
+  const setCompletedModules = useAppStore((s) => s.setCompletedModules);
   const addXp = useAppStore((s) => s.addXp);
 
   // Étape du flux :
@@ -82,8 +81,8 @@ export default function OnboardingModal({
       quizSubtitle: 'Question {current} / 3',
       resultTitle: 'Recommandation personnalisée',
       resultScore: 'Ton score : {score} / 3',
-      resultLowDesc: 'Nous te recommandons de démarrer par le Module 1 (Les Fondations) pour maîtriser les sons arabes essentiels (7, 3, 9, kh) et ancrer les bases.',
-      resultHighDesc: 'Bravo ! Tu as déjà de solides bases en Darija. Tu peux démarrer directement au Module 3 ou revoir les bases depuis le début.',
+      resultLowDesc: 'Nous te recommandons de démarrer par le Module 1 (Les Fondations) pour maîtriser les sons arabes essentiels (7, 3, 9, kh) et les bases.',
+      resultHighDesc: 'Bravo ! Tu as déjà de bonnes bases en Darija.',
       btnStartMod1: 'Démarrer au Module 1 (Les Fondations)',
       btnStartMod3: '🚀 Commencer au Niveau Intermédiaire (Module 3)',
       btnRestartMod1: '🔄 Recommencer depuis le début (Module 1)',
@@ -220,13 +219,8 @@ export default function OnboardingModal({
   };
 
   const handleFinishIntermediate = () => {
-    // Débloque et marque les leçons des modules 1 et 2 comme complétées
-    const m1Lessons = fullCurriculum['1']?.lessons?.map((l) => l.id) || [];
-    const m2Lessons = fullCurriculum['2']?.lessons?.map((l) => l.id) || [];
-    const currentCompleted = useAppStore.getState().completedLessons;
-    const allCompleted = Array.from(new Set([...currentCompleted, ...m1Lessons, ...m2Lessons]));
-
-    setCompletedLessons(allCompleted);
+    // Débloque et marque les modules 1 et 2 comme complétés
+    setCompletedModules(['1', '2']);
     addXp(60);
     completeOnboarding(goal ?? 'travel', minutes ?? 10);
 
