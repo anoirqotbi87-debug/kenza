@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { useTranslation } from '../../store/useAppStore';
 
 interface KenzaLogoProps {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -23,6 +24,8 @@ export const KenzaLogo: React.FC<KenzaLogoProps> = ({
   className = '',
 }) => {
   const dimension = SIZES[size] || SIZES.md;
+  const { t } = useTranslation();
+  const tagline = t.brand?.tagline ?? 'la darija, en chemin';
 
   return (
     <div className={`inline-flex items-center gap-2.5 shrink-0 ${className}`}>
@@ -41,7 +44,7 @@ export const KenzaLogo: React.FC<KenzaLogoProps> = ({
             KENZA
           </span>
           <span className="text-[10px] text-amber-700/80 font-medium tracking-wide">
-            la darija, en chemin
+            {tagline}
           </span>
         </div>
       )}

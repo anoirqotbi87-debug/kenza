@@ -93,6 +93,7 @@ export const translations = {
       later: "Plus tard",
       reassurance: "Gratuit · 30 secondes · Avec Google ou e-mail"
     },
+    brand: { tagline: "la darija, en chemin" },
     common: {
       back: "Retour", loading: "Chargement...", close: "Fermer", save: "Enregistrer", cancel: "Annuler",
       continue: "Continuer", retry: "Réessayer", start: "Commencer", check: "Vérifier", next: "Suivant",
@@ -226,6 +227,7 @@ export const translations = {
       later: "Later",
       reassurance: "Free · 30 seconds · With Google or email"
     },
+    brand: { tagline: "darija, on the way" },
     common: {
       back: "Back", loading: "Loading...", close: "Close", save: "Save", cancel: "Cancel",
       continue: "Continue", retry: "Retry", start: "Start", check: "Check", next: "Next",
@@ -359,6 +361,7 @@ export const translations = {
       later: "Más tarde",
       reassurance: "Gratis · 30 segundos · Con Google o correo"
     },
+    brand: { tagline: "la darija, en camino" },
     common: {
       back: "Atrás", loading: "Cargando...", close: "Cerrar", save: "Guardar", cancel: "Cancelar",
       continue: "Continuar", retry: "Reintentar", start: "Empezar", check: "Comprobar", next: "Siguiente",
@@ -492,6 +495,7 @@ export const translations = {
       later: "لاحقًا",
       reassurance: "مجاني · 30 ثانية · عبر جوجل أو البريد الإلكتروني"
     },
+    brand: { tagline: "الدارجة، في الطريق" },
     common: {
       back: "رجوع", loading: "جاري التحميل...", close: "إغلاق", save: "حفظ", cancel: "إلغاء",
       continue: "استمر", retry: "حاول مجدداً", start: "ابدأ", check: "تحقق", next: "التالي",
