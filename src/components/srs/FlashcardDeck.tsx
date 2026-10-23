@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Volume2, Info, RotateCw } from 'lucide-react';
+import { Volume2, Volume1, Info, RotateCw } from 'lucide-react';
 import { VocabularySRSData, ReviewGrade, SRSCard } from '../../types/srs';
 import { playAudio } from '../../lib/audio';
+import { hapticSuccess, hapticError } from '../../lib/haptics';
 import { useAppStore, useTranslation } from '../../store/useAppStore';
 import { getLocalizedText } from '../../lib/i18n/utils';
 import { getWordFromDictionary } from '../../data/srs-deck';
@@ -16,10 +17,22 @@ interface FlashcardDeckProps {
   onComplete: () => void;
 }
 
+/** Vitesse de la lecture lente du mode Écoute Pure */
+const SLOW_SPEED = 0.75;
+
+/**
+ * Une carte est « jouable » si elle a un fichier audio statique ou un texte à
+ * synthétiser en darija marocaine (TTS Edge). Sans aucun des deux, le mode
+ * Écoute Pure est désactivé pour cette carte (affichage normal).
+ * Exportée pour les tests.
+ */
+export const hasPlayableAudio = (w: VocabularySRSData | null): boolean =>
+  !!w && (!!w.audioUrl || !!w.arabizi || !!w.arabic);
+
 export default function FlashcardDeck({ cards, vocabulary, onComplete }: FlashcardDeckProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-  const { preferredNotation, soundEnabled, reviewCard, customVocabulary } = useAppStore();
+  const { preferredNotation, soundEnabled, reviewCard, customVocabulary, blindAudioMode } = useAppStore();
   const { lang, t } = useTranslation();
 
   // Helper de résolution de carte
@@ -47,6 +60,10 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
   const currentSRSCard = validCards[currentIndex];
   const wordData = currentSRSCard ? resolveCardWord(currentSRSCard.wordId || currentSRSCard.id) : null;
 
+  // Mode Écoute Pure : actif uniquement si (a) l'utilisateur l'a activé et
+  // (b) la carte est réellement jouable. Sinon → affichage normal de la carte.
+  const isBlindAudio = blindAudioMode && !isFlipped && hasPlayableAudio(wordData);
+
   // Auto-skip silencieux si une carte orpheline subsiste pour ne jamais bloquer l'apprenant
   useEffect(() => {
     if (validCards.length > 0 && !wordData && currentIndex < validCards.length) {
@@ -61,11 +78,44 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
     }
   }, [wordData, currentIndex, validCards.length, onComplete]);
 
+  const handlePlayAudio = useCallback((e?: React.MouseEvent, slow: boolean = false) => {
+    e?.stopPropagation();
+    if (!wordData) return;
+    const speed = slow ? SLOW_SPEED : 1.0;
+    if (wordData.audioUrl) {
+      playAudio(wordData.arabizi || wordData.arabic, wordData.audioUrl, soundEnabled, speed);
+    } else {
+      playAudio(wordData.arabizi || wordData.arabic, wordData.arabic, soundEnabled, speed);
+    }
+  }, [wordData, soundEnabled]);
+
+  // Lecture audio automatique en mode Écoute Pure : à chaque nouvelle carte
+  // (non retournée), on déclenche une première écoute. Ref pour éviter les
+  // doubles volées lors des re-rendus de l'état d'animation.
+  const blindAutoplayRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (!isBlindAudio || !wordData) return;
+    // Ne pas relancer si la carte courante a déjà été écoutée
+    if (blindAutoplayRef.current === currentIndex) return;
+    blindAutoplayRef.current = currentIndex;
+    const timer = setTimeout(() => {
+      handlePlayAudio();
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [isBlindAudio, wordData, currentIndex, handlePlayAudio]);
+
   const handleGrade = useCallback((grade: ReviewGrade) => {
     if (!currentSRSCard) return;
-    
+
     reviewCard(currentSRSCard.wordId, grade);
-    
+
+    // Retour haptique distinct selon le résultat de l'évaluation
+    if (grade === 'again') {
+      hapticError();
+    } else {
+      hapticSuccess();
+    }
+
     setIsFlipped(false);
     setTimeout(() => {
       if (currentIndex < validCards.length - 1) {
@@ -195,16 +245,6 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
     });
   };
 
-  const handlePlayAudio = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    // Priorité à l'audio statique s'il existe, sinon synthèse vocale marocaine (arabizi + arabe)
-    if (wordData.audioUrl) {
-      playAudio(wordData.arabizi || wordData.arabic, wordData.audioUrl, soundEnabled);
-    } else {
-      playAudio(wordData.arabizi || wordData.arabic, wordData.arabic, soundEnabled);
-    }
-  };
-
   return (
     <div className="flex flex-col items-center justify-center w-full max-w-2xl mx-auto py-4 [perspective:1000px]">
       
@@ -267,10 +307,46 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
               <div className="flex justify-center scale-110">
                 <CardIllustration illustration={wordData.illustration} />
               </div>
-              
-              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-normal text-[#1B2A4A] tracking-tight">
-                {getLocalizedText(wordData.translation, lang)}
-              </h2>
+
+              {isBlindAudio ? (
+                <>
+                  {/* Mode Écoute Pure : pas de texte visible, icône animée + lecture lente */}
+                  <div className="flex flex-col items-center gap-5 py-2">
+                    <motion.button
+                      type="button"
+                      onClick={(e) => handlePlayAudio(e, false)}
+                      aria-label="Écouter le mot"
+                      className="w-20 h-20 rounded-full bg-[#1B2A4A] text-[#C9A05C] flex items-center justify-center shadow-md relative"
+                      animate={{ scale: [1, 1.08, 1] }}
+                      transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut' }}
+                    >
+                      <Volume2 className="w-9 h-9" />
+                      <motion.span
+                        className="absolute inset-0 rounded-full border-2 border-[#C9A05C]/40"
+                        animate={{ opacity: [0.7, 0], scale: [1, 1.35] }}
+                        transition={{ repeat: Infinity, duration: 1.6, ease: 'easeOut' }}
+                      />
+                    </motion.button>
+
+                    <button
+                      type="button"
+                      onClick={(e) => handlePlayAudio(e, true)}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#F7F3EA] border border-[#E8E2D5] text-xs font-bold text-[#1B2A4A] hover:bg-[#C9A05C]/10 transition-colors"
+                    >
+                      <Volume1 className="w-4 h-4 text-[#C9A05C]" />
+                      🐢 {t.srs?.slowListen || "Écoute lente"}
+                    </button>
+
+                    <p className="text-[11px] text-[#7A7670] font-medium">
+                      {t.srs?.listenPrompt || "Écoutez le mot en darija puis retournez la carte"}
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-normal text-[#1B2A4A] tracking-tight">
+                  {getLocalizedText(wordData.translation, lang)}
+                </h2>
+              )}
             </div>
             
             {/* Flip prompt hint */}

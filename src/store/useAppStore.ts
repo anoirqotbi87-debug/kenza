@@ -33,6 +33,9 @@ interface AppState {
   audioSpeed: number;
   uiLanguage: UILanguage;
   regionalVariant: 'chamal' | 'casablanca' | 'fes';
+  /** Mode « Écoute Pure » : le recto des flashcards SRS masque les textes (arabe/arabizi)
+   *  et force l'écoute audio avant le retournement. */
+  blindAudioMode: boolean;
   
   // Actions
   addXp: (amount: number) => void;
@@ -45,6 +48,7 @@ interface AppState {
   setNotation: (notation: Notation) => void;
   toggleSound: () => void;
   setAudioSpeed: (speed: number) => void;
+  setBlindAudioMode: (enabled: boolean) => void;
   setLanguage: (lang: UILanguage) => void;
   setRegionalVariant: (variant: 'chamal' | 'casablanca' | 'fes') => void;
   
@@ -100,6 +104,7 @@ export const useAppStore = create<AppState>()(
       audioSpeed: 1.0,
       uiLanguage: 'fr',
       regionalVariant: 'casablanca',
+      blindAudioMode: false,
       
       hasCompletedOnboarding: false,
       userGoal: null,
@@ -274,6 +279,7 @@ export const useAppStore = create<AppState>()(
       toggleSound: () => set((state: AppState) => ({ soundEnabled: !state.soundEnabled })),
 
       setAudioSpeed: (speed: number) => set({ audioSpeed: speed }),
+      setBlindAudioMode: (enabled: boolean) => set({ blindAudioMode: enabled }),
       
       setLanguage: (lang: UILanguage) => {
         const value = (lang || 'fr').toLowerCase() as UILanguage;
@@ -395,7 +401,7 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'darija-quest-storage',
-      version: 5,
+      version: 6,
       partialize: (state: AppState) => {
         // isPremium est exclu : c'est un droit payant, il ne doit jamais pouvoir être
         // débloqué en éditant le localStorage. Source de vérité unique : profiles.is_premium,
@@ -438,6 +444,12 @@ export const useAppStore = create<AppState>()(
           // le total « X / N » reste juste, mais les lecons apparaissent à refaire.
           if (Array.isArray(state.completedLessons)) {
             state.completedLessons = migrateLegacyLessonIds(state.completedLessons);
+          }
+        }
+        if (version < 6) {
+          // Mode « Écoute Pure » ajouté en v6 : absent des persistances antérieures.
+          if (typeof state.blindAudioMode !== 'boolean') {
+            (state as { blindAudioMode?: boolean }).blindAudioMode = false;
           }
         }
         return state;
