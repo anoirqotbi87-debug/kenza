@@ -89,12 +89,33 @@ describe('LiveInteractiveTour 6 Steps & Non-overlapping Compact Tooltip', () => 
     expect(tourSource).toContain("const isRtl = langKey === 'ar'");
   });
 
-  it('garantit le défilement du conteneur parent scrollable et le positionnement au-dessus de la carte VIP à l’étape 6', () => {
-    expect(tourSource).toContain("vipSection.closest('.overflow-y-auto')");
-    expect(tourSource).toContain("vipSection.scrollIntoView({ behavior: 'smooth', block: 'center' })");
-    expect(tourSource).toContain("scrollWaitTime = nextConfig.key === 'space-vip' ? 400 : 350");
+  it('garantit le défilement vers la carte VIP à l’étape 6, centré et sans conteneur scrollable fantôme', () => {
+    // Garde-fou : la page (window) est le seul conteneur scrollable de Mon Espace.
+    // Un scrollTo sur <main> (non scrollable) était un no-op silencieux.
+    expect(tourSource).not.toContain(".closest('.overflow-y-auto')");
+    expect(tourSource).toContain('scrollWhenMounted');
+    expect(tourSource).toContain('VIP_TARGET_SELECTOR');
+    expect(tourSource).toContain("'center'");
+    expect(tourSource).toContain('scrollWaitTime = nextConfig.key === \'space-vip\' ? 400 : 350');
     expect(tourSource).toContain("currentStep.key === 'space-vip'");
     expect(tourSource).toContain("effectivePlacement = 'top'");
+  });
+
+  it('attend le montage de la cible et la stabilisation du défilement avant de mesurer', () => {
+    // Sur mobile lent, la vue Space est montée après la bascule d'onglet : la mesure
+    // doit suivre la stabilisation du rect, pas un délai fixe.
+    expect(tourSource).toContain('settleAndReveal');
+    expect(tourSource).toContain('MAX_SCROLL_WAIT');
+    expect(tourSource).toContain('Math.abs(top - lastTop) < 1');
+  });
+
+  it('vise une cible réellement rendue : le burger masqué en desktop bascule sur la sidebar', () => {
+    // .mobile-menu-trigger est display:none dès 901px : viser le burger en desktop
+    // dessinait un halo de 20px dans le coin supérieur gauche.
+    const menuStep = TOUR_STEPS.find((s) => s.key === 'header-menu');
+    expect(menuStep?.targetSelector).toBe('#tour-hamburger-btn');
+    expect(menuStep?.fallbackSelector).toBe('#tour-side-nav');
+    expect(tourSource).toContain('isRendered');
   });
 
   it('masque la bannière d’installation PWA tant que le tour interactif est actif ou non complété', () => {

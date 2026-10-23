@@ -782,7 +782,7 @@ export default function Home() {
         </div>
 
         <div className="sidebar-label">{t.side.learn || tr("APPRENDRE", "LEARN", "APRENDER", "تعلّم")}</div>
-        <nav className="side-nav" aria-label={tr("Navigation principale", "Main navigation", "Navegación principal", "التنقل الرئيسي")}>
+        <nav id="tour-side-nav" className="side-nav" aria-label={tr("Navigation principale", "Main navigation", "Navegación principal", "التنقل الرئيسي")}>
           {navItems.map((item) => {
             const Icon = item.icon;
             return (
