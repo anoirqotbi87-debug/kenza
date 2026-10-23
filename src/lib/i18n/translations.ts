@@ -74,7 +74,11 @@ export const translations = {
       smartReviewsTitle: "Révisions Intelligentes",
       smartReviewsDesc: "Mémorisez le vocabulaire de la Darija pour toujours grâce à notre système de répétition espacée.",
       cardsToReview: "Cartes à réviser",
-      startSession: "Commencer la session"
+      startSession: "Commencer la session",
+      blindMode: "Mode Écoute Pure",
+      blindModeDesc: "Masque les textes et force l'écoute audio avant de révéler la réponse.",
+      slowListen: "Écoute lente",
+      listenPrompt: "Écoutez le mot en darija puis retournez la carte"
     },
     leagues: {
       bronze: "Bronze", silver: "Argent", gold: "Or", diamond: "Diamant"
@@ -208,7 +212,11 @@ export const translations = {
       smartReviewsTitle: "Smart Reviews",
       smartReviewsDesc: "Memorize Darija vocabulary forever with our spaced repetition system.",
       cardsToReview: "Cards to review",
-      startSession: "Start session"
+      startSession: "Start session",
+      blindMode: "Pure Listening Mode",
+      blindModeDesc: "Hides the texts and forces audio listening before revealing the answer.",
+      slowListen: "Slow listen",
+      listenPrompt: "Listen to the word in darija then flip the card"
     },
     leagues: {
       bronze: "Bronze", silver: "Silver", gold: "Gold", diamond: "Diamond"
@@ -342,7 +350,11 @@ export const translations = {
       smartReviewsTitle: "Repasos Inteligentes",
       smartReviewsDesc: "Memoriza el vocabulario del Darija para siempre con nuestro sistema de repetición espaciada.",
       cardsToReview: "Tarjetas para repasar",
-      startSession: "Comenzar sesión"
+      startSession: "Comenzar sesión",
+      blindMode: "Modo Escucha Pura",
+      blindModeDesc: "Oculta los textos y fuerza la escucha del audio antes de revelar la respuesta.",
+      slowListen: "Escuchar lento",
+      listenPrompt: "Escucha la palabra en darija y luego gira la tarjeta"
     },
     leagues: {
       bronze: "Bronce", silver: "Plata", gold: "Oro", diamond: "Diamante"
@@ -476,7 +488,11 @@ export const translations = {
       smartReviewsTitle: "المراجعات الذكية",
       smartReviewsDesc: "احفظ مفردات الدارجة للأبد بنظام التكرار المتباعد.",
       cardsToReview: "بطاقات للمراجعة",
-      startSession: "ابدأ الجلسة"
+      startSession: "ابدأ الجلسة",
+      blindMode: "وضع الاستماع الصافي",
+      blindModeDesc: "يخفي النصوص ويفرض الاستماع إلى الصوت قبل كشف الإجابة.",
+      slowListen: "استماع بطيء",
+      listenPrompt: "استمع إلى الكلمة بالدارجة ثم اقلب البطاقة"
     },
     leagues: {
       bronze: "برونزية", silver: "فضية", gold: "ذهبية", diamond: "ماسية"

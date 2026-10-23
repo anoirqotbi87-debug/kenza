@@ -9,7 +9,7 @@ import { Sparkles, ArrowRight, ArrowLeft, CheckCircle2, BookOpen, RotateCw, Plus
 import { SRSCard } from '../../types/srs';
 
 export default function SRSDashboard() {
-  const { getDueCards, addCardsToSRS, activateNewCards, srsDeck } = useAppStore();
+  const { getDueCards, addCardsToSRS, activateNewCards, srsDeck, blindAudioMode, setBlindAudioMode } = useAppStore();
   const { t, lang } = useTranslation();
   const [isReviewing, setIsReviewing] = useState(false);
   const [sessionCards, setSessionCards] = useState<SRSCard[]>([]);
@@ -161,13 +161,39 @@ export default function SRSDashboard() {
           </div>
 
           {/* Action button */}
-          <button
-            onClick={handleStartReview}
-            className="w-full max-w-sm py-4 px-6 bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] rounded-full font-bold text-sm shadow-md hover:shadow-lg transition-all flex justify-center items-center gap-3 active:scale-95"
-          >
-            <span>{t.srs?.startSession || "Lancer la session de révision"}</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+          <div className="w-full max-w-sm space-y-4">
+            {/* Toggle Mode Écoute Pure */}
+            <button
+              type="button"
+              onClick={() => setBlindAudioMode(!blindAudioMode)}
+              className={`w-full flex items-center justify-between gap-3 px-5 py-3.5 rounded-2xl border transition-all text-left ${
+                blindAudioMode
+                  ? 'bg-[#1B2A4A] border-[#1B2A4A] text-[#FDFCF8]'
+                  : 'bg-[#F7F3EA] border-[#E8E2D5] text-[#1B2A4A]'
+              }`}
+              aria-pressed={blindAudioMode}
+            >
+              <span className="flex items-center gap-2.5">
+                <span className={`w-7 h-4 rounded-full relative transition-colors ${blindAudioMode ? 'bg-[#C9A05C]' : 'bg-[#C9A05C]/40'}`}>
+                  <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${blindAudioMode ? 'left-3.5' : 'left-0.5'}`} />
+                </span>
+                <span className="text-left">
+                  <span className="block text-xs font-bold">{t.srs?.blindMode || "Mode Écoute Pure"}</span>
+                  <span className={`block text-[10px] font-medium ${blindAudioMode ? 'text-[#FDFCF8]/70' : 'text-[#7A7670]'}`}>
+                    {t.srs?.blindModeDesc || "Masque les textes et force l'écoute audio avant de révéler la réponse."}
+                  </span>
+                </span>
+              </span>
+            </button>
+
+            <button
+              onClick={handleStartReview}
+              className="w-full py-4 px-6 bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] rounded-full font-bold text-sm shadow-md hover:shadow-lg transition-all flex justify-center items-center gap-3 active:scale-95"
+            >
+              <span>{t.srs?.startSession || "Lancer la session de révision"}</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
         </>
       ) : (
         <>
