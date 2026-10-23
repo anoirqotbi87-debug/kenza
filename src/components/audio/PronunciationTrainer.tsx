@@ -223,7 +223,11 @@ export default function PronunciationTrainer({
 
       {/* Voice Recording Interaction Area */}
       <div className="flex flex-col items-center gap-4 pt-2">
-        {isSupported ? (
+        {isSupported === false ? (
+          <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-800 text-center max-w-sm">
+            Reconnaissance vocale non disponible sur ce navigateur. Mode écoute uniquement activé.
+          </div>
+        ) : (
           <button
             type="button"
             onClick={handleMicToggle}
@@ -240,18 +244,14 @@ export default function PronunciationTrainer({
               <Mic className="w-8 h-8 text-[#C9A05C]" />
             )}
           </button>
-        ) : (
-          <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-800 text-center max-w-sm">
-            Reconnaissance vocale non disponible sur ce navigateur. Mode écoute uniquement activé.
-          </div>
         )}
 
         <div className="text-xs font-bold text-[#7A7670]">
           {isListening
             ? (isAr ? 'جاري الاستماع... كرر الجملة بصوت واضح' : 'Écoute en cours... Répétez la phrase à voix haute')
-            : isSupported
-            ? (isAr ? 'اضغط على الميكروفون لاختبار نطقك' : 'Appuyez sur le micro pour tester votre prononciation')
-            : (isAr ? 'استمع إلى النموذج الصوتي أعلاه' : 'Écoutez le modèle audio ci-dessus')}
+            : isSupported === false
+            ? (isAr ? 'استمع إلى النموذج الصوتي أعلاه' : 'Écoutez le modèle audio ci-dessus')
+            : (isAr ? 'اضغط على الميكروفون لاختبار نطقك' : 'Appuyez sur le micro pour tester votre prononciation')}
         </div>
 
         {/* Live captured transcript */}

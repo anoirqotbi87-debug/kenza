@@ -1,6 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useSyncExternalStore } from 'react';
+
+// `useSyncExternalStore` exige une fonction d'abonnement stable : le support du micro
+// ne change pas en cours de session, donc aucun événement à écouter.
+const subscribeToNothing = () => () => {};
 
 // Minimal typings for the Web Speech API (not part of lib.dom.d.ts).
 interface SpeechRecognitionAlternativeLike {
@@ -38,10 +42,14 @@ declare global {
 }
 
 export function useVoiceRecognition(lang = 'ar-MA', timeoutMs = 5000) {
-  const [isSupported] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
-  });
+  // `getServerSnapshot` renvoie `null` : pendant l'hydratation React réutilise cette
+  // valeur, donc le premier rendu client est identique au HTML SSR. Lire
+  // `window.SpeechRecognition` pendant le rendu provoquait l'erreur React #418.
+  const isSupported = useSyncExternalStore(
+    subscribeToNothing,
+    () => !!(window.SpeechRecognition || window.webkitSpeechRecognition),
+    () => null
+  );
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [error, setError] = useState<string | null>(null);
