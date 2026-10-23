@@ -75,6 +75,10 @@ interface AppState {
   /** UI seulement : vrai quand le quota audio du jour est epuise (non persiste). */
   audioQuotaExceeded: boolean;
   setAudioQuotaExceeded: (exceeded: boolean) => void;
+
+  /** UI seulement : vrai quand la visite guidee en direct (tour interactif) est active (non persiste). */
+  isLiveTourActive: boolean;
+  setIsLiveTourActive: (active: boolean) => void;
 }
 
 const isClientVipActive = (): boolean => {
@@ -141,6 +145,8 @@ export const useAppStore = create<AppState>()(
 
       audioQuotaExceeded: false,
       setAudioQuotaExceeded: (exceeded: boolean) => set({ audioQuotaExceeded: exceeded }),
+      isLiveTourActive: false,
+      setIsLiveTourActive: (active: boolean) => set({ isLiveTourActive: active }),
       
       setRegionalVariant: (variant: AppState['regionalVariant']) => set({ regionalVariant: variant }),
       
@@ -403,6 +409,7 @@ export const useAppStore = create<AppState>()(
         const {
           isPremium: _isPremium,
           audioQuotaExceeded: _audioQuotaExceeded,
+          isLiveTourActive: _isLiveTourActive,
           ...rest
         } = state;
         return rest;

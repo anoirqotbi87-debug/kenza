@@ -1334,7 +1334,7 @@ export default function Home() {
         }}
       />
 
-      <InstallPwaBanner />
+      <InstallPwaBanner tourActive={liveTourOpen} />
     </div>
   );
 }
@@ -2508,7 +2508,7 @@ function SpaceView({
           )}
         </article>
 
-        <div id="tour-space-vip">
+        <div id="tour-space-vip" data-tour="space-vip" className="vip-promo-card scroll-mt-24">
           <VipPromoCard user={user} isPremium={isPremium} onToast={onToast} />
         </div>
 

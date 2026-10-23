@@ -230,12 +230,20 @@ export default function LiveInteractiveTour({
   const langKey = (uiLanguage === 'ar' ? 'ar' : uiLanguage === 'en' ? 'en' : uiLanguage === 'es' ? 'es' : 'fr') as 'fr' | 'en' | 'es' | 'ar';
   const isRtl = langKey === 'ar';
 
+  const setIsLiveTourActive = useAppStore((s) => s.setIsLiveTourActive);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   const transitionTimerRef = useRef<NodeJS.Timeout | null>(null);
   const retryTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Synchronisation du statut global du Tour dans le Store
+  useEffect(() => {
+    setIsLiveTourActive(isOpen);
+    return () => setIsLiveTourActive(false);
+  }, [isOpen, setIsLiveTourActive]);
 
   const currentStep = TOUR_STEPS[currentIndex];
   const isFirst = currentIndex === 0;
@@ -245,7 +253,10 @@ export default function LiveInteractiveTour({
   const measureElement = useCallback(
     (selector: string) => {
       if (!isOpen || typeof document === 'undefined') return false;
-      const element = document.querySelector(selector) as HTMLElement | null;
+      const element = (document.querySelector(selector) ||
+        (selector.includes('vip')
+          ? document.querySelector('#tour-space-vip, [data-tour="space-vip"], .vip-promo-card')
+          : null)) as HTMLElement | null;
 
       if (element) {
         const rect = element.getBoundingClientRect();
@@ -264,7 +275,10 @@ export default function LiveInteractiveTour({
     if (!isOpen || isTransitioning) return;
     const step = TOUR_STEPS[currentIndex];
     if (step) {
-      const element = document.querySelector(step.targetSelector) as HTMLElement | null;
+      const element = (document.querySelector(step.targetSelector) ||
+        (step.key === 'space-vip'
+          ? document.querySelector('#tour-space-vip, [data-tour="space-vip"], .vip-promo-card')
+          : null)) as HTMLElement | null;
       if (element) {
         setTargetRect(element.getBoundingClientRect());
       }
@@ -274,8 +288,8 @@ export default function LiveInteractiveTour({
   // Synchronisation temporelle fluide et sans saccade :
   // 1. Masquage immédiat simultané halo + bulle (opacity: 0, pointer-events: none)
   // 2. Navigation d'onglet
-  // 3. Défilement ciblé doux (start avec marge pour le haut, end pour le bas)
-  // 4. Attente de 350ms : le défilement inertiel est STRICTEMENT terminé et la page 100% immobile
+  // 3. Défilement garanti vers la cible (conteneur parent ou window)
+  // 4. Attente de 350-400ms : défilement achevé et page immobile
   // 5. Mesure directe des coordonnées finales getBoundingClientRect()
   // 6. Réaffichage en un fondu doux (opacity: 1, transition 150ms) SANS jamais bouger
   const executeStepTransition = useCallback(
@@ -297,6 +311,39 @@ export default function LiveInteractiveTour({
       // Lance le défilement orienté vers la cible
       const triggerScroll = () => {
         if (typeof document === 'undefined') return;
+
+        // Étape 6 : Mon Espace / Code VIP (défilement garanti du conteneur parent scrollable)
+        if (nextConfig.key === 'space-vip') {
+          const vipSection = document.querySelector(
+            '#tour-space-vip, [data-tour="space-vip"], .vip-promo-card'
+          ) as HTMLElement | null;
+
+          if (vipSection) {
+            // 1. Défilement direct du conteneur parent scrollable
+            const scrollParent =
+              vipSection.closest('.overflow-y-auto') ||
+              document.querySelector('main') ||
+              window;
+
+            if (scrollParent instanceof HTMLElement) {
+              scrollParent.scrollTo({
+                top: vipSection.offsetTop - 80,
+                behavior: 'smooth',
+              });
+            } else if (typeof window !== 'undefined' && scrollParent === window) {
+              const rect = vipSection.getBoundingClientRect();
+              window.scrollTo({
+                top: window.scrollY + rect.top - 80,
+                behavior: 'smooth',
+              });
+            }
+
+            // 2. Défilement complémentaire sécurisé
+            vipSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          return;
+        }
+
         const isHeader = nextConfig.targetSelector.includes('header');
         if (isHeader) {
           window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -305,31 +352,38 @@ export default function LiveInteractiveTour({
 
         const elem = document.querySelector(nextConfig.targetSelector) as HTMLElement | null;
         if (elem) {
-          // Si l'élément est dans la partie basse (ex: Espace VIP), scroll vers le bas
-          if (nextConfig.key === 'space-vip') {
-            elem.scrollIntoView({ behavior: 'smooth', block: 'end' });
-          } else {
-            // Éléments du haut / milieu : scroll vers le haut sous le header fixe (76px)
-            elem.style.scrollMarginTop = '76px';
-            elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
+          // Éléments du haut / milieu : scroll vers le haut sous le header fixe (76px)
+          elem.style.scrollMarginTop = '76px';
+          elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       };
 
       triggerScroll();
 
-      // Attends 350ms que le défilement inertiel soit strictement terminé et la page 100% immobile
+      // Si transition vers space-vip, ré-exécuter le défilement après un micro-délai pour s'assurer
+      // que le composant SpaceView est monté dans le DOM par React
+      if (nextConfig.key === 'space-vip') {
+        setTimeout(triggerScroll, 80);
+      }
+
+      // Attends 400ms (le temps que le défilement jusqu'au bas de page soit complètement achevé)
+      const scrollWaitTime = nextConfig.key === 'space-vip' ? 400 : 350;
       transitionTimerRef.current = setTimeout(() => {
-        const found = measureElement(nextConfig.targetSelector);
+        const selectorToMeasure =
+          nextConfig.key === 'space-vip'
+            ? '#tour-space-vip, [data-tour="space-vip"], .vip-promo-card'
+            : nextConfig.targetSelector;
+
+        const found = measureElement(selectorToMeasure);
         if (!found) {
           retryTimerRef.current = setTimeout(() => {
-            measureElement(nextConfig.targetSelector);
+            measureElement(selectorToMeasure);
             setIsTransitioning(false);
           }, 150);
         } else {
           setIsTransitioning(false);
         }
-      }, 350);
+      }, scrollWaitTime);
     },
     [onNavigateTab, measureElement]
   );
@@ -372,11 +426,12 @@ export default function LiveInteractiveTour({
       }
     } catch {}
 
+    setIsLiveTourActive(false);
     if (onToggleMenu) {
       onToggleMenu(false);
     }
     onClose();
-  }, [onClose, onToggleMenu]);
+  }, [onClose, onToggleMenu, setIsLiveTourActive]);
 
   // Gestion Échap
   useEffect(() => {
@@ -414,14 +469,14 @@ export default function LiveInteractiveTour({
     calculatedLeft = targetRect.left + targetRect.width / 2 - tooltipWidth / 2;
     const targetCenterY = targetRect.top + targetRect.height / 2;
 
-    // Si la cible est dans la moitié haute : place la bulle sous la cible avec 20px d'écart avec le halo
-    if (targetCenterY < window.innerHeight / 2) {
-      effectivePlacement = 'bottom';
-      calculatedTop = targetRect.bottom + PADDING + 20;
-    } else {
-      // Cible dans la moitié basse : place la bulle au-dessus de la cible avec 20px d'écart avec le halo
+    // Étape 6 (space-vip) : la bulle doit impérativement se placer au-dessus de la carte VIP
+    // pour ne pas mordre sur la barre de navigation du bas.
+    if (currentStep.key === 'space-vip' || targetCenterY >= window.innerHeight / 2) {
       effectivePlacement = 'top';
       calculatedTop = targetRect.top - PADDING - 20 - tooltipHeight;
+    } else {
+      effectivePlacement = 'bottom';
+      calculatedTop = targetRect.bottom + PADDING + 20;
     }
   }
 

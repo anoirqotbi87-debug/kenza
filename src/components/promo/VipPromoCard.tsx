@@ -180,8 +180,10 @@ export default function VipPromoCard({ user, isPremium, onToast }: VipPromoCardP
   if (isPremium) {
     return (
       <article
+        id="tour-space-vip-card"
+        data-tour="space-vip"
         dir={isRtl ? 'rtl' : 'ltr'}
-        className="data-card bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-300/40"
+        className="vip-promo-card data-card bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-300/40"
       >
         <div className="data-card-heading">
           <span className="data-icon bg-amber-500 text-white shadow-sm shrink-0">
@@ -211,8 +213,10 @@ export default function VipPromoCard({ user, isPremium, onToast }: VipPromoCardP
   // 2. Formulaire de saisie du Code VIP
   return (
     <article
+      id="tour-space-vip-card"
+      data-tour="space-vip"
       dir={isRtl ? 'rtl' : 'ltr'}
-      className="data-card border border-amber-200/60 hover:border-amber-300/80 transition-colors"
+      className="vip-promo-card data-card border border-amber-200/60 hover:border-amber-300/80 transition-colors"
     >
       <div className="data-card-heading">
         <span className="data-icon bg-[#142943] text-amber-400 shrink-0">

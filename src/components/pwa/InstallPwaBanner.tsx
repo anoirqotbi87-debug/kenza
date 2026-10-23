@@ -2,16 +2,33 @@
 
 import React, { useState, useEffect } from 'react';
 import { Download, X, Share } from 'lucide-react';
-import { useTranslation } from '../../store/useAppStore';
+import { useTranslation, useAppStore } from '../../store/useAppStore';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
-export default function InstallPwaBanner() {
+interface InstallPwaBannerProps {
+  tourActive?: boolean;
+}
+
+export default function InstallPwaBanner({ tourActive }: InstallPwaBannerProps = {}) {
   const { t } = useTranslation();
   const inst = t.modules.install;
+  const storeTourActive = useAppStore((s) => s.isLiveTourActive);
+  const isTourActive = Boolean(tourActive ?? storeTourActive);
+
+  // Masquage strict : si le tour interactif est en cours d'exécution, la bannière ne doit absolument pas s'afficher
+  const isTourEligible = typeof window !== 'undefined'
+    ? (() => {
+        try {
+          return Boolean(localStorage.getItem('kenza_live_tour_completed'));
+        } catch {
+          return true;
+        }
+      })()
+    : false;
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   // Initialise synchronously from the browser so no state is set from an effect.
   const [isIOS] = useState(() => {
@@ -61,6 +78,7 @@ export default function InstallPwaBanner() {
     setDismissed(true);
   };
 
+  if (isTourActive || !isTourEligible) return null;
   if (dismissed || isStandalone) return null;
   if (!deferredPrompt && !isIOS) return null; // Can't install
 

@@ -3,13 +3,26 @@
 import React, { useEffect, useState } from 'react';
 import { track } from '@/lib/tracking';
 import { KenzaLogo } from '@/components/ui/KenzaLogo';
+import { useAppStore } from '@/store/useAppStore';
 
 /**
  * Bannière flottante en bas pour Android invitant au téléchargement direct de l'APK officiel.
  * N'apparaît que sur Android hors mode PWA installée, sauf si l'utilisateur l'a fermée.
  */
-export function InstallApkBanner() {
+export function InstallApkBanner({ tourActive }: { tourActive?: boolean } = {}) {
   const [isOpen, setIsOpen] = useState(false);
+  const storeTourActive = useAppStore((s) => s.isLiveTourActive);
+  const isTourActive = Boolean(tourActive ?? storeTourActive);
+
+  const isTourEligible = typeof window !== 'undefined'
+    ? (() => {
+        try {
+          return Boolean(localStorage.getItem('kenza_live_tour_completed'));
+        } catch {
+          return true;
+        }
+      })()
+    : false;
 
   useEffect(() => {
     // 1. Vérifier si l'utilisateur a déjà fermé la bannière dans localStorage
@@ -54,6 +67,7 @@ export function InstallApkBanner() {
     setIsOpen(false);
   };
 
+  if (isTourActive || !isTourEligible) return null;
   if (!isOpen) return null;
 
   return (

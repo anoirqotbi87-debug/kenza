@@ -88,4 +88,19 @@ describe('LiveInteractiveTour 6 Steps & Non-overlapping Compact Tooltip', () => 
     expect(tourSource).toContain("dir={isRtl ? 'rtl' : 'ltr'}");
     expect(tourSource).toContain("const isRtl = langKey === 'ar'");
   });
+
+  it('garantit le défilement du conteneur parent scrollable et le positionnement au-dessus de la carte VIP à l’étape 6', () => {
+    expect(tourSource).toContain("vipSection.closest('.overflow-y-auto')");
+    expect(tourSource).toContain("vipSection.scrollIntoView({ behavior: 'smooth', block: 'center' })");
+    expect(tourSource).toContain("scrollWaitTime = nextConfig.key === 'space-vip' ? 400 : 350");
+    expect(tourSource).toContain("currentStep.key === 'space-vip'");
+    expect(tourSource).toContain("effectivePlacement = 'top'");
+  });
+
+  it('masque la bannière d’installation PWA tant que le tour interactif est actif ou non complété', () => {
+    const pwaBannerPath = resolve(__dirname, '../pwa/InstallPwaBanner.tsx');
+    const pwaSource = readFileSync(pwaBannerPath, 'utf-8');
+    expect(pwaSource).toContain('if (isTourActive || !isTourEligible) return null;');
+    expect(pwaSource).toContain('isLiveTourActive');
+  });
 });
