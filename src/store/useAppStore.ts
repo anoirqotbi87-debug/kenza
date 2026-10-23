@@ -81,15 +81,6 @@ interface AppState {
   setIsLiveTourActive: (active: boolean) => void;
 }
 
-const isClientVipActive = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  try {
-    return localStorage.getItem('kenza_vip_active') === 'true';
-  } catch {
-    return false;
-  }
-};
-
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
@@ -113,7 +104,10 @@ export const useAppStore = create<AppState>()(
       hasCompletedOnboarding: false,
       userGoal: null,
       dailyTargetMinutes: null,
-      isPremium: isClientVipActive(),
+      // Doit rester identique au rendu serveur : lire localStorage ici faisait diverger
+      // le premier rendu client du HTML SSR (React #418). Le flag VIP en cache local est
+      // restauré après montage par AuthAndPremiumSync, puis corrigé par profiles.is_premium.
+      isPremium: false,
       hasSeenOnboardingPaywall: false,
 
       completeOnboarding: (goal: AppState['userGoal'], minutes: AppState['dailyTargetMinutes']) => set({
