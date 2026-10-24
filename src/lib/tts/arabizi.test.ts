@@ -100,7 +100,7 @@ describe('arabizi → arabe (translittération TTS)', () => {
 
     it('résout les participes passés à tiret du corpus (« chof-t », « mchi-t »)', () => {
       expect(translateArabiziText('chof-t l-makan')).toBe('شفت المكان');
-      expect(translateArabiziText('mchi-t l-sbitar')).toBe('مشيت لسبتر');
+      expect(translateArabiziText('mchi-t l-sbitar')).toBe('مشيت السبيطار');
     });
 
     it('résout « khellini », pronom suffixé courant', () => {
@@ -141,12 +141,48 @@ describe('arabizi → arabe (translittération TTS)', () => {
     });
   });
 
+  describe('couverture basse fréquence (vol. 2)', () => {
+    it('résout les salutations et remerciements courants', () => {
+      expect(translateArabiziText('chokran bezzaf')).toBe('شكراً بزّاف');
+      expect(translateArabiziText('wa 3alaykum salam')).toBe('و عليكم السلام');
+      expect(translateArabiziText('Salamu 3alaykom salam')).toBe('السلام عليكم السّْلامْ');
+    });
+
+    it('résout la politesse « tfeddel » et le souhait « llah ykhelef »', () => {
+      expect(translateArabiziText('tfeddel a sidi')).toBe('تفضّل أ سيدي');
+      expect(translateArabiziText('llah ykhelef')).toBe('الله يخلّف');
+    });
+
+    it('résout les pronoms affixés et déterminants courants', () => {
+      expect(translateArabiziText('3ndi flous bzzaf')).toBe('عندي فلوس بزّاف');
+      expect(translateArabiziText('bghit nchri l-mdina kollha')).toBe('بغيت نشري المدينة كلّها');
+      expect(translateArabiziText('kheddem l-kountour 3afak')).toBe('خدّام لكونتور عافاك');
+    });
+
+    it('résout les formes verbales de basse fréquence', () => {
+      expect(translateArabiziText('bach kat7ess l-youm')).toBe('باش كاتحسّ اليوم');
+      expect(translateArabiziText('wach had l-khobz tayeb')).toBe('واش هاد لخبز طيّب');
+      expect(translateArabiziText('Bghit nkol l-ghda daba')).toBe('بغيت نكل الغدا دابا');
+      expect(translateArabiziText('L-bareh, mchit l-sbitar')).toBe('لبارح مشيت السبيطار');
+    });
+
+    it('résout la négation élidée « ma 3ndi »', () => {
+      expect(translateArabiziText('ma 3ndi flous')).toBe('ما عندي فلوس');
+      expect(translateArabiziText('Khassni tfakki, ma 3ndi flous')).toBe('خاصّني تفكّي ما عندي فلوس');
+    });
+
+    it('résout le l-sandhi avec noms courants', () => {
+      expect(translateArabiziText('ch7al l-kra f ch-her')).toBe('شحال الكرا ف الشهر');
+      expect(translateArabiziText('bghit nshri l-khobz')).toBe('بغيت نشري لخبز');
+    });
+  });
+
   describe('intégrité du lexique', () => {
     it('ne contient aucune clé dupliquée', async () => {
       const { DARIJA_PHONETIC_MAP } = await import('./lexicon');
       const keys = Object.keys(DARIJA_PHONETIC_MAP);
       expect(new Set(keys).size).toBe(keys.length);
-      expect(keys.length).toBeGreaterThanOrEqual(320);
+      expect(keys.length).toBeGreaterThanOrEqual(470);
     });
   });
 });
