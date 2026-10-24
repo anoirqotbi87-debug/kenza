@@ -816,6 +816,9 @@ export default function Home() {
           <a href="/dictionnaire" onClick={() => setMobileMenuOpen(false)} className="nav-item">
             <span>{trL(lang, "Dictionnaire de survie", "Survival dictionary", "Diccionario de supervivencia", "قاموس البقاء")}</span>
           </a>
+          <a href="/situations" onClick={() => setMobileMenuOpen(false)} className="nav-item">
+            <span>{trL(lang, "Situations du Bled", "Bled situations", "Situaciones del Bled", "مواقف البلد")}</span>
+          </a>
         </nav>
 
         <div className="sidebar-label sidebar-label-spaced">{t.side.oral || tr("PRATIQUE ORALE & IA", "SPEAKING & AI", "PRÁCTICA ORAL E IA", "المحادثة والذكاء الاصطناعي")}</div>
