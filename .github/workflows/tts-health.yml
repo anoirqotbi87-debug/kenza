@@ -1,0 +1,71 @@
+name: TTS health
+
+# Surveillance de la dépendance externe Edge TTS.
+#
+# Volontairement SÉPARÉ de `ci.yml` : la CI de pull request doit rester
+# déterministe et hors ligne. Un incident réseau chez Microsoft ne doit pas
+# rendre une PR rouge — sinon l'alerte finit par être ignorée, ce qui est
+# précisément le mode de défaillance que cette sonde doit éviter.
+
+on:
+  schedule:
+    # Toutes les 6 heures (UTC) — la panne de jetons v1→v2 est restée invisible
+    # plusieurs jours ; 4 contrôles/jour gardent la détection sous 6 heures.
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Sonder le moteur TTS en production
+        id: probe
+        run: npm run check:tts
+        continue-on-error: true
+
+      - name: Ouvrir ou mettre à jour l'issue d'alerte
+        if: steps.probe.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITLE="TTS en production dégradé (sonde automatique)"
+          BODY=$(cat <<'EOF'
+          La sonde planifiée `npm run check:tts` a échoué : le moteur Edge TTS ne
+          renvoie plus un flux audio valide en production.
+
+          **Piste principale** : le schéma du jeton `Sec-MS-GEC` a changé (déjà
+          arrivé une fois, v1 → v2). L'échec est silencieux côté service : il
+          répond `HTTP 200` au handshake au lieu d'ouvrir le WebSocket, donc
+          toute l'application devient muette sans erreur explicite.
+
+          **À inspecter** :
+          - `src/lib/tts/synthesizeEdgeTts.ts` — hôte et en-têtes du handshake
+          - `src/lib/tts/edgeTtsToken.ts` — algorithme du jeton (vecteurs de test)
+
+          Voir le détail du run dans l'onglet Actions de ce dépôt.
+
+          _Issue ouverte automatiquement par un agent (OpenHands)._
+          EOF
+          )
+
+          EXISTING=$(gh issue list --state open --search "$TITLE in:title" --json number --jq '.[0].number')
+          if [ -n "$EXISTING" ]; then
+            echo "Issue #$EXISTING déjà ouverte — ajout d'un commentaire."
+            gh issue comment "$EXISTING" --body "$BODY"
+          else
+            gh issue create --title "$TITLE" --body "$BODY" --label "bug"
+          fi

@@ -66,6 +66,7 @@ twa/
 # local test / audit scripts
 /scripts/*
 !/scripts/generate-roleplay-audio.ts
+!/scripts/check-tts-health.ts
 
 # parasite directories (ex: Dify workflow artefacts)
 /{*
