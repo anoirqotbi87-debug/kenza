@@ -73,4 +73,80 @@ describe('arabizi → arabe (translittération TTS)', () => {
       expect(out).toContain('سوق');
     });
   });
+
+  describe('négations ma-...-ch (lexique enrichi)', () => {
+    it('résout la négation courante « ma bghitch » en une vocalisation authentique', () => {
+      expect(translateArabiziText('ma bghitch')).toBe('ما بغيتش');
+    });
+
+    it('résout « makhddamch » (ne fonctionne pas)', () => {
+      expect(translateArabiziText('makhddamch')).toBe('ما خدمتش');
+    });
+
+    it('gère la variante à tirets du corpus « ma-ghadi-ch »', () => {
+      expect(translateArabiziText('ma-ghadi-ch nqle9')).toBe('ما غاديش نقلق');
+    });
+
+    it('traduit « machi mochkil » comme un ensemble figé', () => {
+      expect(translateArabiziText('machi mochkil')).toBe('ماشي مشكل');
+    });
+  });
+
+  describe('verbes conjugués courants (lexique enrichi)', () => {
+    it('conjugue au présent continu « ka-nkteb » / « ka-ykteb »', () => {
+      expect(translateArabiziText('ka-nkteb')).toBe('كنكتب');
+      expect(translateArabiziText('ka-ykteb')).toBe('كيكتب');
+    });
+
+    it('résout les participes passés à tiret du corpus (« chof-t », « mchi-t »)', () => {
+      expect(translateArabiziText('chof-t l-makan')).toBe('شفت المكان');
+      expect(translateArabiziText('mchi-t l-sbitar')).toBe('مشيت لسبتر');
+    });
+
+    it('résout « khellini », pronom suffixé courant', () => {
+      expect(translateArabiziText('khellini f t-ti9ar')).toBe('خلّيني ف التيقار');
+    });
+
+    it('résout le regret « koun 3ref-t, koun ji-t »', () => {
+      expect(translateArabiziText('koun 3ref-t, koun ji-t')).toBe('كون عرفت كون جيت');
+    });
+
+    it('résout les verbes modaux et d’optatif « khassna », « nchoufou », « n9der »', () => {
+      expect(translateArabiziText('khassna nchoufou l-tbib')).toBe('خاصّنا نشوفو الطبيب');
+      expect(translateArabiziText('n9der')).toBe('نقدر');
+    });
+  });
+
+  describe('compléments figés & mots outils (lexique enrichi)', () => {
+    it('résout les nombres et monnaie « n3tik mya w khemsin derhem »', () => {
+      expect(translateArabiziText('n3tik mya w khemsin derhem')).toBe('نعطيك مية وخمسين درهم');
+    });
+
+    it('résout les possessifs « dyali » / « dyalek »', () => {
+      expect(translateArabiziText('dyali')).toBe('ديالي');
+      expect(translateArabiziText('dyalek')).toBe('ديالك');
+    });
+
+    it('résout « sh7al » (variante sh-) et « f ch-her »', () => {
+      expect(translateArabiziText('sh7al')).toBe('شحال');
+      expect(translateArabiziText('f ch-her')).toBe('ف الشهر');
+    });
+
+    it('résout « 3endek l-heqq », expression de justice courante', () => {
+      expect(translateArabiziText('3endek l-heqq')).toBe('عندك لهقق');
+    });
+
+    it('résout le vocatif « a sidi » sans le réduire au « a » isolé', () => {
+      expect(translateArabiziText('salam a sidi')).toBe('السّْلامْ أ سيدي');
+    });
+  });
+
+  describe('intégrité du lexique', () => {
+    it('ne contient aucune clé dupliquée', async () => {
+      const { DARIJA_PHONETIC_MAP } = await import('./lexicon');
+      const keys = Object.keys(DARIJA_PHONETIC_MAP);
+      expect(new Set(keys).size).toBe(keys.length);
+      expect(keys.length).toBeGreaterThanOrEqual(320);
+    });
+  });
 });
