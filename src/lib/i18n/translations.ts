@@ -131,7 +131,15 @@ export const translations = {
           taxi_transport: "Taxi & transport", souk_shopping: "Souk & shopping", housing_riad: "Logement & riad",
           travel_directions: "Directions", numbers_time: "Nombres & heure", grammar_basics: "Grammaire de base",
           shopping: "Shopping", food_drink: "Nourriture & boissons", all: "Toutes"
-        } }
+        } },
+      situations: { badge: "Situations du Bled", title: "Simulateur de conversations",
+        subtitle: "Entraîne-toi dans des situations réelles au Maroc, comme dans une messagerie.",
+        offlineBadge: "100% hors-ligne", chooseScenario: "Choisis une situation", startOver: "Recommencer",
+        tapWord: "Touche un mot pour voir sa traduction", phoneticKey: "Clé des chiffres Arabizi",
+        feedback: "Pourquoi cette réponse ?", chooseReply: "Choisis ta réponse",
+        correct: "Parfait !", awkward: "Maladroit…", replyHint: "Touche une carte pour répondre",
+        done: "Situation terminée ! 🎉", doneDesc: "Tu as tenu toute la conversation. Bravo !",
+        again: "Rejouer", backToList: "Autres situations", listen: "Écouter", slowListen: "Écoute lente" }
     },
     footer: { tagline: "Apprends la Darija marocaine, un pas à la fois.", rights: "Tous droits réservés." },
     modules: {
@@ -278,7 +286,15 @@ export const translations = {
           taxi_transport: "Taxi & transport", souk_shopping: "Souk & shopping", housing_riad: "Accommodation & riad",
           travel_directions: "Directions", numbers_time: "Numbers & time", grammar_basics: "Basic grammar",
           shopping: "Shopping", food_drink: "Food & drinks", all: "All"
-        } }
+        } },
+      situations: { badge: "Bled Situations", title: "Conversation simulator",
+        subtitle: "Practise real situations in Morocco, right in a chat interface.",
+        offlineBadge: "100% offline", chooseScenario: "Choose a situation", startOver: "Start over",
+        tapWord: "Tap a word to see its translation", phoneticKey: "Arabizi numbers key",
+        feedback: "Why this answer?", chooseReply: "Choose your reply",
+        correct: "Perfect!", awkward: "Awkward…", replyHint: "Tap a card to reply",
+        done: "Situation completed! 🎉", doneDesc: "You held the whole conversation. Well done!",
+        again: "Play again", backToList: "Other situations", listen: "Listen", slowListen: "Slow listen" }
     },
     footer: { tagline: "Learn Moroccan Darija, one step at a time.", rights: "All rights reserved." },
     modules: {
@@ -425,7 +441,15 @@ export const translations = {
           taxi_transport: "Taxi y transporte", souk_shopping: "Souk y compras", housing_riad: "Alojamiento y riad",
           travel_directions: "Direcciones", numbers_time: "Números y hora", grammar_basics: "Gramática básica",
           shopping: "Compras", food_drink: "Comida y bebidas", all: "Todas"
-        } }
+        } },
+      situations: { badge: "Situaciones del Bled", title: "Simulador de conversaciones",
+        subtitle: "Practica situaciones reales en Marruecos, como en una mensajería.",
+        offlineBadge: "100% sin conexión", chooseScenario: "Elige una situación", startOver: "Empezar de nuevo",
+        tapWord: "Toca una palabra para ver su traducción", phoneticKey: "Clave de los números Arabizi",
+        feedback: "¿Por qué esta respuesta?", chooseReply: "Elige tu respuesta",
+        correct: "¡Perfecto!", awkward: "Torpe…", replyHint: "Toca una tarjeta para responder",
+        done: "¡Situación completada! 🎉", doneDesc: "Has mantenido toda la conversación. ¡Bien hecho!",
+        again: "Jugar de nuevo", backToList: "Otras situaciones", listen: "Escuchar", slowListen: "Escucha lenta" }
     },
     footer: { tagline: "Aprende Darija marroquí, paso a paso.", rights: "Todos los derechos reservados." },
     modules: {
@@ -572,7 +596,15 @@ export const translations = {
           taxi_transport: "التاكسي والنقل", souk_shopping: "السوق والتسوق", housing_riad: "السكن والرياض",
           travel_directions: "الاتجاهات", numbers_time: "الأرقام والوقت", grammar_basics: "قواعد أساسية",
           shopping: "التسوق", food_drink: "الطعام والشراب", all: "الكل"
-        } }
+        } },
+      situations: { badge: "مواقف البلد", title: "محاكي المحادثات",
+        subtitle: "تدرّب على مواقف حقيقية في المغرب، كما في دردشة.",
+        offlineBadge: "100٪ دون اتصال", chooseScenario: "اختر موقفا", startOver: "إعادة البدء",
+        tapWord: "المس كلمة لترى ترجمتها", phoneticKey: "مفتاح أرقام العرابيزي",
+        feedback: "لماذا هذا الردّ؟", chooseReply: "اختر ردّك",
+        correct: "ممتاز!", awkward: "غير لبِق…", replyHint: "المس بطاقة للردّ",
+        done: "اكتمل الموقف! 🎉", doneDesc: "أتممت المحادثة كلها. أحسنت!",
+        again: "إعادة اللعب", backToList: "مواقف أخرى", listen: "استمع", slowListen: "استماع بطيء" }
     },
     footer: { tagline: "تعلّم الدارجة المغربية خطوة بخطوة.", rights: "جميع الحقوق محفوظة." },
     modules: {
