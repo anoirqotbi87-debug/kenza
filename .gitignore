@@ -67,6 +67,7 @@ twa/
 /scripts/*
 !/scripts/generate-roleplay-audio.ts
 !/scripts/check-tts-health.ts
+!/scripts/find-open-issue.sh
 
 # parasite directories (ex: Dify workflow artefacts)
 /{*
