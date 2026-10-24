@@ -64,7 +64,8 @@ next-env.d.ts
 twa/
 
 # local test / audit scripts
-/scripts/
+/scripts/*
+!/scripts/generate-roleplay-audio.ts
 
 # parasite directories (ex: Dify workflow artefacts)
 /{*

@@ -2,6 +2,7 @@ import { DialogueScenario } from '../../types/dialogue';
 
 export const cafeFesScenario: DialogueScenario = {
   id: 'cafeFes',
+  voice: 'male',
   title: 'Au Café Populaire / F-L-Gahwa',
   titleI18n: {
     fr: 'Au Café Populaire / F-L-Gahwa',
@@ -39,7 +40,7 @@ export const cafeFesScenario: DialogueScenario = {
       arabicText: 'السَّلَامُ عَلَيْكُم ! آشْ حَبّ الخَاطْرْ أَ سِيدِي ؟',
       arabiziText: 'Salamu 3alaykom ! Ach 7abb l-khatr a sidi ?',
       translationFr: 'Bonjour ! Que désirez-vous monsieur ?',
-      audioKey: 'salam_ach_7abb_lkhatr'
+      audioKey: '/audio/roleplay/cafeFes/turn_1.mp3'
     },
     {
       id: 'turn_2',
@@ -62,7 +63,7 @@ export const cafeFesScenario: DialogueScenario = {
       arabicText: 'وْخَا أَ سِيدِي، تْشْرَبْ مْعَاهْ كَاسْ دْ المَا ؟',
       arabiziText: 'Wakha a sidi, tchreb m3ah kas d-l-ma ?',
       translationFr: "D'accord monsieur, vous buvez un verre d'eau avec ?",
-      audioKey: 'wakha_kas_dlma'
+      audioKey: '/audio/roleplay/cafeFes/turn_3.mp3'
     },
     {
       id: 'turn_4',
@@ -85,7 +86,7 @@ export const cafeFesScenario: DialogueScenario = {
       arabicText: 'هَا هُوَ أَتَايْ سْخُونْ، المَجْمُوعْ سَبْعْتَاشْ دَرْهَم',
       arabiziText: 'Ha howa atay skhoun, l-majmo3 seb3tache derhem.',
       translationFr: 'Voici le thé bien chaud, le total fait 17 dirhams.',
-      audioKey: 'atay_skhoun_17_derhem'
+      audioKey: '/audio/roleplay/cafeFes/turn_5.mp3'
     },
     {
       id: 'turn_6',

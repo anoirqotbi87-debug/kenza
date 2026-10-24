@@ -2,6 +2,7 @@ import { DialogueScenario } from '../../types/dialogue';
 
 export const soukFesScenario: DialogueScenario = {
   id: 'soukFes',
+  voice: 'male',
   title: 'Négociation au Souk / F-S-Souq',
   titleI18n: {
     fr: 'Négociation au Souk / F-S-Souq',
@@ -39,7 +40,7 @@ export const soukFesScenario: DialogueScenario = {
       arabicText: 'مَرْحْبَا بِيك أَ خُويَا ! دْخُلْ تْفَرَّجْ، كُلْشِي زْوِينْ',
       arabiziText: 'Mre7ba bik a khoya ! Dkhol tferrej, kolchi zwin.',
       translationFr: 'Bienvenue mon frère ! Entre regarder, tout est beau.',
-      audioKey: 'mre7ba_dkhol_tferrej'
+      audioKey: '/audio/roleplay/soukFes/turn_1.mp3'
     },
     {
       id: 'turn_2',
@@ -62,7 +63,7 @@ export const soukFesScenario: DialogueScenario = {
       arabicText: 'هَادَاك نْحَاسْ حُرّ دْ فَاسْ، كَانْحْسْبُو بْ مْيَاتَيْنْ دَرْهَم',
       arabiziText: 'Hadak n7as 7orr d-Fas, kan7esbo b-myatayn derhem.',
       translationFr: "C'est du vrai cuivre de Fès, je le fais à 200 dirhams.",
-      audioKey: 'n7as_7orr_200_derhem'
+      audioKey: '/audio/roleplay/soukFes/turn_3.mp3'
     },
     {
       id: 'turn_4',
@@ -85,7 +86,7 @@ export const soukFesScenario: DialogueScenario = {
       arabicText: 'صَافِي، بْرْبَّاحْ، نْخَلِّيهْ لِيكْ بْ مْيَة وْ خَمْسِينْ حِيتْ 3جْبْتِينِي',
       arabiziText: 'Safi, b-r-rba7, nkhellih lik b-mya w khemsin 7it 3jebtini.',
       translationFr: "D'accord, c'est une affaire, je te le laisse à 150 parce que tu es sympathique.",
-      audioKey: 'safi_150_7it_3jebtini'
+      audioKey: '/audio/roleplay/soukFes/turn_5.mp3'
     },
     {
       id: 'turn_6',

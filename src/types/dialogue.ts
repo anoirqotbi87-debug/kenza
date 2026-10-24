@@ -15,8 +15,14 @@ export interface DialogueTurn {
   };
 }
 
+export type DialogueVoice = 'male' | 'female';
+
 export interface DialogueScenario {
   id: string;
+  /** Voix Edge TTS du bot (ar-MA-JamalNeural male / ar-MA-MounaNeural female).
+   *  Cohérente entre le MP3 statique pré-généré, le fallback TTS et les
+   *  répliques du chat IA. Défaut féminine. */
+  voice?: DialogueVoice;
   title: string;
   titleFr?: string;
   titleI18n?: { fr: string; ar: string; en: string; es: string };

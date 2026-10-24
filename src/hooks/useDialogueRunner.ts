@@ -34,6 +34,8 @@ export function useDialogueRunner(scenario: DialogueScenario, soundEnabled: bool
   } = useVoiceRecognition('ar-MA', 5000);
 
   const currentTurn = scenario.turns[state.currentTurnIndex];
+  // Voix du bot : stable pour la durée du composant (les scénarios sont statiques).
+  const scenarioVoice: 'male' | 'female' = scenario.voice || 'female';
 
   // Engine loop
   useEffect(() => {
@@ -55,10 +57,17 @@ export function useDialogueRunner(scenario: DialogueScenario, soundEnabled: bool
         return s;
       });
 
-      // Play audio : synthèse Edge TTS marocaine sur la forme arabe vocalisée.
-      // (L'éventuel audioKey pré-enregistré reste une extension future — aucun
-      // mp3 de rôleplay n'existe aujourd'hui, le fallback TTS est assumé.)
-      await playAudio(currentTurn.arabiziText || currentTurn.arabicText, currentTurn.arabicText, soundEnabled);
+      // Audio : si le tour bot dispose d'un MP3 pré-généré (audioKey), il est
+      // joué en priorité (zéro quota, hors-ligne natif via le service worker).
+      // Sinon, fallback Edge TTS sur la forme arabe vocalisée avec la voix du
+      // scénario — cohérente avec le MP3 pré-généré par scripts/generate-roleplay-audio.
+      await playAudio(
+        currentTurn.arabiziText || currentTurn.arabicText,
+        currentTurn.audioKey || currentTurn.arabicText,
+        soundEnabled,
+        1.0,
+        { voice: scenarioVoice }
+      );
       
       // Proceed to next turn
       setState(s => ({ ...s, isBotSpeaking: false, currentTurnIndex: s.currentTurnIndex + 1 }));
@@ -75,7 +84,7 @@ export function useDialogueRunner(scenario: DialogueScenario, soundEnabled: bool
       // We will add it to history as an empty bubble waiting for input, or just show the expected text in the input area.
       // Usually, user's turn bubble is only added after they speak.
     }
-  }, [state.currentTurnIndex, currentTurn, state.isCompleted, soundEnabled, state.isBotSpeaking, state.userWaiting]);
+  }, [state.currentTurnIndex, currentTurn, state.isCompleted, soundEnabled, state.isBotSpeaking, state.userWaiting, scenarioVoice]);
 
   const validateUserInputRef = useRef<(input: string) => void>(() => {});
 

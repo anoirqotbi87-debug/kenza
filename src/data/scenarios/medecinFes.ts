@@ -2,6 +2,7 @@ import { DialogueScenario } from '../../types/dialogue';
 
 export const medecinFes: DialogueScenario = {
   id: 'medecinFes',
+  voice: 'male',
   title: 'F-l-Klinik',
   titleFr: 'Chez le Médecin',
   titleI18n: {
@@ -49,7 +50,7 @@ export const medecinFes: DialogueScenario = {
       arabicText: 'تْفَضَّلْ أَ سِيدِيْ، بَاشْ كَتْحَسْ لْيُومْ؟',
       arabiziText: 'Tfeddel a sidi, bach kat7ess l-youm?',
       translationFr: 'Entrez monsieur, qu\'est-ce que vous ressentez aujourd\'hui ?',
-      audioKey: '/audio/roleplay/medecin/t1.mp3'
+      audioKey: '/audio/roleplay/medecinFes/t1.mp3'
     },
     {
       id: 't2',
@@ -80,7 +81,7 @@ export const medecinFes: DialogueScenario = {
       arabicText: 'وَاْخَا، غَادِيْ نْقَلْبَكْ دَابَا. تْنَفَّسْ مْزْيَانْ.',
       arabiziText: 'Wakha, ghadi n9ellbek daba. Tneffes mezyan.',
       translationFr: 'D\'accord, je vais vous examiner maintenant. Respirez bien.',
-      audioKey: '/audio/roleplay/medecin/t3.mp3'
+      audioKey: '/audio/roleplay/medecinFes/t3.mp3'
     },
     {
       id: 't4',
@@ -111,7 +112,7 @@ export const medecinFes: DialogueScenario = {
       arabicText: 'عَنْدَكْ غِيرْ رْوَاحْ خْفِيفْ. هَادِيْ لُورْدُونُونْصْ، خُودْ هَادْ الدَّوَا مُورَا الْمَاكْلَةْ.',
       arabiziText: '3endek ghir rwa7 khfif. Hadi l-ordonnance, khoud had d-dwa mowra l-makla.',
       translationFr: 'Vous avez juste un léger rhume. Voici l\'ordonnance, prenez ce médicament après les repas.',
-      audioKey: '/audio/roleplay/medecin/t5.mp3'
+      audioKey: '/audio/roleplay/medecinFes/t5.mp3'
     },
     {
       id: 't6',
