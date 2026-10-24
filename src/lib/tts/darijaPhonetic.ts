@@ -15,6 +15,8 @@
  *    de tronquer les 150 dernières millisecondes de l'audio.
  */
 
+import { translateArabiziText } from './arabizi';
+
 /** Dictionnaire de réécriture phonétique marocaine (Phonetic Respelling) */
 export const DARIJA_RESPEL_MAP: Record<string, string> = {
   'عفاك': 'عافاك',
@@ -66,11 +68,23 @@ export function prepareDarijaForTts(text: string): string {
   let cleaned = text.trim();
   if (cleaned.length === 0) return '';
 
-  // 1. Supprimer les balises éventuelles et délimiteurs
+  // 1. Supprimer les balises éventuelles et délimiteurs (avant tout test de
+  //    script : les balises [ARZ] ne doivent pas polluer la translittération).
   cleaned = cleaned
     .replace(/\[\/?(AR|ARZ|FR|TR|SUGG)\]/gi, '')
     .replace(/[()«»""'']/g, '')
     .trim();
+  if (cleaned.length === 0) return '';
+
+  // 0. Translittération Arabizi quand l'entrée est majoritairement latine :
+  //    Edge TTS ne lit que l'arabe ; sans cela, « bghit 9hwa nss-nss » aurait
+  //    produit une chaîne vide (tout le latin était supprimé). La darija en
+  //    arabizi est convertie via le lexique vocalisé puis la translittération.
+  const hasLatin = /[a-zA-Z0-9]/.test(cleaned);
+  const hasArabic = /[\u0600-\u06FF]/.test(cleaned);
+  if (hasLatin && !hasArabic) {
+    return prepareDarijaForTts(translateArabiziText(cleaned));
+  }
 
   // 2. Convertir les chiffres Arabizi résiduels (3->ع, 7->ح, 9->ق, 5->خ)
   cleaned = cleaned

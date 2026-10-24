@@ -131,7 +131,7 @@ export default function PronunciationTrainer({
       currentExercise.arabic,
       soundEnabled,
       speed === 'slow' ? 0.75 : 1.0,
-      { speed, voice: 'female' }
+      { voice: 'female' }
     );
   };
 

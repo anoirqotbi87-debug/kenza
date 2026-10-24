@@ -149,7 +149,6 @@ export default function RoleplayChat({
         true,
         speed === 'slow' ? 0.75 : 1.0,
         {
-          speed,
           voice: gender,
           consumeQuota: false,
         }

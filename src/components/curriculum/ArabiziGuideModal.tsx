@@ -36,7 +36,7 @@ export default function ArabiziGuideModal({ onClose }: ArabiziGuideModalProps) {
       arabicWithTashkeel,
       soundEnabled,
       speed === 'slow' ? 0.75 : 1.0,
-      { speed, voice: 'female' }
+      { voice: 'female' }
     );
   };
 

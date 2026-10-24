@@ -19,7 +19,12 @@ describe('normalizeDarija', () => {
   });
 
   it('convertit mot par mot et caractère par caractère en arabe hors carte connue', () => {
-    expect(normalizeDarija('wash ghadi 3la 7al')).toBe('wash غadi عla حal');
+    // Le lexique enrichi résout désormais les mots courants (wash, ghadi, 3la, 7al)
+    expect(normalizeDarija('wash ghadi 3la 7al')).toBe('واش غادي على حال');
+  });
+
+  it('normalise les mots arabizi courants via le lexique (digits, digraphes, voix)', () => {
+    expect(normalizeDarija('bghit mzyan 3omri')).toBe('بغيت مزيان عمري');
   });
 
   it('ignore un arabicText vide et utilise le texte principal avec la prononciation darija', () => {
