@@ -96,6 +96,29 @@ const CORPUS: DictionaryEntry[] = [
   aliases: (w as EssentialSRSWord).aliases ?? [],
 }));
 
+/** Index id → entrée, construit une fois : résolution directe des favoris. */
+const BY_ID = new Map<string, DictionaryEntry>(CORPUS.map((entry) => [entry.id, entry]));
+
+/** Retourne l'entrée d'identifiant `id`, ou `undefined`. */
+export function getDictionaryEntry(id: string): DictionaryEntry | undefined {
+  return BY_ID.get(id);
+}
+
+/** Résout une liste d'identifiants (favoris) en entrées, ordre préservé,
+ *  doublons et identifiants inconnus ignorés. */
+export function getDictionaryEntries(ids: readonly string[]): DictionaryEntry[] {
+  const seen = new Set<string>();
+  const entries: DictionaryEntry[] = [];
+  for (const id of ids) {
+    if (seen.has(id)) continue;
+    const entry = BY_ID.get(id);
+    if (!entry) continue;
+    seen.add(id);
+    entries.push(entry);
+  }
+  return entries;
+}
+
 /** Score de similarité entre une saisie et un mot : 0 = parfait. Les préfixes
  *  et correspondances exactes sont fortement favorisés. */
 function scoreWord(queryNorm: string, wordNorm: string): number {
