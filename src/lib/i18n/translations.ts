@@ -122,7 +122,16 @@ export const translations = {
         badge: "Révisions & Progression", title: "Révisions & Paquets de cartes",
         tabSrs: "Révision intelligente", tabDecks: "Mes paquets de cartes", tabGamification: "Progression & Badges",
         activityMap: "Carte d'activité", myBadges: "Mes badges", weeklyLeague: "Ligues hebdomadaires"
-      }
+      },
+      dictionnaire: { badge: "Dictionnaire de Survie", title: "Dictionnaire de Darija hors-ligne",
+        searchPlaceholder: "Chercher un mot : chhal, pain, شحال…", search: "Rechercher", noResults: "Aucun résultat",
+        offlineBadge: "100% hors-ligne", listen: "Écouter", slowListen: "Écoute lente",
+        categories: {
+          polite_social: "Politesse & social", cafe_resto: "Café & restaurant", urgencies_health: "Urgences & santé",
+          taxi_transport: "Taxi & transport", souk_shopping: "Souk & shopping", housing_riad: "Logement & riad",
+          travel_directions: "Directions", numbers_time: "Nombres & heure", grammar_basics: "Grammaire de base",
+          shopping: "Shopping", food_drink: "Nourriture & boissons", all: "Toutes"
+        } }
     },
     footer: { tagline: "Apprends la Darija marocaine, un pas à la fois.", rights: "Tous droits réservés." },
     modules: {
@@ -260,7 +269,16 @@ export const translations = {
         badge: "Reviews & Progress", title: "Reviews & Card Decks",
         tabSrs: "Smart Review", tabDecks: "My Card Decks", tabGamification: "Progress & Badges",
         activityMap: "Activity map", myBadges: "My badges", weeklyLeague: "Weekly leagues"
-      }
+      },
+      dictionnaire: { badge: "Survival Dictionary", title: "Offline Darija dictionary",
+        searchPlaceholder: "Search a word: chhal, bread, شحال…", search: "Search", noResults: "No results",
+        offlineBadge: "100% offline", listen: "Listen", slowListen: "Slow listen",
+        categories: {
+          polite_social: "Politeness & social", cafe_resto: "Coffee & restaurant", urgencies_health: "Emergencies & health",
+          taxi_transport: "Taxi & transport", souk_shopping: "Souk & shopping", housing_riad: "Accommodation & riad",
+          travel_directions: "Directions", numbers_time: "Numbers & time", grammar_basics: "Basic grammar",
+          shopping: "Shopping", food_drink: "Food & drinks", all: "All"
+        } }
     },
     footer: { tagline: "Learn Moroccan Darija, one step at a time.", rights: "All rights reserved." },
     modules: {
@@ -398,7 +416,16 @@ export const translations = {
         badge: "Repasos y Progreso", title: "Repasos y Mazos de tarjetas",
         tabSrs: "Repaso inteligente", tabDecks: "Mis mazos de tarjetas", tabGamification: "Progreso y Logros",
         activityMap: "Mapa de actividad", myBadges: "Mis logros", weeklyLeague: "Ligas semanales"
-      }
+      },
+      dictionnaire: { badge: "Diccionario de Supervivencia", title: "Diccionario de Darija sin conexión",
+        searchPlaceholder: "Busca una palabra: chhal, pan, شحال…", search: "Buscar", noResults: "Sin resultados",
+        offlineBadge: "100% sin conexión", listen: "Escuchar", slowListen: "Escucha lenta",
+        categories: {
+          polite_social: "Cortesía y social", cafe_resto: "Café y restaurante", urgencies_health: "Emergencias y salud",
+          taxi_transport: "Taxi y transporte", souk_shopping: "Souk y compras", housing_riad: "Alojamiento y riad",
+          travel_directions: "Direcciones", numbers_time: "Números y hora", grammar_basics: "Gramática básica",
+          shopping: "Compras", food_drink: "Comida y bebidas", all: "Todas"
+        } }
     },
     footer: { tagline: "Aprende Darija marroquí, paso a paso.", rights: "Todos los derechos reservados." },
     modules: {
@@ -536,7 +563,16 @@ export const translations = {
         badge: "المراجعات والتقدم", title: "المراجعات وبطاقاتي",
         tabSrs: "المراجعة الذكية", tabDecks: "بطاقاتي", tabGamification: "التقدم والأوسمة",
         activityMap: "خريطة النشاط", myBadges: "أوسمتي", weeklyLeague: "الترتيب الأسبوعي"
-      }
+      },
+      dictionnaire: { badge: "قاموس البقاء", title: "قاموس الدارجة دون اتصال",
+        searchPlaceholder: "ابحث عن كلمة: chhal، خبز، شحال…", search: "بحث", noResults: "لا نتائج",
+        offlineBadge: "يعمل 100% دون اتصال", listen: "استمع", slowListen: "استماع بطيء",
+        categories: {
+          polite_social: "المجاملات والاجتماعي", cafe_resto: "المقهى والمطعم", urgencies_health: "الطوارئ والصحة",
+          taxi_transport: "التاكسي والنقل", souk_shopping: "السوق والتسوق", housing_riad: "السكن والرياض",
+          travel_directions: "الاتجاهات", numbers_time: "الأرقام والوقت", grammar_basics: "قواعد أساسية",
+          shopping: "التسوق", food_drink: "الطعام والشراب", all: "الكل"
+        } }
     },
     footer: { tagline: "تعلّم الدارجة المغربية خطوة بخطوة.", rights: "جميع الحقوق محفوظة." },
     modules: {
