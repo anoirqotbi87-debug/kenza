@@ -2,6 +2,7 @@ import { DialogueScenario } from '../../types/dialogue';
 
 export const loyerFes: DialogueScenario = {
   id: 'loyerFes',
+  voice: 'female',
   title: 'Kré d-Dar',
   titleFr: 'Négociation de Loyer',
   titleI18n: {
@@ -49,7 +50,7 @@ export const loyerFes: DialogueScenario = {
       arabicText: 'مرحباً بِكْ أَ سِيدِيْ. الدَّارْ عْجَبَاتْكْ؟',
       arabiziText: 'Mar7ba bik a sidi. D-dar 3ejbatk?',
       translationFr: 'Bienvenue monsieur. La maison vous a plu ?',
-      audioKey: '/audio/roleplay/loyer/t1.mp3'
+      audioKey: '/audio/roleplay/loyerFes/t1.mp3'
     },
     {
       id: 't2',
@@ -80,7 +81,7 @@ export const loyerFes: DialogueScenario = {
       arabicText: 'الوَاجِبْ هُوْ تَلْتَالَافْ دِرْهَمْ لِلشَّهْرْ، وْ شَهْرِينْ دْ الضْمَانْ.',
       arabiziText: 'L-wajib howa teltalaf derhem l-ch-chher, w chahrayn d d-daman.',
       translationFr: 'Le loyer est de 3000 dirhams par mois, et deux mois de caution.',
-      audioKey: '/audio/roleplay/loyer/t3.mp3'
+      audioKey: '/audio/roleplay/loyerFes/t3.mp3'
     },
     {
       id: 't4',
@@ -112,7 +113,7 @@ export const loyerFes: DialogueScenario = {
       arabicText: 'وَاْخَا سِيدِيْ، مَاشِيْ مُشْكِلْ. وْ لَكِنْ الْمَا وْ الضُّوْ عْلِيكْ.',
       arabiziText: 'Wakha sidi, machi mouchkil. Walakin l-ma w d-dow 3lik.',
       translationFr: 'D\'accord monsieur, pas de problème. Mais l\'eau et l\'électricité sont à votre charge.',
-      audioKey: '/audio/roleplay/loyer/t5.mp3'
+      audioKey: '/audio/roleplay/loyerFes/t5.mp3'
     },
     {
       id: 't6',

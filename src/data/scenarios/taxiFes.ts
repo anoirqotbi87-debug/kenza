@@ -2,6 +2,7 @@ import { DialogueScenario } from '../../types/dialogue';
 
 export const taxiFesScenario: DialogueScenario = {
   id: 'taxiFes',
+  voice: 'male',
   title: 'Le Petit Taxi vers Bab Boujloud',
   titleI18n: {
     fr: 'Le Petit Taxi vers Bab Boujloud',
@@ -39,7 +40,7 @@ export const taxiFesScenario: DialogueScenario = {
       arabicText: 'السَّلَامْ ! فِينْ غَادِي ؟',
       arabiziText: 'Salam ! Fin ghadi ?',
       translationFr: 'Bonjour ! Où vas-tu ?',
-      audioKey: 'salam_fin_ghadi' // Clé pour la synthèse vocale ou l'audio pré-enregistré
+      audioKey: '/audio/roleplay/taxiFes/turn_1.mp3'
     },
     {
       id: 'turn_2',
@@ -62,7 +63,7 @@ export const taxiFesScenario: DialogueScenario = {
       arabicText: 'مَرْحْبَا، طْلَعْ !',
       arabiziText: 'Mre7ba, tle3 !',
       translationFr: 'Bienvenue, monte !',
-      audioKey: 'mre7ba_tle3'
+      audioKey: '/audio/roleplay/taxiFes/turn_3.mp3'
     },
     {
       id: 'turn_4',
@@ -85,7 +86,7 @@ export const taxiFesScenario: DialogueScenario = {
       arabicText: 'هَا حْنَا وْصَلْنَا، طْنْعَاشْ دَرْهَمْ',
       arabiziText: 'Ha 7na wselna, tne3ch derhem.',
       translationFr: 'Nous voilà arrivés, 12 dirhams.',
-      audioKey: 'ha_7na_wselna_12_derhem'
+      audioKey: '/audio/roleplay/taxiFes/turn_5.mp3'
     },
     {
       id: 'turn_6',

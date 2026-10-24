@@ -81,6 +81,20 @@ describe('dialogues — integrite des scenarios', () => {
       expect(new Set(ids).size, scenario.id).toBe(ids.length);
     }
   });
+
+  it('chaque replique bot a une audioKey statique bien formee', () => {
+    for (const { scenario } of DIALOGUE_CATALOG) {
+      for (const turn of scenario.turns) {
+        if (turn.speaker !== 'bot') continue;
+        const where = `${scenario.id}.${turn.id}`;
+        expect(turn.audioKey, `${where} audioKey manquante`).toBeDefined();
+        // Pattern : /audio/roleplay/<scenarioId>/<turnId>.mp3
+        expect(turn.audioKey, `${where} audioKey`).toMatch(
+          new RegExp(`^/audio/roleplay/${scenario.id}/${turn.id}\\.mp3$`)
+        );
+      }
+    }
+  });
 });
 
 describe('dialogues — tours utilisateur exploitables par l apprenant', () => {
