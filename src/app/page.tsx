@@ -36,6 +36,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAppStore, useTranslation } from "@/store/useAppStore";
 import type { User } from "@supabase/supabase-js";
 import { KenzaLogo } from "@/components/ui/KenzaLogo";
+import GemOfTheDayCard from "@/components/culture/GemOfTheDayCard";
 
 const tr = (fr: string, en: string, es: string, ar: string) => {
   const lang = useAppStore.getState().uiLanguage;
@@ -819,6 +820,9 @@ export default function Home() {
           <a href="/situations" onClick={() => setMobileMenuOpen(false)} className="nav-item">
             <span>{trL(lang, "Situations du Bled", "Bled situations", "Situaciones del Bled", "مواقف البلد")}</span>
           </a>
+          <a href="/culture" onClick={() => setMobileMenuOpen(false)} className="nav-item">
+            <span>{trL(lang, "Sagesse & Street Darija", "Wisdom & Street Darija", "Sabiduría y dariya de la calle", "حكمة ودارجة الشارع")}</span>
+          </a>
         </nav>
 
         <div className="sidebar-label sidebar-label-spaced">{t.side.oral || tr("PRATIQUE ORALE & IA", "SPEAKING & AI", "PRÁCTICA ORAL E IA", "المحادثة والذكاء الاصطناعي")}</div>
@@ -1485,6 +1489,8 @@ function TodayView({
           </button>
         </article>
       </div>
+
+      <GemOfTheDayCard />
 
       <div className="section-heading">
         <div>

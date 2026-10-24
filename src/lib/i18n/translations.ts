@@ -139,7 +139,16 @@ export const translations = {
         feedback: "Pourquoi cette réponse ?", chooseReply: "Choisis ta réponse",
         correct: "Parfait !", awkward: "Maladroit…", replyHint: "Touche une carte pour répondre",
         done: "Situation terminée ! 🎉", doneDesc: "Tu as tenu toute la conversation. Bravo !",
-        again: "Rejouer", backToList: "Autres situations", listen: "Écouter", slowListen: "Écoute lente" }
+        again: "Rejouer", backToList: "Autres situations", listen: "Écouter", slowListen: "Écoute lente" },
+      culture: { badge: "Sagesse & Street Darija", title: "Perles culturelles de Darija",
+        subtitle: "Les formules qu’on te tend et les proverbes qu’on te lance : apprends la bonne réplique et la sagesse qui va avec.",
+        offlineBadge: "100% hors-ligne", tabPoliteness: "Politesse & Rituels", tabWisdom: "Sagesse de la Rue",
+        heard: "Ce qu’on te dit", answer: "La bonne réplique", literal: "Traduction littérale",
+        meaning: "Ce que ça veut dire", inTheStreet: "Dans la rue",
+        listen: "Écouter", slowListen: "Écoute lente", addToSrs: "Réviser (SRS)", addedToSrs: "Ajouté aux révisions",
+        favorite: "Ajouter aux favoris", unfavorite: "Retirer des favoris", onlyFavorites: "Mes favoris",
+        emptyFavorites: "Aucune perle dans tes favoris pour cet onglet.", gemsLabel: "perles",
+        widgetKicker: "PERLE CULTURELLE DU JOUR", widgetCta: "Voir toutes les perles" }
     },
     footer: { tagline: "Apprends la Darija marocaine, un pas à la fois.", rights: "Tous droits réservés." },
     modules: {
@@ -294,7 +303,16 @@ export const translations = {
         feedback: "Why this answer?", chooseReply: "Choose your reply",
         correct: "Perfect!", awkward: "Awkward…", replyHint: "Tap a card to reply",
         done: "Situation completed! 🎉", doneDesc: "You held the whole conversation. Well done!",
-        again: "Play again", backToList: "Other situations", listen: "Listen", slowListen: "Slow listen" }
+        again: "Play again", backToList: "Other situations", listen: "Listen", slowListen: "Slow listen" },
+      culture: { badge: "Sagesse & Street Darija", title: "Darija cultural gems",
+        subtitle: "The formulas people hand you and the proverbs they throw at you: learn the right reply and the wisdom behind it.",
+        offlineBadge: "100% offline", tabPoliteness: "Politeness & Rituals", tabWisdom: "Street Wisdom",
+        heard: "What you hear", answer: "The right reply", literal: "Literal translation",
+        meaning: "What it really means", inTheStreet: "In the street",
+        listen: "Listen", slowListen: "Slow listen", addToSrs: "Review (SRS)", addedToSrs: "Added to reviews",
+        favorite: "Add to favourites", unfavorite: "Remove from favourites", onlyFavorites: "My favourites",
+        emptyFavorites: "No gems in your favourites for this tab.", gemsLabel: "gems",
+        widgetKicker: "CULTURAL GEM OF THE DAY", widgetCta: "See all gems" }
     },
     footer: { tagline: "Learn Moroccan Darija, one step at a time.", rights: "All rights reserved." },
     modules: {
@@ -449,7 +467,16 @@ export const translations = {
         feedback: "¿Por qué esta respuesta?", chooseReply: "Elige tu respuesta",
         correct: "¡Perfecto!", awkward: "Torpe…", replyHint: "Toca una tarjeta para responder",
         done: "¡Situación completada! 🎉", doneDesc: "Has mantenido toda la conversación. ¡Bien hecho!",
-        again: "Jugar de nuevo", backToList: "Otras situaciones", listen: "Escuchar", slowListen: "Escucha lenta" }
+        again: "Jugar de nuevo", backToList: "Otras situaciones", listen: "Escuchar", slowListen: "Escucha lenta" },
+      culture: { badge: "Sabiduría & Darija de la Calle", title: "Joyas culturales del dariya",
+        subtitle: "Las fórmulas que te tienden y los refranes que te lanzan: aprende la respuesta correcta y la sabiduría que hay detrás.",
+        offlineBadge: "100% sin conexión", tabPoliteness: "Cortesía y rituales", tabWisdom: "Sabiduría de la calle",
+        heard: "Lo que te dicen", answer: "La respuesta correcta", literal: "Traducción literal",
+        meaning: "Lo que significa", inTheStreet: "En la calle",
+        listen: "Escuchar", slowListen: "Escucha lenta", addToSrs: "Repasar (SRS)", addedToSrs: "Añadido al repaso",
+        favorite: "Añadir a favoritos", unfavorite: "Quitar de favoritos", onlyFavorites: "Mis favoritos",
+        emptyFavorites: "No hay joyas en tus favoritos para esta pestaña.", gemsLabel: "joyas",
+        widgetKicker: "JOYA CULTURAL DEL DÍA", widgetCta: "Ver todas las joyas" }
     },
     footer: { tagline: "Aprende Darija marroquí, paso a paso.", rights: "Todos los derechos reservados." },
     modules: {
@@ -604,7 +631,16 @@ export const translations = {
         feedback: "لماذا هذا الردّ؟", chooseReply: "اختر ردّك",
         correct: "ممتاز!", awkward: "غير لبِق…", replyHint: "المس بطاقة للردّ",
         done: "اكتمل الموقف! 🎉", doneDesc: "أتممت المحادثة كلها. أحسنت!",
-        again: "إعادة اللعب", backToList: "مواقف أخرى", listen: "استمع", slowListen: "استماع بطيء" }
+        again: "إعادة اللعب", backToList: "مواقف أخرى", listen: "استمع", slowListen: "استماع بطيء" },
+      culture: { badge: "حكمة ودارجة الشارع", title: "جواهر الدارجة الثقافية",
+        subtitle: "الصيغ التي تُقال لك والأمثال التي تُرمى إليك: تعلّم الردّ الصحيح والحكمة وراءه.",
+        offlineBadge: "100٪ دون اتصال", tabPoliteness: "اللياقة والطقوس", tabWisdom: "حكمة الشارع",
+        heard: "ما يُقال لك", answer: "الردّ الصحيح", literal: "الترجمة الحرفية",
+        meaning: "ما يعنيه", inTheStreet: "في الشارع",
+        listen: "استمع", slowListen: "استماع بطيء", addToSrs: "مراجعة (SRS)", addedToSrs: "أُضيف إلى المراجعة",
+        favorite: "أضف إلى المفضلة", unfavorite: "أزل من المفضلة", onlyFavorites: "مفضلتي",
+        emptyFavorites: "لا توجد جواهر في مفضلتك لهذا التبويب.", gemsLabel: "جوهرة",
+        widgetKicker: "جوهرة اليوم الثقافية", widgetCta: "عرض كل الجواهر" }
     },
     footer: { tagline: "تعلّم الدارجة المغربية خطوة بخطوة.", rights: "جميع الحقوق محفوظة." },
     modules: {
