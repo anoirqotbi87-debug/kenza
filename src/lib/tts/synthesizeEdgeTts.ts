@@ -1,12 +1,27 @@
 import WebSocket from 'ws';
 import crypto from 'crypto';
 
-function generateSecMsGec(): string {
-  const ticks = Math.floor(Date.now() / 1000) + 11644473600;
-  const rounded = ticks - (ticks % 300);
-  const windowsTicks = BigInt(rounded) * BigInt(10000000);
-  const data = windowsTicks.toString() + '6A5AA1D4EAFF4E9FB37E23D68491D6F4';
-  return crypto.createHash('sha256').update(data).digest('hex').toUpperCase();
+import { generateSecMsGecV2, SEC_MS_GEC_VERSION, TRUSTED_CLIENT_TOKEN } from './edgeTtsToken';
+
+const CHROMIUM_MAJOR = '143';
+const USER_AGENT =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
+  `(KHTML, like Gecko) Chrome/${CHROMIUM_MAJOR}.0.0.0 Safari/537.36 Edg/${CHROMIUM_MAJOR}.0.0.0`;
+
+/**
+ * Hôte historique du service « Read Aloud » d'Edge. C'est le seul point d'entrée
+ * qui accepte encore le jeton `Sec-MS-GEC` v2 ; l'hôte `api.msedgeservices.com`
+ * répond `HTTP 200` (donc jamais d'upgrade WebSocket) et casse la synthèse.
+ */
+const WSS_BASE = 'wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1';
+
+function connectId(): string {
+  return crypto.randomUUID().replace(/-/g, '');
+}
+
+/** Horodatage au format JavaScript attendu par le service (bug assumé côté Edge). */
+function dateToString(): string {
+  return new Date().toUTCString();
 }
 
 export interface EdgeTtsOptions {
@@ -17,8 +32,11 @@ export interface EdgeTtsOptions {
 }
 
 /**
- * Synthétise un texte en audio MP3 via le protocole WebSocket officiel Edge TTS mis à jour (api.msedgeservices.com).
- * Résout le problème de 403 Forbidden apparu sur l'ancien hôte déprécié speech.platform.bing.com.
+ * Synthétise un texte en audio MP3 via le protocole WebSocket Edge TTS.
+ *
+ * Le service exige désormais un jeton `Sec-MS-GEC` **v2** (voir `edgeTtsToken`).
+ * Avec un jeton v1, le handshake échoue en `HTTP 200` au lieu d'ouvrir la
+ * connexion : la synthèse échouait alors pour toute l'application.
  */
 export async function synthesizeEdgeTts(
   ssml: string,
@@ -27,19 +45,27 @@ export async function synthesizeEdgeTts(
   const timeoutMs = options.timeoutMs || 15000;
 
   return new Promise((resolve, reject) => {
-    const secMsGec = generateSecMsGec();
-    const connectionId = crypto.randomUUID().replace(/-/g, '');
-    const url = `wss://api.msedgeservices.com/tts/cognitiveservices/websocket/v1?Ocp-Apim-Subscription-Key=6A5AA1D4EAFF4E9FB37E23D68491D6F4&Sec-MS-GEC=${secMsGec}&Sec-MS-GEC-Version=1-143.0.3650.75&ConnectionId=${connectionId}`;
+    const url =
+      `${WSS_BASE}?TrustedClientToken=${TRUSTED_CLIENT_TOKEN}` +
+      `&ConnectionId=${connectId()}` +
+      `&Sec-MS-GEC=${generateSecMsGecV2()}` +
+      `&Sec-MS-GEC-Version=${SEC_MS_GEC_VERSION}`;
 
     const ws = new WebSocket(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0',
-        'Origin': 'chrome-extension://jdiccldimpdaibmpdkjnbmckianbfold',
+        'User-Agent': USER_AGENT,
+        'Accept-Encoding': 'gzip, deflate, br, zstd',
+        'Accept-Language': 'en-US,en;q=0.9',
+        Pragma: 'no-cache',
+        'Cache-Control': 'no-cache',
+        Origin: 'chrome-extension://jdiccldimpdaibmpdkjnbmckianbfold',
+        'Sec-WebSocket-Version': '13',
+        Cookie: `muid=${crypto.randomBytes(16).toString('hex').toUpperCase()};`,
       },
     });
 
     const chunks: Buffer[] = [];
-    const reqId = crypto.randomUUID().replace(/-/g, '');
+    const reqId = connectId();
 
     const timer = setTimeout(() => {
       try {
@@ -50,7 +76,9 @@ export async function synthesizeEdgeTts(
 
     ws.on('open', () => {
       ws.send(
-        'Content-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n' +
+        `X-Timestamp:${dateToString()}\r\n` +
+          'Content-Type:application/json; charset=utf-8\r\n' +
+          'Path:speech.config\r\n\r\n' +
           JSON.stringify({
             context: {
               synthesis: {
@@ -63,7 +91,12 @@ export async function synthesizeEdgeTts(
           })
       );
 
-      const ssmlMsg = `X-RequestId:${reqId}\r\nContent-Type:application/ssml+xml\r\nPath:ssml\r\n\r\n${ssml.trim()}`;
+      const ssmlMsg =
+        `X-RequestId:${reqId}\r\n` +
+        'Content-Type:application/ssml+xml\r\n' +
+        `X-Timestamp:${dateToString()}Z\r\n` +
+        'Path:ssml\r\n\r\n' +
+        ssml.trim();
       ws.send(ssmlMsg);
     });
 
@@ -87,9 +120,15 @@ export async function synthesizeEdgeTts(
         try {
           ws.close();
         } catch {}
-        const audioBuffer = Buffer.concat(chunks);
-        resolve(audioBuffer);
+        resolve(Buffer.concat(chunks));
       }
+    });
+
+    // Un refus d'upgrade arrive ici : sans ce garde-fou, l'erreur générique ne
+    // disait pas pourquoi la synthèse échouait (jeton expiré, hôte obsolète…).
+    ws.on('unexpected-response', (_req, res) => {
+      clearTimeout(timer);
+      reject(new Error(`Edge TTS handshake refused: HTTP ${res.statusCode}`));
     });
 
     ws.on('error', (err: unknown) => {

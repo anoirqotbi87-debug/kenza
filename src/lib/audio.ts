@@ -144,22 +144,28 @@ export const playAudio = async (
 
   // Quota des écoutes gratuites : on refuse AVANT toute requête réseau (sauf si explicitement exempté)
   const shouldCheckQuota = options?.consumeQuota !== false && shouldConsumeAudioQuota(text, audioUrl);
-  if (shouldCheckQuota) {
-    const { isPremium, setAudioQuotaExceeded } = useAppStore.getState();
-    const storage = audioQuotaStorage();
-    const now = new Date();
-    const isVipOrPremium = isPremium || isVipClientActive(storage);
+  const { isPremium, setAudioQuotaExceeded } = useAppStore.getState();
+  const storage = audioQuotaStorage();
+  const now = new Date();
+  const isVipOrPremium = isPremium || isVipClientActive(storage);
 
+  if (shouldCheckQuota) {
     if (!hasAudioQuota(storage, isVipOrPremium, now)) {
       setAudioQuotaExceeded(true);
       return;
     }
-    if (!isVipOrPremium) {
-      recordAudioPlay(storage, now);
-    } else {
-      setAudioQuotaExceeded(false);
-    }
+    if (isVipOrPremium) setAudioQuotaExceeded(false);
   }
+
+  // Une écoute n'est décomptée qu'au démarrage effectif de la lecture : une
+  // synthèse en échec (réseau, service indisponible) ne doit pas consommer le
+  // quota d'un utilisateur qui n'a rien entendu.
+  let quotaRecorded = false;
+  const consumeQuotaOnce = () => {
+    if (!shouldCheckQuota || quotaRecorded || isVipOrPremium) return;
+    quotaRecorded = true;
+    recordAudioPlay(storage, now);
+  };
 
   // Arrêter tout audio Web Audio précédemment en cours
   stopAudio();
@@ -230,6 +236,7 @@ export const playAudio = async (
           }
           resolve();
         };
+        consumeQuotaOnce();
         source.start();
       });
     } catch (e) {
@@ -296,6 +303,7 @@ export const playAudio = async (
           }
           resolve();
         };
+        consumeQuotaOnce();
         source.start();
       });
     } catch (e) {
