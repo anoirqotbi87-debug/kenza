@@ -94,6 +94,14 @@ function audioQuotaStorage(): Storage | null {
 }
 
 export interface AudioOptions {
+  /**
+   * Vitesse de synthèse Edge TTS (SSML), distincte du playbackRate Web Audio.
+   * - `'normal'` : débit SSML courant (-8 %).
+   * - `'slow'`  : mode tortue, débit SSML ralenti (-28 %), SANS re-ralentissement
+   *   Web Audio supplémentaire. Utiliser UNE SEULE strate : soit le SSML ralenti
+   *   (options.speed='slow'), soit un playbackRate < 1 (paramètre `speed`),
+   *   jamais les deux.
+   */
   speed?: number | 'normal' | 'slow';
   voice?: 'female' | 'male' | 'ar-MA-JamalNeural' | 'ar-MA-MounaNeural';
   consumeQuota?: boolean;
@@ -119,12 +127,18 @@ export const playAudio = async (
   if (!soundEnabled) return;
   if (!text && !audioUrl) return;
 
-  // Resolve speed and voice parameters
-  const speedParam: 'normal' | 'slow' =
-    options?.speed === 'slow' || speed === 'slow' || (typeof speed === 'number' && speed <= 0.8)
-      ? 'slow'
-      : 'normal';
-  const numericSpeed = typeof speed === 'number' ? speed : (speedParam === 'slow' ? 0.75 : 1.0);
+  // Resolve speed and voice parameters.
+  // Le ralentissement se déclare PAR UNE SEULE strate :
+  //  - options.speed === 'slow'      → SSML ralenti (-28 %), playbackRate normal
+  //  - paramètre `speed` < 1         → playbackRate abaissé, débit SSML normal
+  //  - paramètre `speed` === 'slow'  → équivalent à options.speed='slow'
+  const useSsmlSlow =
+    options?.speed === 'slow' || speed === 'slow';
+  const speedParam: 'normal' | 'slow' = useSsmlSlow ? 'slow' : 'normal';
+  // Une strate unique : si le SSML est déjà ralenti, playbackRate neutre (1.0) ;
+  // sinon on applique le playbackRate numérique fourni (< 1 ⇒ tortue client).
+  const numericSpeed =
+    typeof speed === 'number' && !useSsmlSlow ? speed : 1.0;
   const voiceParam: 'female' | 'male' =
     options?.voice === 'male' || options?.voice === 'ar-MA-JamalNeural' ? 'male' : 'female';
 

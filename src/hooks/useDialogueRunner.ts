@@ -55,10 +55,10 @@ export function useDialogueRunner(scenario: DialogueScenario, soundEnabled: bool
         return s;
       });
 
-      // Play audio
-      // In a real app we might fetch audioURL from a CDN via audioKey.
-      // Here we just use TTS fallback with the text.
-      await playAudio(currentTurn.arabiziText, undefined, soundEnabled);
+      // Play audio : synthèse Edge TTS marocaine sur la forme arabe vocalisée.
+      // (L'éventuel audioKey pré-enregistré reste une extension future — aucun
+      // mp3 de rôleplay n'existe aujourd'hui, le fallback TTS est assumé.)
+      await playAudio(currentTurn.arabiziText || currentTurn.arabicText, currentTurn.arabicText, soundEnabled);
       
       // Proceed to next turn
       setState(s => ({ ...s, isBotSpeaking: false, currentTurnIndex: s.currentTurnIndex + 1 }));

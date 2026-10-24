@@ -240,7 +240,7 @@ export default function SpeechTrainer() {
                 </button>
                 <button 
                   type="button"
-                  onClick={() => playAudio(currentExercise.arabizi, currentExercise.arabic, soundEnabled, 0.75, { speed: 'slow' })}
+                  onClick={() => playAudio(currentExercise.arabizi, currentExercise.arabic, soundEnabled, 0.75, {})}
                   className="px-4 py-2 bg-[#FDFCF8] border border-[#E8E2D5] text-[#1B2A4A] rounded-full flex items-center gap-2 shadow-xs hover:bg-[#E8E2D5]/50 hover:scale-105 transition-all text-xs font-bold"
                   title="Écouter au ralenti (mode tortue)"
                 >

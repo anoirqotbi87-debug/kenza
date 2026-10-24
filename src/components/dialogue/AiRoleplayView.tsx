@@ -86,7 +86,6 @@ export default function AiRoleplayView({ personaId, onClose }: AiRoleplayViewPro
         true,
         speed === 'slow' ? 0.75 : 1.0,
         {
-          speed,
           voice: gender,
           consumeQuota: false,
         }
