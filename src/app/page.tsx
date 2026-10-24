@@ -37,6 +37,7 @@ import { useAppStore, useTranslation } from "@/store/useAppStore";
 import type { User } from "@supabase/supabase-js";
 import { KenzaLogo } from "@/components/ui/KenzaLogo";
 import GemOfTheDayCard from "@/components/culture/GemOfTheDayCard";
+import OfflineReadyBadge from "@/components/OfflineReadyBadge";
 
 const tr = (fr: string, en: string, es: string, ar: string) => {
   const lang = useAppStore.getState().uiLanguage;
@@ -915,6 +916,11 @@ export default function Home() {
 
           {/* Contrôles compacts strictly flex-nowrap à droite */}
           <div className="topbar-actions shrink-0 flex items-center gap-1.5 sm:gap-2">
+            {/* Disponibilité hors-ligne (masqué tant que le Service Worker n'est pas actif) */}
+            <div className="hidden md:block shrink-0">
+              <OfflineReadyBadge />
+            </div>
+
             {/* Badge d'abonnement persistant sur grands écrans uniquement */}
             <div className="hidden xl:block shrink-0">
               <SubscriptionBadge onUpgrade={() => setPricingSource("header_upgrade")} />

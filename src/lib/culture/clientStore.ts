@@ -1,65 +1,40 @@
 'use client';
 
 import { useSyncExternalStore } from 'react';
+import { createFavoritesStore, useFavorites } from '@/lib/favorites/store';
 import { parseFavorites, toggleFavorite } from './engine';
 
-const FAVORITES_KEY = 'kenza_culture_favorites';
-const EMPTY: string[] = [];
+/** Clé de stockage : ne jamais la renommer sans migration. */
+export const CULTURE_FAVORITES_KEY = 'kenza_culture_favorites';
 
 /**
- * Source de vérité des favoris en mémoire. La première lecture vient du
- * localStorage, les suivantes du cache : le snapshot doit rester
- * référentiellement stable pour `useSyncExternalStore`.
+ * Favoris de la page /culture. Le store générique garantit un snapshot
+ * référentiellement stable (exigé par `useSyncExternalStore`) et une écriture
+ * tolérante aux pannes de `localStorage`.
  */
-let initialized = false;
-let favorites: string[] = EMPTY;
-const listeners = new Set<() => void>();
-
-function readStoredFavorites(): string[] {
-  if (typeof window === 'undefined') return EMPTY;
-  try {
-    return parseFavorites(window.localStorage.getItem(FAVORITES_KEY));
-  } catch {
-    return EMPTY;
-  }
-}
+export const cultureFavorites = createFavoritesStore(CULTURE_FAVORITES_KEY, {
+  parse: parseFavorites,
+  toggle: toggleFavorite,
+});
 
 export function getFavoritesSnapshot(): string[] {
-  if (!initialized) {
-    favorites = readStoredFavorites();
-    initialized = true;
-  }
-  return favorites;
+  return cultureFavorites.getSnapshot();
 }
 
 export function getFavoritesServerSnapshot(): string[] {
-  return EMPTY;
+  return cultureFavorites.getServerSnapshot();
 }
 
 export function subscribeFavorites(listener: () => void): () => void {
-  listeners.add(listener);
-  return () => {
-    listeners.delete(listener);
-  };
+  return cultureFavorites.subscribe(listener);
 }
 
 export function toggleCultureFavorite(id: string): void {
-  favorites = toggleFavorite(getFavoritesSnapshot(), id);
-  initialized = true;
-  try {
-    window.localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
-  } catch {
-    // Stockage indisponible (navigation privée) : les favoris restent en mémoire.
-  }
-  listeners.forEach((listener) => listener());
+  cultureFavorites.toggle(id);
 }
 
 export function useCultureFavorites(): string[] {
-  return useSyncExternalStore(
-    subscribeFavorites,
-    getFavoritesSnapshot,
-    getFavoritesServerSnapshot
-  );
+  return useFavorites(cultureFavorites);
 }
 
 const subscribeNever = () => () => {};

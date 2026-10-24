@@ -3,6 +3,7 @@ import { DM_Sans, DM_Serif_Display, Noto_Sans_Arabic } from "next/font/google";
 import "./globals.css";
 import I18nProvider from '../components/I18nProvider';
 import NetworkStatus from '../components/NetworkStatus';
+import OfflineBootstrap from '../components/OfflineBootstrap';
 import DirSync from '../components/DirSync';
 import TrackingProvider from '../components/TrackingProvider';
 import InstallApkBanner from '../components/InstallApkBanner';
@@ -42,6 +43,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <DirSync />
         <I18nProvider>
           <NetworkStatus />
+          <OfflineBootstrap />
           <TrackingProvider>
             {children}
           </TrackingProvider>

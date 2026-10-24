@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useMemo, useRef, useState } from 'react';
-import { Search, Volume2, BookOpen, BadgeCheck, WifiOff } from 'lucide-react';
+import { Search, Volume2, BookOpen, BadgeCheck, WifiOff, Heart } from 'lucide-react';
 import PageHeader from '@/components/ui/PageHeader';
 import { useAppStore, useTranslation } from '@/store/useAppStore';
-import { searchDictionary, DictionaryEntry } from '@/lib/dictionary/dictionarySearch';
+import { searchDictionary, getDictionaryEntries, DictionaryEntry } from '@/lib/dictionary/dictionarySearch';
+import { toggleDictionaryFavorite, useDictionaryFavorites } from '@/lib/dictionary/clientStore';
 import { playAudio } from '@/lib/audio';
 import type { MultiLangText } from '@/types/curriculum';
 
@@ -58,13 +59,25 @@ function CategoryChips({ value, onChange }: { value: string | null; onChange: (v
   );
 }
 
-function DictCard({ entry, lang }: { entry: DictionaryEntry; lang: string }) {
+function DictCard({
+  entry,
+  lang,
+  isFavorite,
+  onToggleFavorite,
+}: {
+  entry: DictionaryEntry;
+  lang: string;
+  isFavorite: boolean;
+  onToggleFavorite: () => void;
+}) {
   const { t } = useTranslation();
   const soundEnabled = useAppStore((s) => s.soundEnabled);
   const dict = t.pages?.dictionnaire as {
     listen?: string;
     slowListen?: string;
     categories?: Record<string, string>;
+    favoriteAdd?: string;
+    favoriteRemove?: string;
   } | undefined;
 
   const tr = entry.translation;
@@ -103,6 +116,23 @@ function DictCard({ entry, lang }: { entry: DictionaryEntry; lang: string }) {
           )}
         </div>
         <div className="flex flex-col gap-1.5 shrink-0">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFavorite();
+            }}
+            className={`w-9 h-9 grid place-items-center rounded-full border transition-colors ${
+              isFavorite
+                ? 'bg-[#C9A05C] text-white border-[#C9A05C]'
+                : 'bg-[#FDFCF8] text-[#7A7670] border-[#E8E2D5] hover:border-[#C9A05C]'
+            }`}
+            aria-pressed={isFavorite}
+            aria-label={(isFavorite ? dict?.favoriteRemove : dict?.favoriteAdd) ?? 'Favoris'}
+            title={(isFavorite ? dict?.favoriteRemove : dict?.favoriteAdd) ?? 'Favoris'}
+          >
+            <Heart size={16} fill={isFavorite ? 'currentColor' : 'none'} />
+          </button>
           <button
             type="button"
             onClick={(e) => handlePlay(e, false)}
@@ -145,6 +175,8 @@ export default function DictionnairePage() {
   const isAr = lang === 'ar';
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<string | null>(null);
+  const [showFavorites, setShowFavorites] = useState(false);
+  const favorites = useDictionaryFavorites();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const dict = t.pages?.dictionnaire as
@@ -154,16 +186,18 @@ export default function DictionnairePage() {
         searchPlaceholder?: string;
         noResults?: string;
         offlineBadge?: string;
+        favorites?: string;
+        noFavorites?: string;
       }
     | undefined;
 
   const results = useMemo(() => {
     const q = query.trim();
-    if (!q && !category) return [];
+    if (showFavorites) return getDictionaryEntries(favorites);
     const found = q ? searchDictionary(q, 24) : [];
     if (!category) return found;
     return found.filter((w) => w.category === category);
-  }, [query, category]);
+  }, [query, category, showFavorites, favorites]);
 
   return (
     <div dir={isAr ? 'rtl' : 'ltr'} className="min-h-screen bg-[#F7F3EA]">
@@ -185,12 +219,41 @@ export default function DictionnairePage() {
               ref={inputRef}
               type="search"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => {
+                if (e.target.value) setShowFavorites(false);
+                setQuery(e.target.value);
+              }}
               placeholder={dict?.searchPlaceholder ?? 'Rechercher un mot…'}
               className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[#FDFCF8] border border-[#E8E2D5] text-sm text-[#142943] placeholder:text-[#B0A998] focus:outline-none focus:ring-2 focus:ring-[#C9A05C] focus:border-transparent"
               aria-label={dict?.searchPlaceholder ?? 'Rechercher'}
             />
           </div>
+          <button
+            type="button"
+            onClick={() => {
+              const next = !showFavorites;
+              setShowFavorites(next);
+              if (next) {
+                setCategory(null);
+                setQuery('');
+              }
+            }}
+            className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold transition-colors ${
+              showFavorites
+                ? 'bg-[#C9A05C] text-white border-[#C9A05C]'
+                : 'bg-[#FDFCF8] text-[#142943] border-[#E8E2D5] hover:border-[#C9A05C]'
+            }`}
+            aria-pressed={showFavorites}
+          >
+            <Heart size={14} fill={showFavorites ? 'currentColor' : 'none'} />
+            <span className="hidden sm:inline">{dict?.favorites ?? 'Favoris'}</span>
+            <span className="sm:hidden" aria-hidden="true">{favorites.length}</span>
+            {favorites.length > 0 && (
+              <span className="hidden sm:inline rounded-full bg-[#142943]/10 px-1.5 text-[10px] leading-4">
+                {favorites.length}
+              </span>
+            )}
+          </button>
           <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#E7F0E4] text-[#2E6B41] text-xs font-semibold">
             <WifiOff size={14} />
             <span>{dict?.offlineBadge ?? '100% hors-ligne'}</span>
@@ -203,13 +266,22 @@ export default function DictionnairePage() {
 
         {/* Contenu : résultats ou état vide */}
         <div className="mt-5">
-          {!query.trim() && !category && (
+          {!query.trim() && !category && !showFavorites && (
             <div className="text-center py-16">
               <BookOpen size={44} className="mx-auto text-[#C9A05C]" />
               <p className="mt-4 text-sm text-[#7A7670] max-w-md mx-auto leading-relaxed">
                 {isAr
                   ? 'اكتب كلمة بالعربية أو بالحروف اللاتينية (مثلاً chhal أو pain) للبحث في القاموس.'
                   : 'Tapez un mot en Arabizi, en arabe ou en français (ex. « chhal », « pain ») — la recherche ignore les variantes d\u2019orthographe.'}
+              </p>
+            </div>
+          )}
+
+          {showFavorites && favorites.length === 0 && (
+            <div className="text-center py-16">
+              <Heart size={36} className="mx-auto text-[#C9A05C]/70" />
+              <p className="mt-3 text-sm text-[#7A7670] max-w-md mx-auto leading-relaxed">
+                {dict?.noFavorites ?? 'Aucun mot en favori.'}
               </p>
             </div>
           )}
@@ -224,7 +296,13 @@ export default function DictionnairePage() {
           {results.length > 0 && (
             <div className="grid gap-3 sm:grid-cols-2">
               {results.map((entry) => (
-                <DictCard key={entry.id} entry={entry} lang={lang} />
+                <DictCard
+                  key={entry.id}
+                  entry={entry}
+                  lang={lang}
+                  isFavorite={favorites.includes(entry.id)}
+                  onToggleFavorite={() => toggleDictionaryFavorite(entry.id)}
+                />
               ))}
             </div>
           )}

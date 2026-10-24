@@ -6,6 +6,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useAppStore, useTranslation } from '../../store/useAppStore';
 import LanguageSelector from './LanguageSelector';
 import { KenzaLogo } from './KenzaLogo';
+import OfflineReadyBadge from '../OfflineReadyBadge';
 
 interface PageHeaderProps {
   /** Small uppercase eyebrow text (already localized). */
@@ -65,6 +66,7 @@ export default function PageHeader({ badge, title, backHref = '/', actions }: Pa
 
         {/* Côté droit : Actions optionnelles + Sélecteur de langue compact */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <OfflineReadyBadge variant="dark" />
           {actions}
           <LanguageSelector variant="dark" compact={true} className="px-2 py-1" />
         </div>
