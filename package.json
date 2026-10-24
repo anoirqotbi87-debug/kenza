@@ -10,7 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "gen:audio:roleplay": "tsx scripts/generate-roleplay-audio.ts"
+    "gen:audio:roleplay": "tsx scripts/generate-roleplay-audio.ts",
+    "check:tts": "tsx scripts/check-tts-health.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "0.0.66",
