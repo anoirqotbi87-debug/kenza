@@ -13,6 +13,11 @@ on:
     # plusieurs jours ; 4 contrôles/jour gardent la détection sous 6 heures.
     - cron: '0 */6 * * *'
   workflow_dispatch:
+    inputs:
+      simulate_failure:
+        description: "Forcer l'échec de la sonde (validation du chemin d'alerte)."
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -37,15 +42,21 @@ jobs:
         run: npm run check:tts
         continue-on-error: true
 
-      - name: Ouvrir ou mettre à jour l'issue d'alerte
-        if: steps.probe.outcome == 'failure'
-        env:
-          GH_TOKEN: ${{ github.token }}
+      # Le chemin d'alerte n'était exerçable qu'en cas de panne réelle, donc
+      # jamais testé. Cette entrée permet de l'exercer à la demande : c'est le
+      # seul moyen de vérifier qu'une alerte arrivera vraiment le jour J.
+      - name: Forcer l'état dégradé (simulation)
+        if: ${{ inputs.simulate_failure }}
         run: |
-          TITLE="TTS en production dégradé (sonde automatique)"
-          BODY=$(cat <<'EOF'
-          La sonde planifiée `npm run check:tts` a échoué : le moteur Edge TTS ne
-          renvoie plus un flux audio valide en production.
+          echo "::warning::Simulation demandée : le chemin d'alerte va être exercé."
+          echo "SIMULATED_FAILURE=1" >> "$GITHUB_ENV"
+
+      - name: Préparer le corps de l'alerte
+        if: steps.probe.outcome == 'failure' || env.SIMULATED_FAILURE == '1'
+        run: |
+          cat > /tmp/tts-alert-body.md <<'EOF'
+          La sonde `npm run check:tts` a échoué : le moteur Edge TTS ne renvoie
+          plus un flux audio valide en production.
 
           **Piste principale** : le schéma du jeton `Sec-MS-GEC` a changé (déjà
           arrivé une fois, v1 → v2). L'échec est silencieux côté service : il
@@ -60,18 +71,14 @@ jobs:
 
           _Issue ouverte automatiquement par un agent (OpenHands)._
           EOF
-          )
 
-          # Comparaison EXACTE du titre, via l'API de listing.
-          # `--search` serait plus court mais peu fiable ici : l'index de recherche
-          # GitHub est à cohérence différée (une issue créée à l'instant n'est pas
-          # encore trouvée) et les métacaractères `[` / `(` du titre perturbent la
-          # syntaxe de requête. Les deux défauts produisaient des doublons.
-          EXISTING=$(gh issue list --state open --limit 100 --json number,title \
-            | bash scripts/find-open-issue.sh "$TITLE")
-          if [ -n "$EXISTING" ]; then
-            echo "Issue #$EXISTING déjà ouverte — ajout d'un commentaire."
-            gh issue comment "$EXISTING" --body "$BODY"
-          else
-            gh issue create --title "$TITLE" --body "$BODY" --label "bug"
+      - name: Ouvrir ou mettre à jour l'issue d'alerte
+        if: steps.probe.outcome == 'failure' || env.SIMULATED_FAILURE == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITLE="TTS en production dégradé (sonde automatique)"
+          if [ "${{ inputs.simulate_failure }}" = "true" ]; then
+            TITLE="[TEST] $TITLE"
           fi
+          bash scripts/report-tts-health.sh --title "$TITLE" --body-file /tmp/tts-alert-body.md --label bug
