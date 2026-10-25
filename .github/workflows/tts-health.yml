@@ -11,7 +11,12 @@ on:
   schedule:
     # Toutes les 6 heures (UTC) — la panne de jetons v1→v2 est restée invisible
     # plusieurs jours ; 4 contrôles/jour gardent la détection sous 6 heures.
-    - cron: '0 */6 * * *'
+    #
+    # Décalé de 17 min : GitHub signale que la charge est maximale au début de
+    # chaque heure et que « some queued jobs may be dropped ». Pour une sonde,
+    # un job abandonné n'est pas un retard mais un TROU SILENCIEUX dans la
+    # couverture — exactement ce que ce système doit éliminer.
+    - cron: '17 */6 * * *'
   workflow_dispatch:
     inputs:
       simulate_failure:
