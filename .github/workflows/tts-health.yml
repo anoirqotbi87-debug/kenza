@@ -62,7 +62,13 @@ jobs:
           EOF
           )
 
-          EXISTING=$(gh issue list --state open --search "$TITLE in:title" --json number --jq '.[0].number')
+          # Comparaison EXACTE du titre, via l'API de listing.
+          # `--search` serait plus court mais peu fiable ici : l'index de recherche
+          # GitHub est à cohérence différée (une issue créée à l'instant n'est pas
+          # encore trouvée) et les métacaractères `[` / `(` du titre perturbent la
+          # syntaxe de requête. Les deux défauts produisaient des doublons.
+          EXISTING=$(gh issue list --state open --limit 100 --json number,title \
+            | bash scripts/find-open-issue.sh "$TITLE")
           if [ -n "$EXISTING" ]; then
             echo "Issue #$EXISTING déjà ouverte — ajout d'un commentaire."
             gh issue comment "$EXISTING" --body "$BODY"
