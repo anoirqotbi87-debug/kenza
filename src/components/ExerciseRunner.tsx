@@ -467,7 +467,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-32 flex items-center justify-center">
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-[calc(11rem+env(safe-area-inset-bottom,0px))] md:pb-40 flex items-center justify-center">
         {renderContent()}
       </main>
 

@@ -79,7 +79,7 @@ export default function MatchingExercise({ exercise, onUpdate, isAnswerChecked }
   const isCorrectMatch = (leftId: string, rightId: string) => leftId === rightId; // because id is same in Pair
 
   return (
-    <div className="grid grid-cols-2 gap-8 w-full max-w-xl mx-auto">
+    <div className="grid grid-cols-2 gap-4 sm:gap-6 md:gap-8 w-full max-w-xl mx-auto">
       {/* Colonne Darija (Left) */}
       <div className="space-y-4">
         {leftItems.map(item => {
@@ -93,11 +93,11 @@ export default function MatchingExercise({ exercise, onUpdate, isAnswerChecked }
               onClick={() => handleLeftClick(item.id)}
               disabled={isAnswerChecked}
               className={`
-                w-full p-4 rounded-xl border-2 text-center font-bold transition-all shadow-sm
-                ${selectedLeft === item.id ? 'border-blue-500 bg-blue-50 scale-105' : 'border-slate-200 bg-white hover:border-slate-300'}
-                ${isMatchedLeft(item.id) && !isAnswerChecked ? 'bg-slate-100 border-slate-300 opacity-70' : ''}
-                ${isSuccess ? 'bg-green-100 border-green-500 text-green-800' : ''}
-                ${isError ? 'bg-red-100 border-red-500 text-red-800' : ''}
+                w-full p-4 rounded-xl border-2 text-center font-bold transition-all shadow-xs
+                ${selectedLeft === item.id ? 'border-blue-600 bg-blue-50 text-blue-950 ring-2 ring-blue-500/40 scale-105 shadow-md' : 'border-slate-300 bg-white text-[#1B2A4A] hover:border-slate-400'}
+                ${isMatchedLeft(item.id) && !isAnswerChecked ? 'bg-amber-50/90 border-[#C9A05C] text-[#1B2A4A] ring-1 ring-[#C9A05C]/40' : ''}
+                ${isSuccess ? 'bg-emerald-100 border-emerald-600 text-emerald-950' : ''}
+                ${isError ? 'bg-red-100 border-red-600 text-red-950' : ''}
               `}
             >
               {item.text}
@@ -118,11 +118,11 @@ export default function MatchingExercise({ exercise, onUpdate, isAnswerChecked }
               onClick={() => handleRightClick(item.id)}
               disabled={isAnswerChecked}
               className={`
-                w-full p-4 rounded-xl border-2 text-center font-medium transition-all shadow-sm
-                ${selectedRight === item.id ? 'border-blue-500 bg-blue-50 scale-105' : 'border-slate-200 bg-white hover:border-slate-300'}
-                ${isMatchedRight(item.id) && !isAnswerChecked ? 'bg-slate-100 border-slate-300 opacity-70' : ''}
-                ${isSuccess ? 'bg-green-100 border-green-500 text-green-800' : ''}
-                ${isError ? 'bg-red-100 border-red-500 text-red-800' : ''}
+                w-full p-4 rounded-xl border-2 text-center font-bold transition-all shadow-xs
+                ${selectedRight === item.id ? 'border-blue-600 bg-blue-50 text-blue-950 ring-2 ring-blue-500/40 scale-105 shadow-md' : 'border-slate-300 bg-white text-[#1B2A4A] hover:border-slate-400'}
+                ${isMatchedRight(item.id) && !isAnswerChecked ? 'bg-amber-50/90 border-[#C9A05C] text-[#1B2A4A] ring-1 ring-[#C9A05C]/40' : ''}
+                ${isSuccess ? 'bg-emerald-100 border-emerald-600 text-emerald-950' : ''}
+                ${isError ? 'bg-red-100 border-red-600 text-red-950' : ''}
               `}
             >
               {item.text}
