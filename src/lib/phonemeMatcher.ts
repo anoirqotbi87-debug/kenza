@@ -52,6 +52,8 @@ export const ARABIZI_TO_ARABIC: Record<string, string> = {
   'kh': 'خ',
   '5': 'خ',
   'gh': 'غ',
+  '8': 'غ',
+  '2': 'ء',
 };
 
 /**
@@ -159,8 +161,10 @@ export function normalizeDarijaText(text: string): string {
     .replace(/[\u064B-\u065F\u0670\u0640]/g, '')
     // Normalize forms of alif
     .replace(/[أإآ]/g, 'ا')
-    // Normalize 5 to kh in Arabizi
+    // Normalize Arabizi numerals
     .replace(/5/g, 'kh')
+    .replace(/8/g, 'gh')
+    .replace(/2/g, 'a')
     // Remove common punctuation and symbols
     .replace(/[.,!?؟;:'"()\-–—_]/g, ' ')
     // Normalize spaces
@@ -186,6 +190,8 @@ export function arabicToPhoneticArabizi(text: string): string {
       .replace(/sh/g, 'ch')
       .replace(/q/g, '9')
       .replace(/5/g, 'kh')
+      .replace(/8/g, 'gh')
+      .replace(/2/g, 'a')
       .replace(/é|è|ê/g, 'e')
       .replace(/ou/g, 'u');
   }
@@ -231,6 +237,8 @@ export function reducePhonetics(text: string): string {
     .replace(/e/g, 'i')
     .replace(/q/g, '9')
     .replace(/5/g, 'kh')
+    .replace(/8/g, 'gh')
+    .replace(/2/g, 'a')
     // Reduce duplicate consecutive letters: bb -> b, zz -> z
     .replace(/(.)\1+/g, '$1');
 }

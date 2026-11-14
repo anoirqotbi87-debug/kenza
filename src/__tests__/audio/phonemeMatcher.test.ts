@@ -110,6 +110,19 @@ describe('Phoneme Matcher & Pronunciation Scoring (Darija)', () => {
       expect(result.detectedPhonemes).toContain('kh');
     });
 
+    it('recognizes 8 as Arabizi variant of gh (غ)', () => {
+      const result = evaluatePronunciation('8adi nemchi', 'ghadi nemchi', 'غادي نمشي');
+      expect(result.score).toBeGreaterThanOrEqual(80);
+      expect(result.tier).toBe('excellent');
+      expect(result.detectedPhonemes).toContain('gh');
+    });
+
+    it('recognizes 2 as Arabizi variant of hamza / alif (ء)', () => {
+      const result = evaluatePronunciation('ra2i dyali', 'rai dyali');
+      expect(result.score).toBeGreaterThanOrEqual(80);
+      expect(result.tier).toBe('excellent');
+    });
+
     it('gives 🔴 Needs Work tier when pronunciation is distant', () => {
       const result = evaluatePronunciation('bonjour monsieur', '3afak bzzaf', 'عافاك بزاف');
       expect(result.score).toBeLessThan(50);
