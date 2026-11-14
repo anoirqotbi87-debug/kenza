@@ -133,7 +133,7 @@ export default function PhrasesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FBF9F5] text-[#142943] pb-24">
+    <div dir={lang === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-[#FBF9F5] text-[#142943] pb-24">
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 bg-[#142943] text-white px-4 py-2.5 rounded-xl shadow-lg text-sm animate-fade-in">
           {toastMessage}
@@ -146,7 +146,7 @@ export default function PhrasesPage() {
             href="/"
             className="inline-flex items-center gap-2 text-sm font-medium text-[#142943] hover:text-[#D69B47] transition-colors"
           >
-            <ArrowLeft size={18} />
+            <ArrowLeft size={18} className={lang === 'ar' ? 'rotate-180' : ''} />
             <span>{trL(lang, "Retour à l'accueil", "Back to home", "Volver al inicio", "العودة للرئيسية")}</span>
           </Link>
           <h1 className="text-base font-serif font-bold text-[#142943] tracking-wide">
@@ -236,7 +236,7 @@ export default function PhrasesPage() {
                 setFavoritesOnly(false);
               }}
             >
-              {trL(lang, "Effacer les filtres", "Clear filters", "Borrar filtros", "مسح المرشحات")} <ArrowRight size={14} />
+              {trL(lang, "Effacer les filtres", "Clear filters", "Borrar filtros", "مسح المرشحات")} <ArrowRight size={14} className={lang === 'ar' ? 'rotate-180' : ''} />
             </button>
           </div>
         )}

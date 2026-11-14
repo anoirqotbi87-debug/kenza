@@ -302,9 +302,7 @@ export default function DeckManagerView() {
               {dk.noCards}
             </h3>
             <p className="text-slate-500 max-w-sm mx-auto text-sm">
-              {isAr 
-                ? 'جرب البحث بكلمة أخرى أو قم بتغيير الفلاتر.' 
-                : dk.noCardsDesc}
+              {dk.noCardsDesc}
             </p>
           </div>
         )}

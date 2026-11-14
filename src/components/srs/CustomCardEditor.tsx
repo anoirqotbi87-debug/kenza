@@ -124,8 +124,8 @@ export default function CustomCardEditor({ isOpen, onClose, cardToEdit }: Custom
         <div className="bg-slate-50 border-b border-slate-100 px-6 py-4 flex justify-between items-center">
           <h2 className="text-xl font-bold text-slate-800">
             {isEditMode 
-              ? (isAr ? 'تعديل الكلمة' : 'Modifier l\'expression') 
-              : (isAr ? 'إضافة كلمة جديدة' : 'Ajouter un nouveau mot')}
+              ? (isAr ? 'تعديل الكلمة' : lang === 'es' ? 'Modificar la expresión' : lang === 'en' ? 'Edit phrase' : 'Modifier l\'expression') 
+              : (isAr ? 'إضافة كلمة جديدة' : lang === 'es' ? 'Añadir nueva palabra' : lang === 'en' ? 'Add new word' : 'Ajouter un nouveau mot')}
           </h2>
           <button 
           aria-label={t.common.close}
@@ -143,7 +143,7 @@ export default function CustomCardEditor({ isOpen, onClose, cardToEdit }: Custom
             {/* Arabizi Field */}
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-1">
-                {isAr ? 'بالدارجة (عربيزي)' : 'En Darija (Arabizi)'} <span className="text-red-500">*</span>
+                {isAr ? 'بالدارجة (عربيزي)' : lang === 'es' ? 'En Darija (Arabizi)' : lang === 'en' ? 'In Darija (Arabizi)' : 'En Darija (Arabizi)'} <span className="text-red-500">*</span>
               </label>
               <input
                 ref={inputRef}
@@ -164,7 +164,7 @@ export default function CustomCardEditor({ isOpen, onClose, cardToEdit }: Custom
               <input
                 type="text"
                 className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                placeholder="ex. Je dois partir"
+                placeholder={lang === 'es' ? 'ej. Tengo que irme' : lang === 'en' ? 'e.g. I have to go' : isAr ? 'مثال: يجب أن أذهب' : 'ex. Je dois partir'}
                 value={translation}
                 onChange={(e) => setTranslation(e.target.value)}
               />
@@ -173,7 +173,7 @@ export default function CustomCardEditor({ isOpen, onClose, cardToEdit }: Custom
             {/* Arabic Field */}
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-1">
-                {isAr ? 'بالحروف العربية (اختياري)' : 'En lettres arabes (optionnel)'}
+                {isAr ? 'بالحروف العربية (اختياري)' : lang === 'es' ? 'En letras árabes (opcional)' : lang === 'en' ? 'In Arabic script (optional)' : 'En lettres arabes (optionnel)'}
               </label>
               <input
                 type="text"

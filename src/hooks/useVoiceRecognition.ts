@@ -49,7 +49,7 @@ export type VoiceErrorCode =
   | 'generic'
   | null;
 
-function getLocalizedVoiceError(code: string, uiLang: string): string {
+export function getLocalizedVoiceError(code: string, uiLang: string): string {
   if (code === 'not-allowed') {
     if (uiLang === 'ar') return "تم رفض إذن الميكروفون. يُرجى السماح بالوصول إلى الميكروفون من إعدادات المتصفح.";
     if (uiLang === 'es') return "Permiso de micrófono denegado. Permita el acceso al micrófono en el navegador.";
@@ -74,7 +74,10 @@ function getLocalizedVoiceError(code: string, uiLang: string): string {
     if (uiLang === 'en') return "Speech recognition is not supported in this browser.";
     return "API de reconnaissance vocale non supportée par ce navigateur.";
   }
-  return uiLang === 'ar' ? `خطأ صوتي : ${code}` : `Erreur vocale : ${code}`;
+  if (uiLang === 'ar') return `خطأ صوتي : ${code}`;
+  if (uiLang === 'es') return `Error de voz: ${code}`;
+  if (uiLang === 'en') return `Voice error: ${code}`;
+  return `Erreur vocale : ${code}`;
 }
 
 export function useVoiceRecognition(lang = 'ar-MA', timeoutMs = 5000, uiLang = 'fr') {

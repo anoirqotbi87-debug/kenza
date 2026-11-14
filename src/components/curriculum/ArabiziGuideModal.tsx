@@ -57,11 +57,15 @@ export default function ArabiziGuideModal({ onClose }: ArabiziGuideModalProps) {
             <Sparkles className="w-5 h-5 text-[#C9A05C]" />
             <div>
               <h3 id="arabizi-guide-title" className="font-display font-bold text-[#FDFCF8] text-lg">
-                {isAr ? 'مفتاح أرقام العرابيزي' : 'La Clé des Chiffres Arabizi'}
+                {isAr ? '💡 مفتاح أرقام العرابيزي' : lang === 'es' ? '💡 La Clave de los Números Arabizi' : lang === 'en' ? '💡 The Arabizi Number Key' : '💡 La Clé des Chiffres Arabizi'}
               </h3>
               <p className="text-[10px] text-[#FDFCF8]/70 font-semibold uppercase tracking-wide">
                 {isAr
                   ? 'دليلك الصوتي التفاعلي لنطق الأصوات المغربية (9 · 7 · 5 · 3 · 2)'
+                  : lang === 'es'
+                  ? 'Mini-guía fonética · 5 sonidos'
+                  : lang === 'en'
+                  ? 'Phonetic mini-guide · 5 sounds'
                   : 'Mini-guide phonétique · 5 sons'}
               </p>
             </div>
@@ -69,7 +73,7 @@ export default function ArabiziGuideModal({ onClose }: ArabiziGuideModalProps) {
           <button
             onClick={onClose}
             className="p-1.5 rounded-full text-[#FDFCF8]/80 hover:text-[#FDFCF8] hover:bg-white/10 transition-colors"
-            aria-label="Fermer le guide"
+            aria-label={isAr ? 'إغلاق الدليل' : lang === 'es' ? 'Cerrar la guía' : lang === 'en' ? 'Close guide' : 'Fermer le guide'}
           >
             <X className="w-5 h-5" />
           </button>
@@ -107,7 +111,7 @@ export default function ArabiziGuideModal({ onClose }: ArabiziGuideModalProps) {
             </div>
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wider text-[#C9A05C]">
-                Chiffre {sound.number} · {sound.name}
+                {isAr ? `رقم ${sound.number} · ${sound.name}` : lang === 'es' ? `Número ${sound.number} · ${sound.name}` : lang === 'en' ? `Number ${sound.number} · ${sound.name}` : `Chiffre ${sound.number} · ${sound.name}`}
               </p>
               <p className="text-sm text-[#7A7670] mt-1">{sound.anatomicalTip}</p>
             </div>
@@ -115,7 +119,7 @@ export default function ArabiziGuideModal({ onClose }: ArabiziGuideModalProps) {
 
           <div className="space-y-3">
             <p className="text-[10px] font-bold uppercase tracking-wider text-[#1B2A4A]">
-              {isAr ? 'استمع وردد' : 'Écoutez et répétez'}
+              {isAr ? 'استمع وردد' : lang === 'es' ? 'Escucha y repite' : lang === 'en' ? 'Listen and repeat' : 'Écoutez et répétez'}
             </p>
             {sound.examples.map((ex) => (
               <div key={ex.arabizi} className="bg-[#F7F3EA] border border-[#E8E2D5] rounded-2xl p-4">
@@ -134,7 +138,7 @@ export default function ArabiziGuideModal({ onClose }: ArabiziGuideModalProps) {
                       type="button"
                       onClick={() => handleListen(ex.arabicWithTashkeel, 'normal')}
                       className="px-3 py-1.5 rounded-full text-[11px] font-bold flex items-center gap-1.5 bg-[#1B2A4A] text-[#FDFCF8] hover:bg-[#1B2A4A]/90 transition-colors"
-                      title={isAr ? 'عادي (1.0x)' : 'Écouter à vitesse normale'}
+                      title={isAr ? 'عادي (1.0x)' : lang === 'es' ? 'Escuchar a velocidad normal' : lang === 'en' ? 'Listen at normal speed' : 'Écouter à vitesse normale'}
                     >
                       <Volume2 className="w-3.5 h-3.5 text-[#C9A05C]" />
                       {isAr ? 'عادي (1.0x)' : '1.0x'}
@@ -147,7 +151,7 @@ export default function ArabiziGuideModal({ onClose }: ArabiziGuideModalProps) {
                           ? 'bg-red-500 text-white border-red-500'
                           : 'bg-[#FDFCF8] text-[#1B2A4A] border-[#E8E2D5] hover:bg-[#E8E2D5]/50'
                       }`}
-                      title={isAr ? 'سلحفاة 🐢 (0.75x)' : 'Mode Tortue ralenti (0.75x) pour décomposer les phonèmes'}
+                      title={isAr ? 'سلحفاة 🐢 (0.75x)' : lang === 'es' ? 'Modo tortuga lento (0.75x)' : lang === 'en' ? 'Slow Turtle mode (0.75x)' : 'Mode Tortue ralenti (0.75x) pour décomposer les phonèmes'}
                     >
                       <Turtle className="w-3.5 h-3.5 text-[#C9A05C]" />
                       {isAr ? 'سلحفاة 🐢 (0.75x)' : '🐢 0.75x'}
@@ -164,6 +168,20 @@ export default function ArabiziGuideModal({ onClose }: ArabiziGuideModalProps) {
                 💡 نصيحة : في المغرب، تُستعمل الأرقام كأصوات للحروف — ركّز على حركة الحلق بدلاً من الحرف نفسه لتصبح النطق تلقائياً.
                 {activeSpeed === 'slow' ? (
                   <span className="text-red-600 font-semibold"> وضع السلحفاة 🐢 مفعّل : الصوت مبطّأ إلى 0.75x.</span>
+                ) : null}
+              </>
+            ) : lang === 'es' ? (
+              <>
+                💡 Consejo: en Marruecos, los números representan sonidos — memoriza los movimientos de garganta en lugar de las letras, y la pronunciación se volverá natural.
+                {activeSpeed === 'slow' ? (
+                  <span className="text-red-600 font-semibold"> Modo tortuga 🐢 activo: cada sonido se ralentiza a 0.75x.</span>
+                ) : null}
+              </>
+            ) : lang === 'en' ? (
+              <>
+                💡 Tip: in Morocco, numbers serve as phonetic spelling — focus on throat movements rather than letters, and pronunciation becomes natural.
+                {activeSpeed === 'slow' ? (
+                  <span className="text-red-600 font-semibold"> Turtle mode 🐢 active: each sound is slowed down to 0.75x.</span>
                 ) : null}
               </>
             ) : (

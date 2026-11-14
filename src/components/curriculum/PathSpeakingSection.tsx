@@ -64,7 +64,7 @@ export default function PathSpeakingSection({
           }`}
         >
           <Sparkles className="w-3.5 h-3.5 text-[#D69B47]" />
-          <span>{isAr ? 'ورشة الأصوات' : 'Atelier Phonèmes'}</span>
+          <span>{isAr ? 'ورشة الأصوات' : lang === 'es' ? 'Taller de Fonemas' : lang === 'en' ? 'Phonemes Workshop' : 'Atelier Phonèmes'}</span>
         </button>
 
         <button
@@ -77,7 +77,7 @@ export default function PathSpeakingSection({
           }`}
         >
           <MessageSquare className="w-3.5 h-3.5 text-[#D69B47]" />
-          <span>{isAr ? 'حوارات' : 'Dialogues'}</span>
+          <span>{isAr ? 'حوارات' : lang === 'es' ? 'Diálogos' : lang === 'en' ? 'Dialogues' : 'Dialogues'}</span>
         </button>
       </div>
 
@@ -87,22 +87,26 @@ export default function PathSpeakingSection({
             <button
               type="button"
               onClick={onOpenArabiziModal}
-              className="w-full text-left bg-white/80 border border-dashed border-[#D69B47]/60 hover:border-[#D69B47] hover:bg-[#F5E7C8]/20 rounded-2xl px-5 py-3.5 flex items-center gap-3 transition-colors group shadow-xs"
+              className="w-full text-left rtl:text-right bg-white/80 border border-dashed border-[#D69B47]/60 hover:border-[#D69B47] hover:bg-[#F5E7C8]/20 rounded-2xl px-5 py-3.5 flex items-center gap-3 transition-colors group shadow-xs"
             >
               <div className="w-9 h-9 rounded-xl bg-[#F5E7C8] text-[#8C6D23] flex items-center justify-center shrink-0 transition-transform group-hover:scale-105">
                 <Sparkles className="w-4 h-4 text-[#D69B47]" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-bold text-[#142943]">
-                  💡 {isAr ? 'مفتاح أرقام العرابيزي' : 'La Clé des Chiffres Arabizi'}
+                  💡 {isAr ? 'مفتاح أرقام العرابيزي' : lang === 'es' ? 'La Clave de los Números Arabizi' : lang === 'en' ? 'The Arabizi Number Key' : 'La Clé des Chiffres Arabizi'}
                 </p>
                 <p className="text-xs text-[#6B7174] mt-0.5">
                   {isAr
                     ? 'دليلك الصوتي التفاعلي لنطق الأصوات المغربية (9 · 7 · 5 · 3 · 2)'
+                    : lang === 'es'
+                    ? '2 · 3 · 5 · 7 · 9 — el decodificador de audio interactivo para los sonidos guturales marroquíes.'
+                    : lang === 'en'
+                    ? '2 · 3 · 5 · 7 · 9 — the interactive audio decoder for Moroccan guttural sounds.'
                     : '2 · 3 · 5 · 7 · 9 — le décodeur audio interactif des sons gutturaux marocains.'}
                 </p>
               </div>
-              <ArrowRight className="w-4 h-4 text-[#D69B47] shrink-0" />
+              <ArrowRight className={`w-4 h-4 text-[#D69B47] shrink-0 ${isAr ? 'rotate-180' : ''}`} />
             </button>
           )}
           <PronunciationTrainer />
@@ -111,11 +115,17 @@ export default function PathSpeakingSection({
         <section className="bg-[#FDFCF8] rounded-3xl p-5 sm:p-7 shadow-xs border border-[#E8E2D5] space-y-5">
           <div>
             <h3 className="font-display text-xl font-bold text-[#142943]">
-              {t.modules.scenario.dialoguesTitle || 'Dialogues scénarisés'}
+              {t.modules.scenario.dialoguesTitle || (isAr ? 'حوارات مُعدّة' : lang === 'es' ? 'Diálogos guionizados' : lang === 'en' ? 'Scripted dialogues' : 'Dialogues scénarisés')}
             </h3>
             <p className="text-sm text-[#6B7174] mt-1">
               {t.modules.scenario.dialoguesDesc ||
-                'Entraînez-vous dans des situations marocaines réelles.'}
+                (isAr
+                  ? 'تدرّب على مواقف واقعية مع تصحيح تلقائي'
+                  : lang === 'es'
+                  ? 'Practica situaciones reales con corrección automática'
+                  : lang === 'en'
+                  ? 'Practice real-life situations with automatic correction'
+                  : 'Entraînez-vous dans des situations marocaines réelles.')}
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

@@ -128,6 +128,10 @@ export default function VoiceFeedbackCard({
                   <span className="text-slate-800">
                     {isAr
                       ? `صوت ${ph.char} (${ph.name})`
+                      : isEs
+                      ? `Sonido ${ph.char} (${ph.name})`
+                      : isEn
+                      ? `Sound ${ph.char} (${ph.name})`
                       : `Son ${ph.char} (${ph.name})`}
                   </span>
                   {ph.detected ? (

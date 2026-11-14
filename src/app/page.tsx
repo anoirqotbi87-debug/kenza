@@ -883,7 +883,7 @@ export default function Home() {
             onClick={() => showToast(t.modules.home.dailyGoal)}
             className="goal-link"
           >
-            {trL(lang, tr("Ajuster l’objectif", "Adjust goal", "Ajustar objetivo", "عدّل الهدف"), "Adjust goal", "Ajustar objetivo", "عدّل الهدف")} <ArrowRight size={14} className={isAr ? "rotate-180" : ""} />
+            {trL(lang, "Ajuster l’objectif", "Adjust goal", "Ajustar objetivo", "عدّل الهدف")} <ArrowRight size={14} className={isAr ? "rotate-180" : ""} />
           </button>
         </div>
 

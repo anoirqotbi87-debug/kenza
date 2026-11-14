@@ -83,8 +83,8 @@ export default function ParlerPage() {
   return (
     <div dir={isAr ? 'rtl' : 'ltr'} className="min-h-screen bg-[#F7F3EA] pb-16">
       <PageHeader
-        badge={tp?.badge || (isAr ? 'التدريب الشفهي' : 'Pratique Orale')}
-        title={tp?.title || (isAr ? 'تدريب النطق' : 'Entraînement de prononciation')}
+        badge={tp?.badge || (isAr ? 'التدريب الشفهي' : lang === 'es' ? 'Práctica Oral' : lang === 'en' ? 'Speaking Practice' : 'Pratique Orale')}
+        title={tp?.title || (isAr ? 'تدريب النطق' : lang === 'es' ? 'Entrenador de pronunciación' : lang === 'en' ? 'Pronunciation trainer' : 'Entraînement de prononciation')}
         backHref="/?view=path&tab=parler"
       />
 
@@ -102,7 +102,7 @@ export default function ParlerPage() {
           >
             <Sparkles className="w-3.5 h-3.5 text-[#C9A05C]" />
             <span className={activeMode === 'trainer' ? '!text-white' : ''}>
-              {isAr ? 'ورشة الأصوات' : 'Atelier Phonèmes'}
+              {isAr ? 'ورشة الأصوات' : lang === 'es' ? 'Taller de fonemas' : lang === 'en' ? 'Phonemes workshop' : 'Atelier Phonèmes'}
             </span>
           </button>
 
@@ -117,7 +117,7 @@ export default function ParlerPage() {
           >
             <MessageSquare className="w-3.5 h-3.5 text-[#C9A05C]" />
             <span className={activeMode === 'dialogue' ? '!text-white' : ''}>
-              {isAr ? 'حوارات' : 'Dialogues & Mises en situation'}
+              {isAr ? 'حوارات' : lang === 'es' ? 'Diálogos y situaciones' : lang === 'en' ? 'Dialogues & Scenarios' : 'Dialogues & Mises en situation'}
             </span>
           </button>
         </div>
@@ -128,10 +128,10 @@ export default function ParlerPage() {
           <section className="bg-[#FDFCF8] rounded-3xl p-5 sm:p-7 shadow-xs border border-[#E8E2D5] space-y-5">
             <div>
               <h2 className="font-display text-xl font-bold text-[#1B2A4A]">
-                {t.modules.scenario.dialoguesTitle || (isAr ? 'حوارات وسيناريوهات' : 'Dialogues scénarisés')}
+                {t.modules.scenario.dialoguesTitle || (isAr ? 'حوارات وسيناريوهات' : lang === 'es' ? 'Diálogos guionizados' : lang === 'en' ? 'Scripted dialogues' : 'Dialogues scénarisés')}
               </h2>
               <p className="text-sm text-[#7A7670] mt-1">
-                {t.modules.scenario.dialoguesDesc || (isAr ? 'تدرّب في مواقف مغربية واقعية.' : 'Entraînez-vous dans des situations marocaines réelles.')}
+                {t.modules.scenario.dialoguesDesc || (isAr ? 'تدرّب في مواقف مغربية واقعية.' : lang === 'es' ? 'Practica en situaciones marroquíes reales.' : lang === 'en' ? 'Practice real-life situations.' : 'Entraînez-vous dans des situations marocaines réelles.')}
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

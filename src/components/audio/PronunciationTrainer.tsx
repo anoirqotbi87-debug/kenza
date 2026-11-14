@@ -229,7 +229,15 @@ export default function PronunciationTrainer({
               type="button"
               onClick={() => setShowPhonemeTip(!showPhonemeTip)}
               className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#C9A05C]/15 hover:bg-[#C9A05C]/25 border border-[#C9A05C]/30 rounded-full text-xs font-bold text-[#1B2A4A] transition-colors"
-              title={isAr ? 'انقر لمعرفة طريقة نطق هذا الحرف' : 'Cliquez pour voir comment articuler ce son'}
+              title={
+                isAr
+                  ? 'انقر لمعرفة طريقة نطق هذا الحرف'
+                  : isEs
+                  ? 'Haz clic para ver cómo articular este sonido'
+                  : isEn
+                  ? 'Click to see how to articulate this sound'
+                  : 'Cliquez pour voir comment articuler ce son'
+              }
             >
               <Info className="w-3.5 h-3.5 text-[#C9A05C]" />
               <span>
@@ -274,7 +282,15 @@ export default function PronunciationTrainer({
                 ? 'bg-[#1B2A4A] !text-white shadow-xs'
                 : 'bg-[#FDFCF8] text-[#1B2A4A] border border-[#E8E2D5] hover:bg-[#E8E2D5]/50'
             }`}
-            title={isAr ? 'عادي (1.0x)' : 'Écouter à vitesse normale'}
+            title={
+              isAr
+                ? 'عادي (1.0x)'
+                : isEs
+                ? 'Escuchar a velocidad normal'
+                : isEn
+                ? 'Listen at normal speed'
+                : 'Écouter à vitesse normale'
+            }
           >
             <Volume2 className="w-4 h-4 text-[#C9A05C]" />
             <span className={activeSpeed === 'normal' ? '!text-white' : ''}>
@@ -290,11 +306,19 @@ export default function PronunciationTrainer({
                 ? 'bg-[#1B2A4A] !text-white shadow-xs'
                 : 'bg-[#FDFCF8] text-[#1B2A4A] border border-[#E8E2D5] hover:bg-[#E8E2D5]/50'
             }`}
-            title={isAr ? 'سلحفاة 🐢 (0.75x)' : 'Mode Tortue ralenti (0.75x)'}
+            title={
+              isAr
+                ? 'سلحفاة 🐢 (0.75x)'
+                : isEs
+                ? 'Modo tortuga lento (0.75x)'
+                : isEn
+                ? 'Slow Turtle mode (0.75x)'
+                : 'Mode Tortue ralenti (0.75x)'
+            }
           >
             <Turtle className="w-4 h-4 text-[#C9A05C]" />
             <span className={activeSpeed === 'slow' ? '!text-white' : ''}>
-              {isAr ? 'سلحفاة 🐢 (0.75x)' : 'Tortue (0.75x)'}
+              {isAr ? 'سلحفاة 🐢 (0.75x)' : isEs ? 'Tortuga (0.75x)' : isEn ? 'Turtle (0.75x)' : 'Tortue (0.75x)'}
             </span>
           </button>
         </div>
@@ -325,9 +349,17 @@ export default function PronunciationTrainer({
               isListening
                 ? isAr
                   ? 'إيقاف التسجيل'
+                  : isEs
+                  ? 'Detener grabación'
+                  : isEn
+                  ? 'Stop recording'
                   : 'Arrêter l’enregistrement'
                 : isAr
                 ? 'بدء التحدث'
+                : isEs
+                ? 'Comenzar a hablar'
+                : isEn
+                ? 'Start speaking'
                 : 'Commencer à parler'
             }
           >
@@ -364,6 +396,10 @@ export default function PronunciationTrainer({
             : isSupported === false
             ? isAr
               ? 'استمع إلى النموذج الصوتي أعلاه'
+              : isEs
+              ? 'Escucha el modelo de audio arriba'
+              : isEn
+              ? 'Listen to the audio model above'
               : 'Écoutez le modèle audio ci-dessus'
             : isAr
             ? 'اضغط على الميكروفون لاختبار نطقك'

@@ -37,21 +37,21 @@ export default function RevisionsPage() {
             onClick={() => setTab('smart')}
             className={`py-2 px-1 text-center rounded-lg transition-all truncate ${tab === 'smart' ? 'bg-[#142943] text-white shadow-sm font-semibold' : 'text-[#7A7670] hover:text-[#142943]'}`}
           >
-            {isAr ? 'مراجعة' : lang === 'es' ? 'Repaso' : lang === 'en' ? 'Review' : 'Révision'}
+            {tp?.tabSrs || (isAr ? 'مراجعة' : lang === 'es' ? 'Repaso' : lang === 'en' ? 'Review' : 'Révision')}
           </button>
           <button
             type="button"
             onClick={() => setTab('decks')}
             className={`py-2 px-1 text-center rounded-lg transition-all truncate ${tab === 'decks' ? 'bg-[#142943] text-white shadow-sm font-semibold' : 'text-[#7A7670] hover:text-[#142943]'}`}
           >
-            {isAr ? 'حزمي' : lang === 'es' ? 'Mis mazos' : lang === 'en' ? 'My decks' : 'Mes paquets'}
+            {tp?.tabDecks || (isAr ? 'حزمي' : lang === 'es' ? 'Mis mazos' : lang === 'en' ? 'My decks' : 'Mes paquets')}
           </button>
           <button
             type="button"
             onClick={() => setTab('badges')}
             className={`py-2 px-1 text-center rounded-lg transition-all truncate ${tab === 'badges' ? 'bg-[#142943] text-white shadow-sm font-semibold' : 'text-[#7A7670] hover:text-[#142943]'}`}
           >
-            {isAr ? 'أوسمتي' : lang === 'es' ? 'Insignias' : lang === 'en' ? 'Badges' : 'Badges'}
+            {tp?.tabGamification || (isAr ? 'أوسمتي' : lang === 'es' ? 'Insignias' : lang === 'en' ? 'Badges' : 'Badges')}
           </button>
         </div>
       </div>
