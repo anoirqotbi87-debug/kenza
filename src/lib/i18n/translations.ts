@@ -598,7 +598,7 @@ export const translations = {
     },
     srs: {
       flip: "اقلب البطاقة", again: "مجدداً", hard: "صعب", good: "جيد", easy: "سهل",
-      dueToday: "بطاقات اليوم", tapToFlip: "انقر للقلب ->",
+      dueToday: "بطاقات اليوم", tapToFlip: "انقر للقلب ←",
       answer: "الإجابة", translateArabizi: "ترجم إلى العَربي زي", translateArabic: "ترجم إلى العربية", translateDuo: "ترجم إلى الدارجة (ثنائي)",
       allCaughtUp: "أنت على اكتمال!",
       allCaughtUpDesc: "لا توجد بطاقات للمراجعة اليوم. عد غداً لتثبيت ذاكرتك.",

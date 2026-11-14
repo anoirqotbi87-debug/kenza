@@ -123,5 +123,29 @@ describe('Phoneme Matcher & Pronunciation Scoring (Darija)', () => {
       const res = calculateSimilarity('salam', 'salam');
       expect(res.score).toBe(100);
     });
+
+    it('matches spoken Arabic script even without targetArabic provided', () => {
+      const result = evaluatePronunciation('عافاك', '3afak');
+      expect(result.score).toBeGreaterThanOrEqual(80);
+      expect(result.tier).toBe('excellent');
+      expect(result.detectedPhonemes).toContain('3');
+    });
+
+    it('matches multi-word Arabic speech against Arabizi target', () => {
+      const result = evaluatePronunciation('شكرا بزاف', 'chokran bzzaf');
+      expect(result.score).toBeGreaterThanOrEqual(75);
+    });
+
+    it('returns Arabic badge and tips when lang is ar', () => {
+      const result = evaluatePronunciation('3afak bzzaf', '3afak bzzaf', 'عافاك بزاف', 'ar');
+      expect(result.badge.text).toContain('ممتاز');
+      expect(result.targetPhonemes[0]?.tip).toContain('الحلق');
+    });
+
+    it('returns English badge and tips when lang is en', () => {
+      const result = evaluatePronunciation('3afak bzzaf', '3afak bzzaf', 'عافاك بزاف', 'en');
+      expect(result.badge.text).toContain('Excellent!');
+      expect(result.targetPhonemes[0]?.tip).toContain('throat');
+    });
   });
 });

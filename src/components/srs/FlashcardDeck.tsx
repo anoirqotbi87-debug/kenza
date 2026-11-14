@@ -34,6 +34,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
   const [isFlipped, setIsFlipped] = useState(false);
   const { preferredNotation, soundEnabled, reviewCard, customVocabulary, blindAudioMode } = useAppStore();
   const { lang, t } = useTranslation();
+  const isAr = lang === 'ar';
 
   // Helper de résolution de carte
   const resolveCardWord = useCallback((wordId: string): VocabularySRSData | null => {
@@ -213,26 +214,74 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
 
   // Formatage des catégories techniques
   const formatCategory = (cat?: string) => {
-    if (!cat) return "Vocabulaire";
-    const labels: Record<string, string> = {
-      POLITE_SOCIAL: 'Politesse & Salutations',
-      polite_social: 'Politesse & Salutations',
-      FOOD_DRINK: 'Café & Restauration',
-      food_drink: 'Café & Restauration',
-      NUMBERS_TIME: 'Nombres & Temps',
-      numbers_time: 'Nombres & Temps',
-      EMERGENCY: 'Urgences & Santé',
-      emergency: 'Urgences & Santé',
-      urgencies_health: 'Urgences & Santé',
-      TRAVEL_DIRECTIONS: 'Déplacements & Taxi',
-      travel_directions: 'Déplacements & Taxi',
-      directions: 'Déplacements & Taxi',
-      SHOPPING: 'Achats & Marché',
-      shopping: 'Achats & Marché',
-      souk_bargaining: 'Achats & Marché',
-      housing_riad: 'Hébergement & Riad',
+    if (!cat) return isAr ? "مفردات" : lang === "es" ? "Vocabulario" : lang === "en" ? "Vocabulary" : "Vocabulaire";
+    const labels: Record<string, Record<string, string>> = {
+      polite_social: {
+        fr: 'Politesse & Salutations',
+        en: 'Politeness & Greetings',
+        es: 'Cortesía y Saludos',
+        ar: 'التحيات واللباقة',
+      },
+      food_drink: {
+        fr: 'Café & Restauration',
+        en: 'Café & Dining',
+        es: 'Cafetería y Comida',
+        ar: 'المقهى والمطعم',
+      },
+      numbers_time: {
+        fr: 'Nombres & Temps',
+        en: 'Numbers & Time',
+        es: 'Números y Tiempo',
+        ar: 'الأرقام والوقت',
+      },
+      emergency: {
+        fr: 'Urgences & Santé',
+        en: 'Emergency & Health',
+        es: 'Urgencias y Salud',
+        ar: 'الطوارئ والصحة',
+      },
+      urgencies_health: {
+        fr: 'Urgences & Santé',
+        en: 'Emergency & Health',
+        es: 'Urgencias y Salud',
+        ar: 'الطوارئ والصحة',
+      },
+      travel_directions: {
+        fr: 'Déplacements & Taxi',
+        en: 'Getting around & Taxi',
+        es: 'Desplazamientos y Taxi',
+        ar: 'المواصلات والاتجاهات',
+      },
+      directions: {
+        fr: 'Déplacements & Taxi',
+        en: 'Getting around & Taxi',
+        es: 'Desplazamientos y Taxi',
+        ar: 'المواصلات والاتجاهات',
+      },
+      shopping: {
+        fr: 'Achats & Marché',
+        en: 'Shopping & Market',
+        es: 'Compras y Mercado',
+        ar: 'التسوق والسوق',
+      },
+      souk_bargaining: {
+        fr: 'Achats & Marché',
+        en: 'Shopping & Market',
+        es: 'Compras y Mercado',
+        ar: 'التسوق والسوق',
+      },
+      housing_riad: {
+        fr: 'Hébergement & Riad',
+        en: 'Housing & Riad',
+        es: 'Alojamiento y Riad',
+        ar: 'السكن والرياض',
+      },
     };
-    return labels[cat] || cat.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+    const key = cat.toLowerCase();
+    if (labels[key]) {
+      return labels[key][lang] || labels[key].fr;
+    }
+    return cat.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
   };
 
   // Highlight specific phonetic numbers in Arabizi
@@ -383,7 +432,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
             {/* Kicker supérieur réponse */}
             <div className="flex items-center gap-2 text-[#7A9174] text-xs font-bold tracking-[0.22em] uppercase">
               <span>—</span>
-              <span>Darija marocaine</span>
+              <span>{isAr ? 'الدارجة المغربية' : lang === 'es' ? 'Darija marroquí' : lang === 'en' ? 'Moroccan Darija' : 'Darija marocaine'}</span>
             </div>
 
             <div className="space-y-4 my-auto w-full">
@@ -393,21 +442,23 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
               
               {/* Display Logic Based on Notation Preference */}
               {(preferredNotation === 'arabizi' || preferredNotation === 'duo') && (
-                <div className="font-display text-4xl sm:text-5xl font-bold text-[#1B2A4A] tracking-tight">
+                <div className="font-display text-4xl sm:text-5xl font-bold text-[#1B2A4A] tracking-tight" dir="ltr">
                   {formatArabizi(wordData.arabizi)}
                 </div>
               )}
               
               {(preferredNotation === 'arabic' || preferredNotation === 'duo') && (
-                <div className="text-3xl sm:text-4xl font-bold text-[#1B2A4A] font-arabic leading-tight">
+                <div className="text-3xl sm:text-4xl font-bold text-[#1B2A4A] font-arabic leading-tight" dir="rtl">
                   {wordData.arabic}
                 </div>
               )}
 
               {/* Example Context */}
               {wordData.example && (
-                <div className="mt-4 p-3.5 bg-[#F7F3EA] rounded-2xl border border-[#E8E2D5] text-left text-xs space-y-1">
-                  <div className="text-[#C9A05C] font-bold text-[10px] tracking-wider uppercase">En contexte</div>
+                <div className="mt-4 p-3.5 bg-[#F7F3EA] rounded-2xl border border-[#E8E2D5] text-left rtl:text-right text-xs space-y-1">
+                  <div className="text-[#C9A05C] font-bold text-[10px] tracking-wider uppercase">
+                    {isAr ? 'في سياق الجملة' : lang === 'es' ? 'En contexto' : lang === 'en' ? 'In context' : 'En contexte'}
+                  </div>
                   <div className="font-display font-bold text-sm text-[#1B2A4A]">
                     {preferredNotation === 'arabic' ? wordData.example.arabic : wordData.example.arabizi}
                   </div>
@@ -418,7 +469,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
               )}
 
               {wordData.culturalNote && (
-                <div className="mt-2 flex gap-2 items-start text-xs text-left bg-[#C9A05C]/10 border border-[#C9A05C]/30 text-[#1B2A4A] p-2.5 rounded-xl">
+                <div className="mt-2 flex gap-2 items-start text-xs text-left rtl:text-right bg-[#C9A05C]/10 border border-[#C9A05C]/30 text-[#1B2A4A] p-2.5 rounded-xl">
                   <Info className="w-4 h-4 text-[#C9A05C] shrink-0 mt-0.5" />
                   <p>{wordData.culturalNote}</p>
                 </div>
@@ -426,7 +477,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
             </div>
 
             <div className="text-[#7A7670] text-xs">
-              Évaluez votre mémorisation ci-dessous
+              {isAr ? 'قيّم مدى تذكّرك أدناه' : lang === 'es' ? 'Evalúa tu memorización abajo' : lang === 'en' ? 'Rate your recall below' : 'Évaluez votre mémorisation ci-dessous'}
             </div>
           </div>
         </motion.div>

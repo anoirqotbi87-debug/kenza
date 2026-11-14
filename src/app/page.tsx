@@ -114,7 +114,7 @@ const buildPhrases = (lang: string): Phrase[] => [
   { id: "bghit", category: trL(lang, tr("Au café", "At the café", "En el café", "في المقهى"), "At the café", "En el café", "في المقهى"), darija: "Bghit lma, afak.", arabic: "بْغِيتْ الْمَا، عَافَاكْ.", meaning: trL(lang, tr("Je voudrais de l’eau, s’il vous plaît.", "I’d like some water, please.", "Quisiera agua, por favor.", "أريد ماءً، من فضلك."), "I’d like some water, please.", "Quisiera agua, por favor.", "أريد ماءً، من فضلك."), note: trL(lang, tr("Remplace « lma » par ce que tu aimerais commander.", "Replace « lma » with whatever you’d like to order.", "Sustituye « lma » por lo que quieras pedir.", "استبدل «لما» بما تود طلبه."), "Replace « lma » with whatever you’d like to order.", "Sustituye « lma » por lo que quieras pedir.", "استبدل «لما» بما تود طلبه.") },
   { id: "fin", category: trL(lang, tr("Se déplacer", "Getting around", "Desplazarse", "التنقل"), "Getting around", "Desplazarse", "التنقل"), darija: "Fin kayn souk?", arabic: "فِينْ كَايْنْ السُّوقْ ؟", meaning: trL(lang, tr("Où est le souk ?", "Where is the souk?", "¿dónde está el souk?", "أين السوق؟"), "Where is the souk?", "¿dónde está el souk?", "أين السوق؟"), note: trL(lang, tr("Utilise cette structure pour demander un lieu.", "Use this structure to ask for a place.", "Usa esta estructura para preguntar por un lugar.", "استخدم هذه الصيغة لسؤال عن مكان."), "Use this structure to ask for a place.", "Usa esta estructura para preguntar por un lugar.", "استخدم هذه الصيغة لسؤال عن مكان.") },
   { id: "shukran", category: trL(lang, tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات"), "Essentials", "Lo esencial", "الأساسيات"), darija: "Shukran bzaf!", arabic: "شُكْرَانْ بْزَّافْ !", meaning: trL(lang, tr("Merci beaucoup !", "Thank you very much!", "¡Muchas gracias!", "شكراً جزيلاً!"), "Thank you very much!", "¡Muchas gracias!", "شكراً جزيلاً!"), note: trL(lang, tr("« Bzaf » signifie beaucoup — un mot qui sert partout.", "« Bzaf » means a lot — a word useful everywhere.", "« Bzaf » significa mucho — una palabra útil en todo.", "«بزاف» تعني كثيراً — كلمة تفيد في كل مكان."), "« Bzaf » means a lot — a word useful everywhere.", "« Bzaf » significa mucho — una palabra útil en todo.", "«بزاف» تعني كثيراً — كلمة تفيد في كل مكان.") },
-  { id: "smah", category: trL(lang, tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات"), "Essentials", "Lo esencial", "الأساسيات"), darija: "Smah liya.", arabic: "سْمَحْ لِيَّا.", meaning: trL(lang, tr("Excuse-moi / pardon.", "Excuse me / sorry.", "Disculpa / perdón.", "المامعة / عفواً."), "Excuse me / sorry.", "Disculpa / perdón.", "المامعة / عفواً."), note: trL(lang, tr("Pour attirer l’attention ou demander pardon, avec douceur.", "To catch attention or apologize, gently.", "Para llamar la atención o pedir perdón, con dulzura.", "للتنبيه أو طلب العفو، بلطف."), "To catch attention or apologize, gently.", "Para llamar la atención o pedir perdón, con dulzura.", "للتنبيه أو طلب العفو، بلطف.") },
+  { id: "smah", category: trL(lang, tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات"), "Essentials", "Lo esencial", "الأساسيات"), darija: "Smah liya.", arabic: "سْمَحْ لِيَّا.", meaning: trL(lang, tr("Excuse-moi / pardon.", "Excuse me / sorry.", "Disculpa / perdón.", "المسامحة / عفواً."), "Excuse me / sorry.", "Disculpa / perdón.", "المسامحة / عفواً."), note: trL(lang, tr("Pour attirer l’attention ou demander pardon, avec douceur.", "To catch attention or apologize, gently.", "Para llamar la atención o pedir perdón, con dulzura.", "للتنبيه أو طلب العفو، بلطف."), "To catch attention or apologize, gently.", "Para llamar la atención o pedir perdón, con dulzura.", "للتنبيه أو طلب العفو، بلطف.") },
   { id: "bslama", category: trL(lang, tr("Saluer", "Greeting", "Saludar", "التحية"), "Greeting", "Saludar", "التحية"), darija: "Bslama, nshawfek.", arabic: "بْسْلَامَةْ، نْشُوفْكْ.", meaning: tr("Au revoir, à bientôt.", "Goodbye, see you soon.", "Adiós, hasta pronto.", "إلى اللقاء، أراك قريباً."), note: trL(lang, tr("Une façon amicale de prendre congé.", "A friendly way to say goodbye.", "Una manera amable de despedirse.", "طريقة ودية للوداع."), "A friendly way to say goodbye.", "Una manera amable de despedirse.", "طريقة ودية للوداع.") },
 ];
 
@@ -549,7 +549,9 @@ export default function Home() {
       if (typeof w.translation === "string") {
         meaningText = w.translation;
       } else if (w.translation && typeof w.translation === "object") {
-        meaningText = w.translation.fr || w.translation.en || tr("Expression en darija", "Darija expression", "Expresión en darija", "عبارة بالدارجة");
+        meaningText = (w.translation as unknown as Record<string, string>)[lang] || w.translation.fr || w.translation.en || tr("Expression en darija", "Darija expression", "Expresión en darija", "عبارة بالدارجة");
+      } else if (legacy.translations?.[lang]) {
+        meaningText = legacy.translations[lang];
       } else if (legacy.translations?.fr) {
         meaningText = legacy.translations.fr;
       } else if (typeof legacy.back === "string") {
@@ -558,20 +560,27 @@ export default function Home() {
 
       let cat = trL(lang, tr("Les essentiels", "Essentials", "Lo esencial", "الأساسيات"), "Essentials", "Lo esencial", "الأساسيات");
       if (w.category === "polite_social") cat = trL(lang, tr("Saluer", "Greeting", "Saludar", "التحية"), "Greeting", "Saludar", "التحية");
-      else if (w.category === "food_drink") cat = trL(lang, tr("Au café", "At the café", "En el café", "في المقهى"), "At the café", "En el café", "في المقهى");
-      else if (w.category === "directions" || w.category === "travel_directions" || w.category === "travel_direction" || w.category === "transport") {
+      else if (w.category === "food_drink" || w.category === "cafe_resto") cat = trL(lang, tr("Au café", "At the café", "En el café", "في المقهى"), "At the café", "En el café", "في المقهى");
+      else if (w.category === "directions" || w.category === "travel_directions" || w.category === "travel_direction" || w.category === "transport" || w.category === "taxi_transport") {
         cat = trL(lang, tr("Déplacements & Taxi", "Getting around & Taxi", "Desplazamientos y Taxi", "مواصلات ونقل"), "Getting around & Taxi", "Desplazamientos y Taxi", "مواصلات ونقل");
-      } else if (w.category === "shopping" || w.category === "souk_bargaining" || w.category === "souk") {
+      } else if (w.category === "shopping" || w.category === "souk_bargaining" || w.category === "souk" || w.category === "souk_shopping") {
         cat = trL(lang, tr("Achats & Souk", "Shopping & Souk", "Compras y Zoco", "التسوق والسوق"), "Shopping & Souk", "Compras y Zoco", "التسوق والسوق");
       } else if (w.category === "numbers_time" || w.category === "time") {
         cat = trL(lang, tr("Nombres & Temps", "Numbers & Time", "Números y Tiempo", "الأرقام والوقت"), "Numbers & Time", "Números y Tiempo", "الأرقام والوقت");
       } else if (w.category === "emergency" || w.category === "urgencies_health" || w.category === "health") {
         cat = trL(lang, tr("Urgences & Santé", "Emergency & Health", "Urgencias y Salud", "الطوارئ والصحة"), "Emergency & Health", "Urgencias y Salud", "الطوارئ والصحة");
+      } else if (w.category === "housing_riad") {
+        cat = trL(lang, tr("Hébergement & Riad", "Housing & Riad", "Alojamiento y Riad", "السكن والرياض"), "Housing & Riad", "Alojamiento y Riad", "السكن والرياض");
       } else if (w.category === "grammar_basics" || w.category === "grammar") {
         cat = trL(lang, tr("Grammaire & Bases", "Grammar & Basics", "Gramática y Bases", "قواعد وأساسيات"), "Grammar & Basics", "Gramática y Bases", "قواعد وأساسيات");
       } else if (w.category) {
         cat = w.category.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
       }
+
+      const exampleTr = w.example?.translation
+        ? (typeof w.example.translation === "object" ? (w.example.translation as unknown as Record<string, string>)[lang] || w.example.translation.fr || w.example.translation.en : w.example.translation)
+        : "";
+      const noteText = (w.example?.arabizi ? `Ex: ${w.example.arabizi}${exampleTr ? ` (${exampleTr})` : ''}` : "") || tr("Vocabulaire du quotidien avec audio naturel.", "Everyday vocabulary with natural audio.", "Vocabulario cotidiano con audio natural.", "مفردات يومية بصوت طبيعي.");
 
       return {
         id: w.id || `vocab_${idx}`,
@@ -579,7 +588,7 @@ export default function Home() {
         darija: w.arabizi || legacy.front || "",
         arabic: w.arabic || "",
         meaning: meaningText,
-        note: (w.example?.arabizi ? `Ex: ${w.example.arabizi}` : "") || tr("Vocabulaire du quotidien avec audio naturel.", "Everyday vocabulary with natural audio.", "Vocabulario cotidiano con audio natural.", "مفردات يومية بصوت طبيعي."),
+        note: noteText,
       };
     });
 
@@ -603,13 +612,13 @@ export default function Home() {
       if (typeof p.meaning === "string") {
         meaningStr = p.meaning;
       } else if (p.meaning && typeof p.meaning === "object") {
-        meaningStr = p.meaning.fr || p.meaning.en || "";
+        meaningStr = (p.meaning as Record<string, string>)[lang] || p.meaning.fr || p.meaning.en || "";
       } else if (typeof p.back === "string") {
         meaningStr = p.back;
       } else if (p.back && typeof p.back === "object") {
-        meaningStr = p.back.fr || p.back.en || "";
+        meaningStr = (p.back as Record<string, string>)[lang] || p.back.fr || p.back.en || "";
       } else if (p.translation) {
-        meaningStr = typeof p.translation === "string" ? p.translation : p.translation.fr || p.translation.en || "";
+        meaningStr = typeof p.translation === "string" ? p.translation : (p.translation as Record<string, string>)[lang] || p.translation.fr || p.translation.en || "";
       }
 
       return {
@@ -873,7 +882,7 @@ export default function Home() {
             onClick={() => showToast(t.modules.home.dailyGoal)}
             className="goal-link"
           >
-            {trL(lang, tr("Ajuster l’objectif", "Adjust goal", "Ajustar objetivo", "عدّل الهدف"), "Adjust goal", "Ajustar objetivo", "عدّل الهدف")} <ArrowRight size={14} />
+            {trL(lang, tr("Ajuster l’objectif", "Adjust goal", "Ajustar objetivo", "عدّل الهدف"), "Adjust goal", "Ajustar objetivo", "عدّل الهدف")} <ArrowRight size={14} className="rtl:rotate-180" />
           </button>
         </div>
 
@@ -1205,7 +1214,7 @@ export default function Home() {
             <KenzaLogo size="sm" showWordmark={true} />
             <span>{trL(lang, "Apprendre une langue, c’est rencontrer des gens.", "Learning a language is meeting people.", "Aprender un idioma es conocer gente.", "تعلم اللغة لقاءٌ بالناس.")}</span>
             <button onClick={() => switchView("space")}>
-              {trL(lang, "Passeport Culturel & Données", "Cultural passport & data", "Pasaporte cultural y datos", "الجواز الثقافي والبيانات")} <ArrowRight size={13} />
+              {trL(lang, "Passeport Culturel & Données", "Cultural passport & data", "Pasaporte cultural y datos", "الجواز الثقافي والبيانات")} <ArrowRight size={13} className="rtl:rotate-180" />
             </button>
           </footer>
         </div>
@@ -1404,7 +1413,7 @@ function TodayView({
             </h2>
             <p>{trL(lang, "Une phrase, une rencontre, une autre façon de voir le Maroc.", "A phrase, an encounter, another way to see Morocco.", "Una frase, un encuentro, otra forma de ver Marruecos.", "عبارة، لقاء، وطريقة أخرى لرؤية المغرب.")}</p>
             <button className="hero-button" onClick={() => onOpenLesson(nextLesson?.id)}>
-              {trL(lang, "Continuer à apprendre", "Keep learning", "Seguir aprendiendo", "واصل التعلم")} <ArrowRight size={16} />
+              {trL(lang, "Continuer à apprendre", "Keep learning", "Seguir aprendiendo", "واصل التعلم")} <ArrowRight size={16} className="rtl:rotate-180" />
             </button>
             <div className="hero-footnote">
               <span className="hero-foot-line" /> {trL(lang, "À ton rythme, toujours.", "At your pace, always.", "A tu ritmo, siempre.", "على إيقاعك، دائماً.")}
@@ -1507,7 +1516,7 @@ function TodayView({
           <h2>{trL(lang, "Sept modules, un seul moteur d’exercices.", "Seven modules, one exercise engine.", "Siete módulos, un solo motor de ejercicios.", "سبع وحدات، محرك تمارين واحد.")}</h2>
         </div>
         <button className="plain-link" onClick={onOpenCurriculum}>
-          {trL(lang, "Ouvrir le parcours", "Open the journey", "Abrir el recorrido", "افتح المسار")} <ArrowRight size={15} />
+          {trL(lang, "Ouvrir le parcours", "Open the journey", "Abrir el recorrido", "افتح المسار")} <ArrowRight size={15} className="rtl:rotate-180" />
         </button>
       </div>
 
@@ -1536,7 +1545,7 @@ function TodayView({
               </span>
               <strong>{getLocalizedText(mod.title, lang as UILanguage)}</strong>
               <span className="quick-bottom">
-                {mod.lessons} {tr("leçons", "lessons", "lecciones", "دروس")} · {mod.steps} {tr("étapes", "steps", "pasos", "خطوات")} <ArrowRight size={14} />
+                {mod.lessons} {tr("leçons", "lessons", "lecciones", "دروس")} · {mod.steps} {tr("étapes", "steps", "pasos", "خطوات")} <ArrowRight size={14} className="rtl:rotate-180" />
               </span>
             </button>
           );
@@ -1570,7 +1579,7 @@ function TodayView({
                 <strong>{lesson.title}</strong>
                 <span className="quick-bottom">
                   {lesson.steps} {tr("étapes", "steps", "pasos", "خطوات")}
-                  {done ? ` · ${tr("terminée", "completed", "completada", "مكتملة")}` : ""} <ArrowRight size={14} />
+                  {done ? ` · ${tr("terminée", "completed", "completada", "مكتملة")}` : ""} <ArrowRight size={14} className="rtl:rotate-180" />
                 </span>
               </button>
             );
@@ -1617,7 +1626,7 @@ function TodayView({
           </div>
         </div>
         <button className="stat-action" onClick={() => onNavigate("space")}>
-          {trL(lang, "Voir mon espace", "See my space", "Ver mi espacio", "فضائي")} <ArrowRight size={14} />
+          {trL(lang, "Voir mon espace", "See my space", "Ver mi espacio", "فضائي")} <ArrowRight size={14} className="rtl:rotate-180" />
         </button>
       </div>
 
@@ -1630,7 +1639,7 @@ function TodayView({
           <h2>{trL(lang, "À toi de choisir ton pas.", "Your pace, your choice.", "Tú eliges tu paso.", "اختر خطوتك.")}</h2>
         </div>
         <button className="plain-link" onClick={() => onNavigate("path")}>
-          {trL(lang, "Voir le parcours", "View the journey", "Ver la ruta", "المسار")} <ArrowRight size={15} />
+          {trL(lang, "Voir le parcours", "View the journey", "Ver la ruta", "المسار")} <ArrowRight size={15} className="rtl:rotate-180" />
         </button>
       </div>
 
@@ -1646,7 +1655,7 @@ function TodayView({
             {trL(lang, "de phrases", " book", " de frases", " للعبارات")}
           </strong>
           <span className="quick-bottom">
-            {trL(lang, "Vocabulaire essentiel", "Essential vocabulary", "Vocabulario esencial", "مفردات أساسية")} <ArrowRight size={14} />
+            {trL(lang, "Vocabulaire essentiel", "Essential vocabulary", "Vocabulario esencial", "مفردات أساسية")} <ArrowRight size={14} className="rtl:rotate-180" />
           </span>
         </button>
 
@@ -1661,7 +1670,7 @@ function TodayView({
             {trL(lang, "petite révision", "review", "revisión rápida", "سريعة")}
           </strong>
           <span className="quick-bottom">
-            {trL(lang, "Cartes du jour", "Cards of the day", "Cartas del día", "بطاقات اليوم")} <ArrowRight size={14} />
+            {trL(lang, "Cartes du jour", "Cards of the day", "Cartas del día", "بطاقات اليوم")} <ArrowRight size={14} className="rtl:rotate-180" />
           </span>
         </button>
 
@@ -1676,7 +1685,7 @@ function TodayView({
             {trL(lang, "situation", "scenarios", "de la vida real", "من الحياة")}
           </strong>
           <span className="quick-bottom">
-            {trL(lang, "Au café, en taxi", "At the café, in a taxi", "En el café, en taxi", "في المقهى وفي التاكسي")} <ArrowRight size={14} />
+            {trL(lang, "Au café, en taxi", "At the café, in a taxi", "En el café, en taxi", "في المقهى وفي التاكسي")} <ArrowRight size={14} className="rtl:rotate-180" />
           </span>
         </button>
       </div>
@@ -1700,7 +1709,7 @@ function TodayView({
           <p>{trL(lang, "Chaque expression est une petite invitation à aller vers l’autre.", "Every phrase is a small invitation to reach out to others.", "Cada expresión es una pequeña invitación a acercarse al otro.", "كل عبارة دعوة صغيرة للتقرب من الآخر.")}</p>
         </div>
         <button onClick={onOpenCurriculum} aria-label={t.modules.home.explorePath}>
-          <ArrowRight size={20} />
+          <ArrowRight size={20} className="rtl:rotate-180" />
         </button>
       </div>
     </>
@@ -2157,7 +2166,7 @@ function PhrasesView({
                   </button>
                 </div>
                 <span className="phrase-index">0{index + 1}</span>
-                <h3>{darijaText}</h3>
+                <h3 dir="ltr" className="text-left rtl:text-right">{darijaText}</h3>
                 {arabicText ? (
                   <span className="phrase-arabic" dir="rtl">
                     {arabicText}
@@ -2193,7 +2202,7 @@ function PhrasesView({
               setFavoritesOnly(false);
             }}
           >
-            {trL(lang, "Effacer les filtres", "Clear filters", "Borrar filtros", "مسح المرشحات")} <ArrowRight size={14} />
+            {trL(lang, "Effacer les filtres", "Clear filters", "Borrar filtros", "مسح المرشحات")} <ArrowRight size={14} className="rtl:rotate-180" />
           </button>
         </div>
       )}
@@ -2516,12 +2525,12 @@ function SpaceView({
           </div>
           {!isPremium && (
             <button className="outline-button" onClick={() => onOpenPaywall("profile_upgrade")}>
-              {trL(lang, "Passer à Kenza Pro", "Go Kenza Pro", "Pasar a Kenza Pro", "انتقل إلى كنزة برو")} <ArrowRight size={14} />
+              {trL(lang, "Passer à Kenza Pro", "Go Kenza Pro", "Pasar a Kenza Pro", "انتقل إلى كنزة برو")} <ArrowRight size={14} className="rtl:rotate-180" />
             </button>
           )}
           {isPremium && (
             <button className="outline-button" onClick={onManageSubscription}>
-              {trL(lang, "Gérer mon abonnement", "Manage my subscription", "Gestionar mi suscripción", "إدارة اشتراكي")} <ArrowRight size={14} />
+              {trL(lang, "Gérer mon abonnement", "Manage my subscription", "Gestionar mi suscripción", "إدارة اشتراكي")} <ArrowRight size={14} className="rtl:rotate-180" />
             </button>
           )}
         </article>

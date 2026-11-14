@@ -83,8 +83,8 @@ export default function ParlerPage() {
   return (
     <div dir={isAr ? 'rtl' : 'ltr'} className="min-h-screen bg-[#F7F3EA] pb-16">
       <PageHeader
-        badge={tp.badge || 'Pratique Orale'}
-        title={tp.title || 'Entraînement de prononciation'}
+        badge={tp?.badge || (isAr ? 'التدريب الشفهي' : 'Pratique Orale')}
+        title={tp?.title || (isAr ? 'تدريب النطق' : 'Entraînement de prononciation')}
         backHref="/?view=path&tab=parler"
       />
 
@@ -128,10 +128,10 @@ export default function ParlerPage() {
           <section className="bg-[#FDFCF8] rounded-3xl p-5 sm:p-7 shadow-xs border border-[#E8E2D5] space-y-5">
             <div>
               <h2 className="font-display text-xl font-bold text-[#1B2A4A]">
-                {t.modules.scenario.dialoguesTitle || 'Dialogues scénarisés'}
+                {t.modules.scenario.dialoguesTitle || (isAr ? 'حوارات وسيناريوهات' : 'Dialogues scénarisés')}
               </h2>
               <p className="text-sm text-[#7A7670] mt-1">
-                {t.modules.scenario.dialoguesDesc || 'Entraînez-vous dans des situations marocaines réelles.'}
+                {t.modules.scenario.dialoguesDesc || (isAr ? 'تدرّب في مواقف مغربية واقعية.' : 'Entraînez-vous dans des situations marocaines réelles.')}
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

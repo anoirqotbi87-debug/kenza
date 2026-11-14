@@ -99,13 +99,14 @@ export function getNextPlayableLesson(
     const playableLessons = mod.lessons.filter(hasSteps);
     const modNumber = parseInt(key, 10) || 1;
     const modTitle = text(mod.title, lang);
+    const levelLabel = lang === 'ar' ? 'المستوى' : lang === 'es' ? 'Nivel' : lang === 'en' ? 'Level' : 'Niveau';
 
     for (const lesson of playableLessons) {
       if (!done.has(lesson.id)) {
         return {
           id: lesson.id,
           title: text(lesson.title, lang),
-          moduleTitle: `${modTitle} · Niveau ${lesson.level ?? modNumber}`,
+          moduleTitle: `${modTitle} · ${levelLabel} ${lesson.level ?? modNumber}`,
           moduleNumber: modNumber,
           stepsCount: lesson.steps?.length || 8,
         };

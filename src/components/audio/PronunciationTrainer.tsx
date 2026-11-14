@@ -10,12 +10,15 @@ import {
   Sparkles,
   ChevronRight,
   Turtle,
+  Info,
 } from 'lucide-react';
 import { playAudio } from '@/lib/audio';
 import { useVoiceRecognition } from '@/hooks/useVoiceRecognition';
 import {
   evaluatePronunciation,
   PronunciationEvaluation,
+  MULTI_PHONEME_TIPS,
+  ARABIZI_TO_ARABIC,
 } from '@/lib/phonemeMatcher';
 import { useAppStore } from '@/store/useAppStore';
 
@@ -23,7 +26,7 @@ export interface PronunciationExercise {
   id: string;
   arabizi: string;
   arabic: string;
-  translation: string;
+  translation: string | Record<string, string>;
   focusPhoneme?: '3' | '7' | '9' | 'kh' | 'gh';
 }
 
@@ -32,35 +35,60 @@ const DEFAULT_EXERCISES: PronunciationExercise[] = [
     id: 'p1',
     arabizi: '3afak, bch7al hada ?',
     arabic: 'عَافَاكْ، بْشْحَالْ هَادَا ؟',
-    translation: "S'il vous plaît, combien ça coûte ?",
+    translation: {
+      fr: "S'il vous plaît, combien ça coûte ?",
+      ar: 'من فضلك، كم ثمن هذا؟',
+      en: 'Please, how much is this?',
+      es: 'Por favor, ¿cuánto cuesta esto?',
+    },
     focusPhoneme: '3',
   },
   {
     id: 'p2',
     arabizi: 'Sba7 l-khir a khoya',
     arabic: 'صْبَاحْ الْخِيرْ أ خُويَا',
-    translation: 'Bonjour mon frère',
+    translation: {
+      fr: 'Bonjour mon frère',
+      ar: 'صباح الخير يا أخي',
+      en: 'Good morning my brother',
+      es: 'Buenos días mi hermano',
+    },
     focusPhoneme: '7',
   },
   {
     id: 'p3',
     arabizi: 'Bghit 9hwa nss-nss',
     arabic: 'بْغِيتْ قَهْوَة نْصّْ نْصّْ',
-    translation: 'Je voudrais un café moitié lait',
+    translation: {
+      fr: 'Je voudrais un café moitié lait',
+      ar: 'أريد قهوة نصف حليب ونصف قهوة',
+      en: 'I would like a half-and-half coffee',
+      es: 'Quisiera un café mitad leche',
+    },
     focusPhoneme: '9',
   },
   {
     id: 'p4',
     arabizi: 'L-khobz skhoun bzzaf',
     arabic: 'الْخُبْزْ سْخُونْ بْزَّافْ',
-    translation: 'Le pain est très chaud',
+    translation: {
+      fr: 'Le pain est très chaud',
+      ar: 'الخبز ساخن جداً',
+      en: 'The bread is very hot',
+      es: 'El pan está muy caliente',
+    },
     focusPhoneme: 'kh',
   },
   {
     id: 'p5',
     arabizi: 'Ghadi nemchi daba',
     arabic: 'غَادِي نْمْشِي دَابَا',
-    translation: 'Je vais partir maintenant',
+    translation: {
+      fr: 'Je vais partir maintenant',
+      ar: 'سأذهب الآن',
+      en: 'I am going to leave now',
+      es: 'Me voy a ir ahora',
+    },
     focusPhoneme: 'gh',
   },
 ];
@@ -79,11 +107,20 @@ export default function PronunciationTrainer({
   const { soundEnabled, addXp, uiLanguage } = useAppStore();
   const lang = uiLanguage || 'fr';
   const isAr = lang === 'ar';
+  const isEs = lang === 'es';
+  const isEn = lang === 'en';
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [evaluation, setEvaluation] = useState<PronunciationEvaluation | null>(null);
   const [activeSpeed, setActiveSpeed] = useState<'normal' | 'slow'>('normal');
+  const [showPhonemeTip, setShowPhonemeTip] = useState(false);
 
   const currentExercise = exercises[currentIndex] || exercises[0];
+
+  const getTranslationText = (trans: string | Record<string, string>): string => {
+    if (typeof trans === 'string') return trans;
+    return trans[lang] || trans.fr || trans.en || '';
+  };
 
   const {
     isSupported,
@@ -93,7 +130,7 @@ export default function PronunciationTrainer({
     startListening,
     stopListening,
     resetTranscript,
-  } = useVoiceRecognition('ar-MA', 6000);
+  } = useVoiceRecognition('ar-MA', 6000, lang);
 
   const evalRef = useRef<(spoken: string) => void>(() => {});
 
@@ -102,7 +139,8 @@ export default function PronunciationTrainer({
     const res = evaluatePronunciation(
       spokenText,
       currentExercise.arabizi,
-      currentExercise.arabic
+      currentExercise.arabic,
+      lang
     );
     setEvaluation(res);
 
@@ -149,18 +187,33 @@ export default function PronunciationTrainer({
     if (isListening) stopListening();
     setEvaluation(null);
     resetTranscript();
+    setShowPhonemeTip(false);
     setCurrentIndex((prev) => (prev + 1) % exercises.length);
   };
 
+  const activePhoneme = currentExercise.focusPhoneme;
+  const phonemeTipInfo = activePhoneme
+    ? MULTI_PHONEME_TIPS[activePhoneme]?.[lang] ||
+      MULTI_PHONEME_TIPS[activePhoneme]?.fr
+    : null;
+
   return (
-    <div dir={isAr ? 'rtl' : 'ltr'} className={`bg-[#FDFCF8] rounded-3xl p-6 sm:p-8 shadow-xs border border-[#E8E2D5] space-y-6 ${className}`}>
-      
+    <div
+      dir={isAr ? 'rtl' : 'ltr'}
+      className={`bg-[#FDFCF8] rounded-3xl p-6 sm:p-8 shadow-xs border border-[#E8E2D5] space-y-6 ${className}`}
+    >
       {/* Exercise progress & header */}
       <div className="flex items-center justify-between border-b border-[#E8E2D5] pb-4">
         <div className="flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-[#C9A05C]" />
           <span className="text-xs font-bold text-[#1B2A4A] tracking-wider uppercase">
-            {isAr ? 'ورشة النطق الصوتي' : 'Atelier de Prononciation'}
+            {isAr
+              ? 'ورشة النطق الصوتي'
+              : isEs
+              ? 'Taller de Pronunciación'
+              : isEn
+              ? 'Pronunciation Workshop'
+              : 'Atelier de Prononciation'}
           </span>
         </div>
         <span className="text-xs font-semibold px-3 py-1 bg-[#F7F3EA] rounded-full text-[#7A7670] border border-[#E8E2D5]">
@@ -170,19 +223,45 @@ export default function PronunciationTrainer({
 
       {/* Target Phrase Display */}
       <div className="bg-[#F7F3EA] rounded-2xl p-6 text-center border border-[#E8E2D5] space-y-3 relative overflow-hidden">
-        {currentExercise.focusPhoneme && (
-          <div className="inline-block px-3 py-1 bg-[#C9A05C]/15 border border-[#C9A05C]/30 rounded-full text-xs font-bold text-[#1B2A4A] mb-1">
-            {isAr ? `الصوت المستهدف : '${currentExercise.focusPhoneme}'` : `Son ciblé : '${currentExercise.focusPhoneme}'`}
+        {activePhoneme && (
+          <div className="flex flex-col items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowPhonemeTip(!showPhonemeTip)}
+              className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#C9A05C]/15 hover:bg-[#C9A05C]/25 border border-[#C9A05C]/30 rounded-full text-xs font-bold text-[#1B2A4A] transition-colors"
+              title={isAr ? 'انقر لمعرفة طريقة نطق هذا الحرف' : 'Cliquez pour voir comment articuler ce son'}
+            >
+              <Info className="w-3.5 h-3.5 text-[#C9A05C]" />
+              <span>
+                {isAr
+                  ? `الصوت المستهدف : '${activePhoneme}' (${ARABIZI_TO_ARABIC[activePhoneme] || ''})`
+                  : isEs
+                  ? `Sonido objetivo: '${activePhoneme}' (${ARABIZI_TO_ARABIC[activePhoneme] || ''})`
+                  : isEn
+                  ? `Target sound: '${activePhoneme}' (${ARABIZI_TO_ARABIC[activePhoneme] || ''})`
+                  : `Son ciblé : '${activePhoneme}' (${ARABIZI_TO_ARABIC[activePhoneme] || ''})`}
+              </span>
+            </button>
+
+            {showPhonemeTip && phonemeTipInfo && (
+              <div className="p-3 bg-white/90 border border-[#C9A05C]/40 rounded-xl text-xs text-[#1B2A4A] text-left rtl:text-right max-w-md animate-in fade-in duration-200">
+                <p className="font-semibold text-[#8B6B23] mb-0.5">
+                  💡 {isAr ? 'نصيحة النطق' : isEs ? 'Consejo de pronunciación' : isEn ? 'Pronunciation tip' : 'Conseil d’articulation'} :
+                </p>
+                <p>{phonemeTipInfo}</p>
+              </div>
+            )}
           </div>
         )}
-        <div className="text-3xl sm:text-4xl font-arabic text-[#1B2A4A] leading-relaxed select-all">
+
+        <div className="text-3xl sm:text-4xl font-arabic text-[#1B2A4A] leading-relaxed select-all" dir="rtl">
           {currentExercise.arabic}
         </div>
-        <div className="font-display text-xl sm:text-2xl font-bold text-[#1B2A4A]">
+        <div className="font-display text-xl sm:text-2xl font-bold text-[#1B2A4A]" dir="ltr">
           {currentExercise.arabizi}
         </div>
         <div className="text-xs sm:text-sm text-[#7A7670] italic">
-          {currentExercise.translation}
+          {getTranslationText(currentExercise.translation)}
         </div>
 
         {/* Dual-speed listen buttons */}
@@ -211,7 +290,7 @@ export default function PronunciationTrainer({
                 ? 'bg-[#1B2A4A] !text-white shadow-xs'
                 : 'bg-[#FDFCF8] text-[#1B2A4A] border border-[#E8E2D5] hover:bg-[#E8E2D5]/50'
             }`}
-            title={isAr ? 'سلحفاة 🐢 (0.75x)' : 'Mode Tortue ralenti (0.75x) pour décomposer les phonèmes'}
+            title={isAr ? 'سلحفاة 🐢 (0.75x)' : 'Mode Tortue ralenti (0.75x)'}
           >
             <Turtle className="w-4 h-4 text-[#C9A05C]" />
             <span className={activeSpeed === 'slow' ? '!text-white' : ''}>
@@ -225,7 +304,13 @@ export default function PronunciationTrainer({
       <div className="flex flex-col items-center gap-4 pt-2">
         {isSupported === false ? (
           <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-800 text-center max-w-sm">
-            Reconnaissance vocale non disponible sur ce navigateur. Mode écoute uniquement activé.
+            {isAr
+              ? 'التعرف الصوتي غير مدعوم على هذا المتصفح. تم تفعيل وضع الاستماع فقط.'
+              : isEs
+              ? 'Reconocimiento de voz no compatible en este navegador. Modo de solo escucha activado.'
+              : isEn
+              ? 'Voice recognition unavailable in this browser. Listening mode activated.'
+              : 'Reconnaissance vocale non disponible sur ce navigateur. Mode écoute uniquement activé.'}
           </div>
         ) : (
           <button
@@ -236,7 +321,15 @@ export default function PronunciationTrainer({
                 ? 'bg-red-500 !text-white animate-pulse scale-110 ring-4 ring-red-200'
                 : 'bg-[#1B2A4A] !text-white hover:bg-[#1B2A4A]/90 hover:scale-105 active:scale-95'
             }`}
-            aria-label={isListening ? 'Arrêter l’enregistrement' : 'Commencer à parler'}
+            aria-label={
+              isListening
+                ? isAr
+                  ? 'إيقاف التسجيل'
+                  : 'Arrêter l’enregistrement'
+                : isAr
+                ? 'بدء التحدث'
+                : 'Commencer à parler'
+            }
           >
             {isListening ? (
               <MicOff className="w-8 h-8 !text-white" />
@@ -246,19 +339,52 @@ export default function PronunciationTrainer({
           </button>
         )}
 
-        <div className="text-xs font-bold text-[#7A7670]">
+        {/* Real-time sound wave bars when mic is active */}
+        {isListening && (
+          <div className="flex items-center justify-center gap-1.5 h-8 my-1" aria-hidden="true">
+            <span className="w-1 bg-[#C9A05C] rounded-full animate-pulse h-3" />
+            <span className="w-1 bg-[#C9A05C] rounded-full animate-pulse h-6" />
+            <span className="w-1 bg-[#C9A05C] rounded-full animate-pulse h-8" />
+            <span className="w-1 bg-[#C9A05C] rounded-full animate-pulse h-5" />
+            <span className="w-1 bg-[#C9A05C] rounded-full animate-pulse h-7" />
+            <span className="w-1 bg-[#C9A05C] rounded-full animate-pulse h-4" />
+            <span className="w-1 bg-[#C9A05C] rounded-full animate-pulse h-2" />
+          </div>
+        )}
+
+        <div className="text-xs font-bold text-[#7A7670] text-center">
           {isListening
-            ? (isAr ? 'جاري الاستماع... كرر الجملة بصوت واضح' : 'Écoute en cours... Répétez la phrase à voix haute')
+            ? isAr
+              ? 'جاري الاستماع... كرر الجملة بصوت واضح'
+              : isEs
+              ? 'Escuchando... Repita la frase en voz alta'
+              : isEn
+              ? 'Listening... Speak the phrase clearly'
+              : 'Écoute en cours... Répétez la phrase à voix haute'
             : isSupported === false
-            ? (isAr ? 'استمع إلى النموذج الصوتي أعلاه' : 'Écoutez le modèle audio ci-dessus')
-            : (isAr ? 'اضغط على الميكروفون لاختبار نطقك' : 'Appuyez sur le micro pour tester votre prononciation')}
+            ? isAr
+              ? 'استمع إلى النموذج الصوتي أعلاه'
+              : 'Écoutez le modèle audio ci-dessus'
+            : isAr
+            ? 'اضغط على الميكروفون لاختبار نطقك'
+            : isEs
+            ? 'Pulse el micrófono para probar su pronunciación'
+            : isEn
+            ? 'Press the microphone to test your pronunciation'
+            : 'Appuyez sur le micro pour tester votre prononciation'}
         </div>
 
         {/* Live captured transcript */}
         {transcript && (
           <div className="w-full max-w-md p-3.5 bg-[#F7F3EA] border border-[#E8E2D5] rounded-2xl text-center space-y-1">
             <span className="text-[10px] uppercase font-bold text-[#7A7670] tracking-wider">
-              {isAr ? 'ما التقطه الميكروفون' : 'Ce que le micro a capté'}
+              {isAr
+                ? 'ما التقطه الميكروفون'
+                : isEs
+                ? 'Lo que captó el micrófono'
+                : isEn
+                ? 'What the microphone captured'
+                : 'Ce que le micro a capté'}
             </span>
             <p className="font-arabic text-lg text-[#1B2A4A]">{transcript}</p>
           </div>
@@ -268,7 +394,16 @@ export default function PronunciationTrainer({
         {voiceError && (
           <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-2 max-w-md text-xs text-amber-800">
             <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{voiceError} {isAr ? '(يمكنك المتابعة في وضع الاستماع).' : '(Vous pouvez continuer en mode écoute).'}</span>
+            <span>
+              {voiceError}{' '}
+              {isAr
+                ? '(يمكنك المتابعة في وضع الاستماع).'
+                : isEs
+                ? '(Puede continuar en modo de escucha).'
+                : isEn
+                ? '(You can continue in listening mode).'
+                : '(Vous pouvez continuer en mode écoute).'}
+            </span>
           </div>
         )}
 
@@ -300,7 +435,13 @@ export default function PronunciationTrainer({
                     {evaluation.badge.text}
                   </div>
                   <div className="text-[11px] text-[#7A7670]">
-                    {isAr ? 'الدقة الصوتية :' : 'Précision acoustique :'} {evaluation.score}%
+                    {isAr
+                      ? 'الدقة الصوتية :'
+                      : isEs
+                      ? 'Precisión acústica:'
+                      : isEn
+                      ? 'Acoustic accuracy:'
+                      : 'Précision acoustique :'} {evaluation.score}%
                   </div>
                 </div>
               </div>
@@ -313,7 +454,13 @@ export default function PronunciationTrainer({
             {evaluation.targetPhonemes.length > 0 && (
               <div className="p-3.5 bg-[#FDFCF8] border border-[#E8E2D5] rounded-2xl space-y-2">
                 <span className="text-[10px] font-bold text-[#7A7670] uppercase tracking-wider block">
-                  {isAr ? 'تشخيص الحروف الصعبة :' : 'Diagnostic des consonnes difficiles :'}
+                  {isAr
+                    ? 'تشخيص الأصوات المستهدفة :'
+                    : isEs
+                    ? 'Diagnóstico de consonantes difíciles:'
+                    : isEn
+                    ? 'Difficult consonants diagnosis:'
+                    : 'Diagnostic des consonnes difficiles :'}
                 </span>
                 <div className="grid gap-1.5">
                   {evaluation.targetPhonemes.map((ph) => (
@@ -330,7 +477,15 @@ export default function PronunciationTrainer({
                           {ph.char} ({ph.arabicChar})
                         </span>
                         <span className="text-[11px] opacity-80">
-                          {ph.detected ? (isAr ? 'نطق ممتاز !' : 'Bien articulé !') : ph.tip}
+                          {ph.detected
+                            ? isAr
+                              ? 'نطق ممتاز !'
+                              : isEs
+                              ? '¡Bien articulado!'
+                              : isEn
+                              ? 'Well articulated!'
+                              : 'Bien articulé !'
+                            : ph.tip}
                         </span>
                       </div>
                       <span className="text-sm font-bold">
@@ -357,7 +512,15 @@ export default function PronunciationTrainer({
               className="px-4 py-2.5 rounded-full bg-[#F7F3EA] border border-[#E8E2D5] text-[#1B2A4A] text-xs font-bold flex items-center gap-1.5 hover:bg-[#E8E2D5]/50 transition-colors"
             >
               <RefreshCw className="w-3.5 h-3.5" />
-              <span>{isAr ? 'إعادة المحاولة' : 'Réessayer'}</span>
+              <span>
+                {isAr
+                  ? 'إعادة المحاولة'
+                  : isEs
+                  ? 'Reintentar'
+                  : isEn
+                  ? 'Retry'
+                  : 'Réessayer'}
+              </span>
             </button>
           )}
 
@@ -366,13 +529,19 @@ export default function PronunciationTrainer({
             onClick={handleNext}
             className="px-6 py-2.5 rounded-full bg-[#1B2A4A] hover:bg-[#1B2A4A]/90 text-[#FDFCF8] text-xs font-bold flex items-center gap-2 transition-all shadow-xs"
           >
-            <span>{isAr ? 'الجملة التالية' : 'Phrase suivante'}</span>
-            <ChevronRight className="w-4 h-4 text-[#C9A05C]" />
+            <span>
+              {isAr
+                ? 'الجملة التالية'
+                : isEs
+                ? 'Siguiente frase'
+                : isEn
+                ? 'Next phrase'
+                : 'Phrase suivante'}
+            </span>
+            <ChevronRight className="w-4 h-4 text-[#C9A05C] rtl:rotate-180" />
           </button>
         </div>
-
       </div>
-
     </div>
   );
 }

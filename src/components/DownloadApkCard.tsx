@@ -3,14 +3,47 @@
 import React from 'react';
 import { Download } from 'lucide-react';
 import { track } from '@/lib/tracking';
+import { useAppStore } from '@/store/useAppStore';
+
+const I18N = {
+  fr: {
+    kicker: 'APPLICATION ANDROID',
+    title: 'Application Officielle (APK)',
+    desc: 'Installez directement Kenza sur votre appareil Android pour une expérience native plein écran, audio fluide et accès hors-ligne (2.8 Mo).',
+    btn: "Télécharger l'application (.APK)",
+  },
+  en: {
+    kicker: 'ANDROID APPLICATION',
+    title: 'Official Application (APK)',
+    desc: 'Install Kenza directly on your Android device for a native full-screen experience, smooth audio, and offline access (2.8 MB).',
+    btn: 'Download the application (.APK)',
+  },
+  es: {
+    kicker: 'APLICACIÓN ANDROID',
+    title: 'Aplicación Oficial (APK)',
+    desc: 'Instala Kenza directamente en tu dispositivo Android para una experiencia nativa en pantalla completa, audio fluido y acceso sin conexión (2.8 MB).',
+    btn: 'Descargar la aplicación (.APK)',
+  },
+  ar: {
+    kicker: 'تطبيق أندرويد',
+    title: 'التطبيق الرسمي (APK)',
+    desc: 'قم بتثبيت كنزة مباشرة على جهاز الأندرويد الخاص بك لتجربة أصلية بشاشة كاملة، وصوت سلس، ووصول دون إنترنت (2.8 ميجابايت).',
+    btn: 'تحميل التطبيق (.APK)',
+  },
+};
 
 export default function DownloadApkCard() {
+  const uiLanguage = useAppStore((s) => s.uiLanguage || 'fr');
+  const lang = (uiLanguage in I18N ? uiLanguage : 'fr') as keyof typeof I18N;
+  const isAr = lang === 'ar';
+  const text = I18N[lang];
+
   const handleDownload = () => {
     track('apk_download_clicked', { source: 'space_card' });
   };
 
   return (
-    <article className="data-card">
+    <article className="data-card" dir={isAr ? 'rtl' : 'ltr'}>
       <div className="data-card-heading">
         <span className="data-icon" style={{ backgroundColor: '#134074', color: '#C59B27' }}>
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -18,12 +51,12 @@ export default function DownloadApkCard() {
           </svg>
         </span>
         <div>
-          <span className="mini-kicker">APPLICATION ANDROID</span>
-          <h3>Application Officielle (APK)</h3>
+          <span className="mini-kicker">{text.kicker}</span>
+          <h3>{text.title}</h3>
         </div>
       </div>
       <p>
-        Installez directement Kenza sur votre appareil Android pour une expérience native plein écran, audio fluide et accès hors-ligne (2.8 Mo).
+        {text.desc}
       </p>
       <div className="pt-2">
         <a
@@ -32,8 +65,8 @@ export default function DownloadApkCard() {
           onClick={handleDownload}
           className="outline-button inline-flex items-center gap-2"
         >
-          <Download size={14} />
-          <span>Télécharger l&apos;application (.APK)</span>
+          <Download size={14} className={isAr ? 'rtl:rotate-180' : ''} />
+          <span>{text.btn}</span>
         </a>
       </div>
     </article>

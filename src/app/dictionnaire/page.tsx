@@ -24,12 +24,15 @@ const CATEGORY_ORDER = [
 
 function CategoryChips({ value, onChange }: { value: string | null; onChange: (v: string | null) => void }) {
   const { t } = useTranslation();
+  const uiLanguage = useAppStore((s) => s.uiLanguage);
+  const isAr = uiLanguage === 'ar';
+  const filterLabel = isAr ? 'تصفية حسب الفئة' : uiLanguage === 'es' ? 'Filtrar por categoría' : uiLanguage === 'en' ? 'Filter by category' : 'Filtrer par catégorie';
   const cats = t.pages?.dictionnaire?.categories as Record<string, string> | undefined;
   const allLabel = cats?.all ?? 'Toutes';
   const slugs = CATEGORY_ORDER.filter((c) => cats && cats[c]);
 
   return (
-    <div className="flex flex-wrap gap-1.5 mt-3" role="group" aria-label="Filtrer par catégorie">
+    <div className="flex flex-wrap gap-1.5 mt-3" role="group" aria-label={filterLabel}>
       <button
         type="button"
         onClick={() => onChange(null)}

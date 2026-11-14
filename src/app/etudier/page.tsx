@@ -90,19 +90,27 @@ export default function EtudierPage() {
       <main className="max-w-4xl mx-auto p-6 pb-24 space-y-8">
         <button
           onClick={() => setShowArabiziGuide(true)}
-          className="w-full text-left bg-white/70 border border-dashed border-[#C9A05C]/50 hover:border-[#C9A05C] hover:bg-[#C9A05C]/5 rounded-2xl px-5 py-4 flex items-center gap-3 transition-colors group"
+          className="w-full text-left rtl:text-right bg-white/70 border border-dashed border-[#C9A05C]/50 hover:border-[#C9A05C] hover:bg-[#C9A05C]/5 rounded-2xl px-5 py-4 flex items-center gap-3 transition-colors group"
         >
           <div className="w-10 h-10 rounded-xl bg-[#C9A05C]/15 text-[#B8860B] flex items-center justify-center shrink-0 transition-transform group-hover:scale-105">
             <Sparkles className="w-5 h-5" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold text-[#1B2A4A]">💡 La Clé des Chiffres Arabizi</p>
+            <p className="text-sm font-bold text-[#1B2A4A]">
+              {isAr ? '💡 مفتاح أرقام العرابيزي' : lang === 'es' ? '💡 La Clave de los Números Arabizi' : lang === 'en' ? '💡 The Arabizi Number Key' : '💡 La Clé des Chiffres Arabizi'}
+            </p>
             <p className="text-xs text-[#7A7670] mt-0.5">
-              2 · 3 · 5 · 7 · 9 — le décodeur des sons gutturaux, avant ou pendant ton parcours.
+              {isAr
+                ? '2 · 3 · 5 · 7 · 9 — دليل الأصوات الحلقية المغربية الصعبة، قبل أو خلال مسارك.'
+                : lang === 'es'
+                ? '2 · 3 · 5 · 7 · 9 — el decodificador de sonidos guturales, antes o durante tu ruta.'
+                : lang === 'en'
+                ? '2 · 3 · 5 · 7 · 9 — the guttural sounds decoder, before or during your journey.'
+                : '2 · 3 · 5 · 7 · 9 — le décodeur des sons gutturaux, avant ou pendant ton parcours.'}
             </p>
           </div>
           <span className="text-xs font-bold text-[#B8860B] bg-[#C9A05C]/10 border border-[#C9A05C]/20 px-3 py-1 rounded-full shrink-0">
-            Mini-guide
+            {isAr ? 'دليل مصغر' : lang === 'es' ? 'Mini-guía' : lang === 'en' ? 'Mini-guide' : 'Mini-guide'}
           </span>
         </button>
         {Object.entries(fullCurriculum).map(([key, mod]) => {
@@ -127,7 +135,7 @@ export default function EtudierPage() {
                       key={lesson.id}
                       onClick={() => handleStart(key, lesson)}
                       disabled={!isPremiumReady && isModuleLocked(key, false)}
-                      className="text-left bg-[#F7F3EA] border border-[#E8E2D5] rounded-xl p-4 hover:border-[#C9A05C] disabled:cursor-wait transition-colors group"
+                      className="text-left rtl:text-right bg-[#F7F3EA] border border-[#E8E2D5] rounded-xl p-4 hover:border-[#C9A05C] disabled:cursor-wait transition-colors group"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">

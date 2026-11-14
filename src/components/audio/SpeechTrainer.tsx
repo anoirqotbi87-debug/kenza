@@ -87,12 +87,12 @@ export default function SpeechTrainer() {
     error: voiceError, 
     startListening, 
     stopListening 
-  } = useVoiceRecognition('ar-MA');
+  } = useVoiceRecognition('ar-MA', 5000, lang);
 
   const evaluateSpeechRef = useRef<(text: string) => void>(() => {});
 
   const evaluateSpeech = (spokenText: string) => {
-    const evalResult = calculateSimilarity(spokenText, currentExercise.arabizi, currentExercise.arabic);
+    const evalResult = calculateSimilarity(spokenText, currentExercise.arabizi, currentExercise.arabic, lang);
     const score = evalResult.score;
     
     setEvaluation(evalResult);
