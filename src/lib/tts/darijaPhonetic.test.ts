@@ -58,3 +58,102 @@ describe('prepareDarijaForTts', () => {
     expect(prepareDarijaForTts('   ')).toBe('');
   });
 });
+
+describe('Normalisation Phonétique — Modules 2 à 7 (Tashkeel Chirurgical & Équilibre Vocalique)', () => {
+  it('applique le patron C1ْC2َC3ْ sur les verbes trilitères (Arabizi et arabe nu)', () => {
+    // 1. Arabizi -> Arabe avec patron C1ْ + C2َ + C3ْ
+    const dkhel = prepareDarijaForTts('dkhel');
+    expect(dkhel).toContain('دْخَل'); // Sukūn sur دْ, Fatha sur خَ
+    expect(dkhel).not.toContain('دْخْلْ'); // Pas de triple sukūn étouffant
+    expect(dkhel).not.toContain('دَخَلَ'); // Pas de triple fatha Fusha
+
+    const khrej = prepareDarijaForTts('khrej');
+    expect(khrej).toContain('خْرَج');
+    expect(khrej).not.toContain('خْرْجْ');
+
+    const chreb = prepareDarijaForTts('chreb');
+    expect(chreb).toContain('شْرَب');
+
+    const gles = prepareDarijaForTts('gles');
+    expect(gles).toContain('گْلَس');
+
+    // 2. Arabe nu -> patron vocalique restauré
+    expect(prepareDarijaForTts('دخل')).toContain('دْخَل');
+    expect(prepareDarijaForTts('خرج')).toContain('خْرَج');
+    expect(prepareDarijaForTts('شرب')).toContain('شْرَب');
+    expect(prepareDarijaForTts('جلس')).toContain('گْلَس');
+    expect(prepareDarijaForTts('گلس')).toContain('گْلَس');
+  });
+
+  it('force le son [g] marocain avec گ (\\u06AF) sur gddam, gles, ga3, goul', () => {
+    // Vérification du caractère \u06AF (گ)
+    const gddam = prepareDarijaForTts('gddam');
+    expect(gddam).toContain('گُدَّام');
+    expect(gddam).toContain('\u06AF');
+
+    const gles = prepareDarijaForTts('gles');
+    expect(gles).toContain('گْلَس');
+    expect(gles).toContain('\u06AF');
+
+    const ga3 = prepareDarijaForTts('ga3');
+    expect(ga3).toContain('گَاع');
+    expect(ga3).toContain('\u06AF');
+
+    const goul = prepareDarijaForTts('goul');
+    expect(goul).toContain('گُول');
+    expect(goul).toContain('\u06AF');
+
+    // Neutralisation du Qaf ou Jim littéraire sur entrées arabes
+    expect(prepareDarijaForTts('قدام')).toContain('گُدَّام');
+    expect(prepareDarijaForTts('گدام')).toContain('گُدَّام');
+    expect(prepareDarijaForTts('جلس')).toContain('گْلَس');
+    expect(prepareDarijaForTts('گاع')).toContain('گَاع');
+    expect(prepareDarijaForTts('كاع')).toContain('گَاع');
+  });
+
+  it('applique l’attaque consonantique sèche (Sukūn initial) sur le vocabulaire des Modules 2 à 7', () => {
+    // Module 2 : Famille
+    expect(prepareDarijaForTts('khti')).toContain('خْتِي');
+    expect(prepareDarijaForTts('ختي')).toContain('خْتِي');
+    expect(prepareDarijaForTts('khouya')).toContain('خُويَا');
+    expect(prepareDarijaForTts('خويا')).toContain('خُويَا');
+
+    // Module 3 : Souk & Adjectifs
+    expect(prepareDarijaForTts('rkhis')).toContain('رْخِيص');
+    expect(prepareDarijaForTts('رخيص')).toContain('رْخِيص');
+    expect(prepareDarijaForTts('kbir')).toContain('كْبِير');
+    expect(prepareDarijaForTts('sghir')).toContain('صْغِير');
+
+    // Module 4 : Ville & Directions
+    expect(prepareDarijaForTts('blassa')).toContain('بْلَاصَة');
+    expect(prepareDarijaForTts('بلاصة')).toContain('بْلَاصَة');
+
+    // Module 7 : Santé
+    expect(prepareDarijaForTts('tbib')).toContain('طْبِيب');
+    expect(prepareDarijaForTts('طبيب')).toContain('طْبِيب');
+    expect(prepareDarijaForTts('mrid')).toContain('مْرِيض');
+    expect(prepareDarijaForTts('مريض')).toContain('مْرِيض');
+  });
+
+  it('garantit l’absence totale de chiffres Arabizi résiduels sur les phrases du curriculum', () => {
+    const testCorpus = [
+      '3afak bghit 9hwa 7lwa bla 5obz m8rib la2',
+      'dkhel l-dar w chreb atay m3a khti 3afak',
+      'tbib 9rib f l-m7tta',
+      'had l-7aja rkhisa bzzaf 3la 9bel l-walida',
+      'mrid f kerchi w rassi bzzaf',
+      'blassa 9ddam l-sbitar',
+      'dor 3la limen w sir nishan l-m7tta',
+      'bch7al had l-khobz w l-7em 3afak',
+      'machi mochkil, goul l-walid rah kolchi mzyan'
+    ];
+
+    for (const phrase of testCorpus) {
+      const result = prepareDarijaForTts(phrase);
+      expect(result).not.toMatch(/[0-9]/);
+      expect(result).not.toMatch(/[a-zA-Z]/);
+      expect(result.endsWith(' ، ')).toBe(true);
+    }
+  });
+});
+
