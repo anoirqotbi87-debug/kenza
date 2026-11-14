@@ -81,6 +81,7 @@ import DialogueView from "@/components/dialogue/DialogueView";
 import type { DialogueScenario } from "@/types/dialogue";
 import OfflineDownloadCard from "@/components/monetization/OfflineDownloadCard";
 import DownloadApkCard from "@/components/DownloadApkCard";
+import BackupRestoreCard from "@/components/profile/BackupRestoreCard";
 import InstallPwaBanner from "@/components/pwa/InstallPwaBanner";
 import DarijaPassportCard from "@/components/certificate/DarijaPassportCard";
 import { PersonaId } from "@/lib/ai/prompts";
@@ -2548,6 +2549,8 @@ function SpaceView({
         />
 
         <DownloadApkCard />
+
+        <BackupRestoreCard />
 
         <article className="data-card data-card-cert">
           <div className="data-card-heading">
