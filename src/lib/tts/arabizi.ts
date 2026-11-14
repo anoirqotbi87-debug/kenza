@@ -33,6 +33,7 @@ const CONSONANT_MAP: Record<string, string> = {
   '5': 'خ',
   '2': 'ء',
   '6': 'ط',
+  '8': 'غ',
   b: 'ب',
   t: 'ت',
   j: 'ج',
@@ -51,6 +52,8 @@ const CONSONANT_MAP: Record<string, string> = {
   g: 'گ',
   q: 'ق',
   x: 'خ',
+  p: 'ب',
+  v: 'ف',
 };
 
 /** Voyelles arabizi : non orthographiées en darija, on les élide. */

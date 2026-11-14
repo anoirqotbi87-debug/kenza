@@ -22,23 +22,25 @@ describe('prepareDarijaForTts', () => {
     expect(removeTrailingSukun('عَافَاكْ')).toBe('عَافَاك');
   });
 
-  it('convertit les chiffres Arabizi résiduels', () => {
-    const input = '3afak bghit 9hwa 7lwa bla 5obz';
+  it('convertit les chiffres Arabizi résiduels (3, 7, 9, 5, 8, 2)', () => {
+    const input = '3afak bghit 9hwa 7lwa bla 5obz m8rib la2';
     const result = prepareDarijaForTts(input);
     expect(result).toContain('ع');
     expect(result).toContain('ق');
     expect(result).toContain('ح');
     expect(result).toContain('خ');
+    expect(result).toContain('غ');
+    expect(result).toContain('ء');
     expect(result.endsWith(' ، ')).toBe(true);
   });
 
   it('applique le dictionnaire de réécriture phonétique marocaine sur mots non diacritisés', () => {
-    expect(prepareDarijaForTts('عفاك')).toContain('عافاك');
-    expect(prepareDarijaForTts('لباس')).toContain('لاباس');
-    expect(prepareDarijaForTts('هدا')).toContain('هادا');
-    expect(prepareDarijaForTts('اخويا')).toContain('آ خويا');
-    expect(prepareDarijaForTts('اختي')).toContain('آ ختي');
-    expect(prepareDarijaForTts('مرحبًا')).toContain('مرحبا');
+    expect(prepareDarijaForTts('عفاك')).toContain('عَافَاك');
+    expect(prepareDarijaForTts('لباس')).toContain('لَابَاس');
+    expect(prepareDarijaForTts('هدا')).toContain('هَادَا');
+    expect(prepareDarijaForTts('اخويا')).toContain('آ خُويَا');
+    expect(prepareDarijaForTts('اختي')).toContain('آ خْتِي');
+    expect(prepareDarijaForTts('مرحبًا')).toContain('مْرْحْبَا');
   });
 
   it('applique l’assimilation solaire de l’article ال (ex: السوق -> اسّوق)', () => {

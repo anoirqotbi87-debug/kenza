@@ -14,8 +14,8 @@ describe('normalizeDarija', () => {
   });
 
   it('retombe sur la carte phonétique arabizi→arabe si aucun texte arabe fourni', () => {
-    expect(normalizeDarija('3afak')).toBe('عافاك');
-    expect(normalizeDarija('9hwa')).toBe('قْهوة');
+    expect(normalizeDarija('3afak')).toBe('عَافَاك');
+    expect(normalizeDarija('9hwa')).toBe('قَهْوَة');
   });
 
   it('convertit mot par mot et caractère par caractère en arabe hors carte connue', () => {
@@ -24,7 +24,7 @@ describe('normalizeDarija', () => {
   });
 
   it('normalise les mots arabizi courants via le lexique (digits, digraphes, voix)', () => {
-    expect(normalizeDarija('bghit mzyan 3omri')).toBe('بغيت مزيان عمري');
+    expect(normalizeDarija('bghit mzyan 3omri')).toBe('بْغِيت مْزْيَان عمري');
   });
 
   it('ignore un arabicText vide et utilise le texte principal avec la prononciation darija', () => {
@@ -33,8 +33,8 @@ describe('normalizeDarija', () => {
   });
 
   it('la carte phonétique contient bien des entrées vocalisées authentiques sans tanween', () => {
-    expect(DARIJA_PHONETIC_MAP['shukran']).toBe('شُكْراً');
-    expect(DARIJA_PHONETIC_MAP['9hwa']).toBe('قْهوة');
+    expect(DARIJA_PHONETIC_MAP['shukran']).toBe('شُكْرَان');
+    expect(DARIJA_PHONETIC_MAP['9hwa']).toBe('قَهْوَة');
     expect(DARIJA_PHONETIC_MAP['salam']).toBe('السّْلامْ');
   });
 });
