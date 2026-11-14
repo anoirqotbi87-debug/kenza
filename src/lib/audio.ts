@@ -1,4 +1,5 @@
 import { getOfflineAudio } from './offlineStorage';
+import { getOrFetchTtsAudioBlob } from './tts/offlineAudioCache';
 import { useAppStore } from '../store/useAppStore';
 import {
   hasAudioQuota,
@@ -67,15 +68,12 @@ export const preloadTtsAudio = async (
   if (audioCache.has(cacheKey)) return;
 
   try {
-    const params = new URLSearchParams();
-    params.append('text', cleanText);
-    if (cleanArabic) params.append('arabicText', cleanArabic);
-    params.append('voice', voice);
-    params.append('speed', speed);
-
-    const response = await fetch(`/api/tts?${params.toString()}`);
-    if (!response.ok) return;
-    const arrayBuffer = await response.arrayBuffer();
+    const audioBlob = await getOrFetchTtsAudioBlob(cleanText, {
+      arabicText: cleanArabic,
+      voice,
+      speed,
+    });
+    const arrayBuffer = await audioBlob.arrayBuffer();
     const ctx = getAudioContext();
     const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
     audioCache.set(cacheKey, audioBuffer);
@@ -253,40 +251,29 @@ export const playAudio = async (
       let audioBuffer = audioCache.get(cacheKey);
 
       if (!audioBuffer) {
-        // 1. Check Offline IndexedDB First (pour le mode normal)
         const cleanText = text.trim();
         const cleanArabic = arabicText ? arabicText.trim() : undefined;
-        const offlineBlob = await getOfflineAudio(cleanText);
-        let arrayBuffer: ArrayBuffer;
 
-        if (offlineBlob && speedParam === 'normal') {
-          arrayBuffer = await offlineBlob.arrayBuffer();
-        } else {
-          // Si l'utilisateur est hors-ligne et que l'audio n'est pas dans le cache IndexedDB
-          if (typeof window !== 'undefined' && !window.navigator.onLine) {
-            console.warn('[Audio TTS] Mode hors-ligne : audio non préchargé localement pour ce mot.');
-            throw new Error('OFFLINE_AUDIO_UNAVAILABLE');
+        // 1. Lecture Cache-First PWA (0 ms si déjà en cache 'kenza-tts-audio-v1' ou téléchargé via le pack)
+        //    Si MISS : effectue l'appel /api/tts et alimente automatiquement le Cache Storage
+        let audioBlob: Blob | null = null;
+        try {
+          audioBlob = await getOrFetchTtsAudioBlob(cleanText, {
+            arabicText: cleanArabic,
+            voice: voiceParam,
+            speed: speedParam,
+          });
+        } catch (fetchErr) {
+          // Fallback rétrocompatible vers IndexedDB si présent pour le mode normal
+          const offlineBlob = await getOfflineAudio(cleanText);
+          if (offlineBlob && speedParam === 'normal') {
+            audioBlob = offlineBlob;
+          } else {
+            throw fetchErr;
           }
-
-          // 2. Fetch from network avec voice et speed
-          const params = new URLSearchParams();
-          params.append('text', cleanText);
-          if (cleanArabic) params.append('arabicText', cleanArabic);
-          params.append('voice', voiceParam);
-          params.append('speed', speedParam);
-          
-          const controller = new AbortController();
-          const networkTimeout = setTimeout(() => controller.abort(), 15000);
-          let response: Response;
-          try {
-            response = await fetch(`/api/tts?${params.toString()}`, { signal: controller.signal });
-          } finally {
-            clearTimeout(networkTimeout);
-          }
-          if (!response.ok) throw new Error('TTS API failed');
-          arrayBuffer = await response.arrayBuffer();
         }
 
+        const arrayBuffer = await audioBlob.arrayBuffer();
         audioBuffer = await ctx.decodeAudioData(arrayBuffer);
         audioCache.set(cacheKey, audioBuffer);
       }

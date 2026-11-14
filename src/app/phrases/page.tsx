@@ -6,6 +6,7 @@ import { ArrowLeft, Search, Heart, ArrowRight } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { PhraseCard, PhraseItem } from '@/components/phrases/PhraseCard';
 import { srsVocabulary } from '@/data/srs-deck';
+import { playAudio } from '@/lib/audio';
 
 const trL = (lang: string, fr: string, en: string, es: string, ar: string) =>
   lang === "en" ? en : lang === "es" ? es : lang === "ar" ? ar : fr;
@@ -103,23 +104,15 @@ export default function PhrasesPage() {
     if (phraseId) {
       const audio = new Audio(`/audio/phrases/${phraseId}.mp3`);
       audio.play().catch(() => {
-        // Fallback direct vers streaming tts
-        const text = arabic?.trim() || darija?.trim();
-        if (text) {
-          const fallback = new Audio(`/api/tts?text=${encodeURIComponent(text)}&speed=normal&gender=male`);
-          fallback.play().catch(console.error);
-        }
+        // Fallback direct vers synthèse vocale avec cache hors-ligne
+        void playAudio(darija, arabic, true, 1.0, { voice: 'male' });
       });
       showToast(trL(lang, "Prononciation audio de la phrase.", "Natural voice pronunciation of the phrase.", "Pronunciación de voz natural de la frase.", "نطق صوتي طبيعي للعبارة."));
       return;
     }
 
-    const text = arabic?.trim() || darija?.trim();
-    if (text) {
-      const fallback = new Audio(`/api/tts?text=${encodeURIComponent(text)}&speed=normal&gender=male`);
-      fallback.play().catch(console.error);
-      showToast(trL(lang, "Prononciation audio de la phrase.", "Natural voice pronunciation of the phrase.", "Pronunciación de voz natural de la frase.", "نطق صوتي طبيعي للعبارة."));
-    }
+    void playAudio(darija, arabic, true, 1.0, { voice: 'male' });
+    showToast(trL(lang, "Prononciation audio de la phrase.", "Natural voice pronunciation of the phrase.", "Pronunciación de voz natural de la frase.", "نطق صوتي طبيعي للعبارة."));
   };
 
   const copyPhrase = async (phrase: PhraseItem) => {
