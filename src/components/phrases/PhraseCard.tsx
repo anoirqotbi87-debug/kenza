@@ -56,7 +56,7 @@ export const PhraseCard: React.FC<PhraseCardProps> = ({
         </button>
       </div>
       <span className="phrase-index">{String(index + 1).padStart(2, '0')}</span>
-      <h3>{darijaText}</h3>
+      <h3 dir="ltr" className="text-left rtl:text-right"><bdi dir="ltr">{darijaText}</bdi></h3>
       {arabicText ? (
         <span className="phrase-arabic" dir="rtl">
           {arabicText}

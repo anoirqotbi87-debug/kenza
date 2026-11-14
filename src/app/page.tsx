@@ -279,6 +279,7 @@ export default function Home() {
   const { t } = useTranslation();
   const { isGuest } = useAuthUser();
   const { lang, phrases, navItems } = useLocalizedContent();
+  const isAr = lang === 'ar';
   const navLabel = (id: string) => {
     const key =
       id === "today" ? "home"
@@ -882,7 +883,7 @@ export default function Home() {
             onClick={() => showToast(t.modules.home.dailyGoal)}
             className="goal-link"
           >
-            {trL(lang, tr("Ajuster l’objectif", "Adjust goal", "Ajustar objetivo", "عدّل الهدف"), "Adjust goal", "Ajustar objetivo", "عدّل الهدف")} <ArrowRight size={14} className="rtl:rotate-180" />
+            {trL(lang, tr("Ajuster l’objectif", "Adjust goal", "Ajustar objetivo", "عدّل الهدف"), "Adjust goal", "Ajustar objetivo", "عدّل الهدف")} <ArrowRight size={14} className={isAr ? "rotate-180" : ""} />
           </button>
         </div>
 
@@ -1214,7 +1215,7 @@ export default function Home() {
             <KenzaLogo size="sm" showWordmark={true} />
             <span>{trL(lang, "Apprendre une langue, c’est rencontrer des gens.", "Learning a language is meeting people.", "Aprender un idioma es conocer gente.", "تعلم اللغة لقاءٌ بالناس.")}</span>
             <button onClick={() => switchView("space")}>
-              {trL(lang, "Passeport Culturel & Données", "Cultural passport & data", "Pasaporte cultural y datos", "الجواز الثقافي والبيانات")} <ArrowRight size={13} className="rtl:rotate-180" />
+              {trL(lang, "Passeport Culturel & Données", "Cultural passport & data", "Pasaporte cultural y datos", "الجواز الثقافي والبيانات")} <ArrowRight size={13} className={isAr ? "rotate-180" : ""} />
             </button>
           </footer>
         </div>
@@ -1413,7 +1414,7 @@ function TodayView({
             </h2>
             <p>{trL(lang, "Une phrase, une rencontre, une autre façon de voir le Maroc.", "A phrase, an encounter, another way to see Morocco.", "Una frase, un encuentro, otra forma de ver Marruecos.", "عبارة، لقاء، وطريقة أخرى لرؤية المغرب.")}</p>
             <button className="hero-button" onClick={() => onOpenLesson(nextLesson?.id)}>
-              {trL(lang, "Continuer à apprendre", "Keep learning", "Seguir aprendiendo", "واصل التعلم")} <ArrowRight size={16} className="rtl:rotate-180" />
+              {trL(lang, "Continuer à apprendre", "Keep learning", "Seguir aprendiendo", "واصل التعلم")} <ArrowRight size={16} className={isAr ? "rotate-180" : ""} />
             </button>
             <div className="hero-footnote">
               <span className="hero-foot-line" /> {trL(lang, "À ton rythme, toujours.", "At your pace, always.", "A tu ritmo, siempre.", "على إيقاعك، دائماً.")}
@@ -1516,7 +1517,7 @@ function TodayView({
           <h2>{trL(lang, "Sept modules, un seul moteur d’exercices.", "Seven modules, one exercise engine.", "Siete módulos, un solo motor de ejercicios.", "سبع وحدات، محرك تمارين واحد.")}</h2>
         </div>
         <button className="plain-link" onClick={onOpenCurriculum}>
-          {trL(lang, "Ouvrir le parcours", "Open the journey", "Abrir el recorrido", "افتح المسار")} <ArrowRight size={15} className="rtl:rotate-180" />
+          {trL(lang, "Ouvrir le parcours", "Open the journey", "Abrir el recorrido", "افتح المسار")} <ArrowRight size={15} className={isAr ? "rotate-180" : ""} />
         </button>
       </div>
 
@@ -1545,7 +1546,7 @@ function TodayView({
               </span>
               <strong>{getLocalizedText(mod.title, lang as UILanguage)}</strong>
               <span className="quick-bottom">
-                {mod.lessons} {tr("leçons", "lessons", "lecciones", "دروس")} · {mod.steps} {tr("étapes", "steps", "pasos", "خطوات")} <ArrowRight size={14} className="rtl:rotate-180" />
+                {mod.lessons} {tr("leçons", "lessons", "lecciones", "دروس")} · {mod.steps} {tr("étapes", "steps", "pasos", "خطوات")} <ArrowRight size={14} className={isAr ? "rotate-180" : ""} />
               </span>
             </button>
           );
@@ -1579,7 +1580,7 @@ function TodayView({
                 <strong>{lesson.title}</strong>
                 <span className="quick-bottom">
                   {lesson.steps} {tr("étapes", "steps", "pasos", "خطوات")}
-                  {done ? ` · ${tr("terminée", "completed", "completada", "مكتملة")}` : ""} <ArrowRight size={14} className="rtl:rotate-180" />
+                  {done ? ` · ${tr("terminée", "completed", "completada", "مكتملة")}` : ""} <ArrowRight size={14} className={isAr ? "rotate-180" : ""} />
                 </span>
               </button>
             );
@@ -1626,7 +1627,7 @@ function TodayView({
           </div>
         </div>
         <button className="stat-action" onClick={() => onNavigate("space")}>
-          {trL(lang, "Voir mon espace", "See my space", "Ver mi espacio", "فضائي")} <ArrowRight size={14} className="rtl:rotate-180" />
+          {trL(lang, "Voir mon espace", "See my space", "Ver mi espacio", "فضائي")} <ArrowRight size={14} className={isAr ? "rotate-180" : ""} />
         </button>
       </div>
 
@@ -1639,7 +1640,7 @@ function TodayView({
           <h2>{trL(lang, "À toi de choisir ton pas.", "Your pace, your choice.", "Tú eliges tu paso.", "اختر خطوتك.")}</h2>
         </div>
         <button className="plain-link" onClick={() => onNavigate("path")}>
-          {trL(lang, "Voir le parcours", "View the journey", "Ver la ruta", "المسار")} <ArrowRight size={15} className="rtl:rotate-180" />
+          {trL(lang, "Voir le parcours", "View the journey", "Ver la ruta", "المسار")} <ArrowRight size={15} className={isAr ? "rotate-180" : ""} />
         </button>
       </div>
 
@@ -1655,7 +1656,7 @@ function TodayView({
             {trL(lang, "de phrases", " book", " de frases", " للعبارات")}
           </strong>
           <span className="quick-bottom">
-            {trL(lang, "Vocabulaire essentiel", "Essential vocabulary", "Vocabulario esencial", "مفردات أساسية")} <ArrowRight size={14} className="rtl:rotate-180" />
+            {trL(lang, "Vocabulaire essentiel", "Essential vocabulary", "Vocabulario esencial", "مفردات أساسية")} <ArrowRight size={14} className={isAr ? "rotate-180" : ""} />
           </span>
         </button>
 
@@ -1670,7 +1671,7 @@ function TodayView({
             {trL(lang, "petite révision", "review", "revisión rápida", "سريعة")}
           </strong>
           <span className="quick-bottom">
-            {trL(lang, "Cartes du jour", "Cards of the day", "Cartas del día", "بطاقات اليوم")} <ArrowRight size={14} className="rtl:rotate-180" />
+            {trL(lang, "Cartes du jour", "Cards of the day", "Cartas del día", "بطاقات اليوم")} <ArrowRight size={14} className={isAr ? "rotate-180" : ""} />
           </span>
         </button>
 
@@ -1685,7 +1686,7 @@ function TodayView({
             {trL(lang, "situation", "scenarios", "de la vida real", "من الحياة")}
           </strong>
           <span className="quick-bottom">
-            {trL(lang, "Au café, en taxi", "At the café, in a taxi", "En el café, en taxi", "في المقهى وفي التاكسي")} <ArrowRight size={14} className="rtl:rotate-180" />
+            {trL(lang, "Au café, en taxi", "At the café, in a taxi", "En el café, en taxi", "في المقهى وفي التاكسي")} <ArrowRight size={14} className={isAr ? "rotate-180" : ""} />
           </span>
         </button>
       </div>
@@ -1709,7 +1710,7 @@ function TodayView({
           <p>{trL(lang, "Chaque expression est une petite invitation à aller vers l’autre.", "Every phrase is a small invitation to reach out to others.", "Cada expresión es una pequeña invitación a acercarse al otro.", "كل عبارة دعوة صغيرة للتقرب من الآخر.")}</p>
         </div>
         <button onClick={onOpenCurriculum} aria-label={t.modules.home.explorePath}>
-          <ArrowRight size={20} className="rtl:rotate-180" />
+          <ArrowRight size={20} className={isAr ? "rotate-180" : ""} />
         </button>
       </div>
     </>
@@ -2086,6 +2087,7 @@ function PhrasesView({
   onCopy: (phrase: Phrase) => void;
 }) {
   const { lang } = useLocalizedContent();
+  const isAr = lang === 'ar';
   const safeFavorites = Array.isArray(favorites) ? favorites : [];
   const safePhrases = Array.isArray(visiblePhrases) ? visiblePhrases : [];
 
@@ -2166,7 +2168,7 @@ function PhrasesView({
                   </button>
                 </div>
                 <span className="phrase-index">0{index + 1}</span>
-                <h3 dir="ltr" className="text-left rtl:text-right">{darijaText}</h3>
+                <h3 dir="ltr" className="text-left rtl:text-right"><bdi dir="ltr">{darijaText}</bdi></h3>
                 {arabicText ? (
                   <span className="phrase-arabic" dir="rtl">
                     {arabicText}
@@ -2202,7 +2204,7 @@ function PhrasesView({
               setFavoritesOnly(false);
             }}
           >
-            {trL(lang, "Effacer les filtres", "Clear filters", "Borrar filtros", "مسح المرشحات")} <ArrowRight size={14} className="rtl:rotate-180" />
+            {trL(lang, "Effacer les filtres", "Clear filters", "Borrar filtros", "مسح المرشحات")} <ArrowRight size={14} className={isAr ? "rotate-180" : ""} />
           </button>
         </div>
       )}
@@ -2404,6 +2406,7 @@ function SpaceView({
 }) {
   const { t } = useTranslation();
   const { lang } = useLocalizedContent();
+  const isAr = lang === 'ar';
   const totalLessons = useMemo(() => getPlayableLessons(lang).length, [lang]);
   const username =
     user?.user_metadata?.full_name || user?.email?.split("@")[0] || t.common.guest;
@@ -2525,12 +2528,12 @@ function SpaceView({
           </div>
           {!isPremium && (
             <button className="outline-button" onClick={() => onOpenPaywall("profile_upgrade")}>
-              {trL(lang, "Passer à Kenza Pro", "Go Kenza Pro", "Pasar a Kenza Pro", "انتقل إلى كنزة برو")} <ArrowRight size={14} className="rtl:rotate-180" />
+              {trL(lang, "Passer à Kenza Pro", "Go Kenza Pro", "Pasar a Kenza Pro", "انتقل إلى كنزة برو")} <ArrowRight size={14} className={isAr ? "rotate-180" : ""} />
             </button>
           )}
           {isPremium && (
             <button className="outline-button" onClick={onManageSubscription}>
-              {trL(lang, "Gérer mon abonnement", "Manage my subscription", "Gestionar mi suscripción", "إدارة اشتراكي")} <ArrowRight size={14} className="rtl:rotate-180" />
+              {trL(lang, "Gérer mon abonnement", "Manage my subscription", "Gestionar mi suscripción", "إدارة اشتراكي")} <ArrowRight size={14} className={isAr ? "rotate-180" : ""} />
             </button>
           )}
         </article>
