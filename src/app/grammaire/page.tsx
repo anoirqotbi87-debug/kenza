@@ -77,7 +77,7 @@ export default function GrammairePage() {
                 key={lesson.id}
                 onClick={() => handleStart(lesson)}
                 disabled={!isPremiumReady}
-                className="text-left bg-[#F7F3EA] border border-[#E8E2D5] rounded-xl p-4 hover:border-[#C9A05C] disabled:cursor-wait transition-colors group"
+                className="text-left rtl:text-right bg-[#F7F3EA] border border-[#E8E2D5] rounded-xl p-4 hover:border-[#C9A05C] disabled:cursor-wait transition-colors group"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
