@@ -39,7 +39,16 @@ function run(dir: string, args: string[]) {
   });
 }
 
-describe('report-tts-health.sh — chemin d’alerte', () => {
+const hasJqAndBash = (() => {
+  try {
+    execFileSync('bash', ['-c', 'command -v jq'], { stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+})();
+
+describe.skipIf(!hasJqAndBash)('report-tts-health.sh — chemin d’alerte', () => {
   let dir: string;
 
   beforeEach(() => {

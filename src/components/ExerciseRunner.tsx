@@ -216,7 +216,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
     if (step.type === 'learning' || step.type === 'grammar' || (step.type as string) === 'concept') {
       if (!step.content) {
         return (
-          <div className="flex flex-col items-center justify-center h-full space-y-8 text-center animate-in fade-in zoom-in duration-300">
+          <div className="flex flex-col items-center justify-center my-auto space-y-8 text-center animate-in fade-in zoom-in duration-300">
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 text-center">
               <h3 className="text-xl font-bold text-slate-800 mb-4">
                 {getLocalizedText((step.content as LessonStep['content'])?.title || step.exercise?.prompt, lang)}
@@ -234,7 +234,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
          return <ConjugationTable />;
       }
       return (
-        <div className="flex flex-col items-center justify-center h-full space-y-8 text-center animate-in fade-in zoom-in duration-300">
+        <div className="flex flex-col items-center justify-center my-auto space-y-8 text-center animate-in fade-in zoom-in duration-300">
           <h2 className="font-display text-3xl font-bold text-[#1B2A4A]">{getLocalizedText(step.content.title, lang)}</h2>
           
           <div className="bg-[#FDFCF8] p-8 rounded-3xl w-full max-w-md shadow-md border border-[#E8E2D5] relative">
@@ -274,7 +274,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
         return null;
       }
       return (
-        <div className="w-full max-w-lg mx-auto">
+        <div className="w-full max-w-lg mx-auto my-auto">
           <div className="bg-[#FDFCF8] rounded-3xl border-2 border-[#C9A05C]/50 shadow-md overflow-hidden animate-in fade-in zoom-in duration-300">
             <div className="bg-gradient-to-r from-[#C9A05C]/15 to-[#F7F3EA] px-6 py-4 border-b border-[#C9A05C]/20 flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-[#C9A05C]/20 text-[#C9A05C] flex items-center justify-center text-xl shrink-0">
@@ -333,7 +333,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
     // 2. Exercises
     if (step.type === 'exercise' && step.exercise) {
       return (
-        <div className="flex flex-col h-full w-full max-w-3xl mx-auto space-y-8 animate-in slide-in-from-right duration-300">
+        <div className="flex flex-col my-auto w-full max-w-3xl mx-auto space-y-8 animate-in slide-in-from-right duration-300">
           <div className="flex justify-between items-start">
             <h2 className="text-2xl font-bold text-slate-800">{getLocalizedText(step.exercise.prompt, lang)}</h2>
             {step.exercise.audioUrl && (
@@ -467,7 +467,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-[calc(11rem+env(safe-area-inset-bottom,0px))] md:pb-40 flex items-center justify-center">
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-[calc(11rem+env(safe-area-inset-bottom,0px))] md:pb-40 flex items-start justify-center">
         {renderContent()}
       </main>
 

@@ -13,7 +13,16 @@ function findIssue(issues: { number: number; title: string }[], title: string): 
   return stdout.trim();
 }
 
-describe('find-open-issue.sh — déduplication de l’issue d’alerte TTS', () => {
+const hasJqAndBash = (() => {
+  try {
+    execFileSync('bash', ['-c', 'command -v jq'], { stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+})();
+
+describe.skipIf(!hasJqAndBash)('find-open-issue.sh — déduplication de l’issue d’alerte TTS', () => {
   const issues = [
     { number: 69, title: 'TTS en production dégradé (sonde automatique)' },
     { number: 70, title: 'Un autre ticket' },
