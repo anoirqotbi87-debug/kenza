@@ -19,6 +19,7 @@ const I18N = {
   fr: {
     kicker: 'DÉFIS DU JOUR',
     title: 'Quêtes Quotidiennes',
+    viewAll: 'Voir tout',
     desc: 'Accomplissez vos 3 quêtes du jour pour consolider vos acquis et débloquer le coffre bonus.',
     chestTitle: 'Coffre Bonus Quotidien',
     chestUnlocked: 'Coffre débloqué ! (+50 XP crédités)',
@@ -57,6 +58,7 @@ const I18N = {
   en: {
     kicker: 'DAILY CHALLENGES',
     title: 'Daily Quests',
+    viewAll: 'View all',
     desc: 'Complete your 3 daily quests to consolidate your skills and unlock the bonus chest.',
     chestTitle: 'Daily Bonus Chest',
     chestUnlocked: 'Chest unlocked! (+50 XP awarded)',
@@ -95,6 +97,7 @@ const I18N = {
   es: {
     kicker: 'DESAFÍOS DEL DÍA',
     title: 'Misiones Diarias',
+    viewAll: 'Ver todo',
     desc: 'Completa tus 3 misiones de hoy para consolidar conocimientos y abrir el cofre extra.',
     chestTitle: 'Cofre Extra Diario',
     chestUnlocked: '¡Cofre abierto! (+50 XP ganados)',
@@ -133,6 +136,7 @@ const I18N = {
   ar: {
     kicker: 'تحديات اليوم',
     title: 'المهام اليومية',
+    viewAll: 'عرض الكل',
     desc: 'أكمل مهامك الـ 3 اليومية لترسيخ مكتسباتك وفتح صندوق المكافأة.',
     chestTitle: 'صندوق المكافأة اليومي',
     chestUnlocked: 'تم فتح الصندوق! (+50 نقطة XP مضافة)',
@@ -207,7 +211,11 @@ function getQuestActionLabel(cat: QuestCategory, texts: typeof I18N.fr): string 
   }
 }
 
-export function DailyQuestsWidget() {
+export interface DailyQuestsWidgetProps {
+  compact?: boolean;
+}
+
+export function DailyQuestsWidget({ compact = false }: DailyQuestsWidgetProps = {}) {
   const dailyQuests = useAppStore((s) => s.dailyQuests);
   const ensureDailyQuests = useAppStore((s) => s.ensureDailyQuests);
   const uiLanguage = useAppStore((s) => s.uiLanguage || 'fr');
@@ -225,6 +233,134 @@ export function DailyQuestsWidget() {
   const totalCount = quests.length || 3;
   const allCompleted = completedCount === totalCount && totalCount > 0;
   const chestClaimed = Boolean(dailyQuests?.dailyBonusClaimed);
+
+  if (compact) {
+    return (
+      <section
+        dir={isAr ? 'rtl' : 'ltr'}
+        className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3"
+        aria-label={texts.title}
+      >
+        {/* Compact Header */}
+        <div className="flex items-center justify-between gap-3 border-b border-zinc-100 dark:border-zinc-800 pb-3">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-500 shrink-0">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">
+                {texts.title}
+              </h2>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Global progress */}
+            <span className="text-xs font-bold font-mono px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+              {completedCount}/{totalCount}
+            </span>
+
+            {/* Bonus chest pill */}
+            <div
+              className={`flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full border transition-colors ${
+                chestClaimed || allCompleted
+                  ? 'bg-amber-500/15 border-amber-500/40 text-amber-700 dark:text-amber-300'
+                  : 'bg-zinc-100 dark:bg-zinc-800/80 border-zinc-200/80 dark:border-zinc-700/80 text-zinc-600 dark:text-zinc-400'
+              }`}
+            >
+              <Gift className="w-3.5 h-3.5 text-amber-500" />
+              <span>+50 XP</span>
+            </div>
+
+            {/* View all link to /revisions */}
+            <Link
+              href="/revisions"
+              className="text-xs font-semibold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 flex items-center gap-0.5 ml-1 transition-colors"
+            >
+              <span>{texts.viewAll}</span>
+              <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
+            </Link>
+          </div>
+        </div>
+
+        {/* Compact Quests list */}
+        <div className="grid gap-2">
+          {quests.map((quest) => {
+            const questI18n = texts.quests[quest.type] || {
+              title: quest.type,
+              desc: () => '',
+            };
+            const progressPercent = Math.min(
+              100,
+              Math.round((quest.progress / Math.max(1, quest.target)) * 100)
+            );
+            const actionLink = getQuestActionLink(quest.category);
+            const actionLabel = getQuestActionLabel(quest.category, texts);
+
+            return (
+              <div
+                key={quest.id}
+                className={`p-2.5 sm:p-3 rounded-xl border flex items-center justify-between gap-3 transition-colors ${
+                  quest.completed
+                    ? 'bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/40'
+                    : 'bg-zinc-50/50 dark:bg-zinc-800/30 border-zinc-200/70 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'
+                }`}
+              >
+                {/* Left: Icon & Short info */}
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div className="p-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-700/60 shrink-0">
+                    {getCategoryIcon(quest.category, quest.type)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 truncate">
+                        {questI18n.title}
+                      </span>
+                      <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 shrink-0 font-mono">
+                        +{quest.xpReward} XP
+                      </span>
+                    </div>
+
+                    {/* Mini progress bar & counter */}
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="flex-1 max-w-[140px] h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-300 ${
+                            quest.completed ? 'bg-emerald-500' : 'bg-amber-500'
+                          }`}
+                          style={{ width: `${progressPercent}%` }}
+                        />
+                      </div>
+                      <span className="text-[10px] font-mono font-medium text-zinc-500 dark:text-zinc-400">
+                        {quest.progress}/{quest.target}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Action or checkmark */}
+                <div className="shrink-0">
+                  {quest.completed ? (
+                    <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                    </div>
+                  ) : (
+                    <Link
+                      href={actionLink}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 border border-amber-200 dark:border-amber-800 transition-colors"
+                    >
+                      <span>{actionLabel}</span>
+                      <ArrowRight className="w-3 h-3 rtl:rotate-180" />
+                    </Link>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section

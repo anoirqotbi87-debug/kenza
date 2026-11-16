@@ -41,4 +41,12 @@ describe('DailyQuestsWidget component', () => {
     expect(source).toContain('ar:');
     expect(source).toContain("dir={isAr ? 'rtl' : 'ltr'}");
   });
+
+  it('propose une variante compacte pour le tableau de bord d’accueil', () => {
+    expect(source).toContain('export interface DailyQuestsWidgetProps');
+    expect(source).toContain('compact?: boolean');
+    expect(source).toContain('if (compact)');
+    expect(source).toContain('viewAll:');
+    expect(source).toContain('href="/revisions"');
+  });
 });

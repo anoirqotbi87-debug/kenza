@@ -96,6 +96,7 @@ import VipPromoCard from "@/components/views/SpaceView";
 import LiveInteractiveTour from "@/components/guide/LiveInteractiveTour";
 import HeaderHelpPopover from "@/components/guide/HeaderHelpPopover";
 import HelpCenterView from "@/components/guide/HelpCenterView";
+import DailyQuestsWidget from "@/components/quests/DailyQuestsWidget";
 
 export type View = "today" | "path" | "phrases" | "review" | "space";
 
@@ -1505,6 +1506,10 @@ function TodayView({
             )}
           </button>
         </article>
+      </div>
+
+      <div className="mt-6">
+        <DailyQuestsWidget compact />
       </div>
 
       <GemOfTheDayCard />
