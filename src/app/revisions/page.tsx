@@ -5,6 +5,7 @@ import { Flame, Award, Trophy } from 'lucide-react';
 import { useAppStore, useTranslation } from '@/store/useAppStore';
 import SRSDashboard from '@/components/srs/SRSDashboard';
 import { MemoryHealthWidget } from '@/components/srs/MemoryHealthWidget';
+import { DailyQuestsWidget } from '@/components/quests/DailyQuestsWidget';
 import DeckManagerView from '@/components/srs/DeckManagerView';
 import Leaderboard from '@/components/gamification/Leaderboard';
 import StreakHeatmap from '@/components/gamification/StreakHeatmap';
@@ -60,6 +61,7 @@ export default function RevisionsPage() {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 pb-24 space-y-6">
         {tab === 'smart' && (
           <div className="space-y-6">
+            <DailyQuestsWidget />
             <MemoryHealthWidget />
             <SRSDashboard />
           </div>

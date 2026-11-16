@@ -12,6 +12,7 @@
 import { useAppStore } from '../../store/useAppStore';
 import { SRSCard, CustomVocabularyItem } from '../../types/srs';
 import { Notation } from '../../types/curriculum';
+import { DailyQuestsState, DailyQuest } from '../../types/quests';
 
 export const BACKUP_APP_IDENTIFIER = 'kenza-darija-quest';
 export const CURRENT_BACKUP_SCHEMA_VERSION = 1;
@@ -36,6 +37,7 @@ export interface ProgressionPayload {
   hasCompletedOnboarding?: boolean;
   userGoal?: string | null;
   dailyTargetMinutes?: number | null;
+  dailyQuests?: DailyQuestsState;
 }
 
 export interface ProgressionBackupEnvelope {
@@ -134,6 +136,7 @@ export function getCurrentProgressionPayload(): ProgressionPayload {
     hasCompletedOnboarding: state.hasCompletedOnboarding || false,
     userGoal: state.userGoal || null,
     dailyTargetMinutes: state.dailyTargetMinutes || null,
+    dailyQuests: state.dailyQuests ? { ...state.dailyQuests } : undefined,
   };
 }
 
@@ -279,6 +282,29 @@ export function sanitizePayload(raw: unknown): ProgressionPayload {
   const userGoal = typeof obj.userGoal === 'string' ? obj.userGoal : null;
   const dailyTargetMinutes = typeof obj.dailyTargetMinutes === 'number' ? obj.dailyTargetMinutes : null;
 
+  let dailyQuests: DailyQuestsState | undefined;
+  if (obj.dailyQuests && typeof obj.dailyQuests === 'object') {
+    const dq = obj.dailyQuests as Record<string, unknown>;
+    if (typeof dq.dateKey === 'string' && Array.isArray(dq.quests)) {
+      dailyQuests = {
+        dateKey: dq.dateKey,
+        quests: (dq.quests as DailyQuest[]).map((q) => ({
+          id: String(q.id),
+          type: q.type,
+          category: q.category,
+          target: Math.max(1, Number(q.target) || 1),
+          progress: Math.max(0, Number(q.progress) || 0),
+          xpReward: Math.max(0, Number(q.xpReward) || 0),
+          completed: Boolean(q.completed),
+          claimed: Boolean(q.claimed),
+          focusTarget: typeof q.focusTarget === 'string' ? q.focusTarget : undefined,
+        })),
+        dailyBonusClaimed: Boolean(dq.dailyBonusClaimed),
+        completedQuestsTotal: Math.max(0, Number(dq.completedQuestsTotal) || 0),
+      };
+    }
+  }
+
   return {
     xp,
     streakDays,
@@ -299,6 +325,7 @@ export function sanitizePayload(raw: unknown): ProgressionPayload {
     hasCompletedOnboarding,
     userGoal,
     dailyTargetMinutes,
+    dailyQuests,
   };
 }
 
@@ -359,6 +386,40 @@ export function mergeProgression(
     ...(imported.customVocabulary || {}),
   };
 
+  let dailyQuests: DailyQuestsState | undefined = current.dailyQuests || imported.dailyQuests;
+  if (current.dailyQuests && imported.dailyQuests) {
+    if (current.dailyQuests.dateKey === imported.dailyQuests.dateKey) {
+      // Même date : fusionne les quêtes par id
+      const mergedQuests = current.dailyQuests.quests.map((q) => {
+        const impQ = imported.dailyQuests?.quests.find((iq) => iq.id === q.id);
+        if (!impQ) return q;
+        const maxProg = Math.max(q.progress, impQ.progress);
+        const isDone = q.completed || impQ.completed || maxProg >= q.target;
+        return {
+          ...q,
+          progress: maxProg,
+          completed: isDone,
+          claimed: q.claimed || impQ.claimed || isDone,
+        };
+      });
+      dailyQuests = {
+        dateKey: current.dailyQuests.dateKey,
+        quests: mergedQuests,
+        dailyBonusClaimed: current.dailyQuests.dailyBonusClaimed || imported.dailyQuests.dailyBonusClaimed,
+        completedQuestsTotal: Math.max(
+          current.dailyQuests.completedQuestsTotal || 0,
+          imported.dailyQuests.completedQuestsTotal || 0
+        ),
+      };
+    } else {
+      // Dates différentes : garder la plus récente
+      dailyQuests =
+        current.dailyQuests.dateKey >= imported.dailyQuests.dateKey
+          ? current.dailyQuests
+          : imported.dailyQuests;
+    }
+  }
+
   return {
     xp,
     streakDays,
@@ -379,6 +440,7 @@ export function mergeProgression(
     hasCompletedOnboarding: current.hasCompletedOnboarding || imported.hasCompletedOnboarding || false,
     userGoal: current.userGoal || imported.userGoal || null,
     dailyTargetMinutes: Math.max(current.dailyTargetMinutes || 0, imported.dailyTargetMinutes || 0) || null,
+    dailyQuests,
   };
 }
 
@@ -432,6 +494,7 @@ export function applyProgressionRestore(
       hasCompletedOnboarding: targetPayload.hasCompletedOnboarding,
       userGoal: targetPayload.userGoal,
       dailyTargetMinutes: targetPayload.dailyTargetMinutes,
+      ...(targetPayload.dailyQuests ? { dailyQuests: targetPayload.dailyQuests } : {}),
     });
 
     return {

@@ -5,6 +5,8 @@ import { Notation } from '../types/curriculum';
 export type { Notation };
 import { SRSCard, ReviewGrade, CustomVocabularyItem } from '../types/srs';
 import { calculateAdaptiveNextReview, sortCardsByUrgency, computeCardUrgency, AdaptiveSrsOptions } from '../lib/srs/adaptiveEngine';
+import { DailyQuestsState } from '../types/quests';
+import { generateAdaptiveDailyQuests, applyQuestEvent, getTodayDateKey } from '../lib/quests/questEngine';
 
 import { UILanguage, translations } from '../lib/i18n/translations';
 import { getLocalTodayDateString, getDaysDifference } from '../utils/dateUtils';
@@ -27,6 +29,9 @@ interface AppState {
   // SRS State
   srsDeck: Record<string, SRSCard>; // Map of wordId to SRSCard
   customVocabulary: Record<string, CustomVocabularyItem>;
+  
+  // Daily Quests State (v1.3)
+  dailyQuests: DailyQuestsState;
   
   // Settings
   preferredNotation: Notation;
@@ -60,6 +65,8 @@ interface AppState {
   deleteCustomWord: (wordId: string) => void;
   reviewCard: (wordId: string, grade: ReviewGrade, options?: AdaptiveSrsOptions) => void;
   recordVocalFailure: (wordId: string) => void;
+  recordVocalSuccess: (wordId: string, score: number) => void;
+  ensureDailyQuests: () => void;
   getDueCards: () => SRSCard[];
   activateNewCards: (count?: number) => void;
   
@@ -101,6 +108,12 @@ export const useAppStore = create<AppState>()(
       completedLessons: [],
       srsDeck: {},
       customVocabulary: {},
+      dailyQuests: {
+        dateKey: '',
+        quests: [],
+        dailyBonusClaimed: false,
+        completedQuestsTotal: 0,
+      },
       preferredNotation: 'arabizi',
       soundEnabled: true,
       audioSpeed: 1.0,
@@ -168,6 +181,12 @@ export const useAppStore = create<AppState>()(
           completedLessons: [],
           srsDeck: {},
           customVocabulary: {},
+          dailyQuests: {
+            dateKey: '',
+            quests: [],
+            dailyBonusClaimed: false,
+            completedQuestsTotal: 0,
+          },
           isPremium: false,
           audioQuotaExceeded: false,
         });
@@ -190,18 +209,36 @@ export const useAppStore = create<AppState>()(
           completedLessons: [],
           srsDeck: {},
           customVocabulary: {},
+          dailyQuests: {
+            dateKey: '',
+            quests: [],
+            dailyBonusClaimed: false,
+            completedQuestsTotal: 0,
+          },
           isPremium: false,
           audioQuotaExceeded: false,
         });
       },
       
       addXp: (amount: number) => set((state: AppState) => {
-        const newXp = state.xp + amount;
+        let questXpBonus = 0;
+        let nextQuests = state.dailyQuests;
+
+        if (state.dailyQuests && state.dailyQuests.quests && state.dailyQuests.quests.length > 0) {
+          const questResult = applyQuestEvent(state.dailyQuests, {
+            type: 'XP_EARNED',
+            amount,
+          });
+          nextQuests = questResult.nextState;
+          questXpBonus = questResult.xpGained;
+        }
+
+        const newXp = state.xp + amount + questXpBonus;
         const newBadges = [...state.unlockedBadges];
         if (newXp >= 500 && !newBadges.includes('polyglot')) {
           newBadges.push('polyglot');
         }
-        return { xp: newXp, unlockedBadges: newBadges };
+        return { xp: newXp, unlockedBadges: newBadges, dailyQuests: nextQuests };
       }),
       
       completeLesson: (lessonId: string) => set((state: AppState) => {
@@ -216,8 +253,25 @@ export const useAppStore = create<AppState>()(
         if (lessonId.includes('taxi') && !newBadges.includes('taxi_ace')) {
           newBadges.push('taxi_ace');
         }
+
+        let questXpBonus = 0;
+        let nextQuests = state.dailyQuests;
+
+        if (state.dailyQuests && state.dailyQuests.quests && state.dailyQuests.quests.length > 0) {
+          const questResult = applyQuestEvent(state.dailyQuests, {
+            type: 'LESSON_COMPLETED',
+            lessonId,
+          });
+          nextQuests = questResult.nextState;
+          questXpBonus = questResult.xpGained;
+        }
         
-        return { completedLessons: completed, unlockedBadges: newBadges };
+        return {
+          completedLessons: completed,
+          unlockedBadges: newBadges,
+          dailyQuests: nextQuests,
+          xp: state.xp + questXpBonus,
+        };
       }),
 
       setCompletedLessons: (lessons: string[]) => set({ completedLessons: lessons }),
@@ -387,8 +441,22 @@ export const useAppStore = create<AppState>()(
           [wordId]: updatedCard
         };
 
-        const newXp = state.xp + 5;
-        set({ srsDeck: newDeck, xp: newXp });
+        const baseReviewXp = 5;
+        let newXp = state.xp + baseReviewXp;
+        let nextQuests = state.dailyQuests;
+
+        if (state.dailyQuests && state.dailyQuests.quests && state.dailyQuests.quests.length > 0) {
+          const questResult = applyQuestEvent(state.dailyQuests, {
+            type: 'SRS_REVIEW',
+            grade,
+            responseTimeMs: options?.responseTimeMs,
+            wordId,
+          });
+          nextQuests = questResult.nextState;
+          newXp += questResult.xpGained;
+        }
+
+        set({ srsDeck: newDeck, xp: newXp, dailyQuests: nextQuests });
 
         // Synchronisation asynchrone sécurisée vers Supabase sans bloquer l'UI
         if (state.user) {
@@ -463,6 +531,93 @@ export const useAppStore = create<AppState>()(
           srsService.syncCardToCloud(state.user.id, updatedCard).catch(() => {});
         }
       },
+
+      recordVocalSuccess: (wordId: string, score: number) => {
+        if (!wordId || score < 75) return;
+        const state = get();
+        const now = new Date();
+
+        // Résolution résiliente de la clé
+        let targetKey = wordId;
+        let existingCard = state.srsDeck[targetKey];
+        if (!existingCard) {
+          if (state.srsDeck[`srs_${wordId}`]) {
+            targetKey = `srs_${wordId}`;
+            existingCard = state.srsDeck[targetKey];
+          } else if (state.srsDeck[wordId.replace(/^srs_/, '')]) {
+            targetKey = wordId.replace(/^srs_/, '');
+            existingCard = state.srsDeck[targetKey];
+          }
+        }
+
+        const wasInVocalDebt = Boolean(existingCard && (existingCard.vocalFailureCount ?? 0) > 0);
+        let newDeck = state.srsDeck;
+
+        if (existingCard && wasInVocalDebt) {
+          const newCount = Math.max(0, (existingCard.vocalFailureCount ?? 0) - 1);
+          const updatedCard: SRSCard = {
+            ...existingCard,
+            vocalFailureCount: newCount,
+            updatedAt: now.toISOString(),
+          };
+          updatedCard.urgencyScore = computeCardUrgency(updatedCard, now);
+
+          newDeck = {
+            ...state.srsDeck,
+            [targetKey]: updatedCard,
+          };
+
+          if (state.user) {
+            srsService.syncCardToCloud(state.user.id, updatedCard).catch(() => {});
+          }
+        }
+
+        let questXpBonus = 0;
+        let nextQuests = state.dailyQuests;
+
+        if (state.dailyQuests && state.dailyQuests.quests && state.dailyQuests.quests.length > 0) {
+          const questResult = applyQuestEvent(state.dailyQuests, {
+            type: 'VOCAL_SUCCESS',
+            wordId: targetKey,
+            score,
+            isRehab: wasInVocalDebt,
+          });
+          nextQuests = questResult.nextState;
+          questXpBonus = questResult.xpGained;
+        }
+
+        set({
+          srsDeck: newDeck,
+          dailyQuests: nextQuests,
+          xp: state.xp + questXpBonus,
+        });
+      },
+
+      ensureDailyQuests: () => {
+        const state = get();
+        const today = getTodayDateKey();
+        if (
+          state.dailyQuests?.dateKey !== today ||
+          !state.dailyQuests?.quests ||
+          state.dailyQuests.quests.length === 0
+        ) {
+          const dueCount = srsService.getDueCards(state.srsDeck).length;
+          const quests = generateAdaptiveDailyQuests(
+            today,
+            state.srsDeck,
+            dueCount,
+            state.streakDays
+          );
+          set({
+            dailyQuests: {
+              dateKey: today,
+              quests,
+              dailyBonusClaimed: false,
+              completedQuestsTotal: state.dailyQuests?.completedQuestsTotal || 0,
+            },
+          });
+        }
+      },
       
       getDueCards: () => {
         const deck = get().srsDeck;
@@ -472,7 +627,7 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'darija-quest-storage',
-      version: 6,
+      version: 7,
       partialize: (state: AppState) => {
         // isPremium est exclu : c'est un droit payant, il ne doit jamais pouvoir être
         // débloqué en éditant le localStorage. Source de vérité unique : profiles.is_premium,
@@ -521,6 +676,17 @@ export const useAppStore = create<AppState>()(
           // Mode « Écoute Pure » ajouté en v6 : absent des persistances antérieures.
           if (typeof state.blindAudioMode !== 'boolean') {
             (state as { blindAudioMode?: boolean }).blindAudioMode = false;
+          }
+        }
+        if (version < 7) {
+          // Quêtes Quotidiennes (v1.3)
+          if (!state.dailyQuests || typeof state.dailyQuests !== 'object') {
+            state.dailyQuests = {
+              dateKey: '',
+              quests: [],
+              dailyBonusClaimed: false,
+              completedQuestsTotal: 0,
+            };
           }
         }
         return state;

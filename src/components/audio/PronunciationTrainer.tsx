@@ -11,6 +11,7 @@ import {
   ChevronRight,
   Turtle,
   Info,
+  CheckCircle2,
 } from 'lucide-react';
 import { playAudio } from '@/lib/audio';
 import { useVoiceRecognition } from '@/hooks/useVoiceRecognition';
@@ -110,7 +111,7 @@ export default function PronunciationTrainer({
   onCompleteExercise,
   className = '',
 }: PronunciationTrainerProps) {
-  const { soundEnabled, addXp, uiLanguage, recordVocalFailure } = useAppStore();
+  const { soundEnabled, addXp, uiLanguage, recordVocalFailure, recordVocalSuccess } = useAppStore();
   const lang = uiLanguage || 'fr';
   const isAr = lang === 'ar';
   const isEs = lang === 'es';
@@ -118,6 +119,7 @@ export default function PronunciationTrainer({
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [evaluation, setEvaluation] = useState<PronunciationEvaluation | null>(null);
+  const [vocalRehabSuccess, setVocalRehabSuccess] = useState(false);
   const [activeSpeed, setActiveSpeed] = useState<'normal' | 'slow'>('normal');
   const [showPhonemeTip, setShowPhonemeTip] = useState(false);
 
@@ -150,11 +152,24 @@ export default function PronunciationTrainer({
     );
     setEvaluation(res);
 
-    if (res.score >= 60) {
+    const targetWordId = currentExercise.srsWordId || currentExercise.id;
+    const currentDeck = useAppStore.getState().srsDeck;
+    const targetCard =
+      currentDeck[targetWordId] ||
+      currentDeck[`srs_${targetWordId}`] ||
+      currentDeck[targetWordId.replace(/^srs_/, '')];
+    const hadVocalDebt = Boolean(targetCard && (targetCard.vocalFailureCount ?? 0) > 0);
+
+    if (res.score >= 75) {
       addXp(15);
+      recordVocalSuccess(targetWordId, res.score);
+      setVocalRehabSuccess(hadVocalDebt);
+    } else if (res.score >= 60) {
+      addXp(15);
+      setVocalRehabSuccess(false);
     } else {
+      setVocalRehabSuccess(false);
       // Synchronisation multimodale : enregistrement de l'échec phonétique dans le deck SRS
-      const targetWordId = currentExercise.srsWordId || currentExercise.id;
       recordVocalFailure(targetWordId);
     }
 
@@ -189,6 +204,7 @@ export default function PronunciationTrainer({
       stopListening();
     } else {
       setEvaluation(null);
+      setVocalRehabSuccess(false);
       resetTranscript();
       startListening();
     }
@@ -197,6 +213,7 @@ export default function PronunciationTrainer({
   const handleNext = () => {
     if (isListening) stopListening();
     setEvaluation(null);
+    setVocalRehabSuccess(false);
     resetTranscript();
     setShowPhonemeTip(false);
     setCurrentIndex((prev) => (prev + 1) % exercises.length);
@@ -556,6 +573,22 @@ export default function PronunciationTrainer({
                     : isEn
                     ? 'Phrase added to your high-priority SRS reviews to strengthen pronunciation.'
                     : 'Expression ajoutée à vos révisions prioritaires (SRS) pour consolider la prononciation.'}
+                </span>
+              </div>
+            )}
+
+            {/* Notification de réhabilitation vocale réussie */}
+            {vocalRehabSuccess && evaluation.score >= 75 && (
+              <div className="p-3.5 bg-emerald-50 border border-emerald-300 rounded-2xl flex items-center gap-3 text-xs text-emerald-900 animate-in fade-in duration-300">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span className="font-medium">
+                  {isAr
+                    ? '🎉 نطق تم إصلاحه بنجاح! تم تخفيض دين النطق في بطاقة المراجعة.'
+                    : isEs
+                    ? '🎉 ¡Pronunciación rehabilitada con éxito! Deuda vocal reducida en tu mazo SRS.'
+                    : isEn
+                    ? '🎉 Pronunciation successfully rehabilitated! Vocal penalty reduced in your SRS deck.'
+                    : '🎉 Prononciation réhabilitée avec succès ! Dette vocale réduite dans votre deck SRS.'}
                 </span>
               </div>
             )}
