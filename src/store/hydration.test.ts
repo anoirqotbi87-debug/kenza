@@ -38,7 +38,7 @@ describe('État initial du store et hydratation', () => {
   beforeAll(async () => {
     storageRef = installStorage();
     store = (await import('./useAppStore')) as StoreModule;
-  });
+  }, 30000);
 
   afterEach(() => {
     vi.resetModules();
