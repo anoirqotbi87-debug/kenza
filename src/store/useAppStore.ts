@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware';
 import { Notation } from '../types/curriculum';
 export type { Notation };
 import { SRSCard, ReviewGrade, CustomVocabularyItem } from '../types/srs';
+import { calculateAdaptiveNextReview, sortCardsByUrgency, computeCardUrgency, AdaptiveSrsOptions } from '../lib/srs/adaptiveEngine';
 
 import { UILanguage, translations } from '../lib/i18n/translations';
 import { getLocalTodayDateString, getDaysDifference } from '../utils/dateUtils';
@@ -57,7 +58,8 @@ interface AppState {
   addCustomWordToSRS: (word: CustomVocabularyItem) => void;
   updateCustomWord: (wordId: string, updates: Partial<CustomVocabularyItem>) => void;
   deleteCustomWord: (wordId: string) => void;
-  reviewCard: (wordId: string, grade: ReviewGrade) => void;
+  reviewCard: (wordId: string, grade: ReviewGrade, options?: AdaptiveSrsOptions) => void;
+  recordVocalFailure: (wordId: string) => void;
   getDueCards: () => SRSCard[];
   activateNewCards: (count?: number) => void;
   
@@ -372,13 +374,13 @@ export const useAppStore = create<AppState>()(
         return { customVocabulary: newVocab, srsDeck: newDeck };
       }),
       
-      reviewCard: (wordId: string, grade: ReviewGrade) => {
+      reviewCard: (wordId: string, grade: ReviewGrade, options?: AdaptiveSrsOptions) => {
         const state = get();
         const card = state.srsDeck[wordId];
         if (!card) return;
 
-        // Calcul SM-2 avec réinitialisation stricte en cas d'échec
-        const updatedCard = srsService.calculateNextReview(card, grade);
+        // Calcul SM-2 adaptatif enrichi par la télémétrie, la phonétique et les clusters
+        const updatedCard = calculateAdaptiveNextReview(card, grade, options);
 
         const newDeck = {
           ...state.srsDeck,
@@ -393,10 +395,79 @@ export const useAppStore = create<AppState>()(
           srsService.syncCardToCloud(state.user.id, updatedCard).catch(() => {});
         }
       },
+
+      recordVocalFailure: (wordId: string) => {
+        if (!wordId) return;
+        const state = get();
+        const now = new Date();
+        const todayMidnight = normalizeDateToUtcMidnight(now);
+
+        // Résolution résiliente de la clé dans le deck SRS
+        let targetKey = wordId;
+        let existingCard = state.srsDeck[targetKey];
+        if (!existingCard) {
+          if (state.srsDeck[`srs_${wordId}`]) {
+            targetKey = `srs_${wordId}`;
+            existingCard = state.srsDeck[targetKey];
+          } else if (state.srsDeck[wordId.replace(/^srs_/, '')]) {
+            targetKey = wordId.replace(/^srs_/, '');
+            existingCard = state.srsDeck[targetKey];
+          }
+        }
+
+        let updatedCard: SRSCard;
+
+        if (existingCard) {
+          const newFailureCount = (existingCard.vocalFailureCount ?? 0) + 1;
+          const tempCard: SRSCard = {
+            ...existingCard,
+            vocalFailureCount: newFailureCount,
+            // Placer l'échéance à aujourd'hui pour qu'elle devienne due immédiatement
+            dueDate: todayMidnight.toISOString(),
+            state: 'learning',
+            updatedAt: now.toISOString(),
+          };
+          updatedCard = {
+            ...tempCard,
+            urgencyScore: computeCardUrgency(tempCard, now),
+          };
+        } else {
+          // Si la carte n'est pas encore dans le deck, création immédiate en apprentissage prioritaire
+          const newCard: SRSCard = {
+            id: targetKey.startsWith('srs_') ? targetKey : `srs_${targetKey}`,
+            wordId: targetKey,
+            interval: 1,
+            repetition: 0,
+            easeFactor: 2.3,
+            dueDate: todayMidnight.toISOString(),
+            state: 'learning',
+            updatedAt: now.toISOString(),
+            vocalFailureCount: 1,
+            averageResponseTimeMs: 3000,
+            consecutiveSuccesses: 0,
+          };
+          updatedCard = {
+            ...newCard,
+            urgencyScore: computeCardUrgency(newCard, now),
+          };
+        }
+
+        const newDeck = {
+          ...state.srsDeck,
+          [targetKey]: updatedCard,
+        };
+
+        set({ srsDeck: newDeck });
+
+        if (state.user) {
+          srsService.syncCardToCloud(state.user.id, updatedCard).catch(() => {});
+        }
+      },
       
       getDueCards: () => {
         const deck = get().srsDeck;
-        return srsService.getDueCards(deck);
+        const dueCards = srsService.getDueCards(deck);
+        return sortCardsByUrgency(dueCards);
       }
     }),
     {

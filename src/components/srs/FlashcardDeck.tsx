@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Volume2, Volume1, Info, RotateCw } from 'lucide-react';
+import { Volume2, Volume1, Info, RotateCw, Sparkles } from 'lucide-react';
 import { VocabularySRSData, ReviewGrade, SRSCard } from '../../types/srs';
 import { playAudio } from '../../lib/audio';
 import { hapticSuccess, hapticError } from '../../lib/haptics';
@@ -105,10 +105,28 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
     return () => clearTimeout(timer);
   }, [isBlindAudio, wordData, currentIndex, handlePlayAudio]);
 
+  // Chronomètre de latence cognitive (mesure du temps de réponse en ms)
+  const cardStartTimeRef = useRef<number | null>(null);
+  useEffect(() => {
+    cardStartTimeRef.current = Date.now();
+  }, [currentIndex]);
+
   const handleGrade = useCallback((grade: ReviewGrade) => {
     if (!currentSRSCard) return;
 
-    reviewCard(currentSRSCard.wordId, grade);
+    // Mesure de la latence cognitive réelle
+    const responseTimeMs = cardStartTimeRef.current
+      ? Math.max(400, Date.now() - cardStartTimeRef.current)
+      : 2500;
+
+    const wordText = wordData ? (wordData.arabic || wordData.arabizi || '') : '';
+
+    // Évaluation via le moteur SM-2 adaptatif (latence, cluster phonétique et feedback vocal)
+    reviewCard(currentSRSCard.wordId, grade, {
+      responseTimeMs,
+      text: wordText,
+      vocalFailed: false,
+    });
 
     // Retour haptique distinct selon le résultat de l'évaluation
     if (grade === 'again') {
@@ -125,7 +143,7 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
         onComplete();
       }
     }, 150);
-  }, [currentSRSCard, currentIndex, validCards.length, onComplete, reviewCard]);
+  }, [currentSRSCard, currentIndex, validCards.length, onComplete, reviewCard, wordData]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -346,9 +364,23 @@ export default function FlashcardDeck({ cards, vocabulary, onComplete }: Flashca
             <span className="absolute bottom-4 right-4 text-[#C9A05C]/50 text-xs font-display pointer-events-none select-none">✦</span>
 
             {/* Kicker supérieur */}
-            <div className="flex items-center gap-2 text-[#C9A05C] text-xs font-bold tracking-[0.22em] uppercase">
-              <span>—</span>
-              <span>{formatCategory(wordData.category)}</span>
+            <div className="flex flex-col items-center gap-1.5">
+              <div className="flex items-center gap-2 text-[#C9A05C] text-xs font-bold tracking-[0.22em] uppercase">
+                <span>—</span>
+                <span>{formatCategory(wordData.category)}</span>
+              </div>
+
+              {/* Badge adaptatif contextuel (défi vocal ou cluster phonétique Darija) */}
+              {currentSRSCard && ((currentSRSCard.vocalFailureCount ?? 0) > 0 || (currentSRSCard.clusterWeight ?? 1) > 1.25) && (
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-normal bg-[#C9A05C]/15 text-[#1B2A4A] border border-[#C9A05C]/30 animate-fade-in">
+                  <Sparkles className="w-3 h-3 text-[#C9A05C]" />
+                  <span>
+                    {(currentSRSCard.vocalFailureCount ?? 0) > 0
+                      ? (isAr ? 'أولوية النطق' : 'Priorité phonétique')
+                      : (isAr ? 'تحدي صوتي مغربي' : 'Cluster phonétique')}
+                  </span>
+                </div>
+              )}
             </div>
             
             {/* Illustration & Translation */}

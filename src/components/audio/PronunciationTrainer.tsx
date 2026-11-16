@@ -28,6 +28,7 @@ export interface PronunciationExercise {
   arabic: string;
   translation: string | Record<string, string>;
   focusPhoneme?: '3' | '7' | '9' | 'kh' | 'gh';
+  srsWordId?: string;
 }
 
 const DEFAULT_EXERCISES: PronunciationExercise[] = [
@@ -42,6 +43,7 @@ const DEFAULT_EXERCISES: PronunciationExercise[] = [
       es: 'Por favor, ¿cuánto cuesta esto?',
     },
     focusPhoneme: '3',
+    srsWordId: 'srs_chhal',
   },
   {
     id: 'p2',
@@ -54,6 +56,7 @@ const DEFAULT_EXERCISES: PronunciationExercise[] = [
       es: 'Buenos días mi hermano',
     },
     focusPhoneme: '7',
+    srsWordId: 'srs_khouya',
   },
   {
     id: 'p3',
@@ -66,6 +69,7 @@ const DEFAULT_EXERCISES: PronunciationExercise[] = [
       es: 'Quisiera un café mitad leche',
     },
     focusPhoneme: '9',
+    srsWordId: 'srs_9hwa',
   },
   {
     id: 'p4',
@@ -78,6 +82,7 @@ const DEFAULT_EXERCISES: PronunciationExercise[] = [
       es: 'El pan está muy caliente',
     },
     focusPhoneme: 'kh',
+    srsWordId: 'srs_khobz',
   },
   {
     id: 'p5',
@@ -90,6 +95,7 @@ const DEFAULT_EXERCISES: PronunciationExercise[] = [
       es: 'Me voy a ir ahora',
     },
     focusPhoneme: 'gh',
+    srsWordId: 'srs_daba',
   },
 ];
 
@@ -104,7 +110,7 @@ export default function PronunciationTrainer({
   onCompleteExercise,
   className = '',
 }: PronunciationTrainerProps) {
-  const { soundEnabled, addXp, uiLanguage } = useAppStore();
+  const { soundEnabled, addXp, uiLanguage, recordVocalFailure } = useAppStore();
   const lang = uiLanguage || 'fr';
   const isAr = lang === 'ar';
   const isEs = lang === 'es';
@@ -146,7 +152,12 @@ export default function PronunciationTrainer({
 
     if (res.score >= 60) {
       addXp(15);
+    } else {
+      // Synchronisation multimodale : enregistrement de l'échec phonétique dans le deck SRS
+      const targetWordId = currentExercise.srsWordId || currentExercise.id;
+      recordVocalFailure(targetWordId);
     }
+
     if (onCompleteExercise) {
       onCompleteExercise(res.score);
     }
@@ -530,6 +541,22 @@ export default function PronunciationTrainer({
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Notification de synchronisation SRS prioritaire en cas d'échec phonétique */}
+            {evaluation.score < 60 && (
+              <div className="p-3.5 bg-[#C9A05C]/15 border border-[#C9A05C]/35 rounded-2xl flex items-center gap-3 text-xs text-[#1B2A4A] animate-in fade-in duration-300">
+                <Sparkles className="w-4 h-4 text-[#C9A05C] shrink-0" />
+                <span className="font-medium">
+                  {isAr
+                    ? 'تمت إضافة هذه العبارة إلى مراجعاتك ذات الأولوية في نظام التكرار المتباعد (SRS) لترسيخ النطق.'
+                    : isEs
+                    ? 'Frase añadida a tus repasos prioritarios (SRS) para afianzar la pronunciación.'
+                    : isEn
+                    ? 'Phrase added to your high-priority SRS reviews to strengthen pronunciation.'
+                    : 'Expression ajoutée à vos révisions prioritaires (SRS) pour consolider la prononciation.'}
+                </span>
               </div>
             )}
           </div>

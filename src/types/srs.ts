@@ -9,6 +9,14 @@ export interface SRSCard {
   dueDate: string; // ISO String timestamp
   state: 'new' | 'learning' | 'review';
   updatedAt?: string;
+
+  // Métriques adaptatives intelligentes (rétrocompatibles)
+  averageResponseTimeMs?: number;
+  vocalFailureCount?: number;
+  consecutiveSuccesses?: number;
+  clusterWeight?: number;
+  lastResponseTimeMs?: number;
+  urgencyScore?: number;
 }
 
 export type ReviewGrade = 'again' | 'hard' | 'good' | 'easy';
