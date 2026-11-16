@@ -1,4 +1,5 @@
 import { fullCurriculum } from '@/data/curriculum';
+import { MODULES_8_10_DATA } from '@/data/modules8to10';
 import { getLocalizedText } from '@/lib/i18n/utils';
 import type { UILanguage } from '@/lib/i18n/translations';
 import { isModuleLocked } from '@/lib/premiumModules';
@@ -14,6 +15,7 @@ import { isModuleLocked } from '@/lib/premiumModules';
 export interface HomeModuleCard {
   key: string;
   title: string;
+  level?: string;
   lessons: number;
   steps: number;
   locked: boolean;
@@ -48,15 +50,17 @@ const hasSteps = (lesson: { steps: unknown[] }) =>
 export function getHomeModules(
   lang: string,
   completedLessons: readonly string[],
-  isPremium: boolean
+  isPremium: boolean,
+  includeAdvanced: boolean = false
 ): HomeModuleCard[] {
   const done = new Set(completedLessons);
-  return Object.entries(fullCurriculum).map(([key, mod]) => {
+  const foundationModules: HomeModuleCard[] = Object.entries(fullCurriculum).map(([key, mod]) => {
     const playable = mod.lessons.filter(hasSteps);
     const completed = playable.filter((lesson) => done.has(lesson.id)).length;
     return {
       key,
       title: text(mod.title, lang),
+      level: key === '1' || key === '2' ? 'A1' : key === '3' ? 'A2' : key === '4' || key === '6' ? 'B1' : 'B2',
       lessons: playable.length,
       steps: playable.reduce((total, lesson) => total + lesson.steps.length, 0),
       locked: isModuleLocked(key, isPremium),
@@ -64,6 +68,28 @@ export function getHomeModules(
       done: completed === playable.length && playable.length > 0,
     };
   });
+
+  if (!includeAdvanced) {
+    return foundationModules;
+  }
+
+  const advancedCards: HomeModuleCard[] = MODULES_8_10_DATA.map((advMod) => {
+    const key = String(advMod.id);
+    const totalUnits = advMod.units.length;
+    const completedUnits = advMod.units.filter((u) => done.has(u.id)).length;
+    return {
+      key,
+      title: text(advMod.title, lang),
+      level: advMod.level,
+      lessons: totalUnits,
+      steps: advMod.units.reduce((sum, u) => sum + u.words.length, 0),
+      locked: !isPremium,
+      completed: completedUnits,
+      done: completedUnits === totalUnits && totalUnits > 0,
+    };
+  });
+
+  return [...foundationModules, ...advancedCards];
 }
 
 /** Lecons jouables d'un module precis, pour la vue detaillee. */
@@ -73,6 +99,23 @@ export function getHomeModuleLessons(
   completedLessons: readonly string[]
 ): HomeModuleLesson[] {
   const done = new Set(completedLessons);
+  const modNum = parseInt(moduleKey, 10);
+
+  // Modules avancés 8 à 10
+  if (modNum >= 8 && modNum <= 10) {
+    const advMod = MODULES_8_10_DATA.find((m) => m.id === modNum);
+    if (!advMod) return [];
+    return advMod.units.map((unit) => ({
+      id: unit.id,
+      title: text(unit.title, lang),
+      description: text(unit.description, lang),
+      steps: unit.words.length,
+      free: false,
+      done: done.has(unit.id),
+    }));
+  }
+
+  // Modules classiques 1 à 7
   const mod = fullCurriculum[moduleKey];
   if (!mod) return [];
   return mod.lessons.filter(hasSteps).map((lesson) => ({

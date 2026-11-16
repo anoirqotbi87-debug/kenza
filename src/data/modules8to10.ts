@@ -1,4 +1,4 @@
-import type { MultiLangText } from '../types/curriculum';
+import type { Lesson, LessonStep, MultiLangText } from '../types/curriculum';
 
 export interface ModuleUnitWord {
   id: string;
@@ -921,3 +921,140 @@ export const MODULES_8_10_DATA: AdvancedModule[] = [
     ],
   },
 ];
+
+/**
+ * Convertit une unité de module avancé (C1/C2) en une leçon interactive
+ * complète, compatible avec le moteur ExerciseRunner de Kenza.
+ */
+export function unitToLesson(unit: ModuleUnit, moduleNumber: number, level: string = 'C1'): Lesson {
+  const steps: LessonStep[] = [];
+
+  // 1. Étapes d'apprentissage pour chaque mot de l'unité
+  unit.words.forEach((w, wIdx) => {
+    steps.push({
+      id: `${unit.id}_step_learn_${wIdx + 1}`,
+      type: 'learning',
+      content: {
+        title: {
+          fr: `${w.arabizi} — ${w.translation.fr}`,
+          en: `${w.arabizi} — ${w.translation.en}`,
+          es: `${w.arabizi} — ${w.translation.es}`,
+          ar: `${w.arabic} — ${w.translation.ar}`,
+        },
+        description: {
+          fr: `Vocabulaire niveau ${level} : ${w.arabizi} (${w.arabic}). Traduction : ${w.translation.fr}.`,
+          en: `Level ${level} vocabulary: ${w.arabizi} (${w.arabic}). Translation: ${w.translation.en}.`,
+          es: `Vocabulario nivel ${level}: ${w.arabizi} (${w.arabic}). Traducción: ${w.translation.es}.`,
+          ar: `مفردات المستوى ${level}: ${w.arabic} (${w.arabizi}). المعنى: ${w.translation.ar}.`,
+        },
+        arabizi: w.arabizi,
+        arabic: w.arabic,
+        translation: w.translation,
+        culturalNote: w.example
+          ? {
+              fr: `Exemple : ${w.example.arabizi} (${w.example.arabic}) — ${w.example.translation.fr}`,
+              en: `Example: ${w.example.arabizi} (${w.example.arabic}) — ${w.example.translation.en}`,
+              es: `Ejemplo: ${w.example.arabizi} (${w.example.arabic}) — ${w.example.translation.es}`,
+              ar: `مثال: ${w.example.arabic} — ${w.example.translation.ar}`,
+            }
+          : undefined,
+      },
+    });
+  });
+
+  // 2. Exercices QCM (MCQ) pour ancrer les mots de vocabulaire
+  unit.words.slice(0, 3).forEach((targetWord, qIdx) => {
+    const otherWords = unit.words.filter((w) => w.id !== targetWord.id);
+    const distractors = otherWords.slice(0, 3);
+    const correctOptionId = `opt_${targetWord.id}_correct`;
+
+    const rawOptions = [
+      { id: correctOptionId, text: targetWord.arabizi, isCorrect: true },
+      ...distractors.map((dw, dIdx) => ({
+        id: `opt_${targetWord.id}_distractor_${dIdx + 1}`,
+        text: dw.arabizi,
+        isCorrect: false,
+      })),
+    ];
+
+    // Permutation déterministe basée sur l'index de la question
+    const shift = (qIdx + 1) % rawOptions.length;
+    const options = [...rawOptions.slice(shift), ...rawOptions.slice(0, shift)];
+
+    steps.push({
+      id: `${unit.id}_step_mcq_${qIdx + 1}`,
+      type: 'exercise',
+      exercise: {
+        id: `ex_${unit.id}_mcq_${targetWord.id}`,
+        type: 'mcq',
+        prompt: {
+          fr: `Comment dit-on « ${targetWord.translation.fr} » en Darija ?`,
+          en: `How do you say "${targetWord.translation.en}" in Darija?`,
+          es: `¿Cómo se dice "${targetWord.translation.es}" en Darija?`,
+          ar: `كيف تقول « ${targetWord.translation.ar} » بالدارجة؟`,
+        },
+        options,
+        answer: correctOptionId,
+      },
+    });
+  });
+
+  // 3. Exercice d'association (Matching)
+  const pairs = unit.words.slice(0, 4).map((w, pIdx) => ({
+    id: `pair_${unit.id}_${pIdx + 1}`,
+    left: { text: `${w.arabizi} (${w.arabic})` },
+    right: { text: w.translation },
+  }));
+
+  steps.push({
+    id: `${unit.id}_step_match`,
+    type: 'exercise',
+    exercise: {
+      id: `ex_${unit.id}_match`,
+      type: 'matching',
+      prompt: {
+        fr: 'Associez chaque mot Darija à son sens exact :',
+        en: 'Match each Darija word to its exact meaning:',
+        es: 'Asocia cada término en Darija con su significado exacto:',
+        ar: 'صل بين كل كلمة بالدارجة ومعناها الدقيق:',
+      },
+      pairs,
+    },
+  });
+
+  return {
+    id: unit.id,
+    title: unit.title,
+    level: moduleNumber >= 10 ? 3 : 2,
+    description: unit.description,
+    steps,
+  };
+}
+
+/** Leçons jouables dérivées des modules 8, 9 et 10. */
+export const advancedModulesLessons: Record<number, Lesson[]> = {
+  8: MODULES_8_10_DATA[0].units.map((u) => unitToLesson(u, 8, 'C1')),
+  9: MODULES_8_10_DATA[1].units.map((u) => unitToLesson(u, 9, 'C1')),
+  10: MODULES_8_10_DATA[2].units.map((u) => unitToLesson(u, 10, 'C2')),
+};
+
+/** Liste aplatie de tous les mots des modules 8 à 10 (54 mots au total). */
+export const allAdvancedWords: ModuleUnitWord[] = MODULES_8_10_DATA.flatMap((m) =>
+  m.units.flatMap((u) => u.words)
+);
+
+/** Récupère les mots d'une unité spécifique. */
+export function findWordsForUnit(unitId: string): ModuleUnitWord[] {
+  for (const m of MODULES_8_10_DATA) {
+    const unit = m.units.find((u) => u.id === unitId);
+    if (unit) return unit.words;
+  }
+  return [];
+}
+
+/** Récupère les mots d'un module spécifique (8, 9 ou 10). */
+export function findWordsForModule(moduleId: number | string): ModuleUnitWord[] {
+  const num = typeof moduleId === 'string' ? parseInt(moduleId, 10) : moduleId;
+  const mod = MODULES_8_10_DATA.find((m) => m.id === num || m.moduleNumber === num);
+  return mod ? mod.units.flatMap((u) => u.words) : [];
+}

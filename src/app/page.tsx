@@ -1758,7 +1758,7 @@ function PathView({
 
   const [selectedModule, setSelectedModule] = useState<string>("1");
 
-  const modules = useMemo(() => getHomeModules(lang, completedLessons, isPremium), [lang, completedLessons, isPremium]);
+  const modules = useMemo(() => getHomeModules(lang, completedLessons, isPremium, true), [lang, completedLessons, isPremium]);
   const doneSet = useMemo(() => new Set(completedLessons), [completedLessons]);
   const totalLessons = useMemo(() => modules.reduce((sum, m) => sum + m.lessons, 0), [modules]);
   const totalCompleted = useMemo(() => modules.reduce((sum, m) => sum + m.completed, 0), [modules]);
@@ -1898,6 +1898,7 @@ function PathView({
                         }
                       >
                         {tr("Module", "Module", "Módulo", "الوحدة")} {mod.key}
+                        {mod.level ? ` · ${mod.level}` : ""}
                       </span>
                       {mod.locked ? (
                         <span className="text-[#D69B47] shrink-0" aria-hidden="true">
@@ -1914,7 +1915,9 @@ function PathView({
                     </h4>
                     <div className={`text-[10px] font-medium ${active ? "text-[#DDE3EC]" : "text-[#7A7670]"}`}>
                       {mod.completed} / {mod.lessons}{" "}
-                      {trL(lang, "leçons terminées", "lessons completed", "lecciones completadas", "دروس مُنجزة")}
+                      {parseInt(mod.key, 10) >= 8
+                        ? trL(lang, "unités terminées", "units completed", "unidades completadas", "وحدات مُنجزة")
+                        : trL(lang, "leçons terminées", "lessons completed", "lecciones completadas", "دروس مُنجزة")}
                     </div>
                     {!mod.locked && (
                       <div className="h-1.5 bg-[#E8E2D2] rounded-full overflow-hidden mt-2">
@@ -1948,7 +1951,9 @@ function PathView({
                 <span className="text-lg" aria-hidden="true">📖</span>
                 <span className="text-sm font-semibold text-[#142943]">
                   {selectedCard.completed} / {selectedCard.lessons}{" "}
-                  {trL(lang, "leçons terminées", "lessons completed", "lecciones completadas", "دروس مُنجزة")}
+                  {parseInt(selectedCard.key, 10) >= 8
+                    ? trL(lang, "unités terminées", "units completed", "unidades completadas", "وحدات مُنجزة")
+                    : trL(lang, "leçons terminées", "lessons completed", "lecciones completadas", "دروس مُنجزة")}
                 </span>
                 <span className="ml-auto text-sm font-bold text-[#D69B47]">
                   {selectedCard.lessons ? Math.round((selectedCard.completed / selectedCard.lessons) * 100) : 0}%
@@ -1977,10 +1982,26 @@ function PathView({
                           {lesson.title}
                         </span>
                         <span className="block text-[11px] text-[#7A7670] mt-0.5">
-                          {lesson.steps} {trL(lang, "étapes", "steps", "pasos", "خطوات")}
+                          {lesson.steps}{" "}
+                          {parseInt(selectedCard.key, 10) >= 8
+                            ? trL(lang, "mots clés", "key words", "palabras clave", "كلمات مفتاحية")
+                            : trL(lang, "étapes", "steps", "pasos", "خطوات")}
                           {!lesson.free && <span className="ml-2 text-[#D69B47] font-bold">Pro</span>}
                         </span>
                       </span>
+                      {parseInt(selectedCard.key, 10) >= 8 && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            useAppStore.getState().addUnitWordsToSRS(lesson.id);
+                          }}
+                          className="shrink-0 text-[10px] font-bold text-[#B8860B] bg-[#C9A05C]/10 hover:bg-[#C9A05C]/20 border border-[#C9A05C]/30 px-2.5 py-1 rounded-lg transition-colors"
+                          title={trL(lang, "Ajouter les 6 mots au deck SRS", "Add 6 words to SRS deck", "Añadir 6 palabras al mazo SRS", "أضف الـ 6 كلمات إلى SRS")}
+                        >
+                          + SRS (6)
+                        </button>
+                      )}
                       {lesson.done ? (
                         <CheckCircle2 className="w-4 h-4 text-[#7A9174] shrink-0" />
                       ) : lesson.free || isPremium ? (

@@ -14,6 +14,65 @@ import { getLocalTodayDateString, getDaysDifference } from '../utils/dateUtils';
 import { srsService, normalizeDateToUtcMidnight } from '../services/srsService';
 import { migrateLegacyLessonIds } from '../data/homeCurriculum';
 import { fullCurriculum } from '../data/curriculum';
+import {
+  MODULES_8_10_DATA,
+  advancedModulesLessons,
+  findWordsForUnit,
+  findWordsForModule,
+  type ModuleUnit,
+} from '../data/modules8to10';
+import type { Lesson, MultiLangText } from '../types/curriculum';
+
+export interface UnifiedModule {
+  id: number;
+  key: string;
+  moduleNumber: number;
+  level: string;
+  title: MultiLangText;
+  description?: MultiLangText;
+  lessons: Lesson[];
+  units?: ModuleUnit[];
+  unitsCount: number;
+  isAdvanced: boolean;
+}
+
+const FOUNDATION_MODULE_LEVELS: Record<string, string> = {
+  '1': 'A1',
+  '2': 'A1',
+  '3': 'A2',
+  '4': 'B1',
+  '5': 'B2',
+  '6': 'B1',
+  '7': 'B2',
+};
+
+export const ALL_UNIFIED_MODULES: UnifiedModule[] = [
+  ...Object.entries(fullCurriculum).map(([key, mod]) => {
+    const num = parseInt(key, 10);
+    return {
+      id: num,
+      key,
+      moduleNumber: num,
+      level: FOUNDATION_MODULE_LEVELS[key] || 'A1',
+      title: mod.title,
+      lessons: mod.lessons,
+      unitsCount: mod.lessons.length,
+      isAdvanced: false,
+    };
+  }),
+  ...MODULES_8_10_DATA.map((advMod) => ({
+    id: advMod.id,
+    key: String(advMod.id),
+    moduleNumber: advMod.moduleNumber,
+    level: advMod.level,
+    title: advMod.title,
+    description: advMod.description,
+    lessons: advancedModulesLessons[advMod.id] || [],
+    units: advMod.units,
+    unitsCount: advMod.units.length,
+    isAdvanced: true,
+  })),
+];
 interface AppState {
   // User Progress
   user: User | null;
@@ -25,6 +84,10 @@ interface AppState {
   unlockedBadges: string[];
   currentLevel: number;
   completedLessons: string[];
+  
+  // Curriculum Catalog (Modules 1 à 10)
+  allModules: UnifiedModule[];
+  getModules: () => UnifiedModule[];
   
   // SRS State
   srsDeck: Record<string, SRSCard>; // Map of wordId to SRSCard
@@ -60,6 +123,8 @@ interface AppState {
   
   // SRS Actions
   addCardsToSRS: (wordIds: string[]) => void;
+  addUnitWordsToSRS: (unitId: string) => void;
+  addModuleWordsToSRS: (moduleId: number | string) => void;
   addCustomWordToSRS: (word: CustomVocabularyItem) => void;
   updateCustomWord: (wordId: string, updates: Partial<CustomVocabularyItem>) => void;
   deleteCustomWord: (wordId: string) => void;
@@ -106,6 +171,8 @@ export const useAppStore = create<AppState>()(
       unlockedBadges: [],
       currentLevel: 1,
       completedLessons: [],
+      allModules: ALL_UNIFIED_MODULES,
+      getModules: () => get().allModules,
       srsDeck: {},
       customVocabulary: {},
       dailyQuests: {
@@ -253,6 +320,15 @@ export const useAppStore = create<AppState>()(
         if (lessonId.includes('taxi') && !newBadges.includes('taxi_ace')) {
           newBadges.push('taxi_ace');
         }
+        if (lessonId.startsWith('unit_8_') && !newBadges.includes('business_darija')) {
+          newBadges.push('business_darija');
+        }
+        if (lessonId.startsWith('unit_9_') && !newBadges.includes('media_debater')) {
+          newBadges.push('media_debater');
+        }
+        if (lessonId.startsWith('unit_10_') && !newBadges.includes('eloquence_master')) {
+          newBadges.push('eloquence_master');
+        }
 
         let questXpBonus = 0;
         let nextQuests = state.dailyQuests;
@@ -265,12 +341,18 @@ export const useAppStore = create<AppState>()(
           nextQuests = questResult.nextState;
           questXpBonus = questResult.xpGained;
         }
+
+        const baseLessonXp = 20;
+        const newXp = state.xp + baseLessonXp + questXpBonus;
+        if (newXp >= 500 && !newBadges.includes('polyglot')) {
+          newBadges.push('polyglot');
+        }
         
         return {
           completedLessons: completed,
           unlockedBadges: newBadges,
           dailyQuests: nextQuests,
-          xp: state.xp + questXpBonus,
+          xp: newXp,
         };
       }),
 
@@ -281,6 +363,10 @@ export const useAppStore = create<AppState>()(
         moduleIds.forEach((mId) => {
           const modLessons = fullCurriculum[mId]?.lessons?.map((l) => l.id) || [];
           lessonIds.push(...modLessons);
+          const advMod = MODULES_8_10_DATA.find((m) => String(m.id) === String(mId));
+          if (advMod) {
+            lessonIds.push(...advMod.units.map((u) => u.id));
+          }
         });
         const merged = Array.from(new Set([...state.completedLessons, ...lessonIds]));
         return { completedLessons: merged };
@@ -368,6 +454,20 @@ export const useAppStore = create<AppState>()(
         
         return { srsDeck: newDeck };
       }),
+
+      addUnitWordsToSRS: (unitId: string) => {
+        const words = findWordsForUnit(unitId);
+        if (words.length > 0) {
+          get().addCardsToSRS(words.map((w) => w.id));
+        }
+      },
+
+      addModuleWordsToSRS: (moduleId: number | string) => {
+        const words = findWordsForModule(moduleId);
+        if (words.length > 0) {
+          get().addCardsToSRS(words.map((w) => w.id));
+        }
+      },
       
       addCustomWordToSRS: (word: CustomVocabularyItem) => set((state: AppState) => {
         const newVocab = { ...state.customVocabulary, [word.id]: word };

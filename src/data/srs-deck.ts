@@ -1,5 +1,6 @@
 import { VocabularySRSData } from '../types/srs';
 import { allVocabulary } from './vocabulary';
+import { allAdvancedWords } from './modules8to10';
 
 export type SRSDictionaryItem = VocabularySRSData;
 
@@ -2502,6 +2503,41 @@ export const getWordFromDictionary = (id: string): VocabularySRSData | undefined
         arabic: vocabMatch.example.arabic,
         translation: vocabMatch.example.translation
       } : undefined
+    };
+  }
+
+  // 5. Recherche dans les modules avancés 8 à 10 (MODULES_8_10_DATA)
+  const advancedMatch = allAdvancedWords.find((w) => {
+    const wLower = w.id.toLowerCase();
+    const wClean = wLower.replace(/^(vocab_|word_srs_|word_|srs_)/i, '');
+    const wStripped = wClean.replace(/[-_]/g, '');
+    const wArabiziStripped = w.arabizi.toLowerCase().replace(/[-_ ]/g, '');
+
+    return (
+      w.id === rawTrimmed ||
+      wLower === lowerId ||
+      wClean === cleanId ||
+      wStripped === strippedId ||
+      wArabiziStripped === strippedId ||
+      wArabiziStripped === cleanId
+    );
+  });
+
+  if (advancedMatch) {
+    return {
+      id: advancedMatch.id,
+      arabizi: advancedMatch.arabizi,
+      arabic: advancedMatch.arabic,
+      translation: advancedMatch.translation,
+      category: advancedMatch.category || 'advanced_c1_c2',
+      illustration: { iconName: 'Sparkles' },
+      example: advancedMatch.example
+        ? {
+            arabizi: advancedMatch.example.arabizi,
+            arabic: advancedMatch.example.arabic,
+            translation: advancedMatch.example.translation,
+          }
+        : undefined,
     };
   }
 
