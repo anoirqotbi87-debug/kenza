@@ -27,7 +27,7 @@ const contentSecurityPolicy = [
   // l'hydratation. `'unsafe-eval'` reste interdit : aucun `eval`/`new Function`
   // dans le code (vérifié). `https://vercel.live` autorise la Vercel Toolbar
   // (aperçus de dev/production) sans ouvrir un `https:` générique.
-  "script-src 'self' 'unsafe-inline' https://vercel.live",
+  `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''} https://vercel.live`,
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self' data: https://vercel.live",
   // `https:` retiré : il autorisait l'envoi de données vers n'importe quel

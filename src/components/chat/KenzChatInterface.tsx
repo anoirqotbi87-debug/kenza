@@ -219,23 +219,23 @@ export default function KenzChatInterface() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)] sm:h-[calc(100vh-160px)] max-w-4xl mx-auto w-full bg-white dark:bg-[#26211E] rounded-3xl border border-amber-100 dark:border-amber-900/30 shadow-md overflow-hidden font-sans">
+    <div className="flex flex-col h-[calc(100vh-140px)] sm:h-[calc(100vh-160px)] max-w-4xl mx-auto w-full bg-white rounded-3xl border border-amber-200/80 shadow-md overflow-hidden font-sans">
       {/* 1. SOUS-EN-TÊTE DE LA CONVERSATION */}
-      <div className="px-4 py-3 bg-[#FAF7F2] dark:bg-[#201B18] border-b border-amber-100/80 dark:border-amber-900/30 flex items-center justify-between gap-3 shrink-0">
+      <div className="px-4 py-3 bg-[#FAF7F2] border-b border-amber-200/70 flex items-center justify-between gap-3 shrink-0">
         <div className="flex items-center gap-2.5">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-600 to-amber-700 text-white flex items-center justify-center shadow-xs border border-amber-500/30">
             <Bot className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <h2 className="text-sm sm:text-base font-bold text-stone-800 dark:text-stone-100">
+              <h2 className="text-sm sm:text-base font-bold text-stone-800">
                 KenzBot
               </h2>
-              <span className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 px-2 py-0.2 rounded-full text-[10px] font-extrabold uppercase tracking-wide">
+              <span className="bg-emerald-50 text-emerald-700 border border-emerald-300/60 px-2 py-0.2 rounded-full text-[10px] font-extrabold uppercase tracking-wide">
                 En ligne
               </span>
             </div>
-            <p className="text-xs text-stone-500 dark:text-stone-400">
+            <p className="text-xs text-stone-500">
               Tuteur & Coach Darija · Intelligence Artificielle
             </p>
           </div>
@@ -247,7 +247,7 @@ export default function KenzChatInterface() {
             onClick={handleResetChat}
             aria-label="Réinitialiser la conversation"
             title="Réinitialiser la conversation"
-            className="p-2 rounded-full text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-100 hover:bg-amber-100/60 dark:hover:bg-amber-900/30 transition-colors"
+            className="p-2 rounded-full text-stone-500 hover:text-stone-800 hover:bg-amber-100/60 transition-colors"
           >
             <RotateCcw className="w-4 h-4" />
           </button>
@@ -255,7 +255,7 @@ export default function KenzChatInterface() {
             type="button"
             onClick={toggleSound}
             aria-label={soundEnabled ? 'Désactiver le son' : 'Activer le son'}
-            className="p-2 rounded-full text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-100 hover:bg-amber-100/60 dark:hover:bg-amber-900/30 transition-colors"
+            className="p-2 rounded-full text-stone-500 hover:text-stone-800 hover:bg-amber-100/60 transition-colors"
           >
             {soundEnabled ? <Volume2 className="w-4 h-4 text-amber-600" /> : <VolumeX className="w-4 h-4 text-stone-400" />}
           </button>
@@ -263,7 +263,7 @@ export default function KenzChatInterface() {
       </div>
 
       {/* 2. ZONE DE DÉFILEMENT DES MESSAGES */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-white">
         {messages.map((m) => {
           const isBot = m.role === 'assistant';
           const parsed = m.parsed;
@@ -275,7 +275,7 @@ export default function KenzChatInterface() {
               className={`flex items-end gap-2.5 sm:gap-3 ${isBot ? 'justify-start' : 'justify-end'}`}
             >
               {isBot && (
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-amber-600 text-white flex items-center justify-center shrink-0 shadow-xs border border-amber-200/50 dark:border-amber-900/40">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-amber-600 text-white flex items-center justify-center shrink-0 shadow-xs border border-amber-300/50">
                   <Bot className="w-4 h-4" />
                 </div>
               )}
@@ -283,15 +283,15 @@ export default function KenzChatInterface() {
               <div
                 className={`max-w-[85%] sm:max-w-[75%] rounded-2xl p-4 shadow-xs transition-all ${
                   isBot
-                    ? 'bg-[#FAF7F2] dark:bg-[#201B18] border border-amber-100 dark:border-amber-900/30 rounded-bl-xs text-stone-800 dark:text-stone-100'
-                    : 'bg-amber-600 text-white dark:bg-amber-700 rounded-br-xs'
+                    ? 'bg-[#FAF7F2] border border-amber-200/80 rounded-bl-xs text-stone-800'
+                    : 'bg-amber-600 text-white rounded-br-xs'
                 }`}
               >
                 {/* En-tête de bulle */}
                 <div className="flex items-center justify-between gap-3 mb-1.5">
                   <span
                     className={`text-[11px] font-bold uppercase tracking-wider ${
-                      isBot ? 'text-amber-700 dark:text-amber-400' : 'text-amber-100'
+                      isBot ? 'text-amber-800' : 'text-amber-100'
                     }`}
                   >
                     {isBot ? 'KenzBot' : 'Vous'}
@@ -302,9 +302,9 @@ export default function KenzChatInterface() {
                       type="button"
                       onClick={() => handlePlayAudio(parsed, m.rawContent)}
                       aria-label="Écouter la prononciation"
-                      className="p-1 rounded-full text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 hover:bg-amber-100/60 dark:hover:bg-amber-900/30 transition-colors"
+                      className="p-1 rounded-full text-amber-600 hover:text-amber-700 hover:bg-amber-100/60 transition-colors"
                     >
-                      <Volume2 className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                      <Volume2 className="w-4 h-4 text-amber-600" />
                     </button>
                   )}
                 </div>
@@ -315,30 +315,30 @@ export default function KenzChatInterface() {
                     {parsed.ar && (
                       <p
                         dir="rtl"
-                        className="text-xl sm:text-2xl font-bold font-arabic leading-relaxed text-stone-800 dark:text-stone-100"
+                        className="text-xl sm:text-2xl font-bold font-arabic leading-relaxed text-stone-800"
                       >
                         {parsed.ar}
                       </p>
                     )}
                     {parsed.arz && (
-                      <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+                      <p className="text-sm font-semibold text-amber-800">
                         {parsed.arz}
                       </p>
                     )}
 
                     {/* Accordéon Traduction */}
                     {parsed.fr && (
-                      <div className="pt-2 border-t border-amber-200/40 dark:border-amber-900/30">
+                      <div className="pt-2 border-t border-amber-200/60">
                         <button
                           type="button"
                           onClick={() => toggleTranslation(m.id)}
-                          className="text-xs flex items-center gap-1 font-semibold text-amber-700 dark:text-amber-400 hover:underline"
+                          className="text-xs flex items-center gap-1 font-semibold text-amber-700 hover:underline"
                         >
                           <span>{isTranslated ? 'Masquer la traduction' : 'Voir la traduction'}</span>
                           {isTranslated ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                         </button>
                         {isTranslated && (
-                          <p className="text-xs mt-1.5 italic text-stone-600 dark:text-stone-300">
+                          <p className="text-xs mt-1.5 italic text-stone-600">
                             « {parsed.fr} »
                           </p>
                         )}
@@ -347,10 +347,10 @@ export default function KenzChatInterface() {
 
                     {/* Conseil pédagogique du coach [TIP] */}
                     {parsed.tip && (
-                      <div className="mt-2.5 p-2.5 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/30 flex items-start gap-2 text-xs text-amber-900 dark:text-amber-300">
-                        <Lightbulb className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                      <div className="mt-2.5 p-2.5 rounded-xl bg-amber-50 border border-amber-200/80 flex items-start gap-2 text-xs text-amber-900">
+                        <Lightbulb className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                         <div>
-                          <span className="font-bold block text-[10px] uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                          <span className="font-bold block text-[10px] uppercase tracking-wider text-amber-700">
                             Conseil du Coach
                           </span>
                           <span className="font-medium">{parsed.tip}</span>
@@ -366,7 +366,7 @@ export default function KenzChatInterface() {
                             key={idx}
                             type="button"
                             onClick={() => sendMessage(sugg)}
-                            className="text-xs bg-amber-100/70 hover:bg-amber-600 hover:text-white dark:bg-[#201B18] dark:hover:bg-amber-600 dark:text-amber-200 text-amber-900 border border-amber-200/60 dark:border-amber-900/40 px-3 py-1 rounded-full transition-colors font-medium text-left"
+                            className="text-xs bg-amber-50 hover:bg-amber-600 hover:text-white text-amber-900 border border-amber-200 px-3 py-1 rounded-full transition-colors font-medium text-left"
                           >
                             {sugg}
                           </button>
@@ -375,12 +375,12 @@ export default function KenzChatInterface() {
                     )}
                   </div>
                 ) : (
-                  <p className="text-sm whitespace-pre-wrap leading-relaxed text-stone-800 dark:text-stone-100">{m.rawContent}</p>
+                  <p className="text-sm whitespace-pre-wrap leading-relaxed text-stone-800">{m.rawContent}</p>
                 )}
               </div>
 
               {!isBot && (
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-stone-800 text-amber-200 dark:bg-stone-700 font-bold flex items-center justify-center shrink-0 shadow-xs border border-white dark:border-zinc-800">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-stone-800 text-amber-200 font-bold flex items-center justify-center shrink-0 shadow-xs border border-white">
                   <User className="w-4 h-4" />
                 </div>
               )}
@@ -394,8 +394,8 @@ export default function KenzChatInterface() {
             <div className="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs shadow-xs">
               <Bot className="w-4 h-4" />
             </div>
-            <div className="bg-[#FAF7F2] dark:bg-[#201B18] border border-amber-100 dark:border-amber-900/30 rounded-2xl rounded-bl-xs px-4 py-3 shadow-xs flex items-center gap-2">
-              <span className="text-xs text-stone-500 dark:text-stone-400 font-medium">
+            <div className="bg-[#FAF7F2] border border-amber-200/80 rounded-2xl rounded-bl-xs px-4 py-3 shadow-xs flex items-center gap-2">
+              <span className="text-xs text-stone-500 font-medium">
                 KenzBot formule sa réponse...
               </span>
               <div className="flex gap-1 items-center ml-1">
@@ -409,7 +409,7 @@ export default function KenzChatInterface() {
 
         {/* Message d'erreur éventuel */}
         {errorMessage && (
-          <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-3 flex items-center gap-2 text-xs text-red-600 dark:text-red-400">
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-3 flex items-center gap-2 text-xs text-red-600">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{errorMessage}</span>
           </div>
@@ -417,7 +417,7 @@ export default function KenzChatInterface() {
       </div>
 
       {/* 3. BARRE D'INTERACTION VOCALE & SAISIE TEXTUELLE */}
-      <div className="p-3 sm:p-4 bg-[#FAF7F2] dark:bg-[#201B18] border-t border-amber-100/80 dark:border-amber-900/30 shrink-0">
+      <div className="p-3 sm:p-4 bg-[#FAF7F2] border-t border-amber-200/70 shrink-0">
         <form onSubmit={handleSubmit} className="flex items-center gap-2 max-w-3xl mx-auto">
           {/* Bouton Microphone */}
           <div className="relative">
@@ -454,7 +454,7 @@ export default function KenzChatInterface() {
                 ? 'Écrivez en Darija, Arabizi ou Français...'
                 : 'Tapez votre message ici...'
             }
-            className="flex-1 bg-white dark:bg-[#26211E] border border-amber-100 dark:border-amber-900/40 rounded-2xl px-4 py-2.5 text-xs sm:text-sm text-stone-800 dark:text-stone-100 placeholder-stone-400 focus:outline-hidden focus:border-amber-500"
+            className="flex-1 bg-white border border-amber-200 rounded-2xl px-4 py-2.5 text-xs sm:text-sm text-stone-800 placeholder-stone-400 focus:outline-hidden focus:border-amber-500"
           />
 
           {/* Bouton d'envoi */}
@@ -468,9 +468,9 @@ export default function KenzChatInterface() {
           </button>
         </form>
 
-        <div className="flex items-center justify-between text-[11px] text-stone-500 dark:text-stone-400 mt-2 max-w-3xl mx-auto px-1">
+        <div className="flex items-center justify-between text-[11px] text-stone-500 mt-2 max-w-3xl mx-auto px-1">
           <span className="flex items-center gap-1">
-            <Sparkles className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+            <Sparkles className="w-3 h-3 text-amber-600" />
             Chaque échange vous rapporte +5 XP
           </span>
           <span>IA optimisée pour le Darija marocain</span>

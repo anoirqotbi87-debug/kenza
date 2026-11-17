@@ -28,7 +28,7 @@ export default function ChatPage() {
     : 'Conversation Libre en Darija';
 
   return (
-    <div dir={isAr ? 'rtl' : 'ltr'} className="min-h-screen bg-[#FAF7F2] dark:bg-[#1C1816] pb-20">
+    <div dir={isAr ? 'rtl' : 'ltr'} className="min-h-screen bg-[#FAF7F2] pb-20">
       <PageHeader
         badge={badgeText}
         title={titleText}

@@ -84,9 +84,9 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#FAF7F2] dark:bg-[#1C1816] flex flex-col overflow-hidden font-sans">
+    <div className="fixed inset-0 z-50 bg-[#FAF7F2] flex flex-col overflow-hidden font-sans">
       {/* 1. EN-TÊTE ÉPURÉ */}
-      <header className="bg-white dark:bg-[#26211E] border-b border-amber-100 dark:border-amber-900/30 px-4 py-3 shrink-0 shadow-xs z-20">
+      <header className="bg-white border-b border-amber-200/80 px-4 py-3 shrink-0 shadow-xs z-20">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
           {/* Bouton retour & Identité Scénario */}
           <div className="flex items-center gap-3 min-w-0">
@@ -94,21 +94,21 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
               type="button"
               onClick={onExit}
               aria-label="Quitter le scénario"
-              className="p-2 -ml-1 rounded-full text-stone-800 dark:text-stone-200 hover:bg-amber-100/50 dark:hover:bg-amber-900/20 transition-colors"
+              className="p-2 -ml-1 rounded-full text-stone-800 hover:bg-amber-100/50 transition-colors"
             >
               <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
             </button>
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h1 className="font-bold text-base sm:text-lg text-stone-800 dark:text-stone-100 truncate">
+                <h1 className="font-bold text-base sm:text-lg text-stone-800 truncate">
                   {scenario.title}
                 </h1>
-                <span className="bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide shrink-0">
+                <span className="bg-amber-500/15 text-amber-700 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide shrink-0">
                   {scenario.level || 'A2'}
                 </span>
               </div>
               {scenario.titleI18n?.ar && (
-                <p className="text-xs text-amber-700 dark:text-amber-400 font-arabic truncate" dir="rtl">
+                <p className="text-xs text-amber-700 font-arabic truncate" dir="rtl">
                   {scenario.titleI18n.ar}
                 </p>
               )}
@@ -117,11 +117,11 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
 
           {/* Indicateurs : Progression & XP & Son */}
           <div className="flex items-center gap-3 shrink-0">
-            <div className="hidden sm:flex items-center gap-1.5 bg-amber-100/50 dark:bg-amber-900/20 px-3 py-1 rounded-full text-xs font-semibold text-stone-800 dark:text-stone-200">
+            <div className="hidden sm:flex items-center gap-1.5 bg-amber-100/50 px-3 py-1 rounded-full text-xs font-semibold text-stone-800">
               <span>Étape {currentStep}/{totalTurns}</span>
             </div>
 
-            <div className="flex items-center gap-1 bg-amber-500/10 border border-amber-500/30 px-2.5 py-1 rounded-full text-amber-700 dark:text-amber-400 font-bold text-xs">
+            <div className="flex items-center gap-1 bg-amber-500/10 border border-amber-500/30 px-2.5 py-1 rounded-full text-amber-700 font-bold text-xs">
               <Zap className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
               <span>+{state.xpEarned} XP</span>
             </div>
@@ -130,7 +130,7 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
               type="button"
               onClick={toggleSound}
               aria-label={soundEnabled ? 'Désactiver le son' : 'Activer le son'}
-              className="p-2 rounded-full text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-100 hover:bg-amber-100/50 dark:hover:bg-amber-900/20 transition-colors"
+              className="p-2 rounded-full text-stone-500 hover:text-stone-800 hover:bg-amber-100/50 transition-colors"
             >
               {soundEnabled ? <Volume2 className="w-5 h-5 text-amber-600" /> : <VolumeX className="w-5 h-5 text-stone-400" />}
             </button>
@@ -138,7 +138,7 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
         </div>
 
         {/* Barre de progression fluide */}
-        <div className="w-full bg-amber-100 dark:bg-amber-950/40 h-1.5 mt-2 rounded-full overflow-hidden">
+        <div className="w-full bg-amber-100 h-1.5 mt-2 rounded-full overflow-hidden">
           <div
             className="bg-amber-600 h-full transition-all duration-500 ease-out"
             style={{ width: `${progressPercent}%` }}
@@ -150,7 +150,7 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
       <main ref={scrollRef} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 max-w-3xl mx-auto w-full">
         {/* Badge d'introduction contextuelle */}
         <div className="text-center my-2">
-          <span className="inline-flex items-center gap-1.5 bg-amber-100/60 dark:bg-amber-900/20 text-stone-600 dark:text-stone-400 text-xs px-3 py-1 rounded-full font-medium border border-amber-200/50 dark:border-amber-800/30">
+          <span className="inline-flex items-center gap-1.5 bg-amber-100/60 text-stone-600 text-xs px-3 py-1 rounded-full font-medium border border-amber-200/50">
             <Sparkles className="w-3.5 h-3.5 text-amber-600" />
             {scenario.location} · {scenario.npcRole}
           </span>
@@ -168,7 +168,7 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
             >
               {/* Avatar Bot */}
               {isBot && (
-                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-amber-600 text-white flex items-center justify-center shrink-0 shadow-xs text-base sm:text-lg border-2 border-amber-200 dark:border-amber-900/40">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-amber-600 text-white flex items-center justify-center shrink-0 shadow-xs text-base sm:text-lg border-2 border-amber-200">
                   {scenario.npcAvatar || '🚕'}
                 </div>
               )}
@@ -177,15 +177,15 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
               <div
                 className={`max-w-[85%] sm:max-w-[75%] rounded-2xl p-4 shadow-xs transition-all ${
                   isBot
-                    ? 'bg-white dark:bg-[#26211E] border border-amber-100 dark:border-amber-900/30 rounded-bl-xs text-stone-800 dark:text-stone-100'
-                    : 'bg-amber-600 text-white dark:bg-amber-700 rounded-br-xs'
+                    ? 'bg-white border border-amber-200/80 rounded-bl-xs text-stone-800'
+                    : 'bg-amber-600 text-white rounded-br-xs'
                 }`}
               >
                 {/* Rôle de l'orateur */}
                 <div className="flex items-center justify-between gap-3 mb-1.5">
                   <span
                     className={`text-[11px] font-bold tracking-wide uppercase ${
-                      isBot ? 'text-amber-700 dark:text-amber-400' : 'text-amber-100'
+                      isBot ? 'text-amber-700' : 'text-amber-100'
                     }`}
                   >
                     {turn.speakerRole}
@@ -197,7 +197,7 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
                       type="button"
                       onClick={() => replayBotTurn(turn)}
                       aria-label="Réécouter la voix"
-                      className="p-1 rounded-full hover:bg-amber-100/50 dark:hover:bg-amber-900/20 text-amber-600 hover:text-amber-700 dark:text-amber-400 transition-colors"
+                      className="p-1 rounded-full hover:bg-amber-100/50 text-amber-600 hover:text-amber-700 transition-colors"
                     >
                       <Volume2 className="w-4 h-4 text-amber-600" />
                     </button>
@@ -215,7 +215,7 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
                 <p
                   dir="rtl"
                   className={`text-xl sm:text-2xl font-bold font-arabic leading-relaxed mb-1.5 ${
-                    isBot ? 'text-stone-800 dark:text-stone-100' : 'text-white'
+                    isBot ? 'text-stone-800' : 'text-white'
                   }`}
                 >
                   {turn.arabicText}
@@ -224,7 +224,7 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
                 {/* Transcription Phonétique Arabizi */}
                 <p
                   className={`text-sm font-semibold tracking-wide ${
-                    isBot ? 'text-stone-600 dark:text-stone-400' : 'text-amber-100'
+                    isBot ? 'text-stone-600' : 'text-amber-100'
                   }`}
                 >
                   {turn.arabiziText}
@@ -232,13 +232,13 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
 
                 {/* Accordéon Traduction Française */}
                 {turn.translationFr && (
-                  <div className="mt-2.5 pt-2 border-t border-black/5 dark:border-white/10">
+                  <div className="mt-2.5 pt-2 border-t border-amber-200/60">
                     <button
                       type="button"
                       onClick={() => toggleTranslation(turn.id)}
                       className={`text-xs flex items-center gap-1 font-semibold transition-colors ${
                         isBot
-                          ? 'text-amber-700 dark:text-amber-400 hover:underline'
+                          ? 'text-amber-700 hover:underline'
                           : 'text-amber-200 hover:text-white'
                       }`}
                     >
@@ -249,7 +249,7 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
                     {isTranslated && (
                       <p
                         className={`text-xs mt-1.5 italic ${
-                          isBot ? 'text-stone-600 dark:text-stone-400' : 'text-zinc-200'
+                          isBot ? 'text-stone-600' : 'text-amber-100'
                         }`}
                       >
                         « {turn.translationFr} »
@@ -261,7 +261,7 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
 
               {/* Avatar Utilisateur */}
               {!isBot && (
-                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-stone-800 text-white font-bold flex items-center justify-center shrink-0 shadow-xs border-2 border-white dark:border-zinc-800">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-stone-800 text-white font-bold flex items-center justify-center shrink-0 shadow-xs border-2 border-white">
                   <span className="text-sm font-extrabold">VOUS</span>
                 </div>
               )}
@@ -272,11 +272,11 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
         {/* Indicateur de parole IA ("L'interlocuteur parle...") */}
         {state.isBotSpeaking && (
           <div className="flex items-end gap-2.5 sm:gap-3 justify-start animate-in fade-in duration-300">
-            <div className="w-9 h-9 rounded-full bg-amber-600 text-white flex items-center justify-center text-sm shadow-xs border-2 border-white dark:border-zinc-800">
+            <div className="w-9 h-9 rounded-full bg-amber-600 text-white flex items-center justify-center text-sm shadow-xs border-2 border-white">
               {scenario.npcAvatar || '🚕'}
             </div>
-            <div className="bg-white dark:bg-[#26211E] border border-amber-100 dark:border-amber-900/30 rounded-2xl rounded-bl-xs px-4 py-3 shadow-xs flex items-center gap-2">
-              <span className="text-xs text-stone-500 dark:text-stone-400 font-medium">
+            <div className="bg-white border border-amber-200/80 rounded-2xl rounded-bl-xs px-4 py-3 shadow-xs flex items-center gap-2">
+              <span className="text-xs text-stone-500 font-medium">
                 {scenario.npcName || 'Chauffeur'} s&apos;exprime...
               </span>
               <div className="flex gap-1 items-center ml-1">
@@ -293,22 +293,22 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
       </main>
 
       {/* 3. BARRE D'INTERACTION VOCALE & SAISIE TEXTE */}
-      <footer className="bg-white dark:bg-[#26211E] border-t border-amber-100 dark:border-amber-900/30 p-4 sm:p-5 shrink-0 shadow-lg z-20">
+      <footer className="bg-white border-t border-amber-200/80 p-4 sm:p-5 shrink-0 shadow-lg z-20">
         <div className="max-w-2xl mx-auto space-y-3">
           {/* Écran de Fin / Victoire */}
           {state.isCompleted ? (
-            <div className="bg-white dark:bg-[#26211E] border border-emerald-500/30 rounded-2xl p-4 text-center space-y-3 animate-in fade-in zoom-in-95 duration-300">
+            <div className="bg-white border border-emerald-500/30 rounded-2xl p-4 text-center space-y-3 animate-in fade-in zoom-in-95 duration-300">
               <div className="w-12 h-12 rounded-full bg-emerald-600 text-white flex items-center justify-center mx-auto shadow-md">
                 <Trophy className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-stone-800 dark:text-stone-100">
+                <h3 className="text-lg font-bold text-stone-800">
                   Mabrouk ! Scénario complété avec succès !
                 </h3>
-                <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
+                <p className="text-xs text-stone-500 mt-1">
                   Vous avez négocié et validé toutes les répliques en Darija authentique.
                 </p>
-                <div className="inline-flex items-center gap-1.5 bg-amber-500/20 text-amber-700 dark:text-amber-400 font-extrabold text-sm px-3 py-1 rounded-full mt-2">
+                <div className="inline-flex items-center gap-1.5 bg-amber-500/20 text-amber-700 font-extrabold text-sm px-3 py-1 rounded-full mt-2">
                   <Zap className="w-4 h-4 fill-amber-500 text-amber-500" />
                   <span>+{state.xpEarned} XP remportés</span>
                 </div>
@@ -318,7 +318,7 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
                 <button
                   type="button"
                   onClick={restart}
-                  className="px-4 py-2 rounded-xl border border-amber-200 dark:border-amber-800 text-xs font-bold text-stone-800 dark:text-stone-200 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition-colors flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-xl border border-amber-200 text-xs font-bold text-stone-800 hover:bg-amber-50 transition-colors flex items-center gap-1.5"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   Rejouer
@@ -336,8 +336,8 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
             <>
               {/* Encadré d'aide contextuelle & Indice pédagogique */}
               {state.userWaiting && currentTurn?.speaker === 'user' && (
-                <div className="bg-[#FAF7F2] dark:bg-[#201B18] border border-amber-100 dark:border-amber-900/30 rounded-2xl p-3 text-xs shadow-2xs space-y-1.5">
-                  <div className="flex items-center justify-between text-amber-700 dark:text-amber-400 font-bold">
+                <div className="bg-[#FAF7F2] border border-amber-200/80 rounded-2xl p-3 text-xs shadow-2xs space-y-1.5">
+                  <div className="flex items-center justify-between text-amber-700 font-bold">
                     <span className="flex items-center gap-1.5">
                       <Lightbulb className="w-4 h-4 text-amber-500" />
                       Indice pour votre réplique
@@ -352,10 +352,10 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
                   </div>
 
                   {showHint && (
-                    <div className="text-stone-800 dark:text-stone-200 font-medium">
+                    <div className="text-stone-800 font-medium">
                       <p>{currentTurn.hintFrench || 'Exprimez votre réponse en Darija marocain.'}</p>
                       {currentTurn.expectedPhrases?.primaryArabizi && (
-                        <p className="mt-1 font-semibold text-amber-700 dark:text-amber-300 text-[11px]">
+                        <p className="mt-1 font-semibold text-amber-700 text-[11px]">
                           Exemple : « {currentTurn.expectedPhrases.primaryArabizi} »
                         </p>
                       )}
@@ -366,7 +366,7 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
 
               {/* Message d'erreur phonétique / validation */}
               {state.validationError && (
-                <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-2.5 flex items-center gap-2 text-xs text-red-600 dark:text-red-400 animate-in fade-in">
+                <div className="bg-red-50 border border-red-200 rounded-xl p-2.5 flex items-center gap-2 text-xs text-red-600 animate-in fade-in">
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{state.validationError}</span>
                 </div>
@@ -393,7 +393,7 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
                         ? 'bg-emerald-600 text-white ring-4 ring-emerald-300 scale-105'
                         : state.userWaiting
                         ? 'bg-amber-600 hover:bg-amber-700 text-white active:scale-95'
-                        : 'bg-stone-300 text-stone-500 dark:bg-stone-800'
+                        : 'bg-stone-200 text-stone-500'
                     }`}
                   >
                     {isListening ? (
@@ -405,9 +405,9 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
                 </div>
 
                 {/* État / Consigne microphone */}
-                <p className="text-xs font-semibold text-center text-stone-500 dark:text-stone-400">
+                <p className="text-xs font-semibold text-center text-stone-500">
                   {isListening ? (
-                    <span className="text-emerald-600 dark:text-emerald-400 font-bold animate-pulse">
+                    <span className="text-emerald-600 font-bold animate-pulse">
                       Écoute en cours... Parlez en Darija !
                     </span>
                   ) : state.userWaiting ? (
@@ -419,7 +419,7 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
 
                 {/* Affichage du transcript en cours si disponible */}
                 {isListening && transcript && (
-                  <p className="text-xs italic text-stone-800 dark:text-stone-200 bg-amber-100/60 dark:bg-amber-900/30 px-3 py-1 rounded-full max-w-sm truncate">
+                  <p className="text-xs italic text-stone-800 bg-amber-100/60 px-3 py-1 rounded-full max-w-sm truncate">
                     « {transcript} »
                   </p>
                 )}
@@ -438,7 +438,7 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
                       ? 'Ou écrivez votre réponse en Darija / Arabizi...'
                       : 'Reconnaissance vocale indisponible : saisissez ici'
                   }
-                  className="flex-1 bg-[#FAF7F2] dark:bg-[#201B18] border border-amber-100 dark:border-amber-900/30 rounded-xl px-3.5 py-2 text-xs text-stone-800 dark:text-stone-100 placeholder-stone-400 focus:outline-hidden focus:border-amber-500 disabled:opacity-50"
+                  className="flex-1 bg-[#FAF7F2] border border-amber-200/80 rounded-xl px-3.5 py-2 text-xs text-stone-800 placeholder-stone-400 focus:outline-hidden focus:border-amber-500 disabled:opacity-50"
                 />
                 <button
                   type="submit"
@@ -456,7 +456,7 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
                   <button
                     type="button"
                     onClick={skipCurrentTurn}
-                    className="text-[11px] font-semibold text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200 underline transition-colors"
+                    className="text-[11px] font-semibold text-stone-500 hover:text-stone-800 underline transition-colors"
                   >
                     Passer cette étape (+5 XP)
                   </button>
