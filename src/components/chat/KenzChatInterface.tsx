@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { useVoiceRecognition } from '@/hooks/useVoiceRecognition';
 import { playAudio } from '@/lib/audio';
-import { parseAiMessage, type ParsedMessage } from '@/lib/ai/parseAiMessage';
+import { parseAiMessage, extractTextFromAiStream, type ParsedMessage } from '@/lib/ai/parseAiMessage';
 import {
   Send,
   Mic,
@@ -147,13 +147,14 @@ export default function KenzChatInterface() {
             if (done) break;
             accumulatedText += decoder.decode(value, { stream: true });
 
-            const liveParsed = parseAiMessage(accumulatedText);
+            const cleanText = extractTextFromAiStream(accumulatedText);
+            const liveParsed = parseAiMessage(cleanText);
             setMessages((prev) => {
               const existing = prev.find((m) => m.id === botMessageId);
               if (existing) {
                 return prev.map((m) =>
                   m.id === botMessageId
-                    ? { ...m, rawContent: accumulatedText, parsed: liveParsed }
+                    ? { ...m, rawContent: cleanText, parsed: liveParsed }
                     : m
                 );
               }
@@ -162,7 +163,7 @@ export default function KenzChatInterface() {
                 {
                   id: botMessageId,
                   role: 'assistant',
-                  rawContent: accumulatedText,
+                  rawContent: cleanText,
                   parsed: liveParsed,
                   timestamp: new Date(),
                 },
@@ -171,13 +172,14 @@ export default function KenzChatInterface() {
           }
         } else {
           accumulatedText = await res.text();
-          const parsed = parseAiMessage(accumulatedText);
+          const cleanText = extractTextFromAiStream(accumulatedText);
+          const parsed = parseAiMessage(cleanText);
           setMessages((prev) => [
             ...prev,
             {
               id: botMessageId,
               role: 'assistant',
-              rawContent: accumulatedText,
+              rawContent: cleanText,
               parsed,
               timestamp: new Date(),
             },

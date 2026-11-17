@@ -25,6 +25,41 @@ const clean = (s: string): string =>
     .trim();
 
 /**
+ * Extrait le texte accumulé d'un flux Vercel AI SDK Data Stream (protocole 0:"chunk"\n)
+ * Si le flux est déjà du texte brut ou du SSE classique, le retourne tel quel.
+ */
+export function extractTextFromAiStream(raw: string): string {
+  if (!raw.includes('0:')) {
+    return raw;
+  }
+
+  let text = '';
+  const lines = raw.split('\n');
+  for (const line of lines) {
+    if (line.startsWith('0:')) {
+      const payload = line.slice(2).trim();
+      try {
+        const decoded = JSON.parse(payload);
+        if (typeof decoded === 'string') {
+          text += decoded;
+        }
+      } catch {
+        // En cas de chunk en cours de streaming avec guillemet non refermé
+        if (payload.startsWith('"')) {
+          const stripped = payload.slice(1);
+          const cleanStr = stripped.endsWith('"') ? stripped.slice(0, -1) : stripped;
+          text += cleanStr.replace(/\\"/g, '"').replace(/\\n/g, '\n').replace(/\\\\/g, '\\');
+        } else {
+          text += payload;
+        }
+      }
+    }
+  }
+
+  return text || raw;
+}
+
+/**
  * Parse la réponse du roleplay, qui doit suivre le format :
  *   [AR] <arabe> [ARZ] <arabizi> [FR] <français> [SUGG] <sugg1 | sugg2>
  *
@@ -32,7 +67,8 @@ const clean = (s: string): string =>
  * les caractères invisibles de tête (BOM, ZWSP, marques de direction …) sont
  * retirés, jamais un glyphe visible.
  */
-export function parseAiMessage(content: string): ParsedMessage {
+export function parseAiMessage(rawContent: string): ParsedMessage {
+  const content = extractTextFromAiStream(rawContent);
   let ar = '';
   let arz = '';
   let fr = '';

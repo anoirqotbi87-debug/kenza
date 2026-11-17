@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { personas, getSystemPrompt } from '@/lib/ai/prompts';
-import { parseAiMessage } from '@/lib/ai/parseAiMessage';
+import { parseAiMessage, extractTextFromAiStream } from '@/lib/ai/parseAiMessage';
 
 describe('KenzBot & Chat IA Integration', () => {
   describe('Persona Configuration & System Prompt', () => {
@@ -22,6 +22,33 @@ describe('KenzBot & Chat IA Integration', () => {
       expect(prompt).toContain('[FR]');
       expect(prompt).toContain('[TIP]');
       expect(prompt).toContain('[SUGG]');
+    });
+  });
+
+  describe('extractTextFromAiStream & Data Stream Decoupling', () => {
+    it('décode fidèlement un flux Vercel AI SDK data stream composé de chunks 0:"..."', () => {
+      const rawStream =
+        '0:"[AR] مَرْحْبَا "\n' +
+        '0:"بِيكْ ! [/AR]\\n"\n' +
+        '0:"[ARZ] Mre7ba bik ! [/ARZ]\\n"\n' +
+        '0:"[FR] Bienvenue ! [/FR]"\n' +
+        'e:{"finishReason":"stop","usage":{"promptTokens":10,"completionTokens":20}}\n' +
+        'd:{"finishReason":"stop"}\n';
+
+      const decoded = extractTextFromAiStream(rawStream);
+      expect(decoded).toBe(
+        '[AR] مَرْحْبَا بِيكْ ! [/AR]\n[ARZ] Mre7ba bik ! [/ARZ]\n[FR] Bienvenue ! [/FR]'
+      );
+
+      const parsed = parseAiMessage(rawStream);
+      expect(parsed.ar).toBe('مَرْحْبَا بِيكْ !');
+      expect(parsed.arz).toBe('Mre7ba bik !');
+      expect(parsed.fr).toBe('Bienvenue !');
+    });
+
+    it('retourne le texte brut inchangé si le flux ne provient pas du protocole AI SDK', () => {
+      const plain = '[AR] كِيدَايْرْ [/AR] [FR] Ça va ? [/FR]';
+      expect(extractTextFromAiStream(plain)).toBe(plain);
     });
   });
 
