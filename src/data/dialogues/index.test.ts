@@ -16,7 +16,8 @@ const THEMES: DialogueTheme[] = ['transport', 'restaurant', 'souk', 'housing', '
 describe('dialogues — catalogage', () => {
   it('chaque scenario des donnees est catalogue exactement une fois', () => {
     const cataloguedIds = DIALOGUE_CATALOG.map((e) => e.scenario.id).sort();
-    const scenarioIds = ALL_SCENARIOS.map((s) => s.id).sort();
+    // Exclut les scénarios de rue dédiés à l'atelier /parler non rattachés aux modules 1 à 4
+    const scenarioIds = ALL_SCENARIOS.filter((s) => s.id !== 'taxi_street_scenario').map((s) => s.id).sort();
     expect(cataloguedIds).toEqual(scenarioIds);
   });
 
