@@ -5,6 +5,7 @@ export interface DialogueTurn {
   arabicText: string;
   arabiziText: string;
   translationFr: string;
+  hintFrench?: string;
   audioKey?: string;
   // Attendu pour le tour de l'utilisateur :
   expectedPhrases?: {
@@ -32,7 +33,7 @@ export interface DialogueScenario {
   descriptionI18n?: { fr: string; ar: string; en: string; es: string };
   category?: 'transport' | 'souk' | 'restaurant' | 'daily';
   location: string;
-  level?: 'A1' | 'A2' | 'B1';
+  level?: 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
   npcName?: string;
   npcRole?: string;
   npcRoleI18n?: { fr: string; ar: string; en: string; es: string };
