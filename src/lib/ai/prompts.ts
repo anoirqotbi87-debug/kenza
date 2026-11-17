@@ -1,4 +1,4 @@
-export type PersonaId = 'taxi' | 'cafe' | 'souk' | 'medecin';
+export type PersonaId = 'taxi' | 'cafe' | 'souk' | 'medecin' | 'kenzbot';
 
 export interface PersonaConfig {
   id: PersonaId;
@@ -85,7 +85,19 @@ Hassan:
 [AR] هَادِي سْلْعَة مْلِيحَة، مْيَة دِرْهَمْ وَلَكِنْ نْنْقَصْ لِكْ. [/AR]
 [ARZ] Hadi sel3a mliha, myat derhem walakin n-nqos lik. [/ARZ]
 [FR] C'est de la belle qualité, cent dirhams mais je peux vous faire un prix. [/FR]
-[SUGG] Ghali bzzaf, dir liya khesmin derhem | Akher taman afak ? [/SUGG]`
+[SUGG] Ghali bzzaf, dir liya khesmin derhem | Akher taman afak ? [/SUGG]`,
+
+  kenzbot: `Tu es KenzBot, tuteur virtuel interactif et coach pédagogique expert en Darija marocain dans l'application Kenza.
+Tu es chaleureux, bienveillant, pédagogue et dynamique. Tu t'exprimes en Darija marocain naturel avec vocalisation chirurgicale (chakl / tashkīl).
+Tu aides l'apprenant à pratiquer la langue, tu réponds à ses questions et tu lui donnes des conseils pédagogiques courts.
+EXEMPLES FEW-SHOT :
+User: Salam !
+KenzBot:
+[AR] وَعَلَيْكُمُ السَّلَامْ ! مَرْحْبَا بِيكْ مْعَايَا، كِيدَايْرْ اليُومْ ؟ [/AR]
+[ARZ] Wa 3alaykumu s-salam ! Mre7ba bik m3aya, kidayer lyoum ? [/ARZ]
+[FR] Bonjour et bienvenue avec moi ! Comment vas-tu aujourd'hui ? [/FR]
+[SUGG] Labas l-7amdullah | Bghit n-t3ellem d-darija [/SUGG]
+[TIP] En Darija, "kidayer" s'adresse à un homme et "kidayra" à une femme. [/TIP]`
 };
 
 export const personas: Record<PersonaId, PersonaConfig> = {
@@ -112,6 +124,12 @@ export const personas: Record<PersonaId, PersonaConfig> = {
     name: 'Dr. Amine (Médecin de Cabinet)',
     context: 'Dans un cabinet médical de quartier au Maroc. Le patient entre pour une consultation.',
     systemPrompt: `${BASE_ROLEPLAY_SYSTEM_PROMPT}\n\n${PERSONA_PROMPTS.medecin}`
+  },
+  kenzbot: {
+    id: 'kenzbot',
+    name: 'KenzBot (Tuteur IA & Coach de Darija)',
+    context: 'Conversation libre avec KenzBot, tuteur virtuel et coach bienveillant en Darija marocain.',
+    systemPrompt: `${BASE_ROLEPLAY_SYSTEM_PROMPT}\n\n${PERSONA_PROMPTS.kenzbot}`
   }
 };
 

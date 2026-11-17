@@ -2,6 +2,7 @@ export interface ParsedMessage {
   ar: string;
   arz: string;
   fr: string;
+  tip?: string;
   suggestions?: string[];
 }
 
@@ -18,7 +19,7 @@ const LEADING_ARABIC_DIACRITICS = /^\u061C|^[\u064B-\u065F\u0670]+/;
 
 const clean = (s: string): string =>
   s
-    .replace(/\[\/(AR|ARZ|FR|TR|SUGG)\]/gi, '')
+    .replace(/\[\/(AR|ARZ|FR|TR|SUGG|TIP)\]/gi, '')
     .replace(LEADING_GARBAGE, '')
     .replace(LEADING_ARABIC_DIACRITICS, '')
     .trim();
@@ -35,6 +36,7 @@ export function parseAiMessage(content: string): ParsedMessage {
   let ar = '';
   let arz = '';
   let fr = '';
+  let tip = '';
   let suggestions: string[] | undefined = undefined;
 
   const arIndex = content.indexOf('[AR]');
@@ -42,11 +44,12 @@ export function parseAiMessage(content: string): ParsedMessage {
   const frIndex = content.indexOf('[FR]');
   const trIndex = content.indexOf('[TR]');
   const suggIndex = content.indexOf('[SUGG]');
+  const tipIndex = content.indexOf('[TIP]');
 
   // Fin d'un champ = marqueur reconnu le plus proche strictement après son
   // début. Les marqueurs de tous les types sont des bornes valides, même dans
   // le désordre : un champ ne "mange" jamais le suivant.
-  const markers = [arIndex, arzIndex, frIndex, trIndex, suggIndex].filter((m) => m !== -1);
+  const markers = [arIndex, arzIndex, frIndex, trIndex, suggIndex, tipIndex].filter((m) => m !== -1);
   const nextMarkerAfter = (start: number): number => {
     let end = content.length;
     for (const m of markers) {
@@ -67,6 +70,10 @@ export function parseAiMessage(content: string): ParsedMessage {
     fr = clean(content.substring(frIndex + 4, nextMarkerAfter(frIndex + 4)));
   } else if (trIndex !== -1) {
     fr = clean(content.substring(trIndex + 4, nextMarkerAfter(trIndex + 4)));
+  }
+
+  if (tipIndex !== -1) {
+    tip = clean(content.substring(tipIndex + 5, nextMarkerAfter(tipIndex + 5)));
   }
 
   if (suggIndex !== -1) {
@@ -90,7 +97,13 @@ export function parseAiMessage(content: string): ParsedMessage {
     }
   }
 
-  return { ar, arz, fr, ...(suggestions && suggestions.length > 0 ? { suggestions } : {}) };
+  return {
+    ar,
+    arz,
+    fr,
+    ...(tip ? { tip } : {}),
+    ...(suggestions && suggestions.length > 0 ? { suggestions } : {}),
+  };
 }
 
 import { prepareDarijaForTts } from '@/lib/tts/darijaPhonetic';

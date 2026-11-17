@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { Home, Compass, Bookmark, Sparkles } from 'lucide-react';
+import { Home, Compass, Bookmark, Sparkles, MessageSquare } from 'lucide-react';
 import { useAppStore, useTranslation } from '@/store/useAppStore';
 
 interface BottomNavProps {
@@ -31,12 +31,14 @@ export default function BottomNav({ currentView, onSelectView }: BottomNavProps)
   const isParcoursActive = pathname === '/etudier' || (pathname === '/' && activeView === 'path');
   const isPhrasesActive = pathname === '/phrases' || (pathname === '/' && activeView === 'phrases');
   const isReviserActive = pathname.startsWith('/revisions') || (pathname === '/' && activeView === 'review');
+  const isChatActive = pathname.startsWith('/chat');
 
   const navLabels = {
     home: lang === 'en' ? 'Home' : lang === 'es' ? 'Inicio' : lang === 'ar' ? 'الرئيسية' : 'Accueil',
     parcours: lang === 'en' ? 'Journey' : lang === 'es' ? 'Recorrido' : lang === 'ar' ? 'المسار' : 'Parcours',
     phrases: lang === 'en' ? 'Phrases' : lang === 'es' ? 'Frases' : lang === 'ar' ? 'العبارات' : 'Phrases',
     reviser: lang === 'en' ? 'Review' : lang === 'es' ? 'Repasar' : lang === 'ar' ? 'مراجعة' : 'Réviser',
+    chat: lang === 'en' ? 'AI Chat' : lang === 'es' ? 'Chat IA' : lang === 'ar' ? 'المحادثة' : 'Chat IA',
   };
 
   const handleHomeClick = (e: React.MouseEvent) => {
@@ -86,6 +88,15 @@ export default function BottomNav({ currentView, onSelectView }: BottomNavProps)
       >
         <Bookmark size={19} />
         <span>{navLabels.phrases}</span>
+      </Link>
+
+      <Link
+        href="/chat"
+        className={isChatActive ? 'mobile-nav-active' : ''}
+        aria-current={isChatActive ? 'page' : undefined}
+      >
+        <MessageSquare size={19} />
+        <span>{navLabels.chat}</span>
       </Link>
 
       <Link

@@ -7,6 +7,7 @@ import {
   Award,
   Bookmark,
   BookOpen,
+  Bot,
   Check,
   CheckCircle2,
   ChevronRight,
@@ -839,7 +840,15 @@ export default function Home() {
         </nav>
 
         <div className="sidebar-label sidebar-label-spaced">{t.side.oral || tr("PRATIQUE ORALE & IA", "SPEAKING & AI", "PRÁCTICA ORAL E IA", "المحادثة والذكاء الاصطناعي")}</div>
-        <div id="tour-sidebar-roleplay">
+        <div id="tour-sidebar-roleplay" className="space-y-1">
+          <a
+            href="/chat"
+            onClick={() => setMobileMenuOpen(false)}
+            className="nav-item w-full flex items-center gap-2.5"
+          >
+            <Bot size={19} strokeWidth={1.8} className="text-[#C9A05C]" />
+            <span>{trL(lang, "Chat IA — KenzBot", "AI Chat — KenzBot", "Chat IA — KenzBot", "المحادثة مع كنزبوت")}</span>
+          </a>
           <button
             onClick={() => {
               setMobileMenuOpen(false);
