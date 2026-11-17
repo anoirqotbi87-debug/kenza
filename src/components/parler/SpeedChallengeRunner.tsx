@@ -201,9 +201,9 @@ export default function SpeedChallengeRunner({ onExit }: SpeedChallengeRunnerPro
   const timePercent = Math.max(0, Math.min(100, (timeLeft / totalTime) * 100));
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#F7F3EA] dark:bg-zinc-950 flex flex-col overflow-hidden font-sans">
+    <div className="fixed inset-0 z-50 bg-[#FAF7F2] dark:bg-[#1C1816] flex flex-col overflow-hidden font-sans">
       {/* 1. EN-TÊTE ÉPURÉ */}
-      <header className="bg-[#FDFCF8] dark:bg-zinc-900 border-b border-[#E8E2D5] dark:border-zinc-800 px-4 py-3 shrink-0 shadow-xs z-20">
+      <header className="bg-white dark:bg-[#26211E] border-b border-amber-100 dark:border-amber-900/30 px-4 py-3 shrink-0 shadow-xs z-20">
         <div className="max-w-3xl mx-auto flex items-center justify-between gap-3">
           {/* Bouton retour & Titre */}
           <div className="flex items-center gap-3">
@@ -211,20 +211,20 @@ export default function SpeedChallengeRunner({ onExit }: SpeedChallengeRunnerPro
               type="button"
               onClick={onExit}
               aria-label="Quitter le Speed Challenge"
-              className="p-2 -ml-1 rounded-full text-[#1B2A4A] dark:text-zinc-200 hover:bg-[#E8E2D5]/50 dark:hover:bg-zinc-800 transition-colors"
+              className="p-2 -ml-1 rounded-full text-stone-800 dark:text-stone-200 hover:bg-amber-100/50 dark:hover:bg-amber-900/20 transition-colors"
             >
               <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
             </button>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="font-bold text-base sm:text-lg text-[#1B2A4A] dark:text-white">
+                <h1 className="font-bold text-base sm:text-lg text-stone-800 dark:text-stone-100">
                   Speed Challenge
                 </h1>
                 <span className="bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide">
                   Débit Natif
                 </span>
               </div>
-              <p className="text-xs text-[#8B6E3F] dark:text-amber-400 font-arabic truncate" dir="rtl">
+              <p className="text-xs text-amber-700 dark:text-amber-400 font-arabic truncate" dir="rtl">
                 طْلَقْ لْسَانْكْ — تَحَدِّي السُّرْعَة
               </p>
             </div>
@@ -233,14 +233,14 @@ export default function SpeedChallengeRunner({ onExit }: SpeedChallengeRunnerPro
           {/* Vies & Score & Son */}
           <div className="flex items-center gap-3 shrink-0">
             {/* Cœurs de vie */}
-            <div className="flex items-center gap-1 bg-[#E8E2D5]/50 dark:bg-zinc-800 px-2.5 py-1 rounded-full">
+            <div className="flex items-center gap-1 bg-amber-100/50 dark:bg-amber-900/20 px-2.5 py-1 rounded-full">
               {[1, 2, 3].map((heartIndex) => (
                 <Heart
                   key={heartIndex}
                   className={`w-4 h-4 transition-all duration-300 ${
                     heartIndex <= state.lives
                       ? 'fill-red-500 text-red-500 scale-100'
-                      : 'text-zinc-300 dark:text-zinc-600 scale-90'
+                      : 'text-stone-300 dark:text-stone-600 scale-90'
                   }`}
                 />
               ))}
@@ -261,9 +261,9 @@ export default function SpeedChallengeRunner({ onExit }: SpeedChallengeRunnerPro
               type="button"
               onClick={toggleSound}
               aria-label={soundEnabled ? 'Désactiver le son' : 'Activer le son'}
-              className="p-2 rounded-full text-[#7A7670] hover:text-[#1B2A4A] dark:hover:text-white transition-colors"
+              className="p-2 rounded-full text-stone-500 hover:text-stone-800 dark:hover:text-stone-100 transition-colors"
             >
-              {soundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5 text-zinc-400" />}
+              {soundEnabled ? <Volume2 className="w-5 h-5 text-amber-600" /> : <VolumeX className="w-5 h-5 text-stone-400" />}
             </button>
           </div>
         </div>
@@ -271,7 +271,7 @@ export default function SpeedChallengeRunner({ onExit }: SpeedChallengeRunnerPro
         {/* Barre de Compte à Rebours Visuelle */}
         {!state.isCompleted && !state.isFailed && (
           <div className="max-w-3xl mx-auto mt-2">
-            <div className="w-full bg-[#E8E2D5] dark:bg-zinc-800 h-2 rounded-full overflow-hidden relative">
+            <div className="w-full bg-amber-100 dark:bg-amber-950/40 h-2 rounded-full overflow-hidden relative">
               <div
                 className={`h-full transition-all duration-1000 ease-linear ${
                   timePercent > 50
@@ -283,7 +283,7 @@ export default function SpeedChallengeRunner({ onExit }: SpeedChallengeRunnerPro
                 style={{ width: `${timePercent}%` }}
               />
             </div>
-            <div className="flex items-center justify-between text-[11px] text-[#7A7670] dark:text-zinc-400 mt-1 font-semibold">
+            <div className="flex items-center justify-between text-[11px] text-stone-500 dark:text-stone-400 mt-1 font-semibold">
               <span>Phrase {state.currentIndex + 1} / {phrases.length}</span>
               <span className={`flex items-center gap-1 ${timeLeft <= 2 ? 'text-red-500 font-bold animate-pulse' : ''}`}>
                 <Timer className="w-3.5 h-3.5" />
@@ -298,23 +298,23 @@ export default function SpeedChallengeRunner({ onExit }: SpeedChallengeRunnerPro
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col justify-center max-w-2xl mx-auto w-full">
         {state.isCompleted ? (
           /* Écran de Victoire */
-          <div className="bg-[#FDFCF8] dark:bg-zinc-900 border border-[#E8E2D5] dark:border-zinc-800 rounded-3xl p-6 sm:p-8 text-center space-y-4 shadow-md animate-in zoom-in-95 duration-300">
-            <div className="w-16 h-16 rounded-full bg-emerald-500 text-white flex items-center justify-center mx-auto shadow-lg">
+          <div className="bg-white dark:bg-[#26211E] border border-amber-100 dark:border-amber-900/30 rounded-3xl p-6 sm:p-8 text-center space-y-4 shadow-md animate-in zoom-in-95 duration-300">
+            <div className="w-16 h-16 rounded-full bg-emerald-600 text-white flex items-center justify-center mx-auto shadow-lg">
               <Trophy className="w-8 h-8" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-[#1B2A4A] dark:text-white">
+              <h2 className="text-2xl font-bold text-stone-800 dark:text-stone-100">
                 Mabrouk ! Défi Débit Réussi !
               </h2>
-              <p className="text-sm text-[#7A7670] dark:text-zinc-400 mt-1">
+              <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">
                 Vous avez validé les 5 phrases avec un rythme de locuteur natif.
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto py-2">
-              <div className="bg-[#F7F3EA] dark:bg-zinc-800 p-3 rounded-2xl border border-[#E8E2D5] dark:border-zinc-700">
-                <span className="text-[11px] font-bold text-[#7A7670] block">SCORE FINAL</span>
-                <span className="text-xl font-extrabold text-[#1B2A4A] dark:text-white">{state.score} pts</span>
+              <div className="bg-[#FAF7F2] dark:bg-[#201B18] p-3 rounded-2xl border border-amber-100 dark:border-amber-900/30">
+                <span className="text-[11px] font-bold text-stone-500 dark:text-stone-400 block">SCORE FINAL</span>
+                <span className="text-xl font-extrabold text-stone-800 dark:text-stone-100">{state.score} pts</span>
               </div>
               <div className="bg-amber-500/10 dark:bg-amber-500/20 p-3 rounded-2xl border border-amber-500/30">
                 <span className="text-[11px] font-bold text-amber-700 dark:text-amber-400 block">XP REMPORTÉE</span>
@@ -326,7 +326,7 @@ export default function SpeedChallengeRunner({ onExit }: SpeedChallengeRunnerPro
               <button
                 type="button"
                 onClick={handleRestart}
-                className="px-5 py-2.5 rounded-xl border border-[#E8E2D5] dark:border-zinc-700 text-xs font-bold text-[#1B2A4A] dark:text-zinc-200 hover:bg-[#F7F3EA] dark:hover:bg-zinc-800 transition-colors flex items-center gap-1.5"
+                className="px-5 py-2.5 rounded-xl border border-amber-200 dark:border-amber-800 text-xs font-bold text-stone-800 dark:text-stone-200 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition-colors flex items-center gap-1.5"
               >
                 <RotateCcw className="w-4 h-4" />
                 Rejouer
@@ -334,7 +334,7 @@ export default function SpeedChallengeRunner({ onExit }: SpeedChallengeRunnerPro
               <button
                 type="button"
                 onClick={onExit}
-                className="px-6 py-2.5 rounded-xl bg-[#1B2A4A] text-white text-xs font-bold hover:bg-[#C9A05C] hover:text-[#1B2A4A] transition-colors shadow-xs"
+                className="px-6 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-colors shadow-xs"
               >
                 Terminer
               </button>
@@ -342,29 +342,29 @@ export default function SpeedChallengeRunner({ onExit }: SpeedChallengeRunnerPro
           </div>
         ) : state.isFailed ? (
           /* Écran d'Échec */
-          <div className="bg-[#FDFCF8] dark:bg-zinc-900 border border-[#E8E2D5] dark:border-zinc-800 rounded-3xl p-6 sm:p-8 text-center space-y-4 shadow-md animate-in zoom-in-95 duration-300">
+          <div className="bg-white dark:bg-[#26211E] border border-amber-100 dark:border-amber-900/30 rounded-3xl p-6 sm:p-8 text-center space-y-4 shadow-md animate-in zoom-in-95 duration-300">
             <div className="w-16 h-16 rounded-full bg-red-500 text-white flex items-center justify-center mx-auto shadow-lg">
               <AlertCircle className="w-8 h-8" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-[#1B2A4A] dark:text-white">
+              <h2 className="text-2xl font-bold text-stone-800 dark:text-stone-100">
                 Plus de vies disponibles !
               </h2>
-              <p className="text-sm text-[#7A7670] dark:text-zinc-400 mt-1">
+              <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">
                 Le débit natif demande de l&apos;entraînement. Respirez et retentez votre chance !
               </p>
             </div>
 
-            <div className="bg-[#F7F3EA] dark:bg-zinc-800 p-3 rounded-2xl max-w-xs mx-auto border border-[#E8E2D5] dark:border-zinc-700">
-              <span className="text-[11px] font-bold text-[#7A7670] block">SCORE ATTEINT</span>
-              <span className="text-xl font-extrabold text-[#1B2A4A] dark:text-white">{state.score} pts</span>
+            <div className="bg-[#FAF7F2] dark:bg-[#201B18] p-3 rounded-2xl max-w-xs mx-auto border border-amber-100 dark:border-amber-900/30">
+              <span className="text-[11px] font-bold text-stone-500 dark:text-stone-400 block">SCORE ATTEINT</span>
+              <span className="text-xl font-extrabold text-stone-800 dark:text-stone-100">{state.score} pts</span>
             </div>
 
             <div className="flex gap-3 justify-center pt-2">
               <button
                 type="button"
                 onClick={handleRestart}
-                className="px-6 py-2.5 rounded-xl bg-[#1B2A4A] text-white text-xs font-bold hover:bg-[#C9A05C] hover:text-[#1B2A4A] transition-colors flex items-center gap-1.5 shadow-xs"
+                className="px-6 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-colors flex items-center gap-1.5 shadow-xs"
               >
                 <RotateCcw className="w-4 h-4" />
                 Réessayer
@@ -372,7 +372,7 @@ export default function SpeedChallengeRunner({ onExit }: SpeedChallengeRunnerPro
               <button
                 type="button"
                 onClick={onExit}
-                className="px-5 py-2.5 rounded-xl border border-[#E8E2D5] dark:border-zinc-700 text-xs font-bold text-[#7A7670] hover:text-[#1B2A4A] transition-colors"
+                className="px-5 py-2.5 rounded-xl border border-amber-200 dark:border-amber-800 text-xs font-bold text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
               >
                 Quitter
               </button>
@@ -381,37 +381,37 @@ export default function SpeedChallengeRunner({ onExit }: SpeedChallengeRunnerPro
         ) : (
           /* Carte de la Phrase Cible */
           <div className="space-y-6">
-            <div className="bg-[#FDFCF8] dark:bg-zinc-900 border border-[#E8E2D5] dark:border-zinc-800 rounded-3xl p-6 sm:p-8 text-center shadow-md relative overflow-hidden">
+            <div className="bg-white dark:bg-[#26211E] border border-amber-100 dark:border-amber-900/30 rounded-3xl p-6 sm:p-8 text-center shadow-md relative overflow-hidden">
               {/* Bouton pour écouter la prononciation modèle */}
               <button
                 type="button"
                 onClick={playModelPhrase}
                 aria-label="Écouter la phrase modèle"
-                className="absolute top-4 right-4 p-2 rounded-full bg-[#E8E2D5]/50 dark:bg-zinc-800 text-[#8B6E3F] dark:text-amber-300 hover:bg-[#C9A05C] hover:text-white transition-colors"
+                className="absolute top-4 right-4 p-2 rounded-full bg-amber-100/60 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 hover:bg-amber-600 hover:text-white transition-colors"
               >
                 <Volume2 className="w-5 h-5" />
               </button>
 
               <div className="space-y-3">
-                <span className="inline-block bg-[#E8E2D5]/40 text-[#7A7670] text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                <span className="inline-block bg-amber-100/60 dark:bg-amber-900/20 text-stone-600 dark:text-stone-400 text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
                   Phrase {state.currentIndex + 1}
                 </span>
 
                 {/* Phrase en Arabe avec Tashkeel chirurgical */}
                 <h2
                   dir="rtl"
-                  className="text-3xl sm:text-4xl font-extrabold font-arabic text-[#1B2A4A] dark:text-white leading-relaxed py-2"
+                  className="text-3xl sm:text-4xl font-extrabold font-arabic text-stone-800 dark:text-stone-100 leading-relaxed py-2"
                 >
                   {currentPhrase?.arabic}
                 </h2>
 
                 {/* Phonétique Arabizi */}
-                <p className="text-lg sm:text-xl font-bold text-[#8B6E3F] dark:text-amber-400">
+                <p className="text-lg sm:text-xl font-bold text-amber-700 dark:text-amber-400">
                   {currentPhrase?.arabizi}
                 </p>
 
                 {/* Traduction Française */}
-                <p className="text-xs sm:text-sm text-[#7A7670] dark:text-zinc-400 italic">
+                <p className="text-xs sm:text-sm text-stone-500 dark:text-stone-400 italic">
                   « {currentPhrase?.translation} »
                 </p>
               </div>
@@ -454,7 +454,7 @@ export default function SpeedChallengeRunner({ onExit }: SpeedChallengeRunnerPro
                     className={`relative z-10 w-18 h-18 sm:w-20 sm:h-20 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 disabled:opacity-50 ${
                       isListening
                         ? 'bg-emerald-600 text-white ring-4 ring-emerald-300 scale-105'
-                        : 'bg-[#1B2A4A] text-white hover:bg-[#C9A05C] hover:text-[#1B2A4A] active:scale-95'
+                        : 'bg-amber-600 hover:bg-amber-700 text-white active:scale-95'
                     }`}
                   >
                     {isListening ? (
@@ -465,7 +465,7 @@ export default function SpeedChallengeRunner({ onExit }: SpeedChallengeRunnerPro
                   </button>
                 </div>
 
-                <p className="text-xs font-semibold text-center text-[#7A7670] dark:text-zinc-400">
+                <p className="text-xs font-semibold text-center text-stone-500 dark:text-stone-400">
                   {isListening ? (
                     <span className="text-emerald-600 dark:text-emerald-400 font-bold animate-pulse">
                       Écoute active... Répétez vite !
@@ -476,7 +476,7 @@ export default function SpeedChallengeRunner({ onExit }: SpeedChallengeRunnerPro
                 </p>
 
                 {isListening && transcript && (
-                  <p className="text-xs italic text-[#1B2A4A] dark:text-zinc-200 bg-[#E8E2D5]/50 px-3 py-1 rounded-full max-w-sm truncate">
+                  <p className="text-xs italic text-stone-800 dark:text-stone-200 bg-amber-100/60 dark:bg-amber-900/30 px-3 py-1 rounded-full max-w-sm truncate">
                     « {transcript} »
                   </p>
                 )}
@@ -493,13 +493,13 @@ export default function SpeedChallengeRunner({ onExit }: SpeedChallengeRunnerPro
                       ? 'Ou tapez la phrase en Arabizi...'
                       : 'Micro indisponible : tapez ici'
                   }
-                  className="flex-1 bg-[#FDFCF8] dark:bg-zinc-800 border border-[#E8E2D5] dark:border-zinc-700 rounded-xl px-3.5 py-2 text-xs text-[#1B2A4A] dark:text-white placeholder-[#7A7670] focus:outline-hidden focus:border-[#C9A05C]"
+                  className="flex-1 bg-white dark:bg-[#26211E] border border-amber-100 dark:border-amber-900/30 rounded-xl px-3.5 py-2 text-xs text-stone-800 dark:text-stone-100 placeholder-stone-400 focus:outline-hidden focus:border-amber-500"
                 />
                 <button
                   type="submit"
                   disabled={!manualText.trim() || isEvaluating}
                   aria-label="Valider la réponse"
-                  className="px-3.5 py-2 rounded-xl bg-[#1B2A4A] text-white hover:bg-[#C9A05C] hover:text-[#1B2A4A] transition-colors disabled:opacity-40"
+                  className="px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white transition-colors disabled:opacity-40"
                 >
                   <Send className="w-4 h-4 rtl:rotate-180" />
                 </button>

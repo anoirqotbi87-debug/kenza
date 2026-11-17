@@ -83,7 +83,7 @@ export default function ParlerPage() {
   };
 
   return (
-    <div dir={isAr ? 'rtl' : 'ltr'} className="min-h-screen bg-[#F7F3EA] pb-16">
+    <div dir={isAr ? 'rtl' : 'ltr'} className="min-h-screen bg-[#FAF7F2] dark:bg-[#1C1816] pb-16">
       <PageHeader
         badge={tp?.badge || (isAr ? 'التدريب الشفهي' : lang === 'es' ? 'Práctica Oral' : lang === 'en' ? 'Speaking Practice' : 'Pratique Orale')}
         title={tp?.title || (isAr ? 'تدريب النطق' : lang === 'es' ? 'Entrenador de pronunciación' : lang === 'en' ? 'Pronunciation trainer' : 'Entraînement de prononciation')}
@@ -92,17 +92,17 @@ export default function ParlerPage() {
 
       <main className="max-w-4xl mx-auto p-4 sm:p-6 pb-24 space-y-6">
         {/* Mode Selector */}
-        <div className="flex bg-[#FDFCF8] rounded-full p-1.5 shadow-xs border border-[#E8E2D5] max-w-lg mx-auto gap-1">
+        <div className="flex bg-white dark:bg-[#26211E] rounded-full p-1.5 shadow-xs border border-amber-100 dark:border-amber-900/30 max-w-lg mx-auto gap-1">
           <button
             type="button"
             onClick={() => setActiveMode('trainer')}
             className={`flex-1 py-2 px-3 rounded-full font-bold text-xs transition-all flex items-center justify-center gap-1.5 ${
               activeMode === 'trainer'
-                ? 'bg-[#1B2A4A] !text-white shadow-xs'
-                : 'text-[#7A7670] hover:text-[#1B2A4A]'
+                ? 'bg-amber-600 !text-white shadow-xs'
+                : 'text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5 text-[#C9A05C]" />
+            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
             <span className={activeMode === 'trainer' ? '!text-white' : ''}>
               {isAr ? 'ورشة الأصوات' : lang === 'es' ? 'Modo Libre' : lang === 'en' ? 'Phonetics' : 'Phonétique'}
             </span>
@@ -113,11 +113,11 @@ export default function ParlerPage() {
             onClick={() => setActiveMode('dialogue')}
             className={`flex-1 py-2 px-3 rounded-full font-bold text-xs transition-all flex items-center justify-center gap-1.5 ${
               activeMode === 'dialogue'
-                ? 'bg-[#1B2A4A] !text-white shadow-xs'
-                : 'text-[#7A7670] hover:text-[#1B2A4A]'
+                ? 'bg-amber-600 !text-white shadow-xs'
+                : 'text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200'
             }`}
           >
-            <MessageSquare className="w-3.5 h-3.5 text-[#C9A05C]" />
+            <MessageSquare className="w-3.5 h-3.5 text-amber-500" />
             <span className={activeMode === 'dialogue' ? '!text-white' : ''}>
               {isAr ? 'سيناريوهات' : lang === 'es' ? 'Escenarios' : lang === 'en' ? 'Scenarios' : 'Scénarios'}
             </span>
@@ -128,11 +128,11 @@ export default function ParlerPage() {
             onClick={() => setActiveMode('speed')}
             className={`flex-1 py-2 px-3 rounded-full font-bold text-xs transition-all flex items-center justify-center gap-1.5 ${
               activeMode === 'speed'
-                ? 'bg-[#1B2A4A] !text-white shadow-xs'
-                : 'text-[#7A7670] hover:text-[#1B2A4A]'
+                ? 'bg-amber-600 !text-white shadow-xs'
+                : 'text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200'
             }`}
           >
-            <Timer className="w-3.5 h-3.5 text-[#C9A05C]" />
+            <Timer className="w-3.5 h-3.5 text-amber-500" />
             <span className={activeMode === 'speed' ? '!text-white' : ''}>
               {isAr ? 'تحدّي السرعة' : lang === 'es' ? 'Speed Challenge' : lang === 'en' ? 'Speed Challenge' : 'Speed Challenge'}
             </span>
@@ -146,11 +146,11 @@ export default function ParlerPage() {
         ) : (
           <section className="space-y-6">
             {/* HERO FEATURE : TAXI_SCENARIO (Scénario Vedette) */}
-            <div className="bg-gradient-to-br from-[#1B2A4A] to-[#0B172A] text-white rounded-3xl p-5 sm:p-7 shadow-md border border-[#C9A05C]/30 relative overflow-hidden">
-              <div className="absolute -right-6 -bottom-6 w-36 h-36 bg-[#C9A05C]/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="bg-gradient-to-br from-[#26211E] to-[#1C1816] text-white rounded-3xl p-5 sm:p-7 shadow-md border border-amber-500/30 relative overflow-hidden">
+              <div className="absolute -right-6 -bottom-6 w-36 h-36 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
                 <div className="space-y-2">
-                  <div className="inline-flex items-center gap-2 bg-[#C9A05C]/20 text-[#C9A05C] border border-[#C9A05C]/30 px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider">
+                  <div className="inline-flex items-center gap-2 bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider">
                     <span>🚕</span>
                     <span>Scénario Vedette · Immersion Immédiate</span>
                   </div>
@@ -160,10 +160,10 @@ export default function ParlerPage() {
                       {TAXI_SCENARIO.level || 'A2'}
                     </span>
                   </h2>
-                  <p className="text-xs sm:text-sm text-zinc-300 max-w-xl">
+                  <p className="text-xs sm:text-sm text-stone-300 max-w-xl">
                     Montez à bord du Grand Taxi à Ouled Ziane : négociez la destination, demandez le tarif de la place et organisez vos bagages en Darija vivant avec Si Mohammed.
                   </p>
-                  <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-[#C9A05C] font-semibold">
+                  <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-amber-400 font-semibold">
                     <span className="flex items-center gap-1">
                       <MapPin className="w-3.5 h-3.5" />
                       {TAXI_SCENARIO.location}
@@ -179,7 +179,7 @@ export default function ParlerPage() {
                 <button
                   type="button"
                   onClick={() => startScenario(TAXI_SCENARIO)}
-                  className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-[#C9A05C] hover:bg-[#b88f4b] text-[#1B2A4A] font-bold text-sm shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 shrink-0"
+                  className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 shrink-0"
                 >
                   <Play className="w-4 h-4 fill-current rtl:rotate-180" />
                   <span>Lancer le Scénario</span>
@@ -188,12 +188,12 @@ export default function ParlerPage() {
             </div>
 
             {/* CATALOGUE COMPLET DES SCÉNARIOS */}
-            <div className="bg-[#FDFCF8] rounded-3xl p-5 sm:p-7 shadow-xs border border-[#E8E2D5] space-y-5">
+            <div className="bg-white dark:bg-[#26211E] rounded-3xl p-5 sm:p-7 shadow-xs border border-amber-100 dark:border-amber-900/30 space-y-5">
               <div>
-                <h3 className="font-display text-lg font-bold text-[#1B2A4A]">
+                <h3 className="font-display text-lg font-bold text-stone-800 dark:text-stone-100">
                   {t.modules.scenario.dialoguesTitle || (isAr ? 'حوارات وسيناريوهات' : lang === 'es' ? 'Diálogos guionizados' : lang === 'en' ? 'Scripted dialogues' : 'Tous les Scénarios de Rue')}
                 </h3>
-                <p className="text-xs sm:text-sm text-[#7A7670] mt-1">
+                <p className="text-xs sm:text-sm text-stone-500 dark:text-stone-400 mt-1">
                   {t.modules.scenario.dialoguesDesc || (isAr ? 'تدرّب في مواقف مغربية واقعية.' : lang === 'es' ? 'Practica en situaciones marroquíes reales.' : lang === 'en' ? 'Practice real-life situations.' : 'Mises en situation réelles pour perfectionner votre aisance orale.')}
                 </p>
               </div>
@@ -207,30 +207,30 @@ export default function ParlerPage() {
                       type="button"
                       onClick={() => startScenario(scenario)}
                       disabled={scenario.tier === 'premium' && !isPremiumReady}
-                      className="text-left rtl:text-right bg-[#F7F3EA] border border-[#E8E2D5] rounded-2xl p-4 hover:border-[#C9A05C] disabled:cursor-wait transition-colors group"
+                      className="text-left rtl:text-right bg-[#FAF7F2] dark:bg-[#201B18] border border-amber-100 dark:border-amber-900/30 rounded-2xl p-4 hover:border-amber-500 disabled:cursor-wait transition-colors group"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <p className="font-bold text-sm text-[#1B2A4A]">{getScenarioTitle(scenario)}</p>
-                          <p className="text-xs text-[#7A7670] mt-1 flex items-center gap-1">
-                            <MapPin className="w-3 h-3 text-[#C9A05C] shrink-0" />
+                          <p className="font-bold text-sm text-stone-800 dark:text-stone-100">{getScenarioTitle(scenario)}</p>
+                          <p className="text-xs text-stone-500 dark:text-stone-400 mt-1 flex items-center gap-1">
+                            <MapPin className="w-3 h-3 text-amber-500 shrink-0" />
                             <span>{getScenarioLocation(scenario)} · {getTurnsLabel(scenario.turns.length)}</span>
                           </p>
-                          <p className="text-[10px] text-[#7A7670] mt-2">{scenario.level || 'A1'} · {getScenarioRole(scenario)}</p>
+                          <p className="text-[10px] text-stone-500 dark:text-stone-400 mt-2">{scenario.level || 'A1'} · {getScenarioRole(scenario)}</p>
                         </div>
                         {locked ? (
-                          <span className="bg-[#C9A05C]/15 text-[#C9A05C] border border-[#C9A05C]/30 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 shrink-0">
+                          <span className="bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 shrink-0">
                             <Lock className="w-3 h-3" /> Kenza Pro
                           </span>
                         ) : (
-                          <span className="w-8 h-8 rounded-full bg-[#1B2A4A] text-[#FDFCF8] flex items-center justify-center shrink-0 group-hover:bg-[#C9A05C] group-hover:text-[#1B2A4A] transition-colors">
+                          <span className="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center shrink-0 group-hover:bg-amber-700 transition-colors">
                             <Play className="w-3.5 h-3.5 rtl:rotate-180" />
                           </span>
                         )}
                       </div>
-                      <div className="mt-3 pt-3 border-t border-[#E8E2D5] text-xs font-semibold text-[#7A7670] flex items-center justify-between">
+                      <div className="mt-3 pt-3 border-t border-amber-100 dark:border-amber-900/30 text-xs font-semibold text-stone-500 dark:text-stone-400 flex items-center justify-between">
                         <span>{getScenarioCategory(scenario)}</span>
-                        <ArrowRight className="w-3.5 h-3.5 text-[#C9A05C] rtl:rotate-180" />
+                        <ArrowRight className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 rtl:rotate-180" />
                       </div>
                     </button>
                   );
