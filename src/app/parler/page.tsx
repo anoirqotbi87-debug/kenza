@@ -4,11 +4,12 @@ import React, { useState } from 'react';
 import { useAppStore, useTranslation } from '@/store/useAppStore';
 import PronunciationTrainer from '@/components/audio/PronunciationTrainer';
 import PageHeader from '@/components/ui/PageHeader';
-import { ArrowRight, Lock, MapPin, MessageSquare, Play, Sparkles, Zap } from 'lucide-react';
+import { ArrowRight, Lock, MapPin, MessageSquare, Play, Sparkles, Timer, Zap } from 'lucide-react';
 import { ALL_SCENARIOS } from '@/data/scenarios';
 import { TAXI_SCENARIO } from '@/data/scenarios/taxiScenario';
 import type { DialogueScenario } from '@/types/dialogue';
 import ScenarioRunner from '@/components/parler/ScenarioRunner';
+import SpeedChallengeRunner from '@/components/parler/SpeedChallengeRunner';
 import PaywallModal from '@/components/monetization/PaywallModal';
 import BottomNav from '@/components/navigation/BottomNav';
 import { usePremiumStatus } from '@/hooks/usePremiumStatus';
@@ -17,7 +18,7 @@ export default function ParlerPage() {
   const { uiLanguage, isPremium } = useAppStore();
   const { isPremiumReady } = usePremiumStatus();
   const { t } = useTranslation();
-  const [activeMode, setActiveMode] = useState<'trainer' | 'dialogue'>('trainer');
+  const [activeMode, setActiveMode] = useState<'trainer' | 'dialogue' | 'speed'>('trainer');
   const [activeScenario, setActiveScenario] = useState<DialogueScenario | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
 
@@ -91,11 +92,11 @@ export default function ParlerPage() {
 
       <main className="max-w-4xl mx-auto p-4 sm:p-6 pb-24 space-y-6">
         {/* Mode Selector */}
-        <div className="flex bg-[#FDFCF8] rounded-full p-1.5 shadow-xs border border-[#E8E2D5] max-w-md mx-auto">
+        <div className="flex bg-[#FDFCF8] rounded-full p-1.5 shadow-xs border border-[#E8E2D5] max-w-lg mx-auto gap-1">
           <button
             type="button"
             onClick={() => setActiveMode('trainer')}
-            className={`flex-1 py-2 px-4 rounded-full font-bold text-xs transition-all flex items-center justify-center gap-2 ${
+            className={`flex-1 py-2 px-3 rounded-full font-bold text-xs transition-all flex items-center justify-center gap-1.5 ${
               activeMode === 'trainer'
                 ? 'bg-[#1B2A4A] !text-white shadow-xs'
                 : 'text-[#7A7670] hover:text-[#1B2A4A]'
@@ -103,14 +104,14 @@ export default function ParlerPage() {
           >
             <Sparkles className="w-3.5 h-3.5 text-[#C9A05C]" />
             <span className={activeMode === 'trainer' ? '!text-white' : ''}>
-              {isAr ? 'ورشة الأصوات' : lang === 'es' ? 'Modo Libre' : lang === 'en' ? 'Free Practice' : 'Mode Libre / Phonétique'}
+              {isAr ? 'ورشة الأصوات' : lang === 'es' ? 'Modo Libre' : lang === 'en' ? 'Phonetics' : 'Phonétique'}
             </span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveMode('dialogue')}
-            className={`flex-1 py-2 px-4 rounded-full font-bold text-xs transition-all flex items-center justify-center gap-2 ${
+            className={`flex-1 py-2 px-3 rounded-full font-bold text-xs transition-all flex items-center justify-center gap-1.5 ${
               activeMode === 'dialogue'
                 ? 'bg-[#1B2A4A] !text-white shadow-xs'
                 : 'text-[#7A7670] hover:text-[#1B2A4A]'
@@ -118,13 +119,30 @@ export default function ParlerPage() {
           >
             <MessageSquare className="w-3.5 h-3.5 text-[#C9A05C]" />
             <span className={activeMode === 'dialogue' ? '!text-white' : ''}>
-              {isAr ? 'سيناريوهات الشارع' : lang === 'es' ? 'Escenarios de Calle' : lang === 'en' ? 'Street Scenarios' : 'Scénarios de Rue'}
+              {isAr ? 'سيناريوهات' : lang === 'es' ? 'Escenarios' : lang === 'en' ? 'Scenarios' : 'Scénarios'}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveMode('speed')}
+            className={`flex-1 py-2 px-3 rounded-full font-bold text-xs transition-all flex items-center justify-center gap-1.5 ${
+              activeMode === 'speed'
+                ? 'bg-[#1B2A4A] !text-white shadow-xs'
+                : 'text-[#7A7670] hover:text-[#1B2A4A]'
+            }`}
+          >
+            <Timer className="w-3.5 h-3.5 text-[#C9A05C]" />
+            <span className={activeMode === 'speed' ? '!text-white' : ''}>
+              {isAr ? 'تحدّي السرعة' : lang === 'es' ? 'Speed Challenge' : lang === 'en' ? 'Speed Challenge' : 'Speed Challenge'}
             </span>
           </button>
         </div>
 
         {activeMode === 'trainer' ? (
           <PronunciationTrainer />
+        ) : activeMode === 'speed' ? (
+          <SpeedChallengeRunner onExit={() => setActiveMode('trainer')} />
         ) : (
           <section className="space-y-6">
             {/* HERO FEATURE : TAXI_SCENARIO (Scénario Vedette) */}
