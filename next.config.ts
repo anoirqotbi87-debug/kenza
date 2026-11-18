@@ -63,7 +63,6 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  devIndicators: false,
   outputFileTracingRoot: path.resolve(__dirname),
   turbopack: {
     root: path.resolve(__dirname),

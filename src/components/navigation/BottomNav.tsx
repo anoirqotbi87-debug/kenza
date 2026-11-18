@@ -54,8 +54,11 @@ export function BottomNav({ currentView, onSelectView }: BottomNavProps = {}) {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-[#26211E] border-t border-amber-100 dark:border-amber-900/30 pb-safe shadow-lg">
-      <div className="flex justify-around items-center h-16 px-2 max-w-md mx-auto">
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/95 dark:bg-[#1C1816]/95 backdrop-blur-md border-t border-amber-200/70 dark:border-amber-900/30 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.06)]"
+      aria-label="Navigation principale mobile"
+    >
+      <div className="grid grid-cols-4 items-center h-16 max-w-md mx-auto px-1">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = isItemActive(item.href);
@@ -65,14 +68,29 @@ export function BottomNav({ currentView, onSelectView }: BottomNavProps = {}) {
               key={item.href}
               href={item.href}
               onClick={(e) => handleItemClick(e, item.href)}
-              className={`flex flex-col items-center justify-center w-full h-full transition-colors ${
+              aria-current={isActive ? 'page' : undefined}
+              className={`flex flex-col items-center justify-center h-full py-1 px-1 transition-all duration-150 select-none ${
                 isActive
-                  ? 'text-amber-600 dark:text-amber-400 font-semibold'
-                  : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300'
+                  ? 'text-amber-700 dark:text-amber-400 font-bold'
+                  : 'text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300'
               }`}
             >
-              <Icon className="w-5 h-5 mb-1" />
-              <span className="text-[11px] leading-tight">{item.label}</span>
+              <div
+                className={`flex items-center justify-center w-11 h-7 rounded-full transition-all duration-150 ${
+                  isActive
+                    ? 'bg-amber-100/90 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 scale-105'
+                    : 'bg-transparent text-stone-400'
+                }`}
+              >
+                <Icon
+                  className={`w-5 h-5 transition-transform ${
+                    isActive ? 'stroke-[2.5]' : 'stroke-[1.75]'
+                  }`}
+                />
+              </div>
+              <span className="text-[11px] font-medium leading-none mt-1 tracking-tight">
+                {item.label}
+              </span>
             </Link>
           );
         })}

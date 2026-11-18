@@ -5,6 +5,16 @@
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+/* Extinction permanente de l'indicateur Next.js dev tools qui chevauche les boutons du menu en bas à gauche */
+nextjs-portal,
+[data-nextjs-dev-tools-indicator],
+[data-nextjs-toast],
+nextjs-portal * {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 :root {
   --ink: #15253b;
   --ink-soft: #293b51;
