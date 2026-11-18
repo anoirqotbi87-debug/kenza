@@ -144,7 +144,7 @@ export function Header({
             className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 border transition-colors ${
               soundEnabled
                 ? 'bg-amber-50/80 border-amber-200/80 text-[#142943] hover:bg-amber-100/80'
-                : 'bg-slate-100 border-slate-200 text-slate-400 hover:bg-slate-200'
+                : 'bg-stone-100 border-stone-200 text-stone-400 hover:bg-stone-200 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-500'
             }`}
             title={soundEnabled ? 'Son activé' : 'Son coupé'}
             aria-label={soundEnabled ? 'Couper le son' : 'Activer le son'}

@@ -60,13 +60,13 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
         aria-modal="true"
         aria-labelledby="exercise-runner-title"
         tabIndex={-1}
-        className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4"
+        className="fixed inset-0 z-50 bg-stone-900/70 backdrop-blur-sm flex items-center justify-center p-4"
       >
-        <div className="bg-white rounded-2xl p-6 max-w-md w-full text-center shadow-xl">
-          <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">⚠️</div>
-          <h3 id="exercise-runner-title" className="text-lg font-bold text-slate-800 mb-2">{t.lessons.unavailable}</h3>
-          <p className="text-sm text-slate-500 mb-4">{t.lessons.unavailableDesc}</p>
-          <button onClick={onClose} className="w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl hover:bg-blue-700">
+        <div className="bg-[#FAF7F2] dark:bg-[#26211E] border border-amber-200/80 dark:border-amber-900/40 rounded-2xl p-6 max-w-md w-full text-center shadow-xl">
+          <div className="w-12 h-12 bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">⚠️</div>
+          <h3 id="exercise-runner-title" className="text-lg font-bold text-stone-800 dark:text-stone-100 mb-2">{t.lessons.unavailable}</h3>
+          <p className="text-sm text-stone-600 dark:text-stone-400 mb-4">{t.lessons.unavailableDesc}</p>
+          <button onClick={onClose} className="w-full bg-amber-600 text-white font-bold py-2.5 rounded-xl hover:bg-amber-700 transition-colors">
             {t.lessons.backToDashboard}
           </button>
         </div>
@@ -161,11 +161,11 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
         aria-modal="true"
         aria-labelledby="exercise-runner-title"
         tabIndex={-1}
-        className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-4 text-center"
+        className="fixed inset-0 bg-[#FAF7F2] dark:bg-[#1C1816] z-50 flex flex-col items-center justify-center p-4 text-center"
       >
         <HeartCrack className="w-24 h-24 text-red-500 mb-6" />
-        <h2 id="exercise-runner-title" className="text-3xl font-bold text-slate-800 mb-4">{t.lessons.gameOver}</h2>
-        <button onClick={onClose} className="px-8 py-4 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-2xl font-bold text-lg">
+        <h2 id="exercise-runner-title" className="text-3xl font-bold text-stone-800 dark:text-stone-100 mb-4">{t.lessons.gameOver}</h2>
+        <button onClick={onClose} className="px-8 py-4 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl font-bold text-lg shadow-md transition-colors">
           {t.lessons.retry}
         </button>
       </div>
@@ -180,19 +180,19 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
         aria-modal="true"
         aria-labelledby="exercise-runner-title"
         tabIndex={-1}
-        className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-4 text-center animate-in fade-in zoom-in duration-300"
+        className="fixed inset-0 bg-[#FAF7F2] dark:bg-[#1C1816] z-50 flex flex-col items-center justify-center p-4 text-center animate-in fade-in zoom-in duration-300"
       >
-        <div className="w-32 h-32 bg-amber-100 rounded-full flex items-center justify-center mb-8 shadow-inner border-4 border-amber-50">
-          <Trophy className="w-16 h-16 text-amber-500" />
+        <div className="w-32 h-32 bg-amber-100 dark:bg-amber-900/40 rounded-full flex items-center justify-center mb-8 shadow-inner border-4 border-amber-200/60 dark:border-amber-700/50">
+          <Trophy className="w-16 h-16 text-amber-600 dark:text-amber-400" />
         </div>
-        <h2 id="exercise-runner-title" className="text-4xl font-black text-amber-500 mb-2">{t.lessons.congrats}</h2>
+        <h2 id="exercise-runner-title" className="text-4xl font-black text-amber-700 dark:text-amber-400 mb-2">{t.lessons.congrats}</h2>
 
         <div className={`flex gap-8 ${finishExtra ? 'mb-6' : 'mb-12'}`}>
-          <div className="bg-blue-50 border border-blue-100 p-6 rounded-3xl min-w-[140px]">
-            <div className="text-blue-500 text-sm font-bold uppercase mb-1">XP</div>
-            <div className="text-3xl font-black text-blue-600">+{xpGained}</div>
+          <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/40 p-6 rounded-3xl min-w-[140px]">
+            <div className="text-amber-700 dark:text-amber-400 text-sm font-bold uppercase mb-1">XP</div>
+            <div className="text-3xl font-black text-amber-600 dark:text-amber-300">+{xpGained}</div>
           </div>
-          <div className="bg-red-50 border border-red-100 p-6 rounded-3xl min-w-[140px]">
+          <div className="bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 p-6 rounded-3xl min-w-[140px]">
             <div className="text-red-500 text-sm font-bold uppercase mb-1">{t.lessons.lives}</div>
             <div className="text-3xl font-black text-red-600 flex justify-center gap-1 mt-2">
               {Array.from({ length: 3 }).map((_, i) => (
@@ -204,7 +204,7 @@ export default function ExerciseRunner({ lesson, onComplete, onClose, finishExtr
 
         {finishExtra}
 
-        <button onClick={onComplete} className="px-12 py-4 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-bold text-xl shadow-lg transition-transform hover:scale-105 active:scale-95 w-full max-w-sm">
+        <button onClick={onComplete} className="px-12 py-4 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl font-bold text-xl shadow-lg transition-transform hover:scale-105 active:scale-95 w-full max-w-sm">
           {t.lessons.continue}
         </button>
       </div>

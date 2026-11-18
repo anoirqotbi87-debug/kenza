@@ -36,6 +36,14 @@ describe('System prompts Roleplay IA — charte linguistique', () => {
     }
   });
 
+  it('vérifie le prompt anti-hallucination et le Darija authentique pour kenzbot', () => {
+    const kenzbotPrompt = getSystemPrompt('kenzbot')!;
+    expect(kenzbotPrompt).toContain('tuteur et coach virtuel expert en Darija marocain');
+    expect(kenzbotPrompt).toContain('nsiddouk');
+    expect(kenzbotPrompt).toContain('Bchhal');
+    expect(kenzbotPrompt).toContain('INTERDICTION ABSOLUE');
+  });
+
   it('retourne undefined pour un persona inconnu', () => {
     expect(getSystemPrompt('inconnu' as PersonaId)).toBeUndefined();
   });
