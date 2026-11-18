@@ -16,7 +16,7 @@ describe('InstallApkBanner component', () => {
   });
 
   it('propose le téléchargement direct de l’APK officiel', () => {
-    expect(source).toContain('/downloads/kenza-v1.0.apk');
+    expect(source).toContain('/downloads/kenza-v1.5.apk');
     expect(source).toContain('Télécharger');
   });
 
