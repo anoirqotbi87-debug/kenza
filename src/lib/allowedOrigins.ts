@@ -14,7 +14,11 @@ export function isAllowedOrigin(origin: string): boolean {
   if (origin === PRODUCTION_ORIGIN || STATIC_ALLOWED_ORIGINS.has(origin)) {
     return true;
   }
-  if (LOCALHOST_REGEX.test(origin)) {
+  // En production stricte, localhost est rejeté pour éviter tout contournement
+  const isProduction =
+    process.env.VERCEL_ENV === 'production' ||
+    (process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV !== 'preview' && process.env.VERCEL_ENV !== 'development');
+  if (!isProduction && LOCALHOST_REGEX.test(origin)) {
     return true;
   }
   if (process.env.VERCEL_URL && origin === `https://${process.env.VERCEL_URL}`) {

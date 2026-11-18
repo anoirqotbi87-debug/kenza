@@ -6,6 +6,7 @@ describe('allowedOrigins security allowlist', () => {
 
   beforeEach(() => {
     process.env = { ...origEnv };
+    delete process.env.VERCEL_ENV;
   });
 
   afterEach(() => {
@@ -21,6 +22,13 @@ describe('allowedOrigins security allowlist', () => {
     expect(isAllowedOrigin('http://localhost:3000')).toBe(true);
     expect(isAllowedOrigin('http://localhost:8080')).toBe(true);
     expect(isAllowedOrigin('http://127.0.0.1:3000')).toBe(true);
+  });
+
+  it('REJETTE localhost si VERCEL_ENV === production', () => {
+    process.env.VERCEL_ENV = 'production';
+    expect(isAllowedOrigin('http://localhost:3000')).toBe(false);
+    expect(isAllowedOrigin('http://localhost:8080')).toBe(false);
+    expect(isAllowedOrigin('http://127.0.0.1:3000')).toBe(false);
   });
 
   it('REJETTE les domaines tiers *.vercel.app (anti-phishing / anti-bypass)', () => {

@@ -65,6 +65,39 @@ export async function POST(req: NextRequest) {
         break;
       }
 
+      case 'customer.subscription.created': {
+        const subscription = event.data.object as Stripe.Subscription;
+        const isActive = subscription.status === 'active' || subscription.status === 'trialing';
+        console.log(`[Stripe Webhook] Souscription créée ${subscription.id} (status: ${subscription.status}, active: ${isActive})`);
+
+        const { error } = await supabase.rpc('update_user_subscription_status', {
+          p_subscription_id: subscription.id,
+          p_is_active: isActive,
+        });
+
+        if (error) {
+          console.error('[Stripe Webhook Error subscription.created]:', error);
+        }
+        break;
+      }
+
+      case 'customer.subscription.updated': {
+        const subscription = event.data.object as Stripe.Subscription;
+        const isActive = subscription.status === 'active' || subscription.status === 'trialing';
+        console.log(`[Stripe Webhook] Souscription mise à jour ${subscription.id} (status: ${subscription.status}, active: ${isActive})`);
+
+        const { error } = await supabase.rpc('update_user_subscription_status', {
+          p_subscription_id: subscription.id,
+          p_is_active: isActive,
+        });
+
+        if (error) {
+          console.error('[Stripe Webhook Error subscription.updated]:', error);
+          return NextResponse.json({ error: 'Failed to update subscription' }, { status: 500 });
+        }
+        break;
+      }
+
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription;
         console.log(`[Stripe Webhook] Résiliation abonnement ${subscription.id}`);
@@ -76,22 +109,6 @@ export async function POST(req: NextRequest) {
         if (error) {
           console.error('[Stripe Webhook Error subscription.deleted]:', error);
           return NextResponse.json({ error: 'Failed to process deletion' }, { status: 500 });
-        }
-        break;
-      }
-
-      case 'customer.subscription.updated': {
-        const subscription = event.data.object as Stripe.Subscription;
-        const isActive = subscription.status === 'active' || subscription.status === 'trialing';
-
-        const { error } = await supabase.rpc('update_user_subscription_status', {
-          p_subscription_id: subscription.id,
-          p_is_active: isActive,
-        });
-
-        if (error) {
-          console.error('[Stripe Webhook Error subscription.updated]:', error);
-          return NextResponse.json({ error: 'Failed to update subscription' }, { status: 500 });
         }
         break;
       }

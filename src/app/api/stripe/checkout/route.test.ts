@@ -1,94 +1,189 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { NextRequest } from 'next/server';
-import { PRICING_CONFIG } from '@/lib/pricingConfig';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { NextRequest } from 'next/server';
 
-const sessionsCreate = vi.fn();
-const getUser = vi.fn();
+const mockCreateSession = vi.fn();
+const mockGetUser = vi.fn();
 
-// Le module stripe reel exige STRIPE_SECRET_KEY : on l'intercepte pour observer
-// exactement ce que la route transmet a l'API Stripe.
-vi.mock('@/lib/stripe', () => ({
-  stripe: { checkout: { sessions: { create: sessionsCreate } } },
-}));
+vi.mock('@/lib/stripe', () => {
+  const mockStripe = {
+    checkout: {
+      sessions: {
+        create: (...args: unknown[]) => mockCreateSession(...args),
+      },
+    },
+  };
+  return {
+    stripe: mockStripe,
+    getStripe: () => mockStripe,
+    getStripeKeyMode: () => 'TEST',
+  };
+});
 
-// Supabase est mocke : la route exige un utilisateur authentifie (un invite ne peut pas
-// s'abonner, le webhook n'aurait personne a crediter).
 vi.mock('@supabase/supabase-js', () => ({
-  createClient: () => ({ auth: { getUser } }),
+  createClient: () => ({
+    auth: {
+      getUser: () => mockGetUser(),
+    },
+  }),
 }));
 
-const { POST } = await import('./route');
+import { POST } from './route';
 
-const AUTH = { Authorization: 'Bearer fake-jwt-token' };
+describe('/api/stripe/checkout', () => {
+  const originalEnv = process.env;
 
-function post(body: Record<string, unknown>, headers: Record<string, string> = AUTH): Promise<Response> {
-  const req = new Request('http://localhost/api/stripe/checkout', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...headers },
-    body: JSON.stringify(body),
+  beforeEach(() => {
+    process.env = {
+      ...originalEnv,
+      STRIPE_SECRET_KEY: 'sk_test_mocked',
+      NEXT_PUBLIC_SUPABASE_URL: 'https://test.supabase.co',
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: 'test_anon_key',
+      NEXT_PUBLIC_APP_URL: 'https://kenza-dusky.vercel.app',
+    };
+    mockCreateSession.mockReset();
+    mockGetUser.mockReset();
   });
-  return POST(req as unknown as NextRequest);
-}
 
-function lastCreateArg() {
-  return sessionsCreate.mock.calls.at(-1)?.[0];
-}
+  afterEach(() => {
+    process.env = originalEnv;
+  });
 
-beforeEach(() => {
-  sessionsCreate.mockReset();
-  sessionsCreate.mockResolvedValue({ url: 'https://checkout.stripe.test/session' });
-  getUser.mockReset();
-  getUser.mockResolvedValue({ data: { user: { id: 'user-1', email: 'eleve@kenza.test' } }, error: null });
-});
+  it('rejette avec HTTP 401 si l’utilisateur n’est pas connecté', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: null }, error: null });
 
-describe('checkout — compte obligatoire', () => {
-  it('sans Authorization : refuse en 401 sans appeler Stripe', async () => {
-    const res = await post({ billingCycle: 'yearly', currency: 'EUR' }, {});
+    const req = new NextRequest('http://localhost:3000/api/stripe/checkout', {
+      method: 'POST',
+      body: JSON.stringify({ billingCycle: 'yearly', currency: 'EUR' }),
+    });
+
+    const res = await POST(req);
     expect(res.status).toBe(401);
-    expect(sessionsCreate).not.toHaveBeenCalled();
+    const data = await res.json();
+    expect(data.error).toContain('Connectez-vous');
   });
 
-  it('jeton invalide (aucun utilisateur) : refuse en 401 sans appeler Stripe', async () => {
-    getUser.mockResolvedValue({ data: { user: null }, error: { message: 'invalid token' } });
-    const res = await post({ billingCycle: 'yearly', currency: 'EUR' });
-    expect(res.status).toBe(401);
-    expect(sessionsCreate).not.toHaveBeenCalled();
-  });
+  it('génère une session Checkout Annuelle EUR avec 59 EUR et 7 jours d’essai', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: 'usr_abc', email: 'test@example.com' } },
+      error: null,
+    });
 
-  it('utilisateur authentifie : rattache la session a son id, jamais a anonymous', async () => {
-    await post({ billingCycle: 'yearly', currency: 'EUR' });
-    expect(lastCreateArg().metadata.userId).toBe('user-1');
-    expect(lastCreateArg().client_reference_id).toBe('user-1');
-  });
-});
+    mockCreateSession.mockResolvedValue({ url: 'https://checkout.stripe.com/pay/cs_test_annual_eur' });
 
-describe('checkout — essai gratuit 7 jours', () => {
-  it('annuel (EUR) : passe subscription_data.trial_period_days = 7', async () => {
-    const res = await post({ billingCycle: 'yearly', currency: 'EUR' });
+    const req = new NextRequest('http://localhost:3000/api/stripe/checkout', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer valid_user_jwt',
+        origin: 'https://kenza-dusky.vercel.app',
+      },
+      body: JSON.stringify({ billingCycle: 'yearly', currency: 'EUR' }),
+    });
+
+    const res = await POST(req);
     expect(res.status).toBe(200);
-    expect(lastCreateArg().subscription_data).toEqual({ trial_period_days: PRICING_CONFIG.annual.trialDays });
+    const data = await res.json();
+    expect(data.url).toBe('https://checkout.stripe.com/pay/cs_test_annual_eur');
+
+    expect(mockCreateSession).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mode: 'subscription',
+        customer_email: 'test@example.com',
+        client_reference_id: 'usr_abc',
+        subscription_data: { trial_period_days: 7 },
+        line_items: [
+          {
+            price_data: {
+              currency: 'eur',
+              product_data: expect.objectContaining({
+                name: 'Kenza Pro - Abonnement Annuel',
+              }),
+              unit_amount: 5900,
+              recurring: { interval: 'year' },
+            },
+            quantity: 1,
+          },
+        ],
+        success_url: 'https://kenza-dusky.vercel.app/?upgrade=success&session_id={CHECKOUT_SESSION_ID}',
+        cancel_url: 'https://kenza-dusky.vercel.app/?upgrade=cancel',
+      })
+    );
   });
 
-  it('annuel (MAD) : passe aussi trial_period_days = 7', async () => {
-    await post({ billingCycle: 'yearly', currency: 'MAD' });
-    expect(lastCreateArg().subscription_data).toEqual({ trial_period_days: PRICING_CONFIG.annual.trialDays });
-  });
+  it('génère une session Checkout Mensuelle EUR avec 9 EUR SANS période d’essai', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: 'usr_abc', email: 'test@example.com' } },
+      error: null,
+    });
 
-  it('mensuel : ne passe AUCUN trial_period_days (facturation immediate)', async () => {
-    const res = await post({ billingCycle: 'monthly', currency: 'EUR' });
+    mockCreateSession.mockResolvedValue({ url: 'https://checkout.stripe.com/pay/cs_test_monthly_eur' });
+
+    const req = new NextRequest('http://localhost:3000/api/stripe/checkout', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer valid_user_jwt',
+      },
+      body: JSON.stringify({ billingCycle: 'monthly', currency: 'EUR' }),
+    });
+
+    const res = await POST(req);
     expect(res.status).toBe(200);
-    expect(lastCreateArg().subscription_data).toBeUndefined();
+
+    const callArgs = mockCreateSession.mock.calls[0][0];
+    expect(callArgs.subscription_data).toBeUndefined();
+    expect(callArgs.line_items[0].price_data.unit_amount).toBe(900);
+    expect(callArgs.line_items[0].price_data.recurring.interval).toBe('month');
   });
 
-  it('annuel : le tarif reste celui de la config (59,00 EUR)', async () => {
-    await post({ billingCycle: 'yearly', currency: 'EUR' });
-    expect(lastCreateArg().line_items[0].price_data.unit_amount).toBe(PRICING_CONFIG.annual.priceEUR * 100);
+  it('génère une session Checkout Annuelle MAD avec 590 MAD et 7 jours d’essai', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: 'usr_mad', email: 'mad@example.com' } },
+      error: null,
+    });
+
+    mockCreateSession.mockResolvedValue({ url: 'https://checkout.stripe.com/pay/cs_test_annual_mad' });
+
+    const req = new NextRequest('http://localhost:3000/api/stripe/checkout', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer valid_user_jwt',
+      },
+      body: JSON.stringify({ billingCycle: 'yearly', currency: 'MAD' }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+
+    const callArgs = mockCreateSession.mock.calls[0][0];
+    expect(callArgs.subscription_data).toEqual({ trial_period_days: 7 });
+    expect(callArgs.line_items[0].price_data.currency).toBe('mad');
+    expect(callArgs.line_items[0].price_data.unit_amount).toBe(59000);
   });
 
-  it('annuel : reste un abonnement recurrent annuel', async () => {
-    await post({ billingCycle: 'yearly', currency: 'EUR' });
-    const price = lastCreateArg().line_items[0].price_data;
-    expect(lastCreateArg().mode).toBe('subscription');
-    expect(price.recurring.interval).toBe('year');
+  it('utilise un price ID d’environnement si disponible', async () => {
+    process.env.STRIPE_PRICE_ANNUAL_EUR = 'price_live_custom_annual_eur';
+
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: 'usr_abc', email: 'test@example.com' } },
+      error: null,
+    });
+
+    mockCreateSession.mockResolvedValue({ url: 'https://checkout.stripe.com/pay/cs_test_custom_price' });
+
+    const req = new NextRequest('http://localhost:3000/api/stripe/checkout', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer valid_user_jwt',
+      },
+      body: JSON.stringify({ billingCycle: 'yearly', currency: 'EUR' }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+
+    const callArgs = mockCreateSession.mock.calls[0][0];
+    expect(callArgs.line_items[0]).toEqual({
+      price: 'price_live_custom_annual_eur',
+      quantity: 1,
+    });
   });
 });

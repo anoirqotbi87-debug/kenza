@@ -39,11 +39,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 3. Si la clé secrète Stripe n'est pas configurée dans l'environnement
+    // 3. Vérification de l'initialisation Stripe
     if (!stripe) {
-      // En production, l'absence de clé est une erreur de configuration : on refuse
-      // explicitement plutôt que de renvoyer un succès simulé (qui, combiné au client,
-      // débloquait le premium sans paiement).
       if (process.env.VERCEL_ENV === 'production' || process.env.NODE_ENV === 'production') {
         console.error('[Stripe Checkout] STRIPE_SECRET_KEY manquante en production.');
         return NextResponse.json(
@@ -58,29 +55,35 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 3. Définition du tarif
+    // 4. Définition du tarif
     const currKey = (currency === 'MAD' ? 'MAD' : 'EUR') as 'EUR' | 'MAD';
     const cycleKey = (billingCycle === 'monthly' ? 'monthly' : 'yearly') as 'monthly' | 'yearly';
     const planConfig = PRICING_CONFIG[currKey][cycleKey];
 
     // Essai gratuit : uniquement sur l'annuel. Le mensuel est facturé immédiatement.
-    // C'est la seule source de vérité du trial — le client ne peut pas l'activer.
     const subscriptionData =
       cycleKey === 'yearly' ? { trial_period_days: TRIAL_PERIOD_DAYS } : undefined;
 
     // Sécurité : allowlist stricte de l'origine (jamais de header brut injecté tel quel)
     const origin = safeRedirectOrigin(req.headers.get('origin') || req.headers.get('referer'));
 
-    // 4. Création de la session Checkout Stripe
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      mode: 'subscription',
-      customer_email: customerEmail,
-      client_reference_id: userId || undefined,
-      allow_promotion_codes: true,
-      ...(subscriptionData ? { subscription_data: subscriptionData } : {}),
-      line_items: [
-        {
+    // Support optionnel d'identifiants de prix statiques (Stripe Dashboard)
+    // avec repli automatique sans faille vers `price_data` dynamique
+    const envPriceId =
+      currKey === 'EUR'
+        ? cycleKey === 'yearly'
+          ? process.env.STRIPE_PRICE_ANNUAL_EUR
+          : process.env.STRIPE_PRICE_MONTHLY_EUR
+        : cycleKey === 'yearly'
+          ? process.env.STRIPE_PRICE_ANNUAL_MAD
+          : process.env.STRIPE_PRICE_MONTHLY_MAD;
+
+    const lineItem = envPriceId
+      ? {
+          price: envPriceId,
+          quantity: 1,
+        }
+      : {
           price_data: {
             currency: planConfig.currency,
             product_data: {
@@ -94,8 +97,17 @@ export async function POST(req: NextRequest) {
             },
           },
           quantity: 1,
-        },
-      ],
+        };
+
+    // 5. Création de la session Checkout Stripe
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'subscription',
+      customer_email: customerEmail,
+      client_reference_id: userId || undefined,
+      allow_promotion_codes: true,
+      ...(subscriptionData ? { subscription_data: subscriptionData } : {}),
+      line_items: [lineItem],
       metadata: {
         userId: userId || 'anonymous',
         billingCycle: cycleKey,

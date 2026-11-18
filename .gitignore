@@ -69,6 +69,8 @@ twa/
 !/scripts/check-tts-health.ts
 !/scripts/find-open-issue.sh
 !/scripts/report-tts-health.sh
+!/scripts/verify-stripe-readiness.mjs
+!/scripts/test-live-endpoints.mjs
 
 # parasite directories (ex: Dify workflow artefacts)
 /{*
