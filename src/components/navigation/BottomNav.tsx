@@ -20,7 +20,7 @@ export function BottomNav({ currentView, onSelectView }: BottomNavProps = {}) {
 
   const navItems = [
     { href: '/', label: 'Accueil', icon: Home },
-    { href: '/parler', label: 'Parcours', icon: BookOpen },
+    { href: '/parler', label: 'Modules', icon: BookOpen },
     { href: '/phrases', label: 'Phrases', icon: MessageSquareText },
     { href: '/chat', label: 'Chat IA', icon: Sparkles },
   ];
@@ -46,6 +46,9 @@ export function BottomNav({ currentView, onSelectView }: BottomNavProps = {}) {
       if (href === '/') {
         e.preventDefault();
         onSelectView('today');
+      } else if (href === '/parler') {
+        e.preventDefault();
+        onSelectView('path');
       } else if (href === '/phrases') {
         e.preventDefault();
         onSelectView('phrases');

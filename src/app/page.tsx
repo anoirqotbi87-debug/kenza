@@ -1868,7 +1868,7 @@ function PathView({
           {/* Grille de sélection des modules (2 colonnes) */}
           <section>
             <p className="text-[11px] font-semibold tracking-[0.18em] uppercase text-[#8C6D23] mb-1">
-              {trL(lang, "Parcours complet", "Full curriculum", "Recorrido completo", "المسار الكامل")}
+              {trL(lang, "Modules de Darija", "Darija Modules", "Módulos de Darija", "وحدات الدارجة")}
             </p>
             <h3 className="text-xl font-serif font-bold text-[#142943] mb-3">
               {trL(lang, "Choisissez votre module", "Choose your module", "Elige tu módulo", "اختر وحدتك")}
