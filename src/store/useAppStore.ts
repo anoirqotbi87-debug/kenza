@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import type { User } from '@supabase/supabase-js';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { indexedDbStorage } from '../lib/storage/indexedDbStorage';
+import { migrateLocalStorageToIdb } from '../lib/storage/migrateLocalStorageToIdb';
 import { Notation } from '../types/curriculum';
 export type { Notation };
 import { SRSCard, ReviewGrade, CustomVocabularyItem } from '../types/srs';
@@ -157,6 +159,10 @@ interface AppState {
   /** UI seulement : vrai quand la visite guidee en direct (tour interactif) est active (non persiste). */
   isLiveTourActive: boolean;
   setIsLiveTourActive: (active: boolean) => void;
+
+  /** Hydratation IndexedDB/localStorage : vrai après chargement du cache local. */
+  _hasHydrated: boolean;
+  setHasHydrated: (hasHydrated: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -228,6 +234,8 @@ export const useAppStore = create<AppState>()(
       setAudioQuotaExceeded: (exceeded: boolean) => set({ audioQuotaExceeded: exceeded }),
       isLiveTourActive: false,
       setIsLiveTourActive: (active: boolean) => set({ isLiveTourActive: active }),
+      _hasHydrated: false,
+      setHasHydrated: (hasHydrated: boolean) => set({ _hasHydrated: hasHydrated }),
       
       setRegionalVariant: (variant: AppState['regionalVariant']) => set({ regionalVariant: variant }),
       
@@ -728,14 +736,29 @@ export const useAppStore = create<AppState>()(
     {
       name: 'darija-quest-storage',
       version: 7,
+      storage: createJSONStorage(() => indexedDbStorage),
+      onRehydrateStorage: () => {
+        // Tente proactivement la migration depuis localStorage vers IndexedDB côté client
+        if (typeof window !== 'undefined') {
+          migrateLocalStorageToIdb('darija-quest-storage').catch(() => {});
+        }
+        return (state, error) => {
+          if (!error && state) {
+            state.setHasHydrated(true);
+          } else {
+            useAppStore.getState().setHasHydrated(true);
+          }
+        };
+      },
       partialize: (state: AppState) => {
         // isPremium est exclu : c'est un droit payant, il ne doit jamais pouvoir être
-        // débloqué en éditant le localStorage. Source de vérité unique : profiles.is_premium,
+        // débloqué en éditant le localStorage/IDB. Source de vérité unique : profiles.is_premium,
         // relu à la connexion (src/app/page.tsx).
         const {
           isPremium: _isPremium,
           audioQuotaExceeded: _audioQuotaExceeded,
           isLiveTourActive: _isLiveTourActive,
+          _hasHydrated: _hasHydrated,
           ...rest
         } = state;
         return rest;
@@ -800,3 +823,6 @@ export function useTranslation() {
   const lang = String(uiLanguage).toLowerCase() as UILanguage;
   return { t: translations[lang] || translations['fr'], lang };
 }
+
+export const useHasHydrated = () => useAppStore((state) => state._hasHydrated);
+

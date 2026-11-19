@@ -25,6 +25,7 @@
     "edge-paths": "3.0.5",
     "framer-motion": "13.4.0",
     "html-to-image": "1.11.13",
+    "idb-keyval": "^6.3.0",
     "lucide-react": "1.47.0",
     "msedge-tts": "2.0.7",
     "next": "^16.4.3",
