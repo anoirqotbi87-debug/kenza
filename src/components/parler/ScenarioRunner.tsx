@@ -293,7 +293,7 @@ export default function ScenarioRunner({ scenario, onExit }: ScenarioRunnerProps
       </main>
 
       {/* 3. BARRE D'INTERACTION VOCALE & SAISIE TEXTE */}
-      <footer className="bg-white border-t border-amber-200/80 p-4 sm:p-5 shrink-0 shadow-lg z-20">
+      <footer className="bg-white border-t border-amber-200/80 p-4 sm:p-5 pb-safe shrink-0 shadow-lg z-20">
         <div className="max-w-2xl mx-auto space-y-3">
           {/* Écran de Fin / Victoire */}
           {state.isCompleted ? (

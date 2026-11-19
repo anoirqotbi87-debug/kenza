@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { track } from '@/lib/tracking';
 import { KenzaLogo } from '@/components/ui/KenzaLogo';
 import { useAppStore } from '@/store/useAppStore';
@@ -40,7 +41,15 @@ export function InstallApkBanner({ tourActive }: { tourActive?: boolean } = {}) 
   const [isOpen, setIsOpen] = useState(false);
   const storeTourActive = useAppStore((s) => s.isLiveTourActive);
   const uiLanguage = useAppStore((s) => s.uiLanguage || 'fr');
+  const pathname = usePathname();
   const isTourActive = Boolean(tourActive ?? storeTourActive);
+  const isInteractivePage = Boolean(
+    pathname &&
+      (pathname.startsWith('/chat') ||
+        pathname.startsWith('/parler') ||
+        pathname.startsWith('/etudier') ||
+        pathname.startsWith('/phrases'))
+  );
   const lang = (uiLanguage in I18N ? uiLanguage : 'fr') as keyof typeof I18N;
   const isAr = lang === 'ar';
   const text = I18N[lang];
@@ -98,7 +107,7 @@ export function InstallApkBanner({ tourActive }: { tourActive?: boolean } = {}) 
     setIsOpen(false);
   };
 
-  if (isTourActive || !isTourEligible) return null;
+  if (isTourActive || !isTourEligible || isInteractivePage) return null;
   if (!isOpen) return null;
 
   return (

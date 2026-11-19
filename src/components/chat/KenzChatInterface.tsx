@@ -219,7 +219,7 @@ export default function KenzChatInterface() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)] sm:h-[calc(100vh-160px)] max-w-4xl mx-auto w-full bg-white rounded-3xl border border-amber-200/80 shadow-md overflow-hidden font-sans">
+    <div className="flex flex-col h-[calc(100dvh-175px)] sm:h-[calc(100vh-160px)] max-w-4xl mx-auto w-full bg-white rounded-3xl border border-amber-200/80 shadow-md overflow-hidden font-sans">
       {/* 1. SOUS-EN-TÊTE DE LA CONVERSATION */}
       <div className="px-4 py-3 bg-[#FAF7F2] border-b border-amber-200/70 flex items-center justify-between gap-3 shrink-0">
         <div className="flex items-center gap-2.5">
@@ -417,7 +417,7 @@ export default function KenzChatInterface() {
       </div>
 
       {/* 3. BARRE D'INTERACTION VOCALE & SAISIE TEXTUELLE */}
-      <div className="p-3 sm:p-4 bg-[#FAF7F2] border-t border-amber-200/70 shrink-0">
+      <div className="p-3 sm:p-4 bg-[#FAF7F2] border-t border-amber-200/70 shrink-0 pb-safe">
         <form onSubmit={handleSubmit} className="flex items-center gap-2 max-w-3xl mx-auto">
           {/* Bouton Microphone */}
           <div className="relative">

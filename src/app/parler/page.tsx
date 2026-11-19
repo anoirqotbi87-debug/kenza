@@ -83,7 +83,7 @@ export default function ParlerPage() {
   };
 
   return (
-    <div dir={isAr ? 'rtl' : 'ltr'} className="min-h-screen bg-[#FAF7F2] pb-16">
+    <div dir={isAr ? 'rtl' : 'ltr'} className="min-h-screen bg-[#FAF7F2] pb-24 md:pb-8 pb-safe">
       <PageHeader
         badge={tp?.badge || (isAr ? 'التدريب الشفهي' : lang === 'es' ? 'Práctica Oral' : lang === 'en' ? 'Speaking Practice' : 'Pratique Orale')}
         title={tp?.title || (isAr ? 'تدريب النطق' : lang === 'es' ? 'Entrenador de pronunciación' : lang === 'en' ? 'Pronunciation trainer' : 'Entraînement de prononciation')}
@@ -249,7 +249,7 @@ export default function ParlerPage() {
       {showPaywall && (
         <PaywallModal onClose={() => setShowPaywall(false)} source="module_locked" />
       )}
-      <BottomNav />
+      {!activeScenario && <BottomNav />}
     </div>
   );
 }

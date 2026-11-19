@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { personas, getSystemPrompt, type PersonaId } from './prompts';
+import { personas, getSystemPrompt, KENZBOT_SYSTEM_PROMPT, BASE_ROLEPLAY_SYSTEM_PROMPT, type PersonaId } from './prompts';
 
 const ALL_PERSONAS = Object.keys(personas) as PersonaId[];
 
@@ -30,9 +30,13 @@ describe('System prompts Roleplay IA — charte linguistique', () => {
     }
   });
 
-  it('fournit toujours une translittération Arabizi (lien son ↔ écriture)', () => {
+  it('fournit toujours une translittération Arabizi (lien son ↔ écriture) avec chiffres phonétiques', () => {
     for (const id of ALL_PERSONAS) {
-      expect(getSystemPrompt(id)!, `persona ${id}`).toContain('Arabizi');
+      const prompt = getSystemPrompt(id)!;
+      expect(prompt, `persona ${id}`).toContain('Arabizi');
+      expect(prompt, `persona ${id}`).toContain('3 = ع');
+      expect(prompt, `persona ${id}`).toContain('7 = ح');
+      expect(prompt, `persona ${id}`).toContain('9 = ق');
     }
   });
 
@@ -42,6 +46,20 @@ describe('System prompts Roleplay IA — charte linguistique', () => {
     expect(kenzbotPrompt).toContain('nsiddouk');
     expect(kenzbotPrompt).toContain('Bchhal');
     expect(kenzbotPrompt).toContain('INTERDICTION ABSOLUE');
+    expect(kenzbotPrompt).toContain('ka-');
+    expect(kenzbotPrompt).toContain('ma-...-ch');
+    expect(kenzbotPrompt).toContain('ghadi');
+    expect(kenzbotPrompt).toContain('chnou');
+    expect(kenzbotPrompt).toContain('bzzaf');
+    expect(kenzbotPrompt).toContain('daba');
+  });
+
+  it('interdit formellement le Fusha scolaire et les dialectes orientaux', () => {
+    expect(BASE_ROLEPLAY_SYSTEM_PROMPT).toContain('Fusha');
+    expect(BASE_ROLEPLAY_SYSTEM_PROMPT).toContain('chami');
+    expect(BASE_ROLEPLAY_SYSTEM_PROMPT).toContain('égyptien');
+    expect(KENZBOT_SYSTEM_PROMPT).toContain('Fusha');
+    expect(KENZBOT_SYSTEM_PROMPT).toContain('levantin');
   });
 
   it('retourne undefined pour un persona inconnu', () => {
