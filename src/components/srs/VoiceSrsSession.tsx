@@ -185,7 +185,7 @@ export default function VoiceSrsSession({
     const earnedXp = reviewedCount * 12;
 
     return (
-      <div className="fixed inset-0 z-50 bg-[#FAF7F2] dark:bg-[#1C1816] flex flex-col justify-center items-center p-4">
+      <div className="fixed inset-0 z-[100] bg-[#FAF7F2] dark:bg-[#1C1816] flex flex-col justify-center items-center p-4">
         <div className="bg-white dark:bg-[#26211E] border border-amber-200/70 dark:border-amber-900/40 rounded-3xl p-6 sm:p-8 max-w-md w-full text-center shadow-xl space-y-5 animate-in fade-in zoom-in-95">
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 text-white flex items-center justify-center mx-auto shadow-md">
             <Trophy className="w-8 h-8" />
@@ -253,7 +253,7 @@ export default function VoiceSrsSession({
   const progress = Math.round(((currentIndex + 1) / practiceCards.length) * 100);
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#FAF7F2] dark:bg-[#1C1816] flex flex-col justify-between font-sans overflow-hidden">
+    <div className="fixed inset-0 z-[100] bg-[#FAF7F2] dark:bg-[#1C1816] flex flex-col justify-between font-sans overflow-hidden">
       {/* 1. EN-TÊTE ÉPURÉ */}
       <header className="px-4 py-3 bg-white dark:bg-[#26211E] border-b border-amber-200/70 dark:border-amber-900/40 flex items-center justify-between gap-3 shrink-0 shadow-xs">
         <div className="flex items-center gap-2">

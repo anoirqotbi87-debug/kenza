@@ -115,7 +115,7 @@ export default function RevisionsPage() {
 
       {showVoiceSrs && <VoiceSrsSession onClose={() => setShowVoiceSrs(false)} />}
 
-      <BottomNav />
+      {!showVoiceSrs && <BottomNav />}
     </div>
   );
 }
