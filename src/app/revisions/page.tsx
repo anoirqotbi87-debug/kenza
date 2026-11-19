@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Flame, Award, Trophy } from 'lucide-react';
+import { Flame, Award, Trophy, Mic, Sparkles } from 'lucide-react';
 import { useAppStore, useTranslation } from '@/store/useAppStore';
 import SRSDashboard from '@/components/srs/SRSDashboard';
 import { MemoryHealthWidget } from '@/components/srs/MemoryHealthWidget';
@@ -12,6 +12,7 @@ import StreakHeatmap from '@/components/gamification/StreakHeatmap';
 import BadgesList from '@/components/gamification/BadgesList';
 import PageHeader from '@/components/ui/PageHeader';
 import BottomNav from '@/components/navigation/BottomNav';
+import VoiceSrsSession from '@/components/srs/VoiceSrsSession';
 
 type Tab = 'smart' | 'decks' | 'badges';
 
@@ -21,6 +22,7 @@ export default function RevisionsPage() {
   const lang = uiLanguage || 'fr';
   const isAr = lang === 'ar';
   const [tab, setTab] = useState<Tab>('smart');
+  const [showVoiceSrs, setShowVoiceSrs] = useState(false);
 
   const tp = t.pages.revisions;
 
@@ -61,6 +63,26 @@ export default function RevisionsPage() {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 pb-24 space-y-6">
         {tab === 'smart' && (
           <div className="space-y-6">
+            {/* Atelier Vocal SM-2 */}
+            <div className="bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-1.5 bg-amber-800/40 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold uppercase tracking-wide">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-200" />
+                  <span>Atelier Vocal SM-2</span>
+                </div>
+                <h3 className="font-bold text-sm sm:text-base">Révision Espacée Vocale</h3>
+                <p className="text-xs text-amber-100">Prononcez vos cartes au micro pour recalibrer vos intervalles de mémorisation.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowVoiceSrs(true)}
+                className="shrink-0 px-4 py-2.5 bg-white text-amber-800 hover:bg-amber-50 rounded-xl font-bold text-xs shadow-xs transition-all flex items-center gap-2 active:scale-95"
+              >
+                <Mic className="w-4 h-4 text-amber-600" />
+                <span>Pratiquer au micro</span>
+              </button>
+            </div>
+
             <DailyQuestsWidget />
             <MemoryHealthWidget />
             <SRSDashboard />
@@ -90,6 +112,8 @@ export default function RevisionsPage() {
           </div>
         )}
       </main>
+
+      {showVoiceSrs && <VoiceSrsSession onClose={() => setShowVoiceSrs(false)} />}
 
       <BottomNav />
     </div>

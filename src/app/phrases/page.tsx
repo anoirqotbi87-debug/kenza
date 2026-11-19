@@ -2,9 +2,10 @@
 
 import React, { useState, useMemo, useRef } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Search, Heart, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Search, Heart, ArrowRight, Mic, Sparkles } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { PhraseCard, PhraseItem } from '@/components/phrases/PhraseCard';
+import VoiceSrsSession from '@/components/srs/VoiceSrsSession';
 import { srsVocabulary } from '@/data/srs-deck';
 import { playAudio } from '@/lib/audio';
 
@@ -18,6 +19,7 @@ export default function PhrasesPage() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('__all__');
   const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const [showVoiceSrs, setShowVoiceSrs] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<string[]>(() => {
     if (typeof window === 'undefined') return [];
@@ -150,6 +152,30 @@ export default function PhrasesPage() {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-6">
+        {/* Bannière Atelier SRS Vocal */}
+        <div className="mb-6 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-1.5 bg-amber-800/40 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold uppercase tracking-wide">
+              <Sparkles size={13} className="text-amber-200" />
+              <span>{trL(lang, "Nouveau · Moteur SM-2", "New · SM-2 Engine", "Nuevo · Motor SM-2", "جديد · خوارزمية SM-2")}</span>
+            </div>
+            <h2 className="text-base sm:text-lg font-bold">
+              {trL(lang, "Atelier Vocal de Répétition Espacée", "Voice Spaced Repetition Workshop", "Taller Vocal de Repetición Espaciada", "ورشة المراجعة المتباعدة الصوتية")}
+            </h2>
+            <p className="text-xs text-amber-100 max-w-xl">
+              {trL(lang, "Révisez vos phrases à haute voix avec reconnaissance vocale et mémorisation SM-2 connectée à IndexedDB.", "Review your phrases aloud with speech recognition and SM-2 memory connected to IndexedDB.", "Repasa tus frases en voz alta con reconocimiento de voz y memoria SM-2 conectada a IndexedDB.", "راجع عباراتك بصوت مسموع مع التعرف الصوتي وخوارزمية SM-2 المتصلة بـ IndexedDB.")}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowVoiceSrs(true)}
+            className="shrink-0 px-4 py-2.5 bg-white text-amber-800 hover:bg-amber-50 rounded-xl font-bold text-xs shadow-xs transition-all flex items-center gap-2 active:scale-95"
+          >
+            <Mic size={15} className="text-amber-600" />
+            <span>{trL(lang, "Démarrer l'atelier", "Start workshop", "Iniciar taller", "بدء الورشة")}</span>
+          </button>
+        </div>
+
         <section className="phrase-toolbar mb-6">
           <label className="phrase-search">
             <Search size={17} />
@@ -234,6 +260,8 @@ export default function PhrasesPage() {
           </div>
         )}
       </main>
+
+      {showVoiceSrs && <VoiceSrsSession onClose={() => setShowVoiceSrs(false)} />}
     </div>
   );
 }

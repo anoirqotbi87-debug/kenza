@@ -3,6 +3,8 @@ import type { User } from '@supabase/supabase-js';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { indexedDbStorage } from '../lib/storage/indexedDbStorage';
 import { migrateLocalStorageToIdb } from '../lib/storage/migrateLocalStorageToIdb';
+import { calculateSm2 } from '../lib/srs/voiceSrs';
+import { saveSrsOfflinePack, loadSrsOfflinePack } from '../lib/storage/offlineCache';
 import { Notation } from '../types/curriculum';
 export type { Notation };
 import { SRSCard, ReviewGrade, CustomVocabularyItem } from '../types/srs';
@@ -131,6 +133,9 @@ interface AppState {
   updateCustomWord: (wordId: string, updates: Partial<CustomVocabularyItem>) => void;
   deleteCustomWord: (wordId: string) => void;
   reviewCard: (wordId: string, grade: ReviewGrade, options?: AdaptiveSrsOptions) => void;
+  reviewVoiceCard: (wordId: string, quality: number, spokenText?: string) => void;
+  syncSrsDeckToOfflinePack: () => Promise<void>;
+  restoreSrsDeckFromOfflinePack: () => Promise<boolean>;
   recordVocalFailure: (wordId: string) => void;
   recordVocalSuccess: (wordId: string, score: number) => void;
   ensureDailyQuests: () => void;
@@ -731,6 +736,97 @@ export const useAppStore = create<AppState>()(
         const deck = get().srsDeck;
         const dueCards = srsService.getDueCards(deck);
         return sortCardsByUrgency(dueCards);
+      },
+
+      reviewVoiceCard: (wordId: string, quality: number, _spokenText?: string) => {
+        const state = get();
+        let targetKey = wordId;
+        let existingCard = state.srsDeck[targetKey];
+        if (!existingCard) {
+          if (state.srsDeck[`srs_${wordId}`]) {
+            targetKey = `srs_${wordId}`;
+            existingCard = state.srsDeck[targetKey];
+          } else if (state.srsDeck[wordId.replace(/^srs_/, '')]) {
+            targetKey = wordId.replace(/^srs_/, '');
+            existingCard = state.srsDeck[targetKey];
+          }
+        }
+
+        const now = new Date();
+        const baseCard: SRSCard = existingCard || {
+          id: targetKey.startsWith('srs_') ? targetKey : `srs_${targetKey}`,
+          wordId: targetKey,
+          interval: 1,
+          repetition: 0,
+          easeFactor: 2.5,
+          dueDate: now.toISOString(),
+          state: 'learning',
+          updatedAt: now.toISOString(),
+          vocalFailureCount: 0,
+          consecutiveSuccesses: 0,
+        };
+
+        const sm2State = calculateSm2(
+          {
+            repetition: baseCard.repetition,
+            interval: baseCard.interval,
+            easeFactor: baseCard.easeFactor,
+            dueDate: baseCard.dueDate,
+          },
+          quality,
+          now
+        );
+
+        const isSuccess = quality >= 3;
+        const vocalFailureCount = isSuccess
+          ? Math.max(0, (baseCard.vocalFailureCount ?? 0) - 1)
+          : (baseCard.vocalFailureCount ?? 0) + 1;
+        const consecutiveSuccesses = isSuccess ? (baseCard.consecutiveSuccesses ?? 0) + 1 : 0;
+
+        const updatedCard: SRSCard = {
+          ...baseCard,
+          ...sm2State,
+          state: sm2State.interval > 21 ? 'review' : 'learning',
+          updatedAt: now.toISOString(),
+          vocalFailureCount,
+          consecutiveSuccesses,
+        };
+
+        const newDeck = {
+          ...state.srsDeck,
+          [targetKey]: updatedCard,
+        };
+
+        const xpGain = isSuccess ? (quality === 5 ? 15 : 10) : 3;
+        const newXp = state.xp + xpGain;
+
+        set({ srsDeck: newDeck, xp: newXp });
+
+        // Synchronisation asynchrone vers le cache hors-ligne IndexedDB
+        saveSrsOfflinePack('srs_deck_main', newDeck).catch(() => {});
+
+        // Synchronisation Supabase cloud si connecté
+        if (state.user) {
+          srsService.syncCardToCloud(state.user.id, updatedCard).catch(() => {});
+        }
+      },
+
+      syncSrsDeckToOfflinePack: async () => {
+        const deck = get().srsDeck;
+        await saveSrsOfflinePack('srs_deck_main', deck, { title: 'Deck SRS Principal' });
+      },
+
+      restoreSrsDeckFromOfflinePack: async () => {
+        try {
+          const pack = await loadSrsOfflinePack('srs_deck_main');
+          if (pack && pack.data && Object.keys(pack.data).length > 0) {
+            set({ srsDeck: { ...get().srsDeck, ...pack.data } });
+            return true;
+          }
+          return false;
+        } catch {
+          return false;
+        }
       }
     }),
     {
@@ -745,6 +841,9 @@ export const useAppStore = create<AppState>()(
         return (state, error) => {
           if (!error && state) {
             state.setHasHydrated(true);
+            if (Object.keys(state.srsDeck || {}).length === 0) {
+              state.restoreSrsDeckFromOfflinePack().catch(() => {});
+            }
           } else {
             useAppStore.getState().setHasHydrated(true);
           }
