@@ -8,27 +8,27 @@ import { useAppStore } from '@/store/useAppStore';
 const I18N = {
   fr: {
     kicker: 'APPLICATION ANDROID',
-    title: 'Application Officielle (APK v1.5)',
+    title: 'Application Officielle (APK v1.6)',
     desc: 'Installez directement Kenza sur votre appareil Android pour une expérience native plein écran, audio fluide et accès hors-ligne (2.6 Mo).',
-    btn: "Télécharger l'APK (v1.5)",
+    btn: "Télécharger l'APK (v1.6)",
   },
   en: {
     kicker: 'ANDROID APPLICATION',
-    title: 'Official Application (APK v1.5)',
+    title: 'Official Application (APK v1.6)',
     desc: 'Install Kenza directly on your Android device for a native full-screen experience, smooth audio, and offline access (2.6 MB).',
-    btn: 'Download APK (v1.5)',
+    btn: 'Download APK (v1.6)',
   },
   es: {
     kicker: 'APLICACIÓN ANDROID',
-    title: 'Aplicación Oficial (APK v1.5)',
+    title: 'Aplicación Oficial (APK v1.6)',
     desc: 'Instala Kenza directamente en tu dispositivo Android para una experiencia nativa en pantalla completa, audio fluido y acceso sin conexión (2.6 MB).',
-    btn: 'Descargar APK (v1.5)',
+    btn: 'Descargar APK (v1.6)',
   },
   ar: {
     kicker: 'تطبيق أندرويد',
-    title: 'التطبيق الرسمي (APK v1.5)',
+    title: 'التطبيق الرسمي (APK v1.6)',
     desc: 'قم بتثبيت كنزة مباشرة على جهاز الأندرويد الخاص بك لتجربة أصلية بشاشة كاملة، وصوت سلس، ووصول دون إنترنت (2.6 ميجابايت).',
-    btn: 'تحميل ملف APK (v1.5)',
+    btn: 'تحميل ملف APK (v1.6)',
   },
 };
 
@@ -60,8 +60,8 @@ export default function DownloadApkCard() {
       </p>
       <div className="pt-2">
         <a
-          href="/downloads/kenza-v1.5.apk"
-          download="kenza-v1.5.apk"
+          href="/downloads/kenza-v1.6.apk"
+          download="kenza-v1.6.apk"
           onClick={handleDownload}
           className="outline-button inline-flex items-center gap-2"
         >

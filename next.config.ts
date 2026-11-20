@@ -104,7 +104,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Content-Disposition',
-            value: 'attachment; filename="kenza-v1.5.apk"',
+            value: 'attachment; filename="kenza-v1.6.apk"',
           },
           {
             key: 'Cache-Control',

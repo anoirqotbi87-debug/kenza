@@ -8,28 +8,28 @@ import { useAppStore } from '@/store/useAppStore';
 
 const I18N = {
   fr: {
-    title: 'Application Android Kenza (v1.5)',
+    title: 'Application Android Kenza (v1.6)',
     close: 'Fermer',
     desc: "Téléchargez l'application officielle pour un accès direct et une écoute audio plus fluide.",
-    btn: "Télécharger l'APK (v1.5)",
+    btn: "Télécharger l'APK (v1.6)",
   },
   en: {
-    title: 'Kenza Android App (v1.5)',
+    title: 'Kenza Android App (v1.6)',
     close: 'Close',
     desc: 'Download the official app for direct access and smoother audio playback.',
-    btn: 'Download APK (v1.5)',
+    btn: 'Download APK (v1.6)',
   },
   es: {
-    title: 'Aplicación Android Kenza (v1.5)',
+    title: 'Aplicación Android Kenza (v1.6)',
     close: 'Cerrar',
     desc: 'Descarga la app oficial para un acceso directo y una reproducción de audio más fluida.',
-    btn: 'Descargar APK (v1.5)',
+    btn: 'Descargar APK (v1.6)',
   },
   ar: {
-    title: 'تطبيق كنزة للأندرويد (الإصدار 1.5)',
+    title: 'تطبيق كنزة للأندرويد (الإصدار 1.6)',
     close: 'إغلاق',
     desc: 'حمّل التطبيق الرسمي للوصول السريع والاستماع الصوتي السلس دون انقطاع.',
-    btn: 'تحميل ملف APK (الإصدار 1.5)',
+    btn: 'تحميل ملف APK (الإصدار 1.6)',
   },
 };
 
@@ -144,8 +144,8 @@ export function InstallApkBanner({ tourActive }: { tourActive?: boolean } = {}) 
 
       {/* Bouton principal de téléchargement direct de l'APK */}
       <a
-        href="/downloads/kenza-v1.5.apk"
-        download="kenza-v1.5.apk"
+        href="/downloads/kenza-v1.6.apk"
+        download="kenza-v1.6.apk"
         onClick={handleDownload}
         className="w-full mt-3 py-2.5 px-4 bg-[#ddb578] hover:bg-[#c9a265] text-[#142943] font-bold rounded-xl text-center text-sm shadow-md transition-all flex items-center justify-center gap-2"
       >

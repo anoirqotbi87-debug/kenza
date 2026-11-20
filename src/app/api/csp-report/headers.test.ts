@@ -127,7 +127,7 @@ describe('en-têtes de téléchargement APK', () => {
     });
     expect(headers).toContainEqual({
       key: 'Content-Disposition',
-      value: 'attachment; filename="kenza-v1.5.apk"',
+      value: 'attachment; filename="kenza-v1.6.apk"',
     });
     expect(headers).toContainEqual({
       key: 'Cache-Control',
